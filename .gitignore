@@ -1,0 +1,45 @@
+
+# Local pilot data and private backups
+pilot_data/
+pilot_backups/
+pilot_exports/
+journal_pilot_20261024/pilot_backup/
+
+# Python and Node environments / generated files
+.venv/
+venv/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+
+# Runtime storage and private backups
+instance/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+
+# AI assets: keep data and weights outside ordinary Git
+*.pt
+*.pth
+*.onnx
+*.engine
+/AI/
+/ai/datasets/
+/ai/experiments/
+/ai/weights/
+/frontend/runs/
