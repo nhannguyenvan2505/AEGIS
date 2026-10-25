@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Farmer App",
+    "slug": "farmer-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/app-logo.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false,
+      "package": "com.aegis.mobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "aegis",
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow Farmer App to photograph crop leaves.",
+          "photosPermission": "Allow Farmer App to choose crop leaf photos.",
+          "microphonePermission": false
+        }
+      ],
+      "expo-router",
+      "expo-font"
+    ]
+  }
+}

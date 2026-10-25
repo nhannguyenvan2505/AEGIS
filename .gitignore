@@ -43,3 +43,5 @@ instance/
 /ai/experiments/
 /ai/weights/
 /frontend/runs/
+/backend/mobile-instance/
+/fe-source-import/
