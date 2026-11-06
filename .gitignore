@@ -45,6 +45,10 @@ instance/
 /frontend/runs/
 /backend/mobile-instance/
 /fe-source-import/
+/ai_service/experiments/
+/ai_service/datasets/
+/ai_service/weights/
+/demo_runs/
 
 # TASK-20: private/raw storage independent of its current launcher location
 uploads/

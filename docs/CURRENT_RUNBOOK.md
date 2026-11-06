@@ -1,5 +1,9 @@
 # Runbook hiện hành — AI/ML và Backend local
 
+**Chạy source đã clone:** bắt đầu ở [CLONE_DEMO.md](../CLONE_DEMO.md) để chọn
+mobile forecast, browser pilot, IoT synthetic hoặc image AI. Các path
+`D:/AEGIS`/`D:/AEGIS-AI` phía dưới là bối cảnh lịch sử của workstation.
+
 04/11/2026: [runbook tổng duyệt midterm](MIDTERM_REHEARSAL_20261104.md) có lệnh
 tools/rehearse_midterm.py cho client TypeScript -> Backend env riêng -> V4 thật.
 Lượt run01 đã đạt30checkpoint, fallback01 không GPU đạt36checkpoint; không dùng

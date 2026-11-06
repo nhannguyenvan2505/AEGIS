@@ -1,13 +1,14 @@
 # Chỉ mục bàn giao hiện hành — AEGIS
 
-**Forecast MVP07/11:** xem [package chạy demo từ clone](../forecast_demo/README.md),
+**Bàn giao clone07/11:** xem [hướng dẫn mọi demo](../CLONE_DEMO.md),
+[package chạy Android forecast](../forecast_demo/README.md),
 [rà soát core hiện hành](MVP_CORE_REVIEW_20261105.md)
 và [runbook dự báo](FORECAST_MVP_MIDTERM_20261105.md). Model synthetic đã chạy
 qua Backend và client mobile; trang chủ lấy tổng quan, tab Dự báo dùng nguồn
 hourly của mùa vụ, có tool tiến thời gian và kiểm restart. Các mô tả “temporal
 chưa inference” bên dưới thuộc mốc cũ. Chưa nghiệm thu điện thoại/native.
-Portable forecast bundle được bổ sung07/11; model/worker/fixtures trong bundle
-không làm YOLO checkpoint hoặc dataset ảnh xuất hiện trong repo.
+Nhánh demo thêm browser pilot, simulator IoT và source AI API. Checkpoint YOLO,
+dataset ảnh, evidence cục bộ và dữ liệu pilot vẫn nằm ngoài Git.
 
 **Tổng duyệt midterm04/11:** [AI thật + Backend + client TypeScript](MIDTERM_REHEARSAL_20261104.md)
 đạt30checkpoint, V4 trên cuda:0; fallback không GPU đạt36checkpoint. Kho tạm/server

@@ -1,5 +1,8 @@
 # Tích hợp Mobile – Backend – AI
 
+**Source để clone:** xem [hướng dẫn toàn bộ demo](../CLONE_DEMO.md). Lệnh
+`D:/AEGIS`/`D:/AEGIS-AI` bên dưới ghi lại workstation; model V4 vẫn được cấp riêng.
+
 ## BE-03 — trạng thái bàn giao hiện hành,04/11/2026
 
 [Ma trận từng màn -> API/DTO -> auth/cache/retry](BE03_MOBILE_API_HANDOFF_20261104.md)

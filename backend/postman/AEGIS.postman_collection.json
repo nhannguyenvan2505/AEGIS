@@ -1,0 +1,930 @@
+{
+  "info": {
+    "name": "AEGIS Backend — Local acceptance",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run in order with local Backend + AI running. Prepare fixtures first. Creates 2 fresh local test accounts and 1 analysis per run. No fixed confidence/detection-count assumption. See postman/README.md."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "type": "string",
+        "value": "{{access_token}}"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/health",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Backend alive\", () => pm.expect(pm.response.json().service).to.eql(\"aegis-backend\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Register owner (fresh account each run)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id=pm.variables.replaceIn('{{$guid}}');",
+              "pm.environment.set('email', 'postman-'+id+'@example.test');",
+              "pm.environment.set('password', 'Test-'+id);",
+              "['access_token','user_id','analysis_id','image_url','other_token','other_user_id','detection_request_id','model_sha256'].forEach(k=>pm.environment.unset(k));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.environment.set(\"user_id\",pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Duplicate email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"email_exists\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Invalid registration",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"invalid\", \"password\": \"short\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_credentials\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Wrong password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"Wrong-password-123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_login\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Login owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const d=pm.response.json();",
+              "pm.test('Bearer session',()=>{pm.expect(d.token_type).to.eql('Bearer'); pm.expect(d.access_token).to.be.a('string').and.not.empty; pm.expect(d.expires_at).to.be.above(Date.now()/1000);});",
+              "if(pm.response.code===200) pm.environment.set('access_token',d.access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Current user",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Owner identity\",()=>pm.expect(pm.response.json().user.id).to.eql(pm.environment.get(\"user_id\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Detection needs token",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"unauthorized\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Missing image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"missing_or_multiple_images\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Empty image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/empty.bin"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"empty_image\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Invalid image bytes",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/invalid.txt"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_image\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Oversized image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/too-large.bin"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 413\", () => pm.response.to.have.status(413));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"upload_too_large\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Detect real image and save",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/sample.jpg"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.environment.set('idempotency_key',pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const d=pm.response.json();",
+              "pm.test('Detection contract',()=>{",
+              " pm.expect(d.success).to.eql(true); pm.expect(d.user_id).to.eql(pm.environment.get('user_id'));",
+              " pm.expect(d.analysis_id).to.be.a('string').and.not.empty;",
+              " pm.expect(d.model_version).to.be.a('string').and.not.empty;",
+              " pm.expect(d.status).to.be.oneOf(['detection_found','no_detection']);",
+              " pm.expect(d.image.orientation).to.eql('exif_corrected');",
+              " pm.expect(d.detections).to.be.an('array');",
+              " d.detections.forEach(x=>{",
+              "  pm.expect(x.detection_id).to.be.a('string');",
+              "  pm.expect(['rice_blast','brown_spot','sheath_blight'][x.class_id]).to.eql(x.disease);",
+              "  pm.expect(x.confidence).to.be.within(0,1);",
+              "  pm.expect(x.bbox.x1).to.be.at.least(0); pm.expect(x.bbox.x2).to.be.above(x.bbox.x1).and.at.most(d.image.width);",
+              "  pm.expect(x.bbox.y1).to.be.at.least(0); pm.expect(x.bbox.y2).to.be.above(x.bbox.y1).and.at.most(d.image.height);",
+              " });",
+              "});",
+              "pm.test('Origin trace and artifact',()=>{",
+              " pm.expect(d.request_id).to.eql(pm.response.headers.get('X-Request-ID'));",
+              " pm.expect(d.model_sha256).to.match(/^[0-9a-f]{64}$/);",
+              " pm.expect(d.timings.ai_processing_ms).to.be.at.least(0);pm.expect(d.timings.ai_roundtrip_ms).to.be.at.least(0);",
+              "});",
+              "if(pm.response.code===200){pm.environment.set('analysis_id',d.analysis_id);pm.environment.set('image_url',d.image_url);pm.environment.set('detection_request_id',d.request_id);pm.environment.set('model_sha256',d.model_sha256);}",
+              "if(pm.response.code===200)pm.environment.set('origin_result',JSON.stringify(pm.response.json()));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13a Replay same image and key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/sample.jpg"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('Replay preserves complete result',()=>{",
+              "pm.expect(pm.response.headers.get('Idempotency-Replayed')).to.eql('true');",
+              "pm.expect(pm.response.json()).to.deep.eql(JSON.parse(pm.environment.get('origin_result')));",
+              "pm.expect(pm.response.headers.get('X-Request-ID')).not.to.eql(pm.response.json().request_id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13b Same key different bytes",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/invalid.txt"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"idempotency_conflict\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13c Invalid key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "invalid key"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/sample.jpg"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_idempotency_key\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 Read persisted detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses/{{analysis_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Persisted owner and origin trace\",()=>{const d=pm.response.json();pm.expect(d.analysis_id).to.eql(pm.environment.get(\"analysis_id\"));pm.expect(d.user_id).to.eql(pm.environment.get(\"user_id\"));pm.expect(d.request_id).to.eql(pm.environment.get(\"detection_request_id\"));pm.expect(d.model_sha256).to.eql(pm.environment.get(\"model_sha256\"));pm.expect(pm.response.headers.get(\"X-Request-ID\")).not.to.eql(d.request_id);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 History page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses?page=1&page_size=20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('History includes saved result',()=>{const d=pm.response.json();pm.expect(d.pagination.total).to.eql(1);pm.expect(d.items[0].analysis_id).to.eql(pm.environment.get('analysis_id'));});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 Invalid pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses?page=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_pagination\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 View private image",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}{{image_url}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('Image headers',()=>{pm.expect(pm.response.headers.get('Content-Type')).to.match(/^image\\/(jpeg|png|webp)/);pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store');pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Image needs token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}{{image_url}}",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"unauthorized\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Register other user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{other_email}}\", \"password\": \"{{other_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id=pm.variables.replaceIn('{{$guid}}');pm.environment.set('other_email','postman-other-'+id+'@example.test');pm.environment.set('other_password','Test-'+id);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.environment.set(\"other_user_id\",pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 Login other user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{other_email}}\", \"password\": \"{{other_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "if(pm.response.code===200)pm.environment.set(\"other_token\",pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 Other user cannot read detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses/{{analysis_id}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"analysis_not_found\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 Other user cannot view image",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}{{image_url}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"analysis_not_found\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 Other user history is empty",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Isolated history\",()=>{pm.expect(pm.response.json().pagination.total).to.eql(0);pm.expect(pm.response.json().items).to.eql([]);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 Logout other user",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/auth/logout",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.environment.unset(\"other_token\");pm.environment.unset(\"other_password\");"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 Logout owner",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/auth/logout"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "26 Revoked token is rejected",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"unauthorized\");});",
+              "pm.environment.unset(\"access_token\");pm.environment.unset(\"password\");"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Current request headers',()=>{",
+          " pm.expect(pm.response.headers.get('X-Request-ID')).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
+          " pm.expect(Number(pm.response.headers.get('X-Processing-Time-Ms'))).to.be.at.least(0);",
+          "});",
+          "if(pm.response.code>=400)pm.test('Error request ID',()=>pm.expect(pm.response.json().request_id).to.eql(pm.response.headers.get('X-Request-ID')));"
+        ]
+      }
+    }
+  ]
+}

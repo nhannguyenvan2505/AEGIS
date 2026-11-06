@@ -1,0 +1,572 @@
+{
+  "schema_version": "aegis-thesis-traceability-v1",
+  "as_of": "2026-10-28",
+  "requirements_origin": "Engineering reconstruction from status/backlog; not an official university acceptance rubric",
+  "evidence_policy": "Dates and hashes identify historical files, not new execution; absent local evidence is not a verified result",
+  "requirements": [
+    {
+      "id": "R01",
+      "title_vi": "Đăng nhập, phiên và quyền owner",
+      "domain": "platform",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/app/auth.py"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_auth.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D01",
+        "D07"
+      ],
+      "can_claim_vi": "Bearer session và owner isolation đã kiểm phần mềm.",
+      "cannot_claim_vi": "Không tự là production security audit.",
+      "remaining_vi": "Native token lifecycle và deployment cần kiểm theo môi trường."
+    },
+    {
+      "id": "R02",
+      "title_vi": "Nhận diện ảnh qua HTTP và provenance",
+      "domain": "image",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/app/ai_service.py",
+        "AEGIS-AI/api/app.py"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_ai_contract.py",
+        "AEGIS-AI/api/checks/test_image_contract.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E06"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Backend gọi image service riêng; EXIF/box/metadata/error contract có test và inference V4 lịch sử.",
+      "cannot_claim_vi": "No detection không xác nhận khỏe; confidence không là xác suất bệnh.",
+      "remaining_vi": "GPU/ảnh demo thật có điều kiện provisioning, không chạy lại trong H6."
+    },
+    {
+      "id": "R03",
+      "title_vi": "Lịch sử và ảnh riêng theo tài khoản",
+      "domain": "platform",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/app/routes.py",
+        "AEGIS/backend/app/storage.py"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_history.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E06"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Persistence/history/detail/image theo owner đã kiểm.",
+      "cannot_claim_vi": "Không là bằng chứng retention/privacy production hoàn chỉnh.",
+      "remaining_vi": "Chính sách lưu/xóa và native UX cần chốt riêng."
+    },
+    {
+      "id": "R04",
+      "title_vi": "Ruộng, mùa vụ, thiết bị và hồ sơ canh tác",
+      "domain": "platform",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/app/farm.py",
+        "AEGIS/backend/app/cultivation.py"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_farm.py",
+        "AEGIS/backend/checks/test_cultivation.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D03"
+      ],
+      "can_claim_vi": "Entity scope và profile revision được quản lý bằng Backend.",
+      "cannot_claim_vi": "Ngày tạo mùa vụ không thay ngày gieo/cấy thực.",
+      "remaining_vi": "Thông tin thật phải do nguồn xác nhận, không đoán từ ảnh."
+    },
+    {
+      "id": "R05",
+      "title_vi": "Telemetry mock và rule điều kiện",
+      "domain": "mock_workflow",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/app/blast_conditions.py"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_blast_conditions.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D03"
+      ],
+      "can_claim_vi": "Rule advisory/insufficient/no_pattern dùng dữ liệu mock đã kiểm.",
+      "cannot_claim_vi": "Không mô hình ML, chẩn đoán bệnh hoặc forecast.",
+      "remaining_vi": "H3 cần raw/device/QC/hourly thật trước nghiên cứu."
+    },
+    {
+      "id": "R06",
+      "title_vi": "Theo dõi, retry, episode và recheck",
+      "domain": "mock_workflow",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/frontend/pilot_followup.py",
+        "AEGIS/frontend/pilot_episodes.py",
+        "AEGIS/frontend/pilot_assessment_versions.py"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_followup.py",
+        "AEGIS/frontend/test_assessment_versions.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D04",
+        "D05",
+        "D06"
+      ],
+      "can_claim_vi": "Workflow version, event retry, snapshot bất biến và correction recheck đã kiểm.",
+      "cannot_claim_vi": "Closed/check không là xác nhận hết bệnh hoặc nhãn train.",
+      "remaining_vi": "Các writer khác/gián đoạn production vẫn cần failure-case phù hợp."
+    },
+    {
+      "id": "R07",
+      "title_vi": "Contract Backend cho mobile",
+      "domain": "mobile",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/serve_mobile.py",
+        "AEGIS/backend/pilot_app.py",
+        "AEGIS/backend/app/mobile_contract.py",
+        "AEGIS/backend/docs/MOBILE_FOLLOWUP_API.md"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_mobile_pilot.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D02",
+        "D04"
+      ],
+      "can_claim_vi": "Core/pilot discovery và required/current DTO đã bàn giao ở Backend.",
+      "cannot_claim_vi": "Không nói UI mobile followup đã được tích hợp.",
+      "remaining_vi": "Nhóm mobile tích hợp subset/kiểm native theo scope riêng."
+    },
+    {
+      "id": "R08",
+      "title_vi": "Nhật ký quan sát và chăm sóc có revision",
+      "domain": "mock_workflow",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/frontend/pilot_journal.py",
+        "AEGIS/frontend/pilot_management.py"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_journal.py",
+        "AEGIS/frontend/test_management.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D06"
+      ],
+      "can_claim_vi": "Observed/recorded/available, revision và observation snapshot được quản lý.",
+      "cannot_claim_vi": "Finding/peer tự khai không thành ground truth chuyên môn.",
+      "remaining_vi": "Nguồn/quyền/SOP và người thật xác nhận riêng."
+    },
+    {
+      "id": "R09",
+      "title_vi": "Lịch khảo sát, coverage và peer review",
+      "domain": "research",
+      "status": "partial",
+      "source_refs": [
+        "AEGIS/frontend/pilot_surveillance.py",
+        "AEGIS/frontend/pilot_review.py"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_surveillance.py",
+        "AEGIS/frontend/test_review.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E12",
+        "E13"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Có workflow/audit quyền và evidence revision.",
+      "cannot_claim_vi": "Hai tài khoản không chứng minh chuyên gia hoặc độc lập ngoài đời.",
+      "remaining_vi": "Chưa có người xác minh/SOP/protocol frozen."
+    },
+    {
+      "id": "R10",
+      "title_vi": "Raw khay opt-in, QC/export và provenance",
+      "domain": "research",
+      "status": "partial",
+      "source_refs": [
+        "AEGIS/frontend/controlled_source.py",
+        "AEGIS/frontend/pilot_telemetry.py",
+        "AEGIS/frontend/telemetry_audit.py"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_controlled_telemetry.py",
+        "AEGIS/frontend/test_telemetry_audit.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E12"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Contract controlled_experiment raw-only đã có, write opt-in mặc định tắt.",
+      "cannot_claim_vi": "Raw point không tự thành hourly/duration, label/rule/train hoặc field data.",
+      "remaining_vi": "Thiết bị/file gốc/units/clock/quyền thật còn thiếu."
+    },
+    {
+      "id": "R11",
+      "title_vi": "Builder temporal as-of và split có purge",
+      "domain": "research",
+      "status": "partial",
+      "source_refs": [
+        "AEGIS-AI/temporal_warning/pipeline.py"
+      ],
+      "test_refs": [
+        "AEGIS-AI/temporal_warning/test_pipeline.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E12"
+      ],
+      "demo_steps": [
+        "D08"
+      ],
+      "can_claim_vi": "Builder120h, label/censoring/as-of/group-time split kiểm synthetic.",
+      "cannot_claim_vi": "72h là target đề xuất, không lead time đã chứng minh.",
+      "remaining_vi": "Chưa dataset đủ điều kiện, preprocessing fit/trainer/evaluation field."
+    },
+    {
+      "id": "R12",
+      "title_vi": "Snapshot/version replay và leakage audit",
+      "domain": "research",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS-AI/temporal_warning/assessment_bridge.py",
+        "AEGIS-AI/temporal_warning/leakage_audit.py"
+      ],
+      "test_refs": [
+        "AEGIS-AI/temporal_warning/test_assessment_bridge.py",
+        "AEGIS-AI/temporal_warning/test_leakage_audit.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E07"
+      ],
+      "demo_steps": [
+        "D08"
+      ],
+      "can_claim_vi": "Có mutation as-of và positive control trong các đường synthetic đã chọn.",
+      "cannot_claim_vi": "Không bảo đảm mọi leakage path hoặc model fit-time đều an toàn.",
+      "remaining_vi": "Audit tiếp khi có pipeline train/dataset thật được phép."
+    },
+    {
+      "id": "R13",
+      "title_vi": "Backup/verify/restore kho pilot",
+      "domain": "platform",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/frontend/pilot_backup.py"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_pilot_backup.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E08"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Backup/restore7DB, hash/lease/integrity/owner chain đã kiểm trên temp.",
+      "cannot_claim_vi": "Không production recovery, encryption/off-device hay retention đã áp dụng.",
+      "remaining_vi": "RPO/RTO/quyền/retention cần quyết định vận hành."
+    },
+    {
+      "id": "R14",
+      "title_vi": "Trace, quota, concurrency và idempotency",
+      "domain": "platform",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/backend/app/observability.py",
+        "AEGIS/backend/app/limits.py",
+        "AEGIS/backend/app/idempotency.py"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_observability.py",
+        "AEGIS/backend/checks/test_limits.py",
+        "AEGIS/backend/checks/test_idempotency.py"
+      ],
+      "evidence_ids": [
+        "E01"
+      ],
+      "demo_steps": [
+        "D05"
+      ],
+      "can_claim_vi": "Request ID, retry và giới hạn phần mềm đã có kiểm thử.",
+      "cannot_claim_vi": "Không benchmark tải/SLA/production security.",
+      "remaining_vi": "Môi trường nhiều process/proxy cần cấu hình và kiểm riêng."
+    },
+    {
+      "id": "R15",
+      "title_vi": "Vận hành nhiều giờ mock và restart",
+      "domain": "platform",
+      "status": "partial",
+      "source_refs": [
+        "AEGIS/frontend/continuous_mock.py",
+        "AEGIS/frontend/soak_warning.py"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_continuous_mock.py"
+      ],
+      "evidence_ids": [
+        "E09",
+        "E10",
+        "E14"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Phiên4h chạy lại completed; phiên trước stopped được giữ riêng.",
+      "cannot_claim_vi": "168h mô phỏng không uptime7ngày;4h không SLA/memory-leak proof.",
+      "remaining_vi": "H5 chỉ chọn failure case có nhu cầu; không chạy soak mới trong H6."
+    },
+    {
+      "id": "R16",
+      "title_vi": "Đánh giá nhận diện ảnh và quyết định model",
+      "domain": "image",
+      "status": "partial",
+      "source_refs": [
+        "AEGIS-AI/api/app.py",
+        "AEGIS/docs/evidence/THESIS_HISTORICAL_SUMMARY.json"
+      ],
+      "test_refs": [
+        "AEGIS-AI/api/checks/test_model_metadata.py"
+      ],
+      "evidence_ids": [
+        "E03",
+        "E04",
+        "E05",
+        "E14"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "V4 source-validation mAP/F1 lịch sử và paired3seed được truy vết; giữ V4.",
+      "cannot_claim_vi": "mAP không accuracy;3seed không là V4 đối chứng; không generalization thực địa.",
+      "remaining_vi": "Thiếu healthy/OOD, chuyên gia, calibration và holdout độc lập."
+    },
+    {
+      "id": "R17",
+      "title_vi": "Source handoff tái lập theo allowlist",
+      "domain": "platform",
+      "status": "implemented",
+      "source_refs": [
+        "AEGIS/tools/build_handoff.py",
+        "AEGIS/tools/check_handoff.py"
+      ],
+      "test_refs": [
+        "AEGIS/tools/test_handoff.py"
+      ],
+      "evidence_ids": [
+        "E01",
+        "E02"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "H1/H2 clean source copy, manifest và CPU regression đã có.",
+      "cannot_claim_vi": "Không đồng nghĩa clean clone/publish/clean dependency install.",
+      "remaining_vi": "Provision runtime/model theo hash và dependency install máy nhận cần kiểm."
+    },
+    {
+      "id": "R18",
+      "title_vi": "Client mobile hiện có và giới hạn native",
+      "domain": "mobile",
+      "status": "partial",
+      "source_refs": [
+        "AEGIS/docs/MOBILE_INTEGRATION.md",
+        "AEGIS/docs/MOBILE_VERIFICATION_20261025.md"
+      ],
+      "test_refs": [
+        "AEGIS/backend/checks/test_mobile_pilot.py"
+      ],
+      "evidence_ids": [
+        "E11",
+        "E01"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Có bằng chứng client HTTP/export lịch sử; H2 là API slice.",
+      "cannot_claim_vi": "Bundle export không APK, chưa chứng minh camera/SecureStore/native followup.",
+      "remaining_vi": "Nhóm mobile kiểm/tích hợp; người dùng vẫn tập trung AI/ML–Backend."
+    },
+    {
+      "id": "R19",
+      "title_vi": "Nguồn/quyền/nhãn và protocol nghiên cứu",
+      "domain": "research",
+      "status": "blocked",
+      "source_refs": [
+        "AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md"
+      ],
+      "test_refs": [
+        "AEGIS/frontend/test_controlled_telemetry.py"
+      ],
+      "evidence_ids": [
+        "E12",
+        "E13",
+        "E14"
+      ],
+      "demo_steps": [],
+      "can_claim_vi": "Đã chuẩn bị protocol/source role/intake; dự kiến khay, chưa người xác minh.",
+      "cannot_claim_vi": "Mẫu form/permission reference không phải chấp thuận hoặc nhãn thật.",
+      "remaining_vi": "Cần nguồn/quyền/SOP/lịch/chuyên môn và cụm độc lập có bằng chứng."
+    },
+    {
+      "id": "R20",
+      "title_vi": "Train và đánh giá forecast thực địa",
+      "domain": "research",
+      "status": "blocked",
+      "source_refs": [
+        "AEGIS-AI/temporal_warning/pipeline.py"
+      ],
+      "test_refs": [
+        "AEGIS-AI/temporal_warning/test_pipeline.py"
+      ],
+      "evidence_ids": [
+        "E12",
+        "E14"
+      ],
+      "demo_steps": [
+        "D08"
+      ],
+      "can_claim_vi": "Hiện chưa có model temporal đã train/field metrics; demo trả blocked.",
+      "cannot_claim_vi": "Không báo accuracy/recall/lead time forecast từ rule hoặc synthetic labels.",
+      "remaining_vi": "Chỉ train sau readiness/protocol/split/holdout và người dùng cho phép riêng."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E01",
+      "path": "AEGIS/h2_mobile_backend_20261028/progress_verification.json",
+      "sha256": "13a2ada5c8d37f0f6b6b920f7406522befa1578a566b929625b300f4bb4032fc",
+      "recorded_date": "2026-10-28",
+      "kind": "local_historical",
+      "scope_vi": "300 regression software tests trong H2; không chạy lại trong H6"
+    },
+    {
+      "id": "E02",
+      "path": "AEGIS/h1_source_handoff_20261028/progress_verification.json",
+      "sha256": "2c9923479b1f96204840bdbdcd4e0e4881ba6470d5627765a6fedb8a5fe35111",
+      "recorded_date": "2026-10-28",
+      "kind": "local_historical",
+      "scope_vi": "H1 source copy/manifest, không clean dependency install"
+    },
+    {
+      "id": "E03",
+      "path": "AEGIS-AI/experiments/ai_quality_source_r1_20261021/baseline_summary.json",
+      "sha256": "591f7946412be9cefec099e619fcaae018b27fa66a0791b039aa09847f6c5afa",
+      "recorded_date": "2026-10-21",
+      "kind": "local_historical",
+      "scope_vi": "V4 source validation, không field/test evaluation mới"
+    },
+    {
+      "id": "E04",
+      "path": "AEGIS-AI/experiments/paired_seed_stability_20261023/aggregate.json",
+      "sha256": "59d8d377b45cf425f5cd6af68d23a247392898129c733b65a800dd3d5308b486",
+      "recorded_date": "2026-10-23",
+      "kind": "local_historical",
+      "scope_vi": "3 cặp seed source-r1/boundary-r2"
+    },
+    {
+      "id": "E05",
+      "path": "AEGIS/handoff_20261024/metrics_recomputed.json",
+      "sha256": "f60b558089233d1634ec2506e8533aebd3e149aec7ab612b93c29e58fca4dfa1",
+      "recorded_date": "2026-10-24",
+      "kind": "local_historical",
+      "scope_vi": "Tính mean/SD mẫu từ kết quả cũ, không inference mới"
+    },
+    {
+      "id": "E06",
+      "path": "AEGIS/handoff_20261024/VERIFICATION.md",
+      "sha256": "29e5d004e7703b20889572619e09e4ef5808a4d4572ef868ea270ebf1fc88884",
+      "recorded_date": "2026-10-24",
+      "kind": "local_historical",
+      "scope_vi": "Historical real V4 HTTP và contract rehearsal, không field performance"
+    },
+    {
+      "id": "E07",
+      "path": "AEGIS/task08_leakage_audit_20261027/REVIEW_VI.md",
+      "sha256": "1c2447aaa3c7ede3a9590c9902abe3a5a0f3bab9cbb6c7a79ed92c05576c860f",
+      "recorded_date": "2026-10-27",
+      "kind": "local_historical",
+      "scope_vi": "Mutation as-of synthetic; không chứng minh mọi leakage path"
+    },
+    {
+      "id": "E08",
+      "path": "AEGIS/task17_backup_restore_20261028/REVIEW_VI.md",
+      "sha256": "d7de584dda53332129901f4670c0a60fd5d14af2946271d893caa8f692b98bb7",
+      "recorded_date": "2026-10-28",
+      "kind": "local_historical",
+      "scope_vi": "Backup/restore bảy DB trên kho tạm"
+    },
+    {
+      "id": "E09",
+      "path": "AEGIS/late_assessment_20261025/soak_four_hours/RESULT.json",
+      "sha256": "c4045ebccd2d07e8a77293854991937d4ff27b90cb064a2f352d9916eb479dc7",
+      "recorded_date": "2026-10-25",
+      "kind": "local_historical",
+      "scope_vi": "Soak stopped, chưa đủ4h; không gộp với phiên sau"
+    },
+    {
+      "id": "E10",
+      "path": "AEGIS/late_assessment_20261025/soak_four_hours_restart_20261026_074411/RESULT.json",
+      "sha256": "9c55254eab29f56079c3715a748b18c539d4d646905dd888d0fac5cad5c86e82",
+      "recorded_date": "2026-10-26",
+      "kind": "local_historical",
+      "scope_vi": "Phiên chạy lại completed4h mock; không SLA"
+    },
+    {
+      "id": "E11",
+      "path": "AEGIS/docs/MOBILE_VERIFICATION_20261025.md",
+      "sha256": "29fd2e7e0c7648e20d97fd4471c33dc2012e0c9af69e525f4bac04646577730e",
+      "recorded_date": "2026-10-25",
+      "kind": "bundled_historical",
+      "scope_vi": "Client HTTP/export lịch sử; chưa native camera/SecureStore"
+    },
+    {
+      "id": "E12",
+      "path": "AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md",
+      "sha256": "df7d303039a15d6e9b3a9767507ff7b135a26f18df981dfdd89e0b1ff21794e5",
+      "recorded_date": "2026-10-27",
+      "kind": "source_document",
+      "scope_vi": "Protocol dự thảo, không empirical evaluation"
+    },
+    {
+      "id": "E13",
+      "path": "AEGIS/task10_source_readiness_20261027/README.md",
+      "sha256": "e76d043d254ea444996e312320d3f328e7d853fe0f2dc6558c1974d8ac4df6a9",
+      "recorded_date": "2026-10-27",
+      "kind": "local_historical",
+      "scope_vi": "Nguồn/quyền/reviewer chưa confirmed; ghi chú contract khay là mốc Task10 trước Task11"
+    },
+    {
+      "id": "E14",
+      "path": "AEGIS/docs/evidence/THESIS_HISTORICAL_SUMMARY.json",
+      "sha256": "96f7aca434416c3196e033a8f781796092b6c64dc2dd9a760228064a1519c41b",
+      "recorded_date": "2026-10-28",
+      "kind": "bundled_curated",
+      "scope_vi": "Metadata curate từ E01/E03/E04/E05/E09/E10; không lượt inference/test mới"
+    }
+  ]
+}
