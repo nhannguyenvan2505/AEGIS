@@ -1,0 +1,996 @@
+{
+  "schema_version": "aegis-hourly-feature-input-v1",
+  "source": "synthetic",
+  "issue_times": [
+    "2026-04-06T00:00:00+00:00"
+  ],
+  "series": [
+    {
+      "plot_id": "syn-plot-train-038-1",
+      "season_id": "syn-season-syn-plot-train-038-1",
+      "device_id": "syn-device-syn-plot-train-038-1",
+      "telemetry": [
+        {
+          "start_at": "2026-04-01T00:00:00+00:00",
+          "available_at": "2026-04-01T01:00:00+00:00",
+          "air_temperature_c": 27.859,
+          "relative_humidity_pct": 83.33,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T01:00:00+00:00",
+          "available_at": "2026-04-01T02:00:00+00:00",
+          "air_temperature_c": 27.978,
+          "relative_humidity_pct": 82.348,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T02:00:00+00:00",
+          "available_at": "2026-04-01T03:00:00+00:00",
+          "air_temperature_c": 28.397,
+          "relative_humidity_pct": 81.841,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T03:00:00+00:00",
+          "available_at": "2026-04-01T04:00:00+00:00",
+          "air_temperature_c": 28.646,
+          "relative_humidity_pct": 83.383,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T04:00:00+00:00",
+          "available_at": "2026-04-01T05:00:00+00:00",
+          "air_temperature_c": 29.294,
+          "relative_humidity_pct": 82.863,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T05:00:00+00:00",
+          "available_at": "2026-04-01T06:00:00+00:00",
+          "air_temperature_c": 29.492,
+          "relative_humidity_pct": 81.681,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T06:00:00+00:00",
+          "available_at": "2026-04-01T07:00:00+00:00",
+          "air_temperature_c": 29.95,
+          "relative_humidity_pct": 84.066,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T07:00:00+00:00",
+          "available_at": "2026-04-01T08:00:00+00:00",
+          "air_temperature_c": 29.835,
+          "relative_humidity_pct": 81.747,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T08:00:00+00:00",
+          "available_at": "2026-04-01T09:00:00+00:00",
+          "air_temperature_c": 30.151,
+          "relative_humidity_pct": 80.795,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T09:00:00+00:00",
+          "available_at": "2026-04-01T10:00:00+00:00",
+          "air_temperature_c": 29.807,
+          "relative_humidity_pct": 79.634,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T10:00:00+00:00",
+          "available_at": "2026-04-01T11:00:00+00:00",
+          "air_temperature_c": 29.625,
+          "relative_humidity_pct": 80.098,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T11:00:00+00:00",
+          "available_at": "2026-04-01T12:00:00+00:00",
+          "air_temperature_c": 29.643,
+          "relative_humidity_pct": 79.427,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T12:00:00+00:00",
+          "available_at": "2026-04-01T13:00:00+00:00",
+          "air_temperature_c": 29.152,
+          "relative_humidity_pct": 79.145,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T13:00:00+00:00",
+          "available_at": "2026-04-01T14:00:00+00:00",
+          "air_temperature_c": 29.063,
+          "relative_humidity_pct": 78.091,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T14:00:00+00:00",
+          "available_at": "2026-04-01T15:00:00+00:00",
+          "air_temperature_c": 28.369,
+          "relative_humidity_pct": 78.563,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T15:00:00+00:00",
+          "available_at": "2026-04-01T16:00:00+00:00",
+          "air_temperature_c": 28.201,
+          "relative_humidity_pct": 80.02,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T16:00:00+00:00",
+          "available_at": "2026-04-01T17:00:00+00:00",
+          "air_temperature_c": 27.748,
+          "relative_humidity_pct": 79.778,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T17:00:00+00:00",
+          "available_at": "2026-04-01T18:00:00+00:00",
+          "air_temperature_c": 27.296,
+          "relative_humidity_pct": 81.128,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T18:00:00+00:00",
+          "available_at": "2026-04-01T19:00:00+00:00",
+          "air_temperature_c": 27.182,
+          "relative_humidity_pct": 83.875,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T19:00:00+00:00",
+          "available_at": "2026-04-01T20:00:00+00:00",
+          "air_temperature_c": 27.14,
+          "relative_humidity_pct": 81.702,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T20:00:00+00:00",
+          "available_at": "2026-04-01T21:00:00+00:00",
+          "air_temperature_c": 26.896,
+          "relative_humidity_pct": 84.194,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T21:00:00+00:00",
+          "available_at": "2026-04-01T22:00:00+00:00",
+          "air_temperature_c": 27.01,
+          "relative_humidity_pct": 85.076,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T22:00:00+00:00",
+          "available_at": "2026-04-01T23:00:00+00:00",
+          "air_temperature_c": 27.108,
+          "relative_humidity_pct": 86.204,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-01T23:00:00+00:00",
+          "available_at": "2026-04-02T00:00:00+00:00",
+          "air_temperature_c": 27.335,
+          "relative_humidity_pct": 87.735,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T00:00:00+00:00",
+          "available_at": "2026-04-02T01:00:00+00:00",
+          "air_temperature_c": 27.576,
+          "relative_humidity_pct": 85.919,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T01:00:00+00:00",
+          "available_at": "2026-04-02T02:00:00+00:00",
+          "air_temperature_c": 28.267,
+          "relative_humidity_pct": 86.842,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T02:00:00+00:00",
+          "available_at": "2026-04-02T03:00:00+00:00",
+          "air_temperature_c": 28.063,
+          "relative_humidity_pct": 86.956,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T03:00:00+00:00",
+          "available_at": "2026-04-02T04:00:00+00:00",
+          "air_temperature_c": 28.827,
+          "relative_humidity_pct": 86.551,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T04:00:00+00:00",
+          "available_at": "2026-04-02T05:00:00+00:00",
+          "air_temperature_c": 29.124,
+          "relative_humidity_pct": 85.362,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T05:00:00+00:00",
+          "available_at": "2026-04-02T06:00:00+00:00",
+          "air_temperature_c": 29.455,
+          "relative_humidity_pct": 85.124,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T06:00:00+00:00",
+          "available_at": "2026-04-02T07:00:00+00:00",
+          "air_temperature_c": 29.794,
+          "relative_humidity_pct": 84.85,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T07:00:00+00:00",
+          "available_at": "2026-04-02T08:00:00+00:00",
+          "air_temperature_c": 29.953,
+          "relative_humidity_pct": 82.818,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T08:00:00+00:00",
+          "available_at": "2026-04-02T09:00:00+00:00",
+          "air_temperature_c": 30.034,
+          "relative_humidity_pct": 84.914,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T09:00:00+00:00",
+          "available_at": "2026-04-02T10:00:00+00:00",
+          "air_temperature_c": 29.855,
+          "relative_humidity_pct": 83.754,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T10:00:00+00:00",
+          "available_at": "2026-04-02T11:00:00+00:00",
+          "air_temperature_c": 29.99,
+          "relative_humidity_pct": 83.705,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T11:00:00+00:00",
+          "available_at": "2026-04-02T12:00:00+00:00",
+          "air_temperature_c": 29.689,
+          "relative_humidity_pct": 82.394,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T12:00:00+00:00",
+          "available_at": "2026-04-02T13:00:00+00:00",
+          "air_temperature_c": 29.109,
+          "relative_humidity_pct": 82.189,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T13:00:00+00:00",
+          "available_at": "2026-04-02T14:00:00+00:00",
+          "air_temperature_c": 28.8,
+          "relative_humidity_pct": 82.57,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T14:00:00+00:00",
+          "available_at": "2026-04-02T15:00:00+00:00",
+          "air_temperature_c": 28.75,
+          "relative_humidity_pct": 80.096,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T15:00:00+00:00",
+          "available_at": "2026-04-02T16:00:00+00:00",
+          "air_temperature_c": 28.132,
+          "relative_humidity_pct": 80.24,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T16:00:00+00:00",
+          "available_at": "2026-04-02T17:00:00+00:00",
+          "air_temperature_c": 27.965,
+          "relative_humidity_pct": 79.27,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T17:00:00+00:00",
+          "available_at": "2026-04-02T18:00:00+00:00",
+          "air_temperature_c": 27.396,
+          "relative_humidity_pct": 81.171,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T18:00:00+00:00",
+          "available_at": "2026-04-02T19:00:00+00:00",
+          "air_temperature_c": 27.403,
+          "relative_humidity_pct": 82.473,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T19:00:00+00:00",
+          "available_at": "2026-04-02T20:00:00+00:00",
+          "air_temperature_c": 27.199,
+          "relative_humidity_pct": 85.085,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T20:00:00+00:00",
+          "available_at": "2026-04-02T21:00:00+00:00",
+          "air_temperature_c": 26.949,
+          "relative_humidity_pct": 86.426,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T21:00:00+00:00",
+          "available_at": "2026-04-02T22:00:00+00:00",
+          "air_temperature_c": 26.928,
+          "relative_humidity_pct": 86.5,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T22:00:00+00:00",
+          "available_at": "2026-04-02T23:00:00+00:00",
+          "air_temperature_c": 26.676,
+          "relative_humidity_pct": 86.227,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-02T23:00:00+00:00",
+          "available_at": "2026-04-03T00:00:00+00:00",
+          "air_temperature_c": 27.225,
+          "relative_humidity_pct": 86.102,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T00:00:00+00:00",
+          "available_at": "2026-04-03T01:00:00+00:00",
+          "air_temperature_c": 27.54,
+          "relative_humidity_pct": 88.541,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T01:00:00+00:00",
+          "available_at": "2026-04-03T02:00:00+00:00",
+          "air_temperature_c": 28.143,
+          "relative_humidity_pct": 88.426,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T02:00:00+00:00",
+          "available_at": "2026-04-03T03:00:00+00:00",
+          "air_temperature_c": 28.54,
+          "relative_humidity_pct": 89.027,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T03:00:00+00:00",
+          "available_at": "2026-04-03T04:00:00+00:00",
+          "air_temperature_c": 28.857,
+          "relative_humidity_pct": 86.657,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T04:00:00+00:00",
+          "available_at": "2026-04-03T05:00:00+00:00",
+          "air_temperature_c": 29.068,
+          "relative_humidity_pct": 85.006,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T05:00:00+00:00",
+          "available_at": "2026-04-03T06:00:00+00:00",
+          "air_temperature_c": 29.573,
+          "relative_humidity_pct": 84.758,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T06:00:00+00:00",
+          "available_at": "2026-04-03T07:00:00+00:00",
+          "air_temperature_c": 30.136,
+          "relative_humidity_pct": 85.963,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T07:00:00+00:00",
+          "available_at": "2026-04-03T08:00:00+00:00",
+          "air_temperature_c": 29.785,
+          "relative_humidity_pct": 83.133,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T08:00:00+00:00",
+          "available_at": "2026-04-03T09:00:00+00:00",
+          "air_temperature_c": 30.038,
+          "relative_humidity_pct": 83.336,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T09:00:00+00:00",
+          "available_at": "2026-04-03T10:00:00+00:00",
+          "air_temperature_c": 30.042,
+          "relative_humidity_pct": 82.926,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T10:00:00+00:00",
+          "available_at": "2026-04-03T11:00:00+00:00",
+          "air_temperature_c": 29.903,
+          "relative_humidity_pct": 83.59,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T11:00:00+00:00",
+          "available_at": "2026-04-03T12:00:00+00:00",
+          "air_temperature_c": 29.719,
+          "relative_humidity_pct": 81.888,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T12:00:00+00:00",
+          "available_at": "2026-04-03T13:00:00+00:00",
+          "air_temperature_c": 29.35,
+          "relative_humidity_pct": 82.188,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T13:00:00+00:00",
+          "available_at": "2026-04-03T14:00:00+00:00",
+          "air_temperature_c": 29.094,
+          "relative_humidity_pct": 83.721,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T14:00:00+00:00",
+          "available_at": "2026-04-03T15:00:00+00:00",
+          "air_temperature_c": 28.652,
+          "relative_humidity_pct": 80.904,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T15:00:00+00:00",
+          "available_at": "2026-04-03T16:00:00+00:00",
+          "air_temperature_c": 28.345,
+          "relative_humidity_pct": 82.115,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T16:00:00+00:00",
+          "available_at": "2026-04-03T17:00:00+00:00",
+          "air_temperature_c": 28.107,
+          "relative_humidity_pct": 82.306,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T17:00:00+00:00",
+          "available_at": "2026-04-03T18:00:00+00:00",
+          "air_temperature_c": 27.602,
+          "relative_humidity_pct": 82.218,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T18:00:00+00:00",
+          "available_at": "2026-04-03T19:00:00+00:00",
+          "air_temperature_c": 27.221,
+          "relative_humidity_pct": 80.855,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T19:00:00+00:00",
+          "available_at": "2026-04-03T20:00:00+00:00",
+          "air_temperature_c": 26.93,
+          "relative_humidity_pct": 83.433,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T20:00:00+00:00",
+          "available_at": "2026-04-03T21:00:00+00:00",
+          "air_temperature_c": 26.935,
+          "relative_humidity_pct": 83.712,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T21:00:00+00:00",
+          "available_at": "2026-04-03T22:00:00+00:00",
+          "air_temperature_c": 26.909,
+          "relative_humidity_pct": 82.871,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T22:00:00+00:00",
+          "available_at": "2026-04-03T23:00:00+00:00",
+          "air_temperature_c": 27.128,
+          "relative_humidity_pct": 88.157,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-03T23:00:00+00:00",
+          "available_at": "2026-04-04T00:00:00+00:00",
+          "air_temperature_c": 27.475,
+          "relative_humidity_pct": 88.277,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T00:00:00+00:00",
+          "available_at": "2026-04-04T01:00:00+00:00",
+          "air_temperature_c": 27.536,
+          "relative_humidity_pct": 89.014,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T01:00:00+00:00",
+          "available_at": "2026-04-04T02:00:00+00:00",
+          "air_temperature_c": 28.033,
+          "relative_humidity_pct": 90.941,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T02:00:00+00:00",
+          "available_at": "2026-04-04T03:00:00+00:00",
+          "air_temperature_c": 28.716,
+          "relative_humidity_pct": 90.247,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T03:00:00+00:00",
+          "available_at": "2026-04-04T04:00:00+00:00",
+          "air_temperature_c": 28.534,
+          "relative_humidity_pct": 91.233,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T04:00:00+00:00",
+          "available_at": "2026-04-04T05:00:00+00:00",
+          "air_temperature_c": 29.19,
+          "relative_humidity_pct": 89.958,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T05:00:00+00:00",
+          "available_at": "2026-04-04T06:00:00+00:00",
+          "air_temperature_c": 29.64,
+          "relative_humidity_pct": 90.661,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T06:00:00+00:00",
+          "available_at": "2026-04-04T07:00:00+00:00",
+          "air_temperature_c": 29.868,
+          "relative_humidity_pct": 91.149,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T07:00:00+00:00",
+          "available_at": "2026-04-04T08:00:00+00:00",
+          "air_temperature_c": 29.729,
+          "relative_humidity_pct": 89.975,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T08:00:00+00:00",
+          "available_at": "2026-04-04T09:00:00+00:00",
+          "air_temperature_c": 30.037,
+          "relative_humidity_pct": 89.146,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T09:00:00+00:00",
+          "available_at": "2026-04-04T10:00:00+00:00",
+          "air_temperature_c": 29.964,
+          "relative_humidity_pct": 86.561,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T10:00:00+00:00",
+          "available_at": "2026-04-04T11:00:00+00:00",
+          "air_temperature_c": 29.6,
+          "relative_humidity_pct": 85.185,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T11:00:00+00:00",
+          "available_at": "2026-04-04T12:00:00+00:00",
+          "air_temperature_c": 29.34,
+          "relative_humidity_pct": 86.598,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T12:00:00+00:00",
+          "available_at": "2026-04-04T13:00:00+00:00",
+          "air_temperature_c": 29.075,
+          "relative_humidity_pct": 83.37,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T13:00:00+00:00",
+          "available_at": "2026-04-04T14:00:00+00:00",
+          "air_temperature_c": 28.896,
+          "relative_humidity_pct": 84.054,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T14:00:00+00:00",
+          "available_at": "2026-04-04T15:00:00+00:00",
+          "air_temperature_c": 28.577,
+          "relative_humidity_pct": 82.428,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T15:00:00+00:00",
+          "available_at": "2026-04-04T16:00:00+00:00",
+          "air_temperature_c": 28.221,
+          "relative_humidity_pct": 84.051,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T16:00:00+00:00",
+          "available_at": "2026-04-04T17:00:00+00:00",
+          "air_temperature_c": 27.823,
+          "relative_humidity_pct": 83.778,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T17:00:00+00:00",
+          "available_at": "2026-04-04T18:00:00+00:00",
+          "air_temperature_c": 27.411,
+          "relative_humidity_pct": 84.874,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T18:00:00+00:00",
+          "available_at": "2026-04-04T19:00:00+00:00",
+          "air_temperature_c": 27.009,
+          "relative_humidity_pct": 84.564,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T19:00:00+00:00",
+          "available_at": "2026-04-04T20:00:00+00:00",
+          "air_temperature_c": 26.879,
+          "relative_humidity_pct": 85.059,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T20:00:00+00:00",
+          "available_at": "2026-04-04T21:00:00+00:00",
+          "air_temperature_c": 27.028,
+          "relative_humidity_pct": 84.428,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T21:00:00+00:00",
+          "available_at": "2026-04-04T22:00:00+00:00",
+          "air_temperature_c": 26.924,
+          "relative_humidity_pct": 86.213,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T22:00:00+00:00",
+          "available_at": "2026-04-04T23:00:00+00:00",
+          "air_temperature_c": 27.15,
+          "relative_humidity_pct": 88.181,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-04T23:00:00+00:00",
+          "available_at": "2026-04-05T00:00:00+00:00",
+          "air_temperature_c": 27.334,
+          "relative_humidity_pct": 88.553,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T00:00:00+00:00",
+          "available_at": "2026-04-05T01:00:00+00:00",
+          "air_temperature_c": 27.724,
+          "relative_humidity_pct": 91.498,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T01:00:00+00:00",
+          "available_at": "2026-04-05T02:00:00+00:00",
+          "air_temperature_c": 28.007,
+          "relative_humidity_pct": 91.073,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T02:00:00+00:00",
+          "available_at": "2026-04-05T03:00:00+00:00",
+          "air_temperature_c": 28.201,
+          "relative_humidity_pct": 88.458,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T03:00:00+00:00",
+          "available_at": "2026-04-05T04:00:00+00:00",
+          "air_temperature_c": 28.863,
+          "relative_humidity_pct": 90.221,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T04:00:00+00:00",
+          "available_at": "2026-04-05T05:00:00+00:00",
+          "air_temperature_c": 29.03,
+          "relative_humidity_pct": 90.628,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T05:00:00+00:00",
+          "available_at": "2026-04-05T06:00:00+00:00",
+          "air_temperature_c": 29.711,
+          "relative_humidity_pct": 88.663,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T06:00:00+00:00",
+          "available_at": "2026-04-05T07:00:00+00:00",
+          "air_temperature_c": 29.692,
+          "relative_humidity_pct": 87.507,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T07:00:00+00:00",
+          "available_at": "2026-04-05T08:00:00+00:00",
+          "air_temperature_c": 29.922,
+          "relative_humidity_pct": 86.557,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T08:00:00+00:00",
+          "available_at": "2026-04-05T09:00:00+00:00",
+          "air_temperature_c": 29.845,
+          "relative_humidity_pct": 84.012,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T09:00:00+00:00",
+          "available_at": "2026-04-05T10:00:00+00:00",
+          "air_temperature_c": 30.153,
+          "relative_humidity_pct": 83.425,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T10:00:00+00:00",
+          "available_at": "2026-04-05T11:00:00+00:00",
+          "air_temperature_c": 29.781,
+          "relative_humidity_pct": 84.168,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T11:00:00+00:00",
+          "available_at": "2026-04-05T12:00:00+00:00",
+          "air_temperature_c": 29.646,
+          "relative_humidity_pct": 82.246,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T12:00:00+00:00",
+          "available_at": "2026-04-05T13:00:00+00:00",
+          "air_temperature_c": 29.417,
+          "relative_humidity_pct": 81.654,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T13:00:00+00:00",
+          "available_at": "2026-04-05T14:00:00+00:00",
+          "air_temperature_c": 28.834,
+          "relative_humidity_pct": 80.165,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T14:00:00+00:00",
+          "available_at": "2026-04-05T15:00:00+00:00",
+          "air_temperature_c": 28.639,
+          "relative_humidity_pct": 80.466,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T15:00:00+00:00",
+          "available_at": "2026-04-05T16:00:00+00:00",
+          "air_temperature_c": 27.883,
+          "relative_humidity_pct": 79.418,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T16:00:00+00:00",
+          "available_at": "2026-04-05T17:00:00+00:00",
+          "air_temperature_c": 27.752,
+          "relative_humidity_pct": 79.975,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T17:00:00+00:00",
+          "available_at": "2026-04-05T18:00:00+00:00",
+          "air_temperature_c": 27.876,
+          "relative_humidity_pct": 80.884,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T18:00:00+00:00",
+          "available_at": "2026-04-05T19:00:00+00:00",
+          "air_temperature_c": 27.173,
+          "relative_humidity_pct": 82.028,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T19:00:00+00:00",
+          "available_at": "2026-04-05T20:00:00+00:00",
+          "air_temperature_c": 27.175,
+          "relative_humidity_pct": 82.532,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T20:00:00+00:00",
+          "available_at": "2026-04-05T21:00:00+00:00",
+          "air_temperature_c": 26.933,
+          "relative_humidity_pct": 82.883,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T21:00:00+00:00",
+          "available_at": "2026-04-05T22:00:00+00:00",
+          "air_temperature_c": 26.684,
+          "relative_humidity_pct": 82.817,
+          "leaf_wet": false,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T22:00:00+00:00",
+          "available_at": "2026-04-05T23:00:00+00:00",
+          "air_temperature_c": 26.92,
+          "relative_humidity_pct": 84.37,
+          "leaf_wet": true,
+          "quality": "valid"
+        },
+        {
+          "start_at": "2026-04-05T23:00:00+00:00",
+          "available_at": "2026-04-06T00:00:00+00:00",
+          "air_temperature_c": 27.398,
+          "relative_humidity_pct": 84.035,
+          "leaf_wet": true,
+          "quality": "valid"
+        }
+      ],
+      "context_revisions": [
+        {
+          "revision": 1,
+          "recorded_at": "2026-03-31T23:00:00+00:00",
+          "available_at": "2026-03-31T23:00:00+00:00",
+          "profile": {
+            "schema_version": "aegis-cultivation-v1",
+            "source": "user_declared",
+            "timezone": "UTC+07:00",
+            "region": "central",
+            "province_or_city": "SYNTHETIC",
+            "locality": null,
+            "rice_variety": "SYNTHETIC_RICE",
+            "planting_method": "direct_seeded",
+            "sown_on": "2026-02-18",
+            "transplanted_on": null,
+            "season_status": "active"
+          }
+        }
+      ]
+    }
+  ]
+}

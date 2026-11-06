@@ -1,0 +1,52 @@
+{
+  "schema_version": "aegis-synthetic-future-event-dataset-v1",
+  "source": "synthetic",
+  "seed": 42,
+  "cluster_counts": {
+    "train": 60,
+    "validation": 20,
+    "test": 20
+  },
+  "contract_sha256": "5a87b898e9eed080e6e9d9debefd58e019d217cb9504d26d3848996f1388b607",
+  "feature_contract_sha256": "107bfc5668d45fd2673037adb34617d03ad42d97ec7fe8ca0e9d2dd243b56e32",
+  "rows": 200,
+  "ready": 170,
+  "excluded": 30,
+  "class_counts": {
+    "train": {
+      "0": 58,
+      "1": 44
+    },
+    "validation": {
+      "0": 18,
+      "1": 16
+    },
+    "test": {
+      "0": 18,
+      "1": 16
+    }
+  },
+  "both_classes_per_partition": true,
+  "files": {
+    "contract.json": "2981a3cffd82bef1781d24148c27f14a24ff9ce08e9612d5abb366500331b25f",
+    "feature_rows.synthetic.jsonl": "d0f53cd66f17343435d88585137079863f5e2ddf2d9ccaef0036299040407e50",
+    "features_insufficient.synthetic.json": "faea8a96d265d8af2a6a39f32431ac08be511b3175d4fa273b487823a785bd42",
+    "features_ready.synthetic.json": "719a0d65168900096be71ce38b7f8b0273797a0aaa05279d997a03cfa3d50705",
+    "future_worlds.synthetic.jsonl": "0efc95ca67941929b0c4412e474adebe8ebc6a02b1d125f5f4c00c5eb73c0da7",
+    "input_insufficient.synthetic.json": "792336a860e86f51fe4b5b68064d48c2cc28f520769d7c2c1daf3be8096ccb5c",
+    "input_ready.synthetic.json": "926d72c66d5b79b07b5ab12b142c37f94d3dcdd4782df959277ed69e586a8e75",
+    "inputs.synthetic.jsonl": "6cd98502165dbb00f080440ee960002942b5e8ac17ca7749b6da7a909c1aa14d",
+    "labels.synthetic.jsonl": "ec71166cada343b33a58633d60554aa52e48b1eeb93d9766ab5b9666ab3bfc71",
+    "metadata.synthetic.jsonl": "355fa66f4bc65585b2508aae9e5c614e3b53f3cc157bc95a58066fc0a49a9854",
+    "split_manifest.json": "72dd0c246b514ed9b6f04d1f24ba3d76121b0bef0e7830815afc83d499208df3"
+  },
+  "training_performed": false,
+  "synthetic_training_authorized": true,
+  "field_training_approved": false,
+  "field_validated": false,
+  "limits": [
+    "Engineering generator coefficients are arbitrary, not biological disease thresholds",
+    "Synthetic metrics cannot establish field accuracy, calibration or lead time",
+    "No model or score is produced by FM-01"
+  ]
+}
