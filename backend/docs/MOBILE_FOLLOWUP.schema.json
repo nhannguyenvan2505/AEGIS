@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aegis:mobile-followup:v1",
+  "title": "AEGIS mobile follow-up composition response",
+  "type": "object",
+  "required": ["success", "contract_version", "item"],
+  "properties": {
+    "success": {"const": true},
+    "contract_version": {"const": "aegis-mobile-followup-v1"},
+    "item": {"$ref": "#/$defs/assessmentView"}
+  },
+  "$defs": {
+    "assessmentVersion": {
+      "type": "object",
+      "required": ["id", "base_assessment_id", "revision", "snapshot_sha256", "snapshot", "available_at", "display_freshness"],
+      "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "base_assessment_id": {"type": "string", "format": "uuid"},
+        "revision": {"type": "integer", "minimum": 1},
+        "snapshot_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "snapshot": {"type": "object"},
+        "available_at": {"type": "string", "format": "date-time"},
+        "display_freshness": {"enum": ["expired", "within_display_window"]}
+      }
+    },
+    "assessmentView": {
+      "type": "object",
+      "required": ["followup_id", "followup_version", "source", "required", "current", "episode_requirement", "projection_read_at", "consistency", "disease_confirmed", "training_approved"],
+      "properties": {
+        "followup_id": {"type": "string", "format": "uuid"},
+        "followup_version": {"type": "integer", "minimum": 1},
+        "source": {"const": "mock"},
+        "required": {"$ref": "#/$defs/assessmentVersion"},
+        "current": {"$ref": "#/$defs/assessmentVersion"},
+        "episode_requirement": {"type": ["object", "null"]},
+        "projection_read_at": {"type": "string", "format": "date-time"},
+        "consistency": {"const": "followup_transaction_core_separate"},
+        "disease_confirmed": {"const": false},
+        "training_approved": {"const": false},
+        "action_capabilities": {"$ref": "#/$defs/actionCapabilities"}
+      }
+    },
+    "actionEligibility": {
+      "type": "object",
+      "required": ["enabled", "disabled_reasons"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "disabled_reasons": {"type": "array", "uniqueItems": true, "items": {"enum": ["workflow_state_not_allowed"]}}
+      }
+    },
+    "checkEligibility": {
+      "allOf": [{"$ref": "#/$defs/actionEligibility"}],
+      "type": "object",
+      "required": ["observation_required", "observation_constraints"],
+      "properties": {
+        "observation_required": {"type": "boolean"},
+        "observation_constraints": {
+          "type": "object",
+          "required": ["source", "record_status", "same_owner_and_season", "observed_at_not_before", "selection_validated"],
+          "properties": {
+            "source": {"const": "synthetic"},
+            "record_status": {"const": "active"},
+            "same_owner_and_season": {"const": true},
+            "observed_at_not_before": {"type": "string", "format": "date-time"},
+            "selection_validated": {"const": false}
+          }
+        }
+      }
+    },
+    "actionCapabilities": {
+      "type": "object",
+      "required": ["projection_version", "base_version", "validation_scope", "actions", "needs_recheck", "recheck_reasons"],
+      "properties": {
+        "projection_version": {"const": "aegis-followup-actions-v1"},
+        "base_version": {"type": "integer", "minimum": 1},
+        "validation_scope": {"const": "workflow_state_and_declared_inputs"},
+        "actions": {
+          "type": "object",
+          "required": ["acknowledge", "check"],
+          "properties": {
+            "acknowledge": {"$ref": "#/$defs/actionEligibility"},
+            "check": {"$ref": "#/$defs/checkEligibility"}
+          }
+        },
+        "needs_recheck": {"type": "boolean"},
+        "recheck_reasons": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

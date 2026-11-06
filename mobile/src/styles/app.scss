@@ -1,0 +1,75 @@
+$green: #059669;
+$muted: #64748b;
+.screen { flex: 1; background-color: #f4f7fb; }
+.content { padding: 24px; padding-top: 12px; padding-bottom: 120px; }
+.brand { color: $green; font-size: 24px; font-weight: 800; }
+.brandLogo { width: 36px; height: 36px; flex-shrink: 0; }
+.title { color: #0f172a; font-size: 22px; font-weight: 800; }
+.subtitle { color: $muted; font-size: 13px; line-height: 21px; margin-bottom: 16px; }
+.card { background-color: #ffffff; border-radius: 24px; padding: 20px; margin-bottom: 18px; }
+.heading { color: #0f172a; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+.label { color: $muted; font-size: 12px; line-height: 19px; margin-bottom: 6px; }
+.value { color: #0f172a; font-size: 23px; font-weight: 800; }
+.row { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+.metric { flex-grow: 1; flex-basis: 40%; background-color: #f4f7fb; border-radius: 16px; padding: 12px; align-items: center; }
+.button { background-color: $green; border-radius: 16px; padding: 15px; align-items: center; margin-top: 10px; min-height: 48px; }
+.buttonText { color: #ffffff; font-size: 14px; font-weight: 700; }
+.secondary { background-color: #ecfdf5; }
+.secondaryText { color: #047857; }
+.input { background-color: #ffffff; border-width: 1px; border-color: #cbd5e1; border-radius: 14px; padding: 14px; font-size: 16px; color: #0f172a; margin-bottom: 12px; }
+.badge { color: #64748b; font-size: 11px; margin-bottom: 14px; }
+.error { color: #be123c; margin-bottom: 12px; }
+.bar { height: 8px; border-radius: 4px; background-color: #e2e8f0; margin-top: 12px; }
+.fill { height: 8px; border-radius: 4px; background-color: #059669; }
+.image { width: 100%; height: 240px; border-radius: 20px; margin-bottom: 16px; }
+.header { padding: 24px; padding-top: 16px; padding-bottom: 18px; flex-direction: row; align-items: center; gap: 14px; }
+.between { flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; }
+.avatar { width: 44px; height: 44px; border-radius: 22px; background-color: #a6192e; align-items: center; justify-content: center; }
+.avatarText { color: #ffffff; font-size: 18px; font-weight: 800; }
+.back { width: 44px; height: 44px; border-radius: 14px; background-color: #ffffff; align-items: center; justify-content: center; }
+.pill { background-color: #ecfdf5; border-radius: 10px; padding: 6px; padding-left: 10px; padding-right: 10px; }
+.pillText { color: #047857; font-size: 11px; font-weight: 700; }
+.alert { background-color: #fff1f2; border-width: 1px; border-color: #fecdd3; padding: 16px; border-radius: 20px; margin-bottom: 18px; flex-direction: row; gap: 12px; }
+.alertTitle { color: #9f1239; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.alertText { color: #881337; font-size: 12px; line-height: 20px; }
+.feature { background-color: #ffffff; border-radius: 20px; padding: 20px; align-items: center; justify-content: center; gap: 10px; flex-basis: 46%; flex-grow: 1; min-height: 132px; }
+.iconBox { width: 48px; height: 48px; border-radius: 16px; background-color: #f4f7fb; align-items: center; justify-content: center; }
+.featureText { color: #0f172a; font-size: 13px; font-weight: 700; }
+.history { background-color: #ffffff; padding: 16px; border-radius: 20px; margin-bottom: 12px; flex-direction: row; align-items: center; gap: 12px; }
+.historyTitle { color: #0f172a; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.nav { position: absolute; bottom: 12px; left: 20px; right: 20px; flex-direction: row; background-color: #ffffff; padding: 8px; border-radius: 36px; elevation: 8; }
+.tab { flex: 1; align-items: center; justify-content: center; gap: 4px; padding-top: 3px; padding-bottom: 3px; min-height: 56px; }
+.tabIcon { width: 40px; height: 32px; align-items: center; justify-content: center; border-radius: 20px; }
+.tabText { color: $muted; font-size: 10px; font-weight: 600; }
+.active { background-color: #d1fae5; }
+.upload { border-width: 2px; border-style: dashed; border-color: #cbd5e1; background-color: #ffffff; border-radius: 24px; padding: 24px; align-items: center; margin-bottom: 24px; }
+.center { align-items: center; }
+.chart { height: 160px; flex-direction: row; align-items: flex-end; gap: 9px; border-bottom-width: 1px; border-bottom-color: #d1fae5; margin-top: 16px; }
+.chartColumn { flex: 1; align-items: center; justify-content: flex-end; height: 160px; gap: 6px; }
+.chartBar { width: 100%; border-top-left-radius: 5px; border-top-right-radius: 5px; background-color: #059669; }
+.setting { flex-direction: row; align-items: center; gap: 12px; padding-top: 16px; padding-bottom: 16px; border-bottom-width: 1px; border-bottom-color: #f1f5f9; min-height: 56px; }
+.preview { height: 240px; background-color: #102e31; border-radius: 24px; padding: 20px; margin-bottom: 20px; align-items: center; justify-content: center; gap: 16px; }
+
+// Authentication forms share the app palette, typography and native controls.
+.authContent { flex-grow: 1; padding-bottom: 32px; }
+.authField { margin-bottom: 16px; }
+.authFieldLabel { color: #0f172a; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.authInputRow { flex-direction: row; align-items: center; gap: 10px; border-width: 1px; border-color: #cbd5e1; border-radius: 14px; background-color: #ffffff; padding-left: 12px; padding-right: 4px; min-height: 52px; }
+.authInputFocused { border-color: $green; }
+.authInputInvalid { border-color: #be123c; }
+.authInput { flex: 1; min-width: 0px; color: #0f172a; font-size: 16px; padding-top: 14px; padding-bottom: 14px; }
+.authVisibility { width: 44px; min-height: 48px; align-items: center; justify-content: center; }
+.authFieldError { color: #be123c; font-size: 12px; line-height: 18px; margin-top: 6px; }
+.authHint { color: $muted; font-size: 12px; line-height: 18px; margin-top: 6px; }
+.authDivider { flex-direction: row; align-items: center; gap: 12px; margin-top: 22px; margin-bottom: 18px; }
+.authDividerLine { flex: 1; height: 1px; background-color: #e2e8f0; }
+.authDividerText { color: $muted; font-size: 12px; }
+.authGoogleButton { flex-direction: row; align-items: center; justify-content: center; gap: 12px; border-width: 1px; border-color: #cbd5e1; border-radius: 16px; background-color: #ffffff; padding: 14px; min-height: 52px; }
+.authGoogleText { color: #0f172a; font-size: 14px; font-weight: 600; flex-shrink: 1; }
+.authPressed { background-color: #f4f7fb; }
+.authLink { min-height: 48px; justify-content: center; align-items: center; padding: 8px; margin-bottom: 10px; }
+.authLinkText { color: $muted; font-size: 13px; line-height: 21px; text-align: center; }
+.authLinkEmphasis { color: #047857; font-weight: 700; }
+.authDemoNote { color: $muted; font-size: 12px; line-height: 19px; text-align: center; margin-top: 16px; }
+.authIntro { flex-direction: row; align-items: center; gap: 14px; margin-bottom: 22px; }
+.authIntroText { flex: 1; }
