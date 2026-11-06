@@ -1,21 +1,64 @@
+import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
-import { Icon, Pill, History, type IconName } from '../../components/Design';
-import { telemetry } from './mock';
-import { Button } from '../../components/UI';
+import { Text } from 'react-native';
+import { Button, Card } from '../../components/UI';
+import { useAuth } from '../../state/AuthContext';
+import { ApiError } from '../../services/api';
+import { forecastOverview, type ForecastOverview } from '../prediction/client';
+import type { Page } from '../followup/client';
 import { s } from '../../styles/generated/styles';
-const features: { path: '/diagnosis' | '/camera' | '/recommendations' | '/analysis'; title: string; icon: IconName }[] = [
- { path: '/diagnosis', title: 'Chẩn đoán AI', icon: 'camera' }, { path: '/camera', title: 'Camera', icon: 'video' },
- { path: '/recommendations', title: 'Đề xuất chăm sóc', icon: 'heart' }, { path: '/analysis', title: 'Thống kê', icon: 'trending-up' },
-];
-export function DashboardScreen() { return <>
- <Pressable accessibilityRole="button" accessibilityLabel="Xem dữ liệu trạm cảm biến" onPress={() => router.navigate('/analysis')} style={[s.card, { borderLeftWidth: 5, borderLeftColor: '#059669' }]}>
- <View style={[s.between, { marginBottom: 16 }]}><Text style={s.historyTitle}>Trạm cảm biến IoT</Text><Pill text="● Mẫu lịch sử" /></View>
- <View style={s.row}>{[['Nhiệt độ', telemetry.temperature + '°'], ['Độ ẩm', telemetry.humidity + '%'], ['Độ pH', String(telemetry.ph)]].map(([label, value]) => <View key={label} style={[s.metric, { flexBasis: '25%', paddingHorizontal: 6 }]}><Text style={s.value}>{value}</Text><Text style={s.label}>{label}</Text></View>)}</View>
- <Text style={[s.label, { marginTop: 12, marginBottom: 0 }]}>Ruộng Đông · Độ ẩm đất {telemetry.soilMoisture}%</Text></Pressable>
- <Pressable accessibilityRole="button" onPress={() => router.navigate('/alerts')} style={s.alert}><Icon name="alert-triangle" color="#e11d48" /><View style={{ flex: 1 }}><Text style={s.alertTitle}>Cảnh báo bệnh Đạo ôn</Text><Text style={s.alertText}>Độ ẩm cao trong dữ liệu mẫu. Kiểm tra diễn biến môi trường và tình trạng lá lúa.</Text></View></Pressable>
- <Text style={s.heading}>Chức năng giám sát</Text><View style={[s.row, { marginBottom: 24 }]}>{features.map(f => <Pressable accessibilityRole="button" key={f.path} onPress={() => router.push(f.path)} style={s.feature}><View style={s.iconBox}><Icon name={f.icon} size={26} /></View><Text style={s.featureText}>{f.title}</Text></Pressable>)}</View>
- <Button title="Lịch sử phân tích từ Backend" onPress={() => router.push('/history')} /><Text style={s.heading}>Lịch sử minh họa</Text>
- <History icon="feather" title="Bệnh Đạo ôn" detail="14/10/2026 · Kết quả mẫu" badge="Nguy cơ" danger onPress={() => router.push('/diagnosis')} />
- <History icon="check-circle" title="Không phát hiện bệnh (mẫu)" detail="12/10/2026 · Kết quả mẫu" badge="Chưa kết luận" onPress={() => router.push('/diagnosis')} />
- </>; }
+
+export function DashboardScreen() {
+  const { session, ready, expireSession } = useAuth();
+  const token = session?.access_token;
+  const [page, setPage] = useState(1);
+  const [refresh, setRefresh] = useState(0);
+  const key = JSON.stringify([token, page, refresh]);
+  const [state, setState] = useState<{key: string; data?: Page<ForecastOverview>; error?: string}>();
+  const data = state?.key === key ? state.data : undefined;
+  const error = state?.key === key ? state.error : undefined;
+  useEffect(() => {
+    if (!token) return;
+    let active = true;
+    void forecastOverview(token, page).then(data => {
+      if (active) setState({key, data});
+    }).catch(e => {
+      if (!active) return;
+      if (e instanceof ApiError && e.status === 401) void expireSession(token);
+      setState({key, error: e instanceof ApiError && e.status === 404 ?
+        'Backend đang dùng chưa có API dự báo. Hãy khởi động kho forecast pilot.' :
+        e instanceof Error ? e.message : 'Không tải được tổng quan.'});
+    });
+    return () => { active = false; };
+  }, [token, page, key, expireSession]);
+  return <>
+    <Card title="Dự báo đạo ôn lá · 72 giờ">
+      <Text>Mô hình dự báo trên lịch sử môi trường giả lập của từng mùa vụ.</Text>
+      <Text style={s.label}>Điểm kỹ thuật chưa hiệu chuẩn; chưa xác minh ngoài thực địa.</Text>
+      <Button title="Mở dự báo theo ruộng và mùa vụ" onPress={() => router.navigate('/analysis')} />
+    </Card>
+    {!token ? <Card title="Dữ liệu theo tài khoản">
+      <Text>{ready ? 'Đăng nhập để xem các mùa vụ và dự báo đã lưu.' : 'Đang khôi phục phiên…'}</Text>
+      {ready && <Button title="Đăng nhập" onPress={() => router.navigate('/login')} />}
+    </Card> : <Card title="Tổng quan mùa vụ từ Backend">
+      <Button secondary title="Tải lại tổng quan" onPress={() => setRefresh(v => v+1)} />
+      {!data && !error && <Text>Đang tải…</Text>}
+      {!!error && <Text accessibilityRole="alert" style={s.error}>{error}</Text>}
+      {data?.items.length === 0 && <Text>Chưa có mùa vụ. Tạo ruộng/mùa vụ hoặc chuẩn bị kho demo dùng chung.</Text>}
+      {data?.items.map(item => <Card key={item.season_id} title={item.plot_name+' · '+item.season_name}>
+        <Text>{item.source_revision === null ? 'Chưa có nguồn môi trường' : 'Nguồn giả lập · phiên bản '+item.source_revision}</Text>
+        {item.latest_forecast ? <>
+          <Text>{item.latest_forecast.status === 'insufficient_data' ? 'Chưa đủ dữ liệu dự báo' : 'Điểm mô hình: '+item.latest_forecast.score!.toFixed(3)}</Text>
+          <Text>{item.latest_forecast.scenario === 'source' ? 'Từ nguồn mùa vụ · phiên bản '+item.latest_forecast.source_revision : 'Kịch bản kiểm thử'}</Text>
+          <Text style={s.label}>Mốc mô phỏng: {new Date(item.latest_forecast.issued_at).toLocaleString('vi-VN')}</Text>
+          <Text style={s.label}>Lưu lúc: {new Date(item.latest_forecast.created_at).toLocaleString('vi-VN')}</Text>
+        </> : <Text>Chưa có dự báo đã lưu.</Text>}
+      </Card>)}
+      {page > 1 && <Button secondary title="Trang trước" onPress={() => setPage(v => v-1)} />}
+      {data?.pagination.has_next && <Button secondary title="Trang sau" onPress={() => setPage(v => v+1)} />}
+    </Card>}
+    <Button secondary title="Quản lý ruộng và mùa vụ" onPress={() => router.push('/farms')} />
+    <Button secondary title="Phân tích ảnh lá lúa" onPress={() => router.push('/diagnosis')} />
+    <Button secondary title="Lịch sử phân tích ảnh" onPress={() => router.push('/history')} />
+  </>;
+}

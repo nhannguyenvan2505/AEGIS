@@ -47,6 +47,10 @@ chối. Quota ghi chung60 request/user/60s, gồm lỗi/replay; AEGIS_FARM_WRITE
 điều chỉnh giới hạn khi khởi động, dùng chung cửa sổ AEGIS_RATE_WINDOW_SECONDS.
 Không có quota farm read riêng trong MVP local. Register/login/detect giữ quota cũ.
 
+BE-01 (03/11/2026): JSON lồng vượt khả năng decoder trả400 `invalid_json`,
+không thành lỗi500 và không ghi dữ liệu nghiệp vụ. Áp dụng helper đọc JSON farm
+dùng chung ở core/pilot; xem [kiểm chứng và giới hạn](FARM_JSON_VALIDATION.md).
+
 ## Telemetry: mock, bất biến và có giờ rõ ràng
 
 ```json
@@ -103,7 +107,9 @@ telemetry trong transaction BEGIN IMMEDIATE để tránh đánh giá trên batch
 
 **Dữ liệu đến muộn không cập nhật assessment cũ**, kể cả bản insufficient_data.
 Để minh họa advisory, nạp đủ số đo trước khi evaluate. Khi có cửa sổ mới, nạp thêm
-bucket mới rồi evaluate; chưa có cơ chế revision/force-recompute một cửa sổ.
+bucket mới rồi evaluate; core không có force-recompute một cửa sổ. Pilot opt-in
+có [assessment versions](D:/AEGIS/frontend/ASSESSMENT_VERSIONS.md) v2/v3 khi late
+bucket đủ điều kiện; v1 core vẫn bất biến. Không tự bật extension ở core/mobile.
 Không đổi profile chỉ để vượt khóa trùng. Khởi động lại Backend không mất lịch sử.
 
 ## Gắn kết quả ảnh kiểm tra

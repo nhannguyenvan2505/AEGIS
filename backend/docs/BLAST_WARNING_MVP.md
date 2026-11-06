@@ -17,10 +17,13 @@ Cập nhật tích hợp24/10/2026: đã có route Flask, migration4, ruộng/m�
 telemetry mock, assessment/history và liên kết ảnh theo owner. Xem
 [contract thực tế](FARM_WARNING_API.md) và
 [runbook tổng duyệt](../../integrated_warning_20261024/RUNBOOK.md).
-Đánh giá trigger thủ công; chưa có scheduler, notification, UI hoặc sensor thật.
-Ghi chú cập nhật sau mốc trên: UI local đã có; đã bổ sung
+Core trigger thủ công. Câu “chưa scheduler/UI” thuộc mốc24/10; đến28/10 pilot
+đã có [mock worker opt-in](D:/AEGIS/frontend/MOCK_AUTOMATION.md), UI local,
+journal/follow-up/review và backup. Chưa có notification ra ngoài, scheduler
+production hoặc sensor thật được xác nhận. Xem [chỉ mục hiện hành](D:/AEGIS/docs/CURRENT_HANDOFF.md).
+Đã bổ sung
 [hồ sơ canh tác theo mùa vụ](CULTIVATION_PROFILE.md) với revision/snapshot.
-Hồ sơ mới chỉ là metadata; nhận định thiếu UI ở câu trước là lịch sử mốc cũ.
+Hồ sơ mới chỉ là metadata; các bổ sung pilot không xác thực rule ngoài ruộng.
 Không thay V4, AI HTTP hoặc threshold nhận diện. Module không import YOLO.
 
 Tên module là monitor **mẫu điều kiện môi trường**, không phải bộ phân loại bệnh.

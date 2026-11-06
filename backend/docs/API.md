@@ -1,5 +1,15 @@
 # AEGIS Backend — hợp đồng API hiện tại
 
+**05/11 — forecast pilot:** [contract và runbook dự báo](../../docs/FORECAST_MVP_MIDTERM_20261105.md)
+mô tả nguồn hourly có revision, create/list/detail/input và tổng quan theo
+owner. Chạy qua launcher/kho pilot; không thay API ảnh hoặc core mặc định.
+
+Cập nhật28/10/2026: đây là contract **Backend core**, không tự bật pilot.
+[Chỉ mục hiện hành](D:/AEGIS/docs/CURRENT_HANDOFF.md) và
+[raw controlled opt-in](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md) phân
+biệt entry point/source/schema. Pilot có collection raw riêng, không thay
+collection ảnh V4; forecast synthetic pilot được bổ sung ở mốc05/11 bên trên.
+
 API nghiệp vụ/cảnh báo mock đã tích hợp: [FARM_WARNING_API.md](FARM_WARNING_API.md).
 Ruộng → mùa vụ → thiết bị → telemetry → assessment/history → liên kết analysis;
 các endpoint disease bên dưới giữ contract hiện tại.
@@ -30,6 +40,9 @@ Health/register/login không cần token. Các API còn lại yêu cầu header
 Email được trim và lowercase; mật khẩu từ 12 đến 128 ký tự. `expires_at` là Unix
 timestamp UTC, mặc định token tồn tại 24 giờ. Logout thu hồi phiên hiện tại.
 Chưa có refresh token, quên mật khẩu hay xác minh email.
+
+H5-T01: [Ranh giới hết hạn, thu hồi phiên và dữ liệu riêng](SESSION_LIFECYCLE.md)
+ghi rõ Backend acceptance và phần native client còn cần nhóm mobile kiểm riêng.
 
 Ví dụ login:
 

@@ -80,8 +80,9 @@ def body(required, optional=()):
         raise ValueError('Non-finite JSON number')
     try:
         data = json.loads(raw, object_pairs_hook=object_pairs, parse_constant=invalid_constant)
-    except (ValueError, UnicodeError):
-        raise FarmError('invalid_json', 'JSON không hợp lệ hoặc có key trùng.')
+    except (ValueError, UnicodeError, RecursionError):
+        # Decoder depth failures are invalid client input, not server failures.
+        raise FarmError('invalid_json', 'JSON không hợp lệ, lồng quá sâu hoặc có key trùng.')
     if not isinstance(data, dict) or set(required) - data.keys() or data.keys() - set(required) - set(optional):
         raise FarmError('invalid_fields', 'Thiếu trường bắt buộc hoặc có trường không được hỗ trợ.')
     return data
@@ -119,8 +120,8 @@ def owned(db, kind, identifier):
     return row
 
 
-def paginate(db, table, where, params, serialize=dict, order=None):
-    if set(request.args) - {'page', 'page_size'}:
+def paginate(db, table, where, params, serialize=dict, order=None, allowed_query=()):
+    if set(request.args) - {'page', 'page_size'} - set(allowed_query):
         raise FarmError('invalid_pagination', 'Chỉ hỗ trợ page và page_size.')
     values = []
     for key, default, maximum in [('page', '1', 1000000), ('page_size', '20', 100)]:

@@ -45,3 +45,39 @@ instance/
 /frontend/runs/
 /backend/mobile-instance/
 /fe-source-import/
+
+# TASK-20: private/raw storage independent of its current launcher location
+uploads/
+backups/
+raw_exports/
+datasets/
+weights/
+checkpoints/
+*.safetensors
+*.ckpt
+*.tflite
+*.h5
+*.p12
+*.p8
+*.jks
+*.mobileprovision
+.npmrc
+# Existing tracked mobile config contains only a cache path, no auth key.
+!/mobile/.npmrc
+.pypirc
+.netrc
+credentials.json
+service-account*.json
+*-credentials.json
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.bak
+*.backup
+
+# Dated work packages are local evidence, not ordinary source imports.
+# Curate useful scripts/templates into a reviewed source location; do not add -f.
+/*_20??????/
+/frontend/evidence/
+/backend/postman/reports/

@@ -23,7 +23,10 @@ hoặc lỗi database. Có thể dùng ID để tìm completion log tương ứn
 POST detect thành công có `request_id` và lưu ID đó cùng analysis. Khi GET chi
 tiết/lịch sử, `request_id` trong analysis là **ID lúc nhận diện**, còn header
 `X-Request-ID` là **ID của GET hiện tại**. Không ghi đè origin ID khi đọc lại.
-Request ID không phải idempotency key: retry POST vẫn tạo lần phân tích mới.
+Request ID không phải idempotency key. POST không gửi Idempotency-Key không có
+bảo đảm chống trùng; sau các kiểm tra auth/quota/admission, cùng key/account/byte ảnh đã completed trả lại analysis cũ
+và Idempotency-Replayed: true, nhưng header X-Request-ID vẫn là request hiện tại.
+Key running/uncertain không được tự chiếm lại sau restart. Xem [IDEMPOTENCY.md](IDEMPOTENCY.md).
 
 ## Hash model và timing
 

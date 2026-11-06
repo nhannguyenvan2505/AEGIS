@@ -1,0 +1,636 @@
+[
+  {
+    "step": 8,
+    "name": "refresh detail",
+    "scenario": "check_conditions",
+    "request": {
+      "method": "GET",
+      "path": "/api/farm/follow-ups/1bad6a4e-7087-46b8-ba67-be32e39b852a",
+      "path_template": "/api/farm/follow-ups/{case_id}",
+      "auth_context": "owner",
+      "body": null
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "X-Request-ID": "b4be73dc-5746-4867-b441-7d22116830f2",
+        "Cache-Control": "private, no-store",
+        "Vary": "Authorization"
+      },
+      "body": {
+        "item": {
+          "assessment_id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+          "assessment_mode": "historical_mock",
+          "assessment_sha256": "d7966e9748ae27c2a03472dfbe6c3e68bd1c087b4c84f9aba3b7aa6679f6a860",
+          "assessment_status": "advisory",
+          "check_status": {
+            "checked_version": null,
+            "needs_recheck": true,
+            "observation": null,
+            "reasons": [
+              "check_not_recorded"
+            ]
+          },
+          "created_at": "2026-10-24T03:00:00+00:00",
+          "disease_confirmed": false,
+          "display_freshness": "expired",
+          "episode_requirement": null,
+          "id": "1bad6a4e-7087-46b8-ba67-be32e39b852a",
+          "season_id": "4731ec90-c4f9-420f-b26f-1206ca70fdb0",
+          "source": "mock",
+          "state": "acknowledged",
+          "task_kind": "check_conditions",
+          "training_approved": false,
+          "updated_at": "2026-10-24T03:00:00+00:00",
+          "valid_until": "2026-10-24T01:00:00+00:00",
+          "version": 2,
+          "window_end": "2026-10-24T00:00:00+00:00"
+        },
+        "success": true
+      }
+    }
+  },
+  {
+    "step": 9,
+    "name": "refresh assessment view",
+    "scenario": "check_conditions",
+    "request": {
+      "method": "GET",
+      "path": "/api/farm/follow-ups/1bad6a4e-7087-46b8-ba67-be32e39b852a/assessment-view",
+      "path_template": "/api/farm/follow-ups/{case_id}/assessment-view",
+      "auth_context": "owner",
+      "body": null
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "X-Request-ID": "9a4bf5d0-4bb5-4d75-ba1d-cd0086b04271",
+        "Cache-Control": "private, no-store",
+        "Vary": "Authorization"
+      },
+      "body": {
+        "contract_version": "aegis-mobile-followup-v1",
+        "item": {
+          "action_capabilities": {
+            "actions": {
+              "acknowledge": {
+                "disabled_reasons": [
+                  "workflow_state_not_allowed"
+                ],
+                "enabled": false
+              },
+              "check": {
+                "disabled_reasons": [],
+                "enabled": true,
+                "observation_constraints": {
+                  "observed_at_not_before": "2026-10-24T00:00:00+00:00",
+                  "record_status": "active",
+                  "same_owner_and_season": true,
+                  "selection_validated": false,
+                  "source": "synthetic"
+                },
+                "observation_required": true
+              }
+            },
+            "base_version": 2,
+            "needs_recheck": true,
+            "projection_version": "aegis-followup-actions-v1",
+            "recheck_reasons": [
+              "check_not_recorded"
+            ],
+            "validation_scope": "workflow_state_and_declared_inputs"
+          },
+          "consistency": "followup_transaction_core_separate",
+          "current": {
+            "available_at": "2026-11-02T14:14:43.046040+00:00",
+            "base_assessment_id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+            "display_freshness": "expired",
+            "id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+            "revision": 1,
+            "snapshot": {
+              "created_at": "2026-11-02T14:14:43.046040+00:00",
+              "cultivation_context": {
+                "age_at_local_date": "2026-10-24",
+                "age_reason": "unknown_planting_context",
+                "captured_at": "2026-11-02T14:14:43.046040+00:00",
+                "context_check": {
+                  "agronomically_verified": false,
+                  "changes_warning_rule": false,
+                  "meaning": "Completeness of user-declared context only; not warning eligibility or field validation",
+                  "missing_fields": [
+                    "region",
+                    "province_or_city",
+                    "rice_variety",
+                    "planting_method",
+                    "planting_date",
+                    "season_status"
+                  ],
+                  "status": "incomplete"
+                },
+                "crop_age_basis": null,
+                "crop_age_days": null,
+                "interpretation": "Current record captured when assessment is created; not evidence it was available at window end",
+                "item": null,
+                "recorded_after_window_end": null
+              },
+              "device_id": "73f60e58-f144-4e9a-b3a5-deda5ef33072",
+              "id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+              "input": {
+                "as_of": "2026-10-24T00:00:00+00:00",
+                "records": [
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T00:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T01:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T02:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T03:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T04:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T05:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T06:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T07:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T08:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T09:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T10:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T11:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T12:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T13:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T14:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T15:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T16:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T17:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T18:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T19:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T20:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T21:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T22:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T23:00:00+00:00"
+                  }
+                ],
+                "source": "mock"
+              },
+              "mode": "historical_mock",
+              "plot_id": "e1a5fe85-9f10-4468-b085-3ee1138b1889",
+              "profile": {
+                "consecutive_hours": 6,
+                "duration_basis": "Engineering demo assumption, not validated infection duration",
+                "humidity_exclusive_min_pct": 90,
+                "mode": "experimental_mock_only",
+                "requires_leaf_wet": true,
+                "source_url": "https://ipm.ucanr.edu/agriculture/rice/rice-blast/",
+                "temperature_max_c": 27.77777777777778,
+                "temperature_min_c": 25.0,
+                "version": "blast-conditions-mock-v0.1",
+                "window_hours": 24
+              },
+              "request_id": "8af82776-dfca-40f1-8be5-0e85705fa0f1",
+              "result": {
+                "action": "Kiểm tra dữ liệu và quan sát ruộng; có thể chụp ảnh để kiểm tra triệu chứng.",
+                "assessment_kind": "environmental_pattern",
+                "completeness": {
+                  "expected_buckets": 24,
+                  "missing_buckets": [],
+                  "received_buckets": 24
+                },
+                "disease": "rice_blast",
+                "field_validated": false,
+                "forecast_horizon_hours": null,
+                "input_sha256": "e87677a045caaa6f0ffe45ca7a7a5a36fc46b3e0d57279917cc2ab33768b3eaa",
+                "is_mock": true,
+                "longest_matching_run_hours": 24,
+                "profile_sha256": "809bc3b9de0dcc14393d145a157afc97837e0208ce479f1f2d4b9a76f356c897",
+                "profile_version": "blast-conditions-mock-v0.1",
+                "reasons": [
+                  "Mẫu hẹp nhiệt độ/độ ẩm/lá ướt đồng thời kéo dài tối đa 24 giờ liên tục.",
+                  "Mốc 6 giờ là giả định demo; chưa chứng minh thời gian nhiễm bệnh.",
+                  "Không xác nhận có/không có bệnh, không ước lượng xác suất hoặc ngày xuất hiện bệnh."
+                ],
+                "source": "mock",
+                "status": "advisory",
+                "window_end": "2026-10-24T00:00:00+00:00",
+                "window_start": "2026-10-23T00:00:00+00:00"
+              },
+              "season_id": "4731ec90-c4f9-420f-b26f-1206ca70fdb0",
+              "user_id": "89baee01-7f47-4b02-af77-3f4d76357ead",
+              "valid_until": "2026-10-24T01:00:00+00:00"
+            },
+            "snapshot_sha256": "d7966e9748ae27c2a03472dfbe6c3e68bd1c087b4c84f9aba3b7aa6679f6a860"
+          },
+          "disease_confirmed": false,
+          "episode_requirement": null,
+          "followup_id": "1bad6a4e-7087-46b8-ba67-be32e39b852a",
+          "followup_version": 2,
+          "projection_read_at": "2026-10-24T03:00:00+00:00",
+          "required": {
+            "available_at": "2026-11-02T14:14:43.046040+00:00",
+            "base_assessment_id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+            "display_freshness": "expired",
+            "id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+            "revision": 1,
+            "snapshot": {
+              "created_at": "2026-11-02T14:14:43.046040+00:00",
+              "cultivation_context": {
+                "age_at_local_date": "2026-10-24",
+                "age_reason": "unknown_planting_context",
+                "captured_at": "2026-11-02T14:14:43.046040+00:00",
+                "context_check": {
+                  "agronomically_verified": false,
+                  "changes_warning_rule": false,
+                  "meaning": "Completeness of user-declared context only; not warning eligibility or field validation",
+                  "missing_fields": [
+                    "region",
+                    "province_or_city",
+                    "rice_variety",
+                    "planting_method",
+                    "planting_date",
+                    "season_status"
+                  ],
+                  "status": "incomplete"
+                },
+                "crop_age_basis": null,
+                "crop_age_days": null,
+                "interpretation": "Current record captured when assessment is created; not evidence it was available at window end",
+                "item": null,
+                "recorded_after_window_end": null
+              },
+              "device_id": "73f60e58-f144-4e9a-b3a5-deda5ef33072",
+              "id": "84c96ec2-6697-4e17-8e37-8cfa01e95076",
+              "input": {
+                "as_of": "2026-10-24T00:00:00+00:00",
+                "records": [
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T00:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T01:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T02:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T03:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T04:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T05:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T06:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T07:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T08:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T09:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T10:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T11:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T12:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T13:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T14:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T15:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T16:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T17:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T18:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T19:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T20:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T21:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T22:00:00+00:00"
+                  },
+                  {
+                    "air_temperature_c": 26.0,
+                    "leaf_wet": true,
+                    "relative_humidity_pct": 95.0,
+                    "start_at": "2026-10-23T23:00:00+00:00"
+                  }
+                ],
+                "source": "mock"
+              },
+              "mode": "historical_mock",
+              "plot_id": "e1a5fe85-9f10-4468-b085-3ee1138b1889",
+              "profile": {
+                "consecutive_hours": 6,
+                "duration_basis": "Engineering demo assumption, not validated infection duration",
+                "humidity_exclusive_min_pct": 90,
+                "mode": "experimental_mock_only",
+                "requires_leaf_wet": true,
+                "source_url": "https://ipm.ucanr.edu/agriculture/rice/rice-blast/",
+                "temperature_max_c": 27.77777777777778,
+                "temperature_min_c": 25.0,
+                "version": "blast-conditions-mock-v0.1",
+                "window_hours": 24
+              },
+              "request_id": "8af82776-dfca-40f1-8be5-0e85705fa0f1",
+              "result": {
+                "action": "Kiểm tra dữ liệu và quan sát ruộng; có thể chụp ảnh để kiểm tra triệu chứng.",
+                "assessment_kind": "environmental_pattern",
+                "completeness": {
+                  "expected_buckets": 24,
+                  "missing_buckets": [],
+                  "received_buckets": 24
+                },
+                "disease": "rice_blast",
+                "field_validated": false,
+                "forecast_horizon_hours": null,
+                "input_sha256": "e87677a045caaa6f0ffe45ca7a7a5a36fc46b3e0d57279917cc2ab33768b3eaa",
+                "is_mock": true,
+                "longest_matching_run_hours": 24,
+                "profile_sha256": "809bc3b9de0dcc14393d145a157afc97837e0208ce479f1f2d4b9a76f356c897",
+                "profile_version": "blast-conditions-mock-v0.1",
+                "reasons": [
+                  "Mẫu hẹp nhiệt độ/độ ẩm/lá ướt đồng thời kéo dài tối đa 24 giờ liên tục.",
+                  "Mốc 6 giờ là giả định demo; chưa chứng minh thời gian nhiễm bệnh.",
+                  "Không xác nhận có/không có bệnh, không ước lượng xác suất hoặc ngày xuất hiện bệnh."
+                ],
+                "source": "mock",
+                "status": "advisory",
+                "window_end": "2026-10-24T00:00:00+00:00",
+                "window_start": "2026-10-23T00:00:00+00:00"
+              },
+              "season_id": "4731ec90-c4f9-420f-b26f-1206ca70fdb0",
+              "user_id": "89baee01-7f47-4b02-af77-3f4d76357ead",
+              "valid_until": "2026-10-24T01:00:00+00:00"
+            },
+            "snapshot_sha256": "d7966e9748ae27c2a03472dfbe6c3e68bd1c087b4c84f9aba3b7aa6679f6a860"
+          },
+          "source": "mock",
+          "training_approved": false
+        },
+        "success": true
+      }
+    }
+  },
+  {
+    "step": 11,
+    "name": "available synthetic observation",
+    "scenario": "check_conditions",
+    "request": {
+      "method": "GET",
+      "path": "/api/farm/seasons/4731ec90-c4f9-420f-b26f-1206ca70fdb0/observations",
+      "path_template": "/api/farm/seasons/{season_id}/observations",
+      "auth_context": "owner",
+      "body": null
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "X-Request-ID": "cb3bd483-3b08-4811-b720-1005e410b5d9",
+        "Cache-Control": "private, no-store",
+        "Vary": "Authorization"
+      },
+      "body": {
+        "items": [
+          {
+            "available_at": "2026-10-24T02:00:00+00:00",
+            "change_reason": "Ghi nhận lần đầu",
+            "disease": "leaf_blast",
+            "id": "ba78dbdf-b110-43de-abaa-aadba0fe78ef",
+            "label_approved_for_training": false,
+            "observed_at": "2026-10-24T00:00:00+00:00",
+            "payload": {
+              "analysis_id": null,
+              "finding": "uncertain",
+              "notes": "Chưa xác minh",
+              "platform_verified": false,
+              "record_status": "active",
+              "review": null,
+              "verification": "unverified",
+              "verification_provenance": "not_verified"
+            },
+            "payload_sha256": "c107254836316de1213029e51ed85a737b5171ff9cadde989416e904221d0865",
+            "plant_part": "leaf",
+            "recorded_at": "2026-10-24T02:00:00+00:00",
+            "request_id": "c363acfc-513e-4f69-96cb-e0031d85a17a",
+            "revision": 1,
+            "scheduled": true,
+            "season_id": "4731ec90-c4f9-420f-b26f-1206ca70fdb0",
+            "source": "synthetic"
+          }
+        ],
+        "pagination": {
+          "has_next": false,
+          "page": 1,
+          "page_size": 20,
+          "total": 1,
+          "total_pages": 1
+        },
+        "success": true
+      }
+    }
+  }
+]
