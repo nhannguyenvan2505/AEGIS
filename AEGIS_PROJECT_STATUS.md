@@ -24,14 +24,15 @@ hỗ trợ. Chưa có thiết bị IoT; tiếp nhận dataset bên ngoài tiếp
 | Pilot/IoT | Raw ingest, QC, retry/buffer, audit, follow-up, timeline, backup/restore và simulator có sẵn | Raw point chưa tự cấp hourly forecast; toàn bộ môi trường demo là giả lập |
 | Vận hành demo | Một launcher Backend+worker+kho chung, seed hai nguồn, replay/restart; tool tiến đồng hồ dry/wet/missing | Localhost; cần nối thiết bị với API và nhập mật khẩu demo khi chạy |
 | Hồi quy05/11 | Backend120, pilot150, temporal129, mobile27 bài đạt; typecheck/lint và Android bundle đạt | Không thay nghiệm thu native, không phải APK/release production |
-| Package cho clone07/11 | Worker forecast, model Logistic Regression giả lập, fixtures và hướng dẫn Android cùng nằm trong `forecast_demo/` | Gói portable chưa được chạy sạch trên máy thành viên; chưa có nghiệm thu native |
+| Bàn giao demo cho clone07/11 | Nhánh có mobile, Backend/pilot, web prototype, forecast synthetic, simulator IoT, AI API source, runbook và status | Chưa clean-install/demo trên máy thành viên; YOLO V4 checkpoint và ảnh/dataset không nằm trong Git |
 | Ngoài core midterm | Camera stream, Google login, đổi mật khẩu, push và đề xuất chuyên môn còn chưa hoàn chỉnh | Không ghi nhận đã hoàn thành toàn bộ roadmap |
 
 **Kết luận:** luồng forecast MVP đã được nối ở mức source, model inference,
-Backend và client HTTP; **FM-05 nghiệm thu trên mobile vẫn chưa hoàn thành**.
+Backend và mobile client; gói clone đã được đẩy lên nhánh riêng. **FM-05 nghiệm
+thu trên thiết bị của thành viên vẫn chưa được ghi nhận.**
 Không suy số kiểm thử hoặc bundle export thành tỷ lệ hoàn thành toàn dự án.
 
-Chi tiết mới nhất ở **mục103** cuối file, lịch sử forecast ở mục102 và
+Chi tiết mới nhất ở **mục105** cuối file; lịch sử forecast ở mục102–104 và
 [rà soát core05/11](D:/AEGIS/docs/MVP_CORE_REVIEW_20261105.md).
 Lệnh chạy/seed/tiến thời gian ở
 [runbook forecast](D:/AEGIS/docs/FORECAST_MVP_MIDTERM_20261105.md).
@@ -39,7 +40,8 @@ Lệnh chạy/seed/tiến thời gian ở
 
 ---
 
-**Lịch sử được bảo toàn:** các mục1–101 bên dưới ghi trạng thái tại từng mốc.
+**Lịch sử được bảo toàn:** các mục1–101 bên dưới ghi trạng thái tại từng mốc;
+những mục102–105 được bổ sung sau.
 Phần mở đầu cũ được lập24/10/2026,09:43; các câu “chưa có forecast/mobile”
 hoặc ưu tiên nhận diện ở mốc cũ không thay thế tổng quan05/11 bên trên.
 
@@ -7270,6 +7272,21 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 - Không đưa lên Git: dataset/ảnh ảnh thật, V4 `.pt`, AI experiments/results,
   venv, database, pilot store, private backup và logs evidence. Checkpoint cần
   được cấp riêng theo SHA-256 trong `CLONE_DEMO.md`.
-- Phạm vi bàn giao đã được chuẩn bị trên nhánh demo. Chưa clean-install hoặc
-  chạy các demo trên máy thành viên; guide nêu riêng yêu cầu checkpoint của
-  luồng nhận diện ảnh.
+- Đã commit và push phần mở rộng tại `6213555` trên
+  `codex/portable-forecast-demo`; trước đó nhánh có commit forecast `aaffdb4`.
+- Chưa clean-install hoặc chạy các demo trên máy thành viên; guide nêu riêng
+  yêu cầu checkpoint cho nhận diện ảnh. Simulator IoT không thay thiết bị vật lý.
+
+## 105. Xác nhận khả năng chạy Forecast từ clone — 07/11/2026
+
+- Forecast MVP đã có đường chạy mobile: launcher seed hai mùa vụ/nguồn hourly,
+  gửi input qua Backend tới worker Logistic Regression, ghi kết quả/lịch sử,
+  và app mobile đọc tổng quan, nguồn, dự báo, trạng thái insufficient-data.
+- Runtime/model synthetic và fixtures đã được đưa vào `forecast_demo/`; cài hai
+  Python 3.11 env theo `forecast_demo/README.md`, sau đó chạy launcher và Expo.
+  Android USB/emulator cần `adb reverse tcp:5000 tcp:5000`.
+- Không cần YOLO checkpoint để chạy forecast. Checkpoint chỉ cần cho luồng nhận
+  diện ảnh. Model dự báo synthetic không được hiệu chuẩn hoặc xác minh ngoài thực địa.
+- Static bundle/fixture SHA được đối chiếu khi đóng gói; chưa chạy cài sạch trên
+  máy thành viên hoặc nghiệm thu native nên khả năng máy đó chạy thành công vẫn
+  cần xác nhận tại buổi tích hợp.
