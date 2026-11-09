@@ -1,5 +1,7 @@
 # Chỉ mục bàn giao hiện hành — AEGIS
 
+**Cutover database 09/11/2026:** MySQL + MongoDB là runtime mặc định cho core/mobile/pilot. Dữ liệu runtime cũ đã nhập và đối chiếu; xem [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) và `backend/database/cutover_report.json`.
+
 **Bàn giao clone07/11:** xem [hướng dẫn mọi demo](../CLONE_DEMO.md),
 [package chạy Android forecast](../forecast_demo/README.md),
 [rà soát core hiện hành](MVP_CORE_REVIEW_20261105.md)

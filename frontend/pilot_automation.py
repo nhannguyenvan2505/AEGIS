@@ -18,6 +18,8 @@ def now():return datetime.now(timezone.utc)
 
 
 def initialize(path):
+    from app.hybrid_pilot import initialized
+    if initialized(path): return
     existed=path.exists()
     with journal_db(path) as db:
         if existed:

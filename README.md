@@ -1,5 +1,9 @@
 # AEGIS
 
+**Frontend midterm handoff:** follow [the team quickstart](docs/MIDTERM_TEAM_QUICKSTART.md) for setup, private model download, hybrid databases and demo launch. See [checkout verification](docs/MIDTERM_HANDOFF_VERIFICATION.md) for what was exercised.
+
+Database update 09/11/2026: core/mobile/pilot now default to MySQL with MongoDB telemetry and inference logs. Start Docker databases before the API; see [hybrid database runbook](docs/HYBRID_DATABASE_RUNBOOK.md). Existing runtime SQLite data has been migrated and retained as recovery sources.
+
 AI and IoT for rice disease monitoring: rice blast, brown spot and sheath blight.
 
 - backend/: Flask API, Bearer sessions, private analyses/history, farm context and mock warning rules.
@@ -27,4 +31,4 @@ See [mobile integration and setup](docs/MOBILE_INTEGRATION.md), [upstream attrib
 IoT readings and forecasts in the midterm flow are synthetic. See the clone guide
 for model/data limits; field validation and device acceptance remain pending.
 
-Use GitHub Flow: issue → branch → selective commits → PR → independent review → squash merge. Workflow documentation is proposed in PR #2; it must be reviewed separately. Do not push directly to main.
+Team workflow: issue → task branch → PR into `develop` → independent review → release into `main`. See [CONTRIBUTING.md](CONTRIBUTING.md) for team rules and [GitHub setup](docs/GITHUB_TEAM_SETUP.md) for activation status. Do not push directly to shared branches.

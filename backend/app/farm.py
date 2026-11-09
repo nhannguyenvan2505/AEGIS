@@ -10,7 +10,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 from .auth import require_auth
 from .blast_conditions import PROFILE, digest, evaluate, parse_time
 from .limits import check_limit
-from .storage import connect
+from .repositories import repository as connect
 from .cultivation import (validate_profile, latest_profile, serialize as cultivation_revision,
                           envelope as cultivation_envelope, assessment_context)
 
@@ -69,6 +69,7 @@ def body(required, optional=()):
     raw = request.stream.read(64 * 1024 + 1)
     if len(raw) > 64 * 1024:
         raise FarmError('payload_too_large', 'JSON tối đa 64 KiB.', 413)
+    g.raw_json_payload = raw
     def object_pairs(pairs):
         result = {}
         for key, value in pairs:
@@ -113,14 +114,19 @@ def timestamp(value):
 
 
 def owned(db, kind, identifier):
-    row = db.execute(f'SELECT * FROM {TABLES[kind]} WHERE id=? AND user_id=?',
-                     (str(identifier), g.user['id'])).fetchone()
+    if isinstance(db, sqlite3.Connection):
+        from .repositories.sqlite import SQLiteRepository
+        db = SQLiteRepository(db)
+    row = db.owned(TABLES[kind], str(identifier), g.user['id'])
     if row is None:
         raise FarmError('resource_not_found', 'Không tìm thấy tài nguyên.', 404)
     return row
 
 
 def paginate(db, table, where, params, serialize=dict, order=None, allowed_query=()):
+    if isinstance(db, sqlite3.Connection):
+        from .repositories.sqlite import SQLiteRepository
+        db = SQLiteRepository(db)
     if set(request.args) - {'page', 'page_size'} - set(allowed_query):
         raise FarmError('invalid_pagination', 'Chỉ hỗ trợ page và page_size.')
     values = []
@@ -130,10 +136,8 @@ def paginate(db, table, where, params, serialize=dict, order=None, allowed_query
             raise FarmError('invalid_pagination', 'Phân trang không hợp lệ.')
         values.append(int(value))
     page, size = values
-    total = db.execute(f'SELECT COUNT(*) FROM {table} WHERE {where}', params).fetchone()[0]
     order = order or ('start_at DESC' if table == 'farm_telemetry' else 'created_at DESC, id DESC')
-    rows = db.execute(f'SELECT * FROM {table} WHERE {where} ORDER BY {order} LIMIT ? OFFSET ?',
-                      (*params, size, (page - 1) * size)).fetchall()
+    total, rows = db.page(table, where, params, size, (page-1)*size, order)
     pages = (total + size - 1) // size
     return jsonify(success=True, items=[serialize(r) for r in rows],
                    pagination=dict(page=page, page_size=size, total=total, total_pages=pages, has_next=page < pages))
@@ -161,13 +165,13 @@ def within_season(instant, season):
 def plots():
     if request.method != 'POST':
         with connect(current_app.config) as db:
-            db.execute('BEGIN')
+            db.begin()
             return paginate(db, 'farm_plots', 'user_id=?', (g.user['id'],))
     data = body({'name'}, {'location_text'})
     item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], name=text(data['name']),
                 location_text=text(data.get('location_text', ''), 500, True), created_at=now().isoformat())
     with connect(current_app.config) as db:
-        db.execute('INSERT INTO farm_plots VALUES (:id,:user_id,:name,:location_text,:created_at)', item)
+        db.add_plot(item)
     return jsonify(success=True, item=item), 201
 
 
@@ -183,7 +187,7 @@ def plot_detail(identifier):
 def seasons(identifier):
     data = body({'name', 'start_date'}, {'end_date'}) if request.method == 'POST' else None
     with connect(current_app.config) as db:
-        db.execute('BEGIN IMMEDIATE' if data is not None else 'BEGIN')
+        db.begin(data is not None)
         parent = owned(db, 'plots', identifier)
         if data is None:
             return paginate(db, 'farm_seasons', 'user_id=? AND plot_id=?', (g.user['id'], parent['id']))
@@ -193,7 +197,7 @@ def seasons(identifier):
             raise FarmError('invalid_dates', 'Ngày kết thúc trước ngày bắt đầu.')
         item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], plot_id=parent['id'], name=text(data['name']),
                     crop='rice', start_date=start, end_date=end, created_at=now().isoformat())
-        db.execute('INSERT INTO farm_seasons VALUES (:id,:user_id,:plot_id,:name,:crop,:start_date,:end_date,:created_at)', item)
+        db.add_season(item)
     return jsonify(success=True, item=item), 201
 
 
@@ -209,7 +213,7 @@ def season_detail(identifier):
 def cultivation_profile(identifier):
     data = body({'base_revision', 'profile', 'change_reason'}) if request.method == 'PUT' else None
     with connect(current_app.config) as db:
-        db.execute('BEGIN IMMEDIATE' if data is not None else 'BEGIN')
+        db.begin(data is not None)
         season = owned(db, 'seasons', identifier)
         old = latest_profile(db, season['id'], g.user['id'])
         if data is None:
@@ -232,8 +236,7 @@ def cultivation_profile(identifier):
             response = jsonify(success=True, **cultivation_envelope(old))
             response.headers['Idempotency-Replayed'] = 'true'
             return response
-        db.execute('INSERT INTO farm_cultivation_revisions VALUES (?,?,?,?,?,?,?,?,?)',
-                   (str(uuid.uuid4()), season['id'], g.user['id'], revision+1,
+        db.add_profile((str(uuid.uuid4()), season['id'], g.user['id'], revision+1,
                     json.dumps(profile, ensure_ascii=False, allow_nan=False), profile_hash,
                     reason, now().isoformat(), g.request_id))
         return jsonify(success=True, **cultivation_envelope(latest_profile(db, season['id'], g.user['id']))), 201
@@ -243,7 +246,7 @@ def cultivation_profile(identifier):
 @require_auth
 def cultivation_history(identifier):
     with connect(current_app.config) as db:
-        db.execute('BEGIN')
+        db.begin()
         season = owned(db, 'seasons', identifier)
         return paginate(db, 'farm_cultivation_revisions', 'season_id=? AND user_id=?',
                         (season['id'], g.user['id']), cultivation_revision, order='revision DESC')
@@ -254,7 +257,7 @@ def cultivation_history(identifier):
 def devices(identifier):
     data = body({'name', 'device_code', 'source'}) if request.method == 'POST' else None
     with connect(current_app.config) as db:
-        db.execute('BEGIN IMMEDIATE' if data is not None else 'BEGIN')
+        db.begin(data is not None)
         parent = owned(db, 'seasons', identifier)
         if data is None:
             return paginate(db, 'farm_devices', 'user_id=? AND season_id=?', (g.user['id'], parent['id']))
@@ -263,11 +266,11 @@ def devices(identifier):
         code = text(data['device_code'], 64)
         if not re.fullmatch(r'[A-Za-z0-9._:-]+', code):
             raise FarmError('invalid_fields', 'device_code chỉ gồm ASCII chữ/số và . _ : -')
-        if db.execute('SELECT 1 FROM farm_devices WHERE user_id=? AND device_code=?', (g.user['id'], code)).fetchone():
+        if db.device_code_exists(g.user['id'], code):
             raise FarmError('device_code_exists', 'Mã thiết bị đã được dùng.', 409)
         item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], season_id=parent['id'], name=text(data['name']),
                     device_code=code, source='mock', created_at=now().isoformat())
-        db.execute('INSERT INTO farm_devices VALUES (:id,:user_id,:season_id,:name,:device_code,:source,:created_at)', item)
+        db.add_device(item)
     return jsonify(success=True, item=item), 201
 
 
@@ -283,7 +286,7 @@ def device_detail(identifier):
 def readings(identifier):
     data = body({'source', 'records'}) if request.method == 'POST' else None
     with connect(current_app.config) as db:
-        db.execute('BEGIN IMMEDIATE' if data is not None else 'BEGIN')
+        db.begin(data is not None)
         device, season = context(db, identifier)
         if data is None:
             return paginate(db, 'farm_telemetry', 'device_id=? AND user_id=?', (device['id'], g.user['id']),
@@ -313,14 +316,13 @@ def readings(identifier):
                              relative_humidity_pct=float(raw['relative_humidity_pct']), leaf_wet=raw['leaf_wet']))
         inserted = replayed = 0
         for row in rows:
-            old = db.execute('SELECT * FROM farm_telemetry WHERE device_id=? AND start_at=?', (device['id'], row['start_at'])).fetchone()
+            old = db.reading(device['id'], row['start_at'])
             if old:
                 if telemetry(old) != row:
                     raise FarmError('telemetry_conflict', 'Bucket đã lưu khác giá trị; dữ liệu không bị ghi đè.', 409)
                 replayed += 1
             else:
-                db.execute('INSERT INTO farm_telemetry VALUES (?,?,?,?,?,?,?)',
-                           (device['id'], g.user['id'], row['start_at'], row['air_temperature_c'],
+                db.add_reading((device['id'], g.user['id'], row['start_at'], row['air_temperature_c'],
                             row['relative_humidity_pct'], int(row['leaf_wet']), now().isoformat()))
                 inserted += 1
     return jsonify(success=True, inserted=inserted, replayed=replayed, source='mock'), 201 if inserted else 200
@@ -335,7 +337,7 @@ def assessment_snapshot(row):
 def assessments(identifier):
     data = body(set(), {'as_of'}) if request.method == 'POST' else None
     with connect(current_app.config) as db:
-        db.execute('BEGIN IMMEDIATE' if data is not None else 'BEGIN')
+        db.begin(data is not None)
         device, season = context(db, identifier)
         if data is None:
             return paginate(db, 'farm_assessments', 'device_id=? AND user_id=?',
@@ -346,15 +348,13 @@ def assessments(identifier):
             raise FarmError('future_assessment', 'Không đánh giá cửa sổ tương lai.')
         within_season(end - timedelta(microseconds=1), season)
         profile_hash = digest(PROFILE)
-        old = db.execute('SELECT * FROM farm_assessments WHERE device_id=? AND profile_sha256=? AND window_end=?',
-                         (device['id'], profile_hash, end.isoformat())).fetchone()
+        old = db.find_assessment(device['id'], profile_hash, end.isoformat())
         if old:
             response = jsonify(success=True, item=assessment_snapshot(old))
             response.headers['Idempotency-Replayed'] = 'true'
             return response
         start = end - timedelta(hours=24)
-        rows = db.execute('SELECT * FROM farm_telemetry WHERE device_id=? AND user_id=? AND start_at>=? AND start_at<? ORDER BY start_at',
-                          (device['id'], g.user['id'], start.isoformat(), end.isoformat())).fetchall()
+        rows = db.readings(device['id'], g.user['id'], start.isoformat(), end.isoformat())
         payload = dict(source='mock', as_of=end.isoformat(), records=[telemetry(r) for r in rows])
         output = evaluate(payload)
         item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], plot_id=season['plot_id'], season_id=season['id'],
@@ -362,8 +362,7 @@ def assessments(identifier):
                     mode='historical_mock' if end < cutoff else 'current_mock',
                     valid_until=(end + timedelta(hours=1)).isoformat(), profile=dict(PROFILE), input=payload, result=output)
         item['cultivation_context'] = assessment_context(latest_profile(db, season['id'], g.user['id']), end, now())
-        db.execute('INSERT INTO farm_assessments VALUES (?,?,?,?,?,?,?,?)',
-                   (item['id'], g.user['id'], device['id'], profile_hash, end.isoformat(), output['status'],
+        db.add_assessment((item['id'], g.user['id'], device['id'], profile_hash, end.isoformat(), output['status'],
                     json.dumps(item, ensure_ascii=False, allow_nan=False), item['created_at']))
     return jsonify(success=True, item=item), 201
 
@@ -380,7 +379,7 @@ def assessment_detail(identifier):
 def followup_analyses(identifier):
     data = body({'analysis_id'}) if request.method == 'POST' else None
     with connect(current_app.config) as db:
-        db.execute('BEGIN IMMEDIATE' if data is not None else 'BEGIN')
+        db.begin(data is not None)
         assessment = owned(db, 'assessments', identifier)
         if data is None:
             # Pagination via analyses table: no raw image bytes or unauthenticated URLs.
@@ -393,10 +392,8 @@ def followup_analyses(identifier):
             analysis_id = str(uuid.UUID(data['analysis_id']))
         except (ValueError, TypeError, AttributeError):
             raise FarmError('invalid_fields', 'analysis_id phải là UUID.')
-        analysis = db.execute('SELECT 1 FROM analyses WHERE id=? AND user_id=?', (analysis_id, g.user['id'])).fetchone()
+        analysis = db.owned('analyses', analysis_id, g.user['id'])
         if analysis is None:
             raise FarmError('resource_not_found', 'Không tìm thấy tài nguyên.', 404)
-        cursor = db.execute('INSERT OR IGNORE INTO farm_assessment_analyses VALUES (?,?,?,?)',
-                            (assessment['id'], analysis_id, g.user['id'], now().isoformat()))
-        inserted = cursor.rowcount == 1
+        inserted = db.link_analysis(assessment['id'], analysis_id, g.user['id'], now().isoformat())
     return jsonify(success=True, assessment_id=assessment['id'], analysis_id=analysis_id), 201 if inserted else 200

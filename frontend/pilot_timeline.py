@@ -16,6 +16,11 @@ def now():return datetime.now(timezone.utc)
 
 @contextmanager
 def read_store(storage):
+    from app.hybrid_pilot import initialized,connection,PilotConnection
+    if initialized(storage/'journal.sqlite3'):
+        with connection(storage/'journal.sqlite3',readonly=True) as journal:
+            yield PilotConnection(journal.connection,journal.config,journal.key,'core',readonly=True)
+        return
     db=sqlite3.connect((storage/'demo.db').as_uri()+'?mode=ro',uri=True);db.row_factory=sqlite3.Row
     try:
         for name,file in [('journal','journal.sqlite3'),('management','management.sqlite3'),('raw','telemetry.sqlite3'),('workflow','followup.sqlite3'),('research','research.sqlite3')]:

@@ -1,0 +1,262 @@
+{
+  "schema_version": "aegis-raw-hourly-output-v1",
+  "algorithm_version": "aegis-slot-hourly-v1",
+  "source": "synthetic",
+  "owner_id": "af95dd15-662a-4947-91b6-bba732598e9c",
+  "season_id": "c8751073-a1c5-4c39-b2f8-f48223afb99a",
+  "stream_id": "11111111-1111-4111-8111-111111111111",
+  "policy": {
+    "schema_version": "aegis-raw-hourly-policy-v1",
+    "algorithm_version": "aegis-slot-hourly-v1",
+    "policy_id": "synthetic-600s-hourly",
+    "revision": 1,
+    "source": "synthetic",
+    "stream_id": "11111111-1111-4111-8111-111111111111",
+    "available_at": "2026-11-01T00:00:00+00:00",
+    "anchor_at": "2026-11-01T00:00:00+00:00",
+    "interval_seconds": 600,
+    "tolerance_seconds": 5,
+    "arrival_grace_seconds": 60,
+    "minimum_coverage_numerator": 4,
+    "minimum_coverage_denominator": 5,
+    "numeric_method": "slot_arithmetic_mean",
+    "wetness_method": "point_diagnostics_only"
+  },
+  "policy_sha256": "2731d90e3d274bc1f66561c8b728d77c0b211caf6894a00efcaca14af8440b73",
+  "raw_bundle_sha256": "da833ef141218380c0cb6af15f6bbb5a426385b090de653e330cb1007a2ea14e",
+  "metadata_sha256": "15a5d304dfa3c9ba76fd8c6bfa57af09bcfa971eea6c21ed31e12ef51fe1f33d",
+  "request": {
+    "start_at": "2026-11-01T00:00:00+00:00",
+    "end_at": "2026-11-01T01:00:00+00:00",
+    "as_of": "2026-11-01T01:01:05+00:00"
+  },
+  "status": "evaluated",
+  "buckets": [
+    {
+      "start_at": "2026-11-01T00:00:00+00:00",
+      "end_at": "2026-11-01T01:00:00+00:00",
+      "close_at": "2026-11-01T01:01:05+00:00",
+      "available_at": "2026-11-01T01:01:05+00:00",
+      "status": "complete_numeric",
+      "expected_slots": 6,
+      "policy_sha256": "2731d90e3d274bc1f66561c8b728d77c0b211caf6894a00efcaca14af8440b73",
+      "variables": {
+        "air_temperature_c": {
+          "valid_slots": 6,
+          "coverage": 1.0,
+          "selected_samples": [
+            {
+              "slot_at": "2026-11-01T00:00:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000001",
+              "observed_at": "2026-11-01T00:00:00+00:00",
+              "received_at": "2026-11-01T00:00:00+00:00",
+              "payload_sha256": "807dc22bfd8f1eb1c183ecedeb67d8aa73988c7ce4aa1eab2674c72c2ff049c9",
+              "value": 20,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:10:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000002",
+              "observed_at": "2026-11-01T00:10:00+00:00",
+              "received_at": "2026-11-01T00:10:00+00:00",
+              "payload_sha256": "0bdc996df648106fc6b2c80bc283cedb85145b87612cdddb59f959942ab04241",
+              "value": 22,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:20:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000003",
+              "observed_at": "2026-11-01T00:20:00+00:00",
+              "received_at": "2026-11-01T00:20:00+00:00",
+              "payload_sha256": "b688ad8efad4c4b416af747bbce73e0b691a1becc89d1ba5be8bf013b9c28c76",
+              "value": 24,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:30:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000004",
+              "observed_at": "2026-11-01T00:30:00+00:00",
+              "received_at": "2026-11-01T00:30:00+00:00",
+              "payload_sha256": "c8a21ad9c862a8b8437e45c9efdfa8150a9bb8b052561fa1789b1b079b55b3b9",
+              "value": 26,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:40:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000005",
+              "observed_at": "2026-11-01T00:40:00+00:00",
+              "received_at": "2026-11-01T00:40:00+00:00",
+              "payload_sha256": "27915b2f9729658a48ede792521f9d5aa2f0f5190d8802c90509e42bc3522656",
+              "value": 28,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:50:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000006",
+              "observed_at": "2026-11-01T00:50:00+00:00",
+              "received_at": "2026-11-01T00:50:00+00:00",
+              "payload_sha256": "b388e165f1636b202a45f0a75a2ed12abe2fcad58017c6e5070cca5a6b9edbcf",
+              "value": 30,
+              "reported_quality": "unknown"
+            }
+          ],
+          "status": "ready",
+          "value": 25.0,
+          "reasons": []
+        },
+        "relative_humidity_pct": {
+          "valid_slots": 6,
+          "coverage": 1.0,
+          "selected_samples": [
+            {
+              "slot_at": "2026-11-01T00:00:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000001",
+              "observed_at": "2026-11-01T00:00:00+00:00",
+              "received_at": "2026-11-01T00:00:00+00:00",
+              "payload_sha256": "807dc22bfd8f1eb1c183ecedeb67d8aa73988c7ce4aa1eab2674c72c2ff049c9",
+              "value": 60,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:10:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000002",
+              "observed_at": "2026-11-01T00:10:00+00:00",
+              "received_at": "2026-11-01T00:10:00+00:00",
+              "payload_sha256": "0bdc996df648106fc6b2c80bc283cedb85145b87612cdddb59f959942ab04241",
+              "value": 62,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:20:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000003",
+              "observed_at": "2026-11-01T00:20:00+00:00",
+              "received_at": "2026-11-01T00:20:00+00:00",
+              "payload_sha256": "b688ad8efad4c4b416af747bbce73e0b691a1becc89d1ba5be8bf013b9c28c76",
+              "value": 64,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:30:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000004",
+              "observed_at": "2026-11-01T00:30:00+00:00",
+              "received_at": "2026-11-01T00:30:00+00:00",
+              "payload_sha256": "c8a21ad9c862a8b8437e45c9efdfa8150a9bb8b052561fa1789b1b079b55b3b9",
+              "value": 66,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:40:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000005",
+              "observed_at": "2026-11-01T00:40:00+00:00",
+              "received_at": "2026-11-01T00:40:00+00:00",
+              "payload_sha256": "27915b2f9729658a48ede792521f9d5aa2f0f5190d8802c90509e42bc3522656",
+              "value": 68,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:50:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000006",
+              "observed_at": "2026-11-01T00:50:00+00:00",
+              "received_at": "2026-11-01T00:50:00+00:00",
+              "payload_sha256": "b388e165f1636b202a45f0a75a2ed12abe2fcad58017c6e5070cca5a6b9edbcf",
+              "value": 70,
+              "reported_quality": "unknown"
+            }
+          ],
+          "status": "ready",
+          "value": 65.0,
+          "reasons": []
+        },
+        "leaf_wet": {
+          "valid_slots": 6,
+          "coverage": 1.0,
+          "selected_samples": [
+            {
+              "slot_at": "2026-11-01T00:00:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000001",
+              "observed_at": "2026-11-01T00:00:00+00:00",
+              "received_at": "2026-11-01T00:00:00+00:00",
+              "payload_sha256": "807dc22bfd8f1eb1c183ecedeb67d8aa73988c7ce4aa1eab2674c72c2ff049c9",
+              "value": true,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:10:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000002",
+              "observed_at": "2026-11-01T00:10:00+00:00",
+              "received_at": "2026-11-01T00:10:00+00:00",
+              "payload_sha256": "0bdc996df648106fc6b2c80bc283cedb85145b87612cdddb59f959942ab04241",
+              "value": true,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:20:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000003",
+              "observed_at": "2026-11-01T00:20:00+00:00",
+              "received_at": "2026-11-01T00:20:00+00:00",
+              "payload_sha256": "b688ad8efad4c4b416af747bbce73e0b691a1becc89d1ba5be8bf013b9c28c76",
+              "value": true,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:30:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000004",
+              "observed_at": "2026-11-01T00:30:00+00:00",
+              "received_at": "2026-11-01T00:30:00+00:00",
+              "payload_sha256": "c8a21ad9c862a8b8437e45c9efdfa8150a9bb8b052561fa1789b1b079b55b3b9",
+              "value": true,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:40:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000005",
+              "observed_at": "2026-11-01T00:40:00+00:00",
+              "received_at": "2026-11-01T00:40:00+00:00",
+              "payload_sha256": "27915b2f9729658a48ede792521f9d5aa2f0f5190d8802c90509e42bc3522656",
+              "value": true,
+              "reported_quality": "unknown"
+            },
+            {
+              "slot_at": "2026-11-01T00:50:00+00:00",
+              "sample_id": "22222222-2222-4222-8222-000000000006",
+              "observed_at": "2026-11-01T00:50:00+00:00",
+              "received_at": "2026-11-01T00:50:00+00:00",
+              "payload_sha256": "b388e165f1636b202a45f0a75a2ed12abe2fcad58017c6e5070cca5a6b9edbcf",
+              "value": true,
+              "reported_quality": "unknown"
+            }
+          ],
+          "whole_hour_value": null,
+          "status": "point_semantics_only",
+          "wet_point_slots": 6,
+          "dry_point_slots": 0,
+          "wet_point_fraction": 1.0
+        }
+      },
+      "diagnostics": {
+        "off_schedule": [],
+        "multiple_sample_slots": [],
+        "excluded": [],
+        "suspect": [],
+        "null": {
+          "air_temperature_c": [],
+          "relative_humidity_pct": [],
+          "leaf_wet": []
+        },
+        "counts": {
+          "off_schedule": 0,
+          "multiple_sample_slots": 0,
+          "excluded": 0,
+          "suspect": 0,
+          "null": {
+            "air_temperature_c": 0,
+            "relative_humidity_pct": 0,
+            "leaf_wet": 0
+          }
+        }
+      },
+      "bucket_sha256": "c2eb3d34d98759e98476fac9e5ce894f034720f89787116c70483fb10d21c296"
+    }
+  ],
+  "result_sha256": "1562fb83e4f38c29cfb62ce9f5ce1c80abf30753d959b4bf3db3745ac3e0ade7"
+}

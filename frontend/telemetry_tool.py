@@ -32,29 +32,63 @@ def load(path):
 def export(store,owner,stream_id,expected_source=None):
     from datetime import datetime,timezone
     store=validate_storage(store);path=store/'telemetry.sqlite3'
+    from app.hybrid_pilot import initialized,connection
+    if initialized(path):
+        with StoreLease(store),connection(path,readonly=True) as db:
+            return snapshot(db,owner,stream_id,datetime.now(timezone.utc),expected_source)
     if not path.is_file():raise ValueError('Missing telemetry database; never create during export')
     with StoreLease(store),closing(sqlite3.connect(path.as_uri()+'?mode=ro',uri=True)) as db:
         db.row_factory=sqlite3.Row;db.execute('PRAGMA query_only=ON');db.execute('BEGIN')
         if db.execute('SELECT kind FROM telemetry_meta').fetchone()[0]!='aegis-pilot-telemetry-v1':raise ValueError('Unsupported telemetry schema')
-        s=db.execute('SELECT * FROM streams WHERE id=? AND user_id=?',(stream_id,owner)).fetchone()
-        if s is None:raise ValueError('Stream not found for selected owner')
-        m=json.loads(s['metadata_json'])
-        if digest(m)!=s['metadata_sha256']:raise ValueError('Metadata hash mismatch')
-        source=controlled.validate_metadata(m)
-        if expected_source is not None and expected_source!=source:raise ValueError('Selected stream does not match expected source')
-        readings=[]
-        for row in db.execute('SELECT * FROM raw_records WHERE stream_id=? AND user_id=? ORDER BY observed_at,id',(stream_id,owner)):
-            r=dict(row);r.pop('user_id');r['payload']=json.loads(r.pop('payload_json'));r['qc']=json.loads(r.pop('qc_json'))
-            if digest(r['payload'])!=r['payload_sha256']:raise ValueError('Sample hash mismatch')
-            r['available_at']=r['received_at'];readings.append(r)
-        result=dict(schema_version='aegis-raw-telemetry-export-v1',exported_at=datetime.now(timezone.utc).isoformat(),
-            owner_id=owner,season_id=s['season_id'],stream_id=stream_id,metadata=m,metadata_sha256=s['metadata_sha256'],
-            stream_created_at=s['created_at'],readings=readings,training_approved=False,hourly_aggregation_performed=False,
-            limits=['Declared source/instrument, calibration not verified','Point wetness does not establish wet duration','Empty stream does not establish coverage'])
-        if source==controlled.SOURCE:
-            result.update(schema_version=controlled.EXPORT_SCHEMA,source_policy=dict(controlled.POLICY))
-        controlled.validate_export(result)
-        result['bundle_sha256']=digest(result);return result
+        return snapshot(db,owner,stream_id,datetime.now(timezone.utc),expected_source)
+
+
+def snapshot(db, owner, stream_id, exported_at, expected_source=None, window=None):
+    """Read a raw snapshot from the caller's existing transaction.
+
+    A live hourly compilation bounds observations and receipts with window.
+    The stopped-store export above continues to export the entire stream.
+    """
+    stream = db.execute('SELECT * FROM streams WHERE id=? AND user_id=?', (stream_id, owner)).fetchone()
+    if stream is None:
+        raise ValueError('Stream not found for selected owner')
+    metadata = json.loads(stream['metadata_json'])
+    if digest(metadata) != stream['metadata_sha256']:
+        raise ValueError('Metadata hash mismatch')
+    source = controlled.validate_metadata(metadata)
+    if expected_source is not None and expected_source != source:
+        raise ValueError('Selected stream does not match expected source')
+    query = 'SELECT * FROM raw_records WHERE stream_id=? AND user_id=?'
+    values = [stream_id, owner]
+    if window is not None:
+        query += ' AND observed_at>=? AND observed_at<=? AND received_at<=?'
+        values.extend(t.isoformat() for t in window)
+    query += ' ORDER BY observed_at,id'
+    if window is not None:
+        query += ' LIMIT 100001'
+    readings = []
+    for row in db.execute(query, values):
+        record = dict(row)
+        record.pop('user_id')
+        record['payload'] = json.loads(record.pop('payload_json'))
+        record['qc'] = json.loads(record.pop('qc_json'))
+        if digest(record['payload']) != record['payload_sha256']:
+            raise ValueError('Sample hash mismatch')
+        record['available_at'] = record['received_at']
+        readings.append(record)
+    if window is not None and len(readings) > 100000:
+        raise ValueError('Hourly window exceeds 100000 raw samples; use a shorter window')
+    result = dict(schema_version='aegis-raw-telemetry-export-v1', exported_at=exported_at.isoformat(),
+        owner_id=owner, season_id=stream['season_id'], stream_id=stream_id,
+        metadata=metadata, metadata_sha256=stream['metadata_sha256'], stream_created_at=stream['created_at'],
+        readings=readings, training_approved=False, hourly_aggregation_performed=False,
+        limits=['Declared source/instrument, calibration not verified',
+                'Point wetness does not establish wet duration', 'Empty stream does not establish coverage'])
+    if source == controlled.SOURCE:
+        result.update(schema_version=controlled.EXPORT_SCHEMA, source_policy=dict(controlled.POLICY))
+    controlled.validate_export(result)
+    result['bundle_sha256'] = digest(result)
+    return result
 
 
 def import_records(url,stream_id,path,token):

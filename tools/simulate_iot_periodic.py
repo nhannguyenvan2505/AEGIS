@@ -4,6 +4,7 @@ Every measurement uses the current UTC clock. Monotonic scheduling does not
 fabricate past readings if the loop is late. No model, broker or hardware.
 """
 import argparse
+import getpass
 from datetime import datetime, timedelta, timezone
 import hashlib
 import json
@@ -96,7 +97,8 @@ def run(c, out, state):
         with session.request(method, base+path, json=data,
                 headers={} if token is None else {'Authorization': 'Bearer '+token},
                 timeout=3, allow_redirects=False) as response:
-            if response.status_code != code:
+            allowed=(code,) if isinstance(code,int) else code
+            if response.status_code not in allowed:
                 raise RuntimeError('Unexpected HTTP status during simulator setup/readback')
             return response.json()
 
@@ -121,8 +123,10 @@ def run(c, out, state):
         if info['model_loaded']:
             raise RuntimeError('Unexpected model import')
         base = 'http://127.0.0.1:'+str(info['port'])
-        credentials = dict(email='periodic-sim@example.test', password='synthetic-periodic-test-2026')
-        api('POST', '/api/auth/register', 201, credentials)
+        email=getattr(c,'email',None)
+        password=getpass.getpass('Existing demo account password: ') if email else 'synthetic-periodic-test-2026'
+        credentials = dict(email=email or 'periodic-sim@example.test', password=password)
+        if not email: api('POST', '/api/auth/register', (201,409), credentials)
         token = api('POST', '/api/auth/login', 200, credentials)['access_token']
         owner = api('GET', '/api/auth/me', 200, token=token)['user']['id']
         today = datetime.now(timezone(timedelta(hours=7))).date()
@@ -291,6 +295,7 @@ def run(c, out, state):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--out', type=Path, required=True)
+    p.add_argument('--email', help='Use an existing frontend demo account; asks for its password without logging it')
     p.add_argument('--duration', type=float, default=30)
     p.add_argument('--interval', type=int, default=2)
     p.add_argument('--send-interval', type=float, default=.5)

@@ -25,7 +25,9 @@ def main():
             app.run(host=args.host, port=args.port, debug=False, use_reloader=False)
         return
     root = Path(__file__).resolve().parent / 'mobile-instance'
-    app = create_app({'DATABASE_PATH': root / 'aegis.sqlite3', 'UPLOAD_DIR': root / 'uploads'})
+    config={'DATABASE_PATH':root/'aegis.sqlite3'}
+    if os.environ.get('AEGIS_STORAGE_BACKEND','mysql')=='sqlite': config['UPLOAD_DIR']=root/'uploads'
+    app = create_app(config)
     app.run(host=args.host, port=args.port, debug=False, use_reloader=False)
 
 

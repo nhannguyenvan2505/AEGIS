@@ -1,5 +1,7 @@
 # Runbook hiện hành — AI/ML và Backend local
 
+**Database 09/11/2026:** core và pilot mặc định dùng MySQL + MongoDB. Xem [vận hành, migration và restore hybrid](HYBRID_DATABASE_RUNBOOK.md) trước khi chạy launcher; các hướng dẫn SQLite có ngày cũ là evidence trước cutover.
+
 **Chạy source đã clone:** bắt đầu ở [CLONE_DEMO.md](../CLONE_DEMO.md) để chọn
 mobile forecast, browser pilot, IoT synthetic hoặc image AI. Các path
 `D:/AEGIS`/`D:/AEGIS-AI` phía dưới là bối cảnh lịch sử của workstation.

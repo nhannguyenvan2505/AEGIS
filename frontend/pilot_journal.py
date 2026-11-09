@@ -15,6 +15,10 @@ from pilot_store import validate_storage
 
 @contextmanager
 def journal_db(path):
+    from app.hybrid_pilot import initialized,connection
+    if initialized(path):
+        with connection(path) as db: yield db
+        return
     db=sqlite3.connect(path,timeout=15);db.row_factory=sqlite3.Row
     db.execute('PRAGMA foreign_keys=ON')
     try:
@@ -23,6 +27,8 @@ def journal_db(path):
 
 
 def initialize(path):
+    from app.hybrid_pilot import initialized
+    if initialized(path): return
     existed=path.exists()
     with journal_db(path) as db:
         if existed:

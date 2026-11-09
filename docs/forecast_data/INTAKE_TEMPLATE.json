@@ -1,0 +1,50 @@
+{
+  "schema_version": "aegis-forecast-data-intake-draft-v1",
+  "status": "blank_template_not_collected_data",
+  "source_id": null,
+  "source_kind": null,
+  "collection_setting": null,
+  "site_alias": null,
+  "unit_alias": null,
+  "season_alias": null,
+  "logger_alias": null,
+  "shared_environment_alias": null,
+  "collection_batch_alias": null,
+  "data_provider_reference": null,
+  "use_rights_reference": null,
+  "collection_started_at": null,
+  "collection_ended_at": null,
+  "timezone": null,
+  "crop": "rice",
+  "rice_variety": null,
+  "planting_method": null,
+  "sown_on": null,
+  "transplanted_on": null,
+  "sensor": {
+    "instrument_reference": null,
+    "temperature_unit": "degC",
+    "humidity_unit": "percent",
+    "wetness_measurement_semantics": null,
+    "nominal_interval_seconds": null,
+    "clock_sync_reference": null,
+    "calibration_reference": null,
+    "calibration_verified": false
+  },
+  "observation_plan": {
+    "target_disease": "leaf_blast",
+    "target_part": "leaf",
+    "case_definition_reference": null,
+    "visit_schedule_reference": null,
+    "reviewer_reference": null,
+    "evidence_reference": null,
+    "verification_status": "not_reviewed"
+  },
+  "provenance": {
+    "raw_files": [],
+    "clock_logs": [],
+    "missingness_logs": [],
+    "protocol_version_reference": null
+  },
+  "forecast_training_eligibility": "not_assessed",
+  "field_validated": false
+}

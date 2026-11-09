@@ -1,14 +1,23 @@
-"""Local SQLite persistence. One analysis owns zero or more detections."""
+"""Core persistence facade. One analysis owns zero or more detections."""
 from contextlib import contextmanager
 import sqlite3
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from .migrations import apply_migrations
+from .repositories import repository
 
 
 @contextmanager
 def connect(config):
+    if config.get('STORAGE_BACKEND', 'sqlite') == 'mysql':
+        from .hybrid_pilot import PilotConnection
+        from .repositories.mysql import mysql_repository
+        with mysql_repository(config) as repo:
+            yield PilotConnection(repo.connection,config,'','core')
+        return
+    if config.get('STORAGE_BACKEND', 'sqlite') != 'sqlite':
+        raise ValueError('Unknown storage backend')
     connection = sqlite3.connect(str(config['DATABASE_PATH']), timeout=5)
     connection.row_factory = sqlite3.Row
     connection.execute('PRAGMA foreign_keys = ON')
@@ -20,6 +29,13 @@ def connect(config):
 
 
 def init_storage(config):
+    if config.get('STORAGE_BACKEND', 'sqlite') == 'mysql':
+        from .repositories.mysql import check_schema
+        check_schema(config)
+        Path(config['UPLOAD_DIR']).mkdir(parents=True, exist_ok=True)
+        return
+    if config.get('STORAGE_BACKEND', 'sqlite') != 'sqlite':
+        raise ValueError('STORAGE_BACKEND must be sqlite or mysql')
     Path(config['DATABASE_PATH']).parent.mkdir(parents=True, exist_ok=True)
     Path(config['UPLOAD_DIR']).mkdir(parents=True, exist_ok=True)
     with connect(config) as db:
@@ -81,28 +97,15 @@ def save_analysis(payload, result, config, user_id, key_hash=None):
         with path.open('xb') as stream:
             written = True
             stream.write(payload)
-        with connect(config) as db:
-            db.execute('''INSERT INTO analyses
-                       (id,user_id,image_path,image_width,image_height,orientation,model_version,status,created_at,
-                        request_id,model_sha256,ai_processing_ms,ai_roundtrip_ms)
-                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                       (analysis_id, user_id, filename, image['width'], image['height'],
-                        image['orientation'], result['model_version'], result['status'], created_at,
-                        result['request_id'], result['model_sha256'], result['timings']['ai_processing_ms'],
-                        result['timings']['ai_roundtrip_ms']))
-            for detection in result['detections']:
-                detection_id = str(uuid.uuid4())
-                box = detection['bbox']
-                db.execute('INSERT INTO detections VALUES (?,?,?,?,?,?,?,?,?)',
-                           (detection_id, analysis_id, detection['class_id'], detection['disease'],
-                            detection['confidence'], box['x1'], box['y1'], box['x2'], box['y2']))
-                detection['detection_id'] = detection_id
-            if key_hash is not None:
-                updated = db.execute('''UPDATE inference_requests SET state='completed',analysis_id=?
-                    WHERE user_id=? AND key_hash=? AND state='running' ''',
-                    (analysis_id, user_id, key_hash))
-                if updated.rowcount != 1:
-                    raise sqlite3.IntegrityError('Missing inference reservation')
+        for detection in result['detections']:
+            detection['detection_id'] = str(uuid.uuid4())
+        with repository(config) as db:
+            db.save_analysis(dict(id=analysis_id,user_id=user_id,image_path=filename,
+                image_width=image['width'],image_height=image['height'],orientation=image['orientation'],
+                model_version=result['model_version'],status=result['status'],created_at=created_at,
+                request_id=result['request_id'],model_sha256=result['model_sha256'],
+                ai_processing_ms=result['timings']['ai_processing_ms'],
+                ai_roundtrip_ms=result['timings']['ai_roundtrip_ms']),result['detections'],key_hash,result)
     except (OSError, sqlite3.Error):
         # Normal failure compensation; crash consistency requires a later recovery job.
         if written:
@@ -113,11 +116,11 @@ def save_analysis(payload, result, config, user_id, key_hash=None):
 
 
 def get_analysis(analysis_id, config, user_id):
-    with connect(config) as db:
-        analysis = db.execute('SELECT * FROM analyses WHERE id=? AND user_id=?', (analysis_id, user_id)).fetchone()
+    with repository(config) as db:
+        analysis = db.owned('analyses', analysis_id, user_id)
         if analysis is None:
             return None
-        rows = db.execute('SELECT * FROM detections WHERE analysis_id=? ORDER BY rowid', (analysis_id,)).fetchall()
+        rows = db.detections(analysis_id)
     return dict(success=True, analysis_id=analysis['id'], user_id=analysis['user_id'],
                 image_url=f'/api/disease/analyses/{analysis["id"]}/image',
                 created_at=analysis['created_at'], image_path=analysis['image_path'],
@@ -130,13 +133,9 @@ def get_analysis(analysis_id, config, user_id):
 
 
 def list_analyses(config, user_id, page, page_size):
-    with connect(config) as db:
-        # Keep count and page in the same SQLite read snapshot.
-        db.execute('BEGIN')
-        total = db.execute('SELECT COUNT(*) FROM analyses WHERE user_id=?', (user_id,)).fetchone()[0]
-        rows = db.execute('''SELECT a.*, (SELECT COUNT(*) FROM detections d WHERE d.analysis_id=a.id) AS detection_count
-            FROM analyses a WHERE a.user_id=? ORDER BY a.created_at DESC, a.id DESC LIMIT ? OFFSET ?''',
-                          (user_id, page_size, (page-1)*page_size)).fetchall()
+    with repository(config) as db:
+        db.begin()
+        total, rows = db.analysis_page(user_id,page_size,(page-1)*page_size)
     pages = (total + page_size - 1) // page_size
     return dict(success=True, items=[dict(analysis_id=r['id'], created_at=r['created_at'],
                 model_version=r['model_version'], status=r['status'], detection_count=r['detection_count'],
@@ -149,6 +148,5 @@ def list_analyses(config, user_id, page, page_size):
 
 
 def get_image_record(analysis_id, user_id, config):
-    with connect(config) as db:
-        return db.execute('SELECT image_path FROM analyses WHERE id=? AND user_id=?',
-                          (analysis_id, user_id)).fetchone()
+    with repository(config) as db:
+        return db.owned('analyses', analysis_id, user_id)

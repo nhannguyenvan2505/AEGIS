@@ -1,5 +1,7 @@
 # AEGIS Backend — local integration milestone
 
+09/11/2026: runtime mặc định là MySQL + MongoDB cho cả core và pilot. Dữ liệu SQLite cũ đã được nhập/đối chiếu, có backup và kiểm chứng restore. Bắt đầu bằng [hybrid database runbook](../docs/HYBRID_DATABASE_RUNBOOK.md) và bật Compose trước khi chạy backend. Các mốc SQLite bên dưới là evidence lịch sử.
+
 Current local guide, 28/10/2026: [handoff index](../docs/CURRENT_HANDOFF.md)
 and [runbook](../docs/CURRENT_RUNBOOK.md). Core/mobile entry points are separate
 from pilot opt-in extensions. The 24/10 verification below is dated evidence,
@@ -32,7 +34,7 @@ Request correlation, model hash, timings and migration: [docs/OBSERVABILITY.md](
 Login/detection quotas and bounded inference: [docs/RESOURCE_LIMITS.md](docs/RESOURCE_LIMITS.md).
 
 Python 3.11. The backend forwards image bytes to the separate AI service;
-it never imports YOLO or loads model weights. SQLite persistence is included;
+it never imports YOLO or loads model weights. MySQL persistence and MongoDB delivery are included;
 authentication uses server-side bearer sessions.
 
 ## PowerShell
@@ -82,7 +84,7 @@ Register returns 201, duplicate normalized email 409, bad input 400, invalid log
 Sessions last 24 hours by default (`SESSION_TTL_SECONDS` app config); logout revokes
 the current session immediately. Re-login creates a new token; no refresh flow yet.
 Werkzeug scrypt hashes passwords; random 256-bit tokens are returned only at login,
-and SHA-256 token digests are stored in SQLite. No new package is needed.
+and SHA-256 token digests are stored in MySQL. Install the current requirements for database drivers.
 Do not log tokens or passwords. Mobile should later use OS secure token storage.
 
 All disease endpoints require `Authorization: Bearer <token>`. Missing, expired,
@@ -92,7 +94,9 @@ are ignored: identity comes from the verified session. Health stays public.
 This local milestone includes fixed-window quotas and bounded inference. Password
 reset, email verification and HTTPS termination remain before external deployment.
 
-## Persistence
+## Persistence before hybrid cutover Historical evidence
+
+For current MySQL/MongoDB schema, uploads and verified restore, use [the hybrid runbook](../docs/HYBRID_DATABASE_RUNBOOK.md). This section records the earlier SQLite implementation.
 
 On startup, missing tables/directories are created in `backend/instance/`.
 SQLite file: `instance/aegis.sqlite3`. Original image bytes are kept privately in
