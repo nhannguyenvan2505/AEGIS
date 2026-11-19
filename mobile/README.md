@@ -52,3 +52,4 @@ tác vụ mới. History/farms/detect chưa có xử lý401/cooldown đồng đ�
 tương ứng dù các API Backend đã có. Không gọi bundle export là nghiệm thu native.
 
 Styles: sửa src/styles/app.scss rồi npm run styles. Giữ component ngoài src/app; dùng Expo Router. Script android:emulator được giữ từ upstream, chưa chạy/xác minh APK trong lượt tích hợp này.
+

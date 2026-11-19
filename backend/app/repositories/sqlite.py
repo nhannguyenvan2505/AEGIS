@@ -62,8 +62,37 @@ class SQLiteRepository:
         rows = self.db.execute(f'SELECT * FROM {table} WHERE {where} ORDER BY {order} LIMIT ? OFFSET ?', (*params,size,offset)).fetchall()
         return total,rows
 
-    def add_plot(self, item):
+    def holding_summary(self, row):
+        from ..farm_hierarchy import farm_summary
+        return farm_summary(self.db, row)
+
+    def add_holding(self, item):
+        self.db.execute('''INSERT INTO farm_holdings
+            (id,user_id,name,address,manager,notes,version,created_at,updated_at)
+            VALUES (:id,:user_id,:name,:address,:manager,:notes,:version,:created_at,:updated_at)''', item)
+
+    def update_holding(self, fields):
+        self.db.execute('''UPDATE farm_holdings SET name=:name,address=:address,manager=:manager,
+            notes=:notes,updated_at=:updated_at,version=version+1 WHERE id=:id AND user_id=:user_id''', fields)
+
+    def delete_holding(self, identifier, user_id):
+        self.db.execute('DELETE FROM farm_holdings WHERE id=? AND user_id=?', (identifier, user_id))
+
+    def holding_plots(self, user_id, farm_id, size, offset):
+        condition = 'p.user_id=? AND m.farm_id=? AND m.user_id=p.user_id'
+        source = 'farm_plots p JOIN farm_plot_memberships m ON m.plot_id=p.id'
+        total = self.db.execute(f'SELECT COUNT(*) FROM {source} WHERE {condition}', (user_id, farm_id)).fetchone()[0]
+        rows = self.db.execute(f'''SELECT p.*,m.farm_id,m.area_ha FROM {source} WHERE {condition}
+            ORDER BY p.created_at DESC,p.id DESC LIMIT ? OFFSET ?''', (user_id, farm_id, size, offset)).fetchall()
+        return total, rows
+
+    def add_plot(self, item, farm_id=None, area_ha=None):
+        from ..farm_hierarchy import default_farm
+        farm_id = farm_id or default_farm(self.db, item['user_id'], item['created_at'])
         self.db.execute('INSERT INTO farm_plots VALUES (:id,:user_id,:name,:location_text,:created_at)', item)
+        self.db.execute('INSERT INTO farm_plot_memberships (plot_id,user_id,farm_id,area_ha) VALUES (?,?,?,?)',
+                        (item['id'], item['user_id'], farm_id, area_ha))
+        return dict(item, farm_id=farm_id, area_ha=area_ha)
 
     def add_season(self, item):
         self.db.execute('INSERT INTO farm_seasons VALUES (:id,:user_id,:plot_id,:name,:crop,:start_date,:end_date,:created_at)', item)

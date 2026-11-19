@@ -2,6 +2,11 @@
 
 09/11/2026: runtime mặc định là MySQL + MongoDB cho cả core và pilot. Dữ liệu SQLite cũ đã được nhập/đối chiếu, có backup và kiểm chứng restore. Bắt đầu bằng [hybrid database runbook](../docs/HYBRID_DATABASE_RUNBOOK.md) và bật Compose trước khi chạy backend. Các mốc SQLite bên dưới là evidence lịch sử.
 
+09/11/2026: mobile hỗ trợ **Nông trại → Ruộng → Mùa vụ**, gồm thêm/sửa nông trại,
+thống kê diện tích và xóa nông trại trống. Xem [API Nông trại và nâng cấp dữ liệu](docs/FARM_HIERARCHY.md).
+Phần mở rộng nông trại đã hỗ trợ MySQL qua migration `005_farm_hierarchy.sql`.
+Máy local có thể chạy MySQL native, không cần Docker; xem [hướng dẫn native](docs/NATIVE_MYSQL.md).
+
 Current local guide, 28/10/2026: [handoff index](../docs/CURRENT_HANDOFF.md)
 and [runbook](../docs/CURRENT_RUNBOOK.md). Core/mobile entry points are separate
 from pilot opt-in extensions. The 24/10 verification below is dated evidence,
