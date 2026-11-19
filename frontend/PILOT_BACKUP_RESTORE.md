@@ -124,7 +124,7 @@ Tách nhóm lưu trữ:
 | Bản thất bại/partial | Đánh dấu không dùng, điều tra và quyết định xử lý riêng | Không xóa sentinel/partial để ép kết quả |
 
 Template tại
-[retention_plan.template.json](D:/AEGIS/task17_backup_restore_20261028/retention_plan.template.json)
+[retention_plan.template.json](../task17_backup_restore_20261028/retention_plan.template.json)
 để người quản lý ghi mục tiêu, tần suất, phạm vi/thời hạn và người phê duyệt khi
 có nhu cầu. Mọi TTL/lịch/xóa tự động hiện null/false. TASK-17 không tạo scheduled
 task, automation hoặc routine cleanup cho dữ liệu thật. Backup thật cần nơi lưu
@@ -132,7 +132,7 @@ phù hợp trước khi cân nhắc hẹn lịch; không yêu cầu mua hoặc t
 
 ## 7. Bằng chứng và giới hạn
 
-[Gói TASK-17](D:/AEGIS/task17_backup_restore_20261028/REVIEW_VI.md) có manifest
+[Gói TASK-17](../task17_backup_restore_20261028/REVIEW_VI.md) có manifest
 software fixture, logs CLI/API, hash và cleanup. Bản DB/account/ảnh fixture đầy
 đủ chỉ ở temp và được dọn sau rehearsal, không giữ trong gói bàn giao. Không
 đo SLA, sự cố mất điện, đĩa hỏng hoặc restore production; không mở model/GPU.

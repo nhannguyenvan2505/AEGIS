@@ -33,7 +33,7 @@ trong Proposal khác hash scrypt đang dùng: chưa tự đổi thuật toán ho
 - MySQL tận dụng schema đã có; SQLite fixture thêm migration 6.
 - Dependency backend và CPU handoff thêm PyJWT, tài liệu contract cập nhật.
 - Workflow local `Backend tests`: CPU regression trên Windows, MySQL/JWT/RBAC
-  trên Ubuntu với Compose và cấu hình CI ngẫu nhiên. Chưa publish/chạy GitHub;
+  trên Ubuntu với Compose và cấu hình CI ngẫu nhiên. Ngày 19/11 đã push trong PR #9 (draft, xếp chồng lên #8), chưa có kết quả runner;
   chưa cấu hình required checks hoặc deploy.
 
 Chi tiết vận hành: [JWT_RBAC](../backend/docs/JWT_RBAC.md).

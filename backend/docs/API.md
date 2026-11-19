@@ -10,8 +10,8 @@ mô tả nguồn hourly có revision, create/list/detail/input và tổng quan t
 owner. Chạy qua launcher/kho pilot; không thay API ảnh hoặc core mặc định.
 
 Cập nhật28/10/2026: đây là contract **Backend core**, không tự bật pilot.
-[Chỉ mục hiện hành](D:/AEGIS/docs/CURRENT_HANDOFF.md) và
-[raw controlled opt-in](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md) phân
+[Chỉ mục hiện hành](../../docs/CURRENT_HANDOFF.md) và
+[raw controlled opt-in](../../frontend/CONTROLLED_EXPERIMENT_RAW.md) phân
 biệt entry point/source/schema. Pilot có collection raw riêng, không thay
 collection ảnh V4; forecast synthetic pilot được bổ sung ở mốc05/11 bên trên.
 

@@ -1,6 +1,6 @@
 # Tiếp nhận số đo môi trường gốc — pilot local
 
-> TASK-11 (27/10/2026): có [contract raw chậu/khay opt-in](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md)
+> TASK-11 (27/10/2026): có [contract raw chậu/khay opt-in](CONTROLLED_EXPERIMENT_RAW.md)
 > đã được người dùng xác nhận. Khi bật --enable-controlled-experiments, chỉ raw
 > ingress hỗ trợ controlled_experiment với context bắt buộc, source filter và
 > export/audit v2. Mặc định vẫn tắt; synthetic/field_observed và raw v1 cũ giữ

@@ -6,7 +6,7 @@ Database update 09/11/2026: core/mobile/pilot now default to MySQL with MongoDB 
 
 AI and IoT for rice disease monitoring: rice blast, brown spot and sheath blight.
 
-- backend/: Flask API, Bearer sessions, private analyses/history, farm context and mock warning rules.
+- backend/: Flask API, JWT bearer auth with revocable sessions and farmer/admin RBAC ([contract](backend/docs/JWT_RBAC.md), PR #9), private analyses/history, farm context, forecast and mock warning rules.
 - mobile/: Expo / React Native frontend from Minh-Tam-tgd, integrated with authentication, image detection/history, farm create/list and opt-in pilot follow-up APIs.
 - The repo includes the mobile/API pilot, browser prototype, synthetic IoT tools,
   and a portable forecast model. The YOLO API source is under `ai_service/api/`;

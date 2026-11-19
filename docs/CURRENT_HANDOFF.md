@@ -1,5 +1,28 @@
 # Chỉ mục bàn giao hiện hành — AEGIS
 
+## Trạng thái hiện hành — 19/11/2026
+
+Đọc bảng này trước. Mọi đoạn có ngày phía dưới là nhật ký theo mốc: câu nào mâu
+thuẫn với bảng này thì bảng này đúng.
+
+| Khối | Hiện hành | Nguồn |
+|---|---|---|
+| Auth | JWT HS256 + session digest để thu hồi; RBAC farmer/admin đọc role từ DB. Token opaque cũ không còn hợp lệ. Mã nằm ở PR #9 (draft, xếp chồng lên #8), chưa vào main | [JWT_RBAC](../backend/docs/JWT_RBAC.md), [Must 15/11](MUST_DELIVERY_20261115.md) |
+| Database | MySQL + MongoDB (outbox) mặc định cho core/mobile/pilot từ 09/11; SQLite chỉ còn là fixture test và nguồn khôi phục | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
+| AI ảnh | YOLO11n V4 mặc định (mAP50 ≈ 68,8% validation); candidate chưa promote | [status](../AEGIS_PROJECT_STATUS.md) |
+| Forecast | FM03 phục vụ; T17 không qua gate; dữ liệu toàn bộ synthetic | [status mục 124](../AEGIS_PROJECT_STATUS.md) |
+| CI | `Team policy` trên main từ 17/11 (#7); `Backend tests` nằm trong PR #9, chưa có lượt chạy runner | [TEAM_POLICY_ACTIONS](TEAM_POLICY_ACTIONS.md) |
+| Việc mở / quyết định chờ | Ngưỡng confidence FR09, deadline (02/12 hay 20/12), phạm vi MQTT/push/report/RAG, Rice Hispa, bcrypt/scrypt, benchmark NFR | [rà soát sau demo](POST_DEMO_REVIEW_20261115.md) |
+
+**Phạm vi của link trong repo.** Các thư mục bằng chứng có ngày ở gốc repo
+(`task*_2026…`, `handoff_2026…`, `h*_2026…`, `fm0*_2026…`, `docs/evidence/`…)
+phần lớn chỉ có trên máy của Nhân, không nằm trong Git: link tới chúng sẽ hỏng
+trên bản clone. Tài liệu ghi `AEGIS-AI/...` thuộc workspace AI riêng, không versioned
+trong repo này. Lệnh có đường dẫn `D:/AEGIS...` là ví dụ trên máy gốc; khi clone,
+thay bằng thư mục của bạn.
+
+## Nhật ký bàn giao theo mốc (mới → cũ)
+
 **15/11/2026 — hoàn thiện nhóm Must:** đã chuyển access token sang JWT có
 revocation và thêm Backend RBAC/admin list/role change/CLI bootstrap theo quyết
 định Nhân. Token opaque cũ cần đăng nhập lại. Xem [tiến độ và kiểm chứng](MUST_DELIVERY_20261115.md)
@@ -37,10 +60,10 @@ giữ mobile-instance. Client follow-up đã có local; native chưa nghiệm th
 Availability đọc qua capabilities; service_status=not_checked không là AI health.
 
 Cập nhật 28/10/2026, Asia/Bangkok (UTC+7), TASK-19. Entry point cho workspace
-local D:/AEGIS và D:/AEGIS-AI. [Runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md).
+local D:/AEGIS và D:/AEGIS-AI. [Runbook](CURRENT_RUNBOOK.md).
 Các thư mục có ngày là bằng chứng của phiên đó, không tự là kết quả chạy mới.
 
-TASK-20: [quản lý source và bàn giao chọn lọc](D:/AEGIS/docs/SOURCE_HANDOFF_GUIDE.md)
+TASK-20: [quản lý source và bàn giao chọn lọc](SOURCE_HANDOFF_GUIDE.md)
 ghi inventory, ignore boundaries, redacted scan và dependencies trong evidence.
 Không add/commit/push hoặc khởi tạo AI repo; ít untracked hơn không có nghĩa đã
 publish source hoặc xóa dữ liệu local.
@@ -53,13 +76,13 @@ Giữ hai workspace riêng; đây là kiểm source copy, chưa phải clean clo
 
 | Phần | Source/contract | Trạng thái và giới hạn |
 |---|---|---|
-| Backend core/mobile | [API](D:/AEGIS/backend/docs/API.md), [farm](D:/AEGIS/backend/docs/FARM_WARNING_API.md), [cultivation](D:/AEGIS/backend/docs/CULTIVATION_PROFILE.md) | Auth/image/history/farm, đánh giá mock thủ công. Mobile chỉ gọi Backend; AI riêng qua HTTP |
-| Mobile của nhóm | [MOBILE_INTEGRATION](D:/AEGIS/docs/MOBILE_INTEGRATION.md) | Source auth/ảnh/history/ruộng và follow-up pilot; Trang chủ/Dữ liệu/chăm sóc còn demo; Camera giám sát chưa stream. BE-03 kiểm TS/HTTP, chưa native |
-| Pilot opt-in local | [frontend README](D:/AEGIS/frontend/README.md) | Có journal/pilot bền vững, follow-up/timeline/episode, survey/coverage/peer và mock worker. Không tự bật ở core mặc định |
-| Raw môi trường | [legacy](D:/AEGIS/frontend/ENVIRONMENT_INGEST.md), [controlled](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md) | controlled_experiment chỉ raw pot/tray khi opt-in, không tự hourly/rule/train |
-| Temporal offline | [README](D:/AEGIS-AI/temporal_warning/README.md), [assessment replay](D:/AEGIS-AI/temporal_warning/ASSESSMENT_BRIDGE.md), [leakage audit](D:/AEGIS-AI/temporal_warning/LEAKAGE_AUDIT.md) | Snapshot v4/research replay v2; rule/peer không thành nhãn; field compile/train vẫn chặn |
-| Nghiên cứu/nguồn | [Protocol DRAFT](D:/AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md), [nguồn/quyền/roles](D:/AEGIS/task10_source_readiness_20261027/README.md) | Dự kiến khay, chưa người xác minh; protocol/nguồn/quyền thật chưa chốt |
-| Quản lý pilot | [backup/restore](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md) | Bảy DB+uploads/marker/metadata, hai lease/manifest/sentinel; retention chưa áp dụng |
+| Backend core/mobile | [API](../backend/docs/API.md), [farm](../backend/docs/FARM_WARNING_API.md), [cultivation](../backend/docs/CULTIVATION_PROFILE.md) | Auth JWT/RBAC (PR #9), image/history/farm, forecast, đánh giá mock thủ công; MySQL + MongoDB. Mobile chỉ gọi Backend; AI riêng qua HTTP. [Contract JWT/admin](../backend/docs/JWT_RBAC.md) |
+| Mobile của nhóm | [MOBILE_INTEGRATION](MOBILE_INTEGRATION.md) | Source auth/ảnh/history/ruộng và follow-up pilot; Trang chủ/Dữ liệu/chăm sóc còn demo; Camera giám sát chưa stream. BE-03 kiểm TS/HTTP, chưa native |
+| Pilot opt-in local | [frontend README](../frontend/README.md) | Có journal/pilot bền vững, follow-up/timeline/episode, survey/coverage/peer và mock worker. Không tự bật ở core mặc định |
+| Raw môi trường | [legacy](../frontend/ENVIRONMENT_INGEST.md), [controlled](../frontend/CONTROLLED_EXPERIMENT_RAW.md) | controlled_experiment chỉ raw pot/tray khi opt-in, không tự hourly/rule/train |
+| Temporal offline | README (`AEGIS-AI/temporal_warning/README.md`, workspace AI ngoài repo), assessment replay (`AEGIS-AI/temporal_warning/ASSESSMENT_BRIDGE.md`, workspace AI ngoài repo), leakage audit (`AEGIS-AI/temporal_warning/LEAKAGE_AUDIT.md`, workspace AI ngoài repo) | Snapshot v4/research replay v2; rule/peer không thành nhãn; field compile/train vẫn chặn |
+| Nghiên cứu/nguồn | Protocol DRAFT (`AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md`, workspace AI ngoài repo), [nguồn/quyền/roles](../task10_source_readiness_20261027/README.md) | Dự kiến khay, chưa người xác minh; protocol/nguồn/quyền thật chưa chốt |
+| Quản lý pilot | [backup/restore](../frontend/PILOT_BACKUP_RESTORE.md) | Bảy DB+uploads/marker/metadata, hai lease/manifest/sentinel; retention chưa áp dụng |
 
 Checkout kiểm28/10 có core/mobile nhưng pilot và nhiều artifact đang untracked;
 AI nằm ngoài repository core/mobile. Có file local không chứng minh clone mới
@@ -70,12 +93,12 @@ PR/invite/branch protection. Chưa kiểm clean install trên máy khác.
 
 | Mốc | Review / ý nghĩa |
 |---|---|
-| TASK-07/08 | [assessment](D:/AEGIS/task07_assessment_replay_20261027/REVIEW_VI.md), [leakage](D:/AEGIS/task08_leakage_audit_20261027/REVIEW_VI.md): replay/mutation synthetic, không là metric thực địa |
-| TASK-09/10 | [protocol](D:/AEGIS/task09_protocol_20261027/REVIEW_VI.md), [nguồn](D:/AEGIS/task10_source_readiness_20261027/REVIEW_VI.md): vẫn một phần |
-| TASK-11 | [controlled raw](D:/AEGIS/task11_controlled_raw_20261027/REVIEW_VI.md): contract raw opt-in, tương thích v1/v2 |
-| TASK-17 | [restore](D:/AEGIS/task17_backup_restore_20261028/REVIEW_VI.md): 136 pilot/65 temporal thuộc phiên đó, không gọi vừa chạy ở Task19 |
-| TASK-19 | [review mới](D:/AEGIS/task19_docs_handoff_20261028/REVIEW_VI.md): tài liệu và smoke contract |
-| Lịch sử đầy đủ | [AEGIS_PROJECT_STATUS](D:/AEGIS/AEGIS_PROJECT_STATUS.md): đọc mục có ngày gần nhất, giữ các kết quả cũ |
+| TASK-07/08 | [assessment](../task07_assessment_replay_20261027/REVIEW_VI.md), [leakage](../task08_leakage_audit_20261027/REVIEW_VI.md): replay/mutation synthetic, không là metric thực địa |
+| TASK-09/10 | [protocol](../task09_protocol_20261027/REVIEW_VI.md), [nguồn](../task10_source_readiness_20261027/REVIEW_VI.md): vẫn một phần |
+| TASK-11 | [controlled raw](../task11_controlled_raw_20261027/REVIEW_VI.md): contract raw opt-in, tương thích v1/v2 |
+| TASK-17 | [restore](../task17_backup_restore_20261028/REVIEW_VI.md): 136 pilot/65 temporal thuộc phiên đó, không gọi vừa chạy ở Task19 |
+| TASK-19 | [review mới](../task19_docs_handoff_20261028/REVIEW_VI.md): tài liệu và smoke contract |
+| Lịch sử đầy đủ | [AEGIS_PROJECT_STATUS](../AEGIS_PROJECT_STATUS.md): đọc mục có ngày gần nhất, giữ các kết quả cũ |
 
 V4 ảnh vẫn mặc định; candidate không tự thay. Confidence không là xác suất đã
 hiệu chuẩn; no_detection không xác nhận cây khỏe. Mock/soak là kiểm phần mềm:
@@ -99,7 +122,7 @@ trong gói mới, browser/rehearsal26/10 không được gọi là đã chạy l
 
 ## Contract và Postman
 
-[Postman README](D:/AEGIS/backend/postman/README.md) tách collection image/farm/
+[Postman README](../backend/postman/README.md) tách collection image/farm/
 cultivation lịch sử có thể gọi V4 thật khỏi **AEGIS-Pilot-Raw** chỉ22 request
 software fixture, yêu cầu controlled opt-in. Không dùng raw collection trên
 kho thật. Runner mới chỉ xuất summary đã lọc; không export environment/full

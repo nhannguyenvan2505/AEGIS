@@ -13,9 +13,9 @@ Không suy ra đã stage/commit/publish hoặc clean install GPU từ bổ sung 
 
 28/10/2026, Asia/Bangkok (UTC+7). Đây là danh mục/review guide cho workspace
 local, không phải script stage/commit hoặc chứng nhận clean clone/secret-free.
-[Chỉ mục chức năng](D:/AEGIS/docs/CURRENT_HANDOFF.md),
-[runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md),
-[bằng chứng TASK-20](D:/AEGIS/task20_source_management_20261028/REVIEW_VI.md).
+[Chỉ mục chức năng](CURRENT_HANDOFF.md),
+[runbook](CURRENT_RUNBOOK.md),
+[bằng chứng TASK-20](../task20_source_management_20261028/REVIEW_VI.md).
 
 ## 1. Hiện trạng và nguyên tắc giữ nguyên
 
@@ -50,7 +50,7 @@ hoặc chuyển lên Git. Không dùng git add . / add -A / add -f để vượt
 | Status đầy đủ, intake đã điền, ảnh chụp/log | Nội bộ/curate riêng, không mặc định source | Quét quyền/PII/secrets; source guide/current summary thay dump lịch sử vào PR |
 
 Danh mục từng file, size, tracked/ignored/category ở
-[source_inventory.json](D:/AEGIS/task20_source_management_20261028/run03/source_inventory.json).
+[source_inventory.json](../task20_source_management_20261028/run03/source_inventory.json).
 Candidate chưa đồng nghĩa file đã được duyệt để stage. Rule không ignore *.png/
 *.jpg hoặc *.json toàn cục: mobile assets và source schema/config vẫn cần Git;
 private uploads/dataset/artifact chặn theo vị trí/loại phù hợp.

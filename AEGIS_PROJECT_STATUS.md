@@ -1,47 +1,50 @@
 # AEGIS — Báo cáo dự án và theo dõi tiến độ
 
-> Cập nhật tổng hợp: **07/11/2026**, múi giờ Asia/Bangkok (UTC+7).
-> Phạm vi: AI nhận diện, AI dự báo, dữ liệu giả lập, Backend, pilot/IoT, mobile, vận hành và chuẩn bị midterm. Tổng hợp từ source, log và artifact đã kiểm trong các phiên trước; lần cập nhật status này không chạy lại train hoặc kiểm thử.
+> Cập nhật tổng hợp: **19/11/2026** (mục 125; tổng quan forecast giữ mốc 09/11), múi giờ Asia/Bangkok (UTC+7).
+> Phạm vi: toàn bộ lịch sử dự án và trạng thái hiện hành; phần Nhân phụ trách gồm AI, ML, dữ liệu, Backend, pilot/IoT và vận hành. Frontend/mobile UI thuộc thành viên frontend. Mục124 là chỉ mục quyết định forecast, mục125 cập nhật Auth/CI/tài liệu; các mục trước là nhật ký theo thời điểm, không bị viết lại.
 
 ## Tổng quan hiện hành — đọc trước các mốc lịch sử
 
-**Mục tiêu đã chốt:** midterm **09/11/2026**, bắt buộc demo mobile; người dùng
-dự kiến chạy thử và tích hợp trên thiết bị ngày **06/11**. Trọng tâm MVP là
-**dự báo kỹ thuật trên dữ liệu thời gian giả lập**. Nhận diện ảnh là chức năng
-hỗ trợ. Chưa có thiết bị IoT; tiếp nhận dataset bên ngoài tiếp tục tạm gác.
+**Trạng thái mới nhất:** các task dự báo T01–T17 đã có hồ sơ trong file này.
+FM03 là model phục vụ đang hoạt động; candidate FM04/T17 đã được đánh giá trên
+cohort giả lập nhưng **không qua gate qualification**, nên chưa tích hợp hoặc
+shadow. Nhân xác nhận toàn bộ dữ liệu trong giai đoạn hiện tại là giả lập.
+Không có bằng chứng thu thập/xác minh bệnh trên cây thật. Ưu tiên kế tiếp là
+T17.1 với cohort và holdout mới; T18 chỉ được xem xét sau gate. Frontend/mobile
+UI do thành viên frontend phụ trách.
 
-| Khối | Tiến độ đến05/11 | Phần còn lại / giới hạn |
+| Khối | Trạng thái hiện hành đến09/11 | Phần còn lại / giới hạn |
 |---|---|---|
 | AI nhận diện | YOLO11n V4 fine-tune từ pretrained,50epoch; API local và luồng Backend đã có | V4 vẫn mặc định; không đổi sang candidate. Không có nghiệm thu thực địa |
 | Thí nghiệm AI ảnh | Boundary-r2/source-r1 và FT25 có artifact/báo cáo; FT25 hoàn thành25epoch mới | FT25 chưa deploy, không gọi model đang phục vụ là train75epoch liên tục |
-| Dữ liệu dự báo FM-01 | 200mẫu/100cụm;170ready và30insufficient; lịch sử120giờ, future label72giờ | Đủ cấu trúc để chạy MVP; quy mô/độ đa dạng giả lập còn nhỏ |
-| AI dự báo FM-02 | Logistic Regression + preprocessing đã train, đóng gói và reload;61feature | Score chưa hiệu chuẩn; validation log loss chưa hơn Dummy |
-| Forecast Backend FM-03 | Worker model thật, nguồn theo mùa/revision, create/list/detail/input, owner guard, replay và SQLite | Forecast chỉ bật ở pilot; worker riêng, không tự thành scheduler |
+| Dữ liệu/AI dự báo | T01–T09: raw→hourly, adapter, feature acceptance, persistence/API, forecast/scheduler, FM02/FM03 và đánh giá nhiều seed/missingness | Các cohort hiện tại đều synthetic; kết quả không xác nhận năng lực bệnh ngoài thực địa |
+| Forecast Backend và dữ liệu | T10–T16: readiness, lịch sử/giải thích, alert, outcome links, dossier, endpoint, mapping/group-time split | Nguồn, outcome và nhãn đều synthetic; external review không tự thành nhãn được duyệt |
+| Candidate T17 | Cohort stochastic 3 seed; LR+sigmoid được khóa trước holdout; replay 144 holdout rows khớp | Candidate chưa qua CI gate so với prior; không promote, không đổi FM03 |
+| Model đang phục vụ | FM03 weather logistic, contract 120 giờ/41 feature/horizon72 giờ, pins được giữ nguyên qua T17 | Không gọi score là xác suất bệnh thực; chưa đánh giá thực địa |
 | Mobile forecast FM-04 | Chọn ruộng/mùa → nguồn riêng → dự báo → dữ liệu đầu vào/kết quả/lịch sử; lỗi/empty/loading | Chưa nghiệm thu giao diện/native trên thiết bị |
 | Trang chủ mobile | Tổng quan từ API theo tài khoản; bỏ số môi trường/cảnh báo mẫu ở trang chủ | Refresh thủ công |
 | Quản lý ruộng/mùa | Tạo/xem ruộng và tạo/xem/phân trang mùa vụ trên mobile | Mùa mới cần được cấp nguồn hourly trước dự báo |
 | Auth/kết nối | Core auth/history/private data đã có; thêm giữ HTTP status lỗi non-JSON, reset theo token và xếp thứ tự lưu/xóa token | SecureStore/account switching cần nghiệm thu native |
 | Pilot/IoT | Raw ingest, QC, retry/buffer, audit, follow-up, timeline, backup/restore và simulator có sẵn | Raw point chưa tự cấp hourly forecast; toàn bộ môi trường demo là giả lập |
 | Vận hành demo | Một launcher Backend+worker+kho chung, seed hai nguồn, replay/restart; tool tiến đồng hồ dry/wet/missing | Localhost; cần nối thiết bị với API và nhập mật khẩu demo khi chạy |
-| Hồi quy05/11 | Backend120, pilot150, temporal129, mobile27 bài đạt; typecheck/lint và Android bundle đạt | Không thay nghiệm thu native, không phải APK/release production |
-| Bàn giao demo cho clone07/11 | Nhánh có mobile, Backend/pilot, web prototype, forecast synthetic, simulator IoT, AI API source, runbook và status | Chưa clean-install/demo trên máy thành viên; YOLO V4 checkpoint và ảnh/dataset không nằm trong Git |
-| Ngoài core midterm | Camera stream, Google login, đổi mật khẩu, push và đề xuất chuyên môn còn chưa hoàn chỉnh | Không ghi nhận đã hoàn thành toàn bộ roadmap |
+| Frontend/mobile | Có lịch sử triển khai và handoff ở các mục trước; phạm vi UI do thành viên frontend phụ trách | Các việc UI/native/release phải được frontend xác nhận riêng; không tính vào T01–T17 Backend/ML |
+| Thực địa | Chưa thực hiện thu thập hoặc xác minh dữ liệu vật lý trong phạm vi T14–T17 | Gate nghiên cứu thực địa vẫn mở; chỉ lập kế hoạch khi nhóm đổi phạm vi và có nguồn thực |
 
-**Kết luận:** luồng forecast MVP đã được nối ở mức source, model inference,
-Backend và mobile client; gói clone đã được đẩy lên nhánh riêng. **FM-05 nghiệm
-thu trên thiết bị của thành viên vẫn chưa được ghi nhận.**
-Không suy số kiểm thử hoặc bundle export thành tỷ lệ hoàn thành toàn dự án.
+**Kết luận:** luồng forecast MVP và Backend/dữ liệu đã được xây dựng qua T01–T17.
+Candidate T17 chưa đủ bằng chứng để shadow; FM03 vẫn là model phục vụ. Không suy
+số kiểm thử hoặc kết quả synthetic thành tỷ lệ hoàn thành toàn dự án hay xác nhận
+khả năng dự báo bệnh thật.
 
-Chi tiết mới nhất ở **mục105** cuối file; lịch sử forecast ở mục102–104 và
-[rà soát core05/11](D:/AEGIS/docs/MVP_CORE_REVIEW_20261105.md).
+Chi tiết mới nhất ở **mục124** cuối file; lịch sử forecast ở mục102–123 và
+[rà soát core05/11](docs/MVP_CORE_REVIEW_20261105.md).
 Lệnh chạy/seed/tiến thời gian ở
-[runbook forecast](D:/AEGIS/docs/FORECAST_MVP_MIDTERM_20261105.md).
-[Chỉ mục bàn giao](D:/AEGIS/docs/CURRENT_HANDOFF.md) tập hợp các mốc khác.
+[runbook forecast](docs/FORECAST_MVP_MIDTERM_20261105.md).
+[Chỉ mục bàn giao](docs/CURRENT_HANDOFF.md) tập hợp các mốc khác.
 
 ---
 
 **Lịch sử được bảo toàn:** các mục1–101 bên dưới ghi trạng thái tại từng mốc;
-những mục102–105 được bổ sung sau.
+những mục102–124 được bổ sung sau.
 Phần mở đầu cũ được lập24/10/2026,09:43; các câu “chưa có forecast/mobile”
 hoặc ưu tiên nhận diện ở mốc cũ không thay thế tổng quan05/11 bên trên.
 
@@ -112,14 +115,14 @@ Các phần chưa hoàn tất: quản lý ruộng/mùa vụ/thiết bị đầy 
 
 Tài liệu Backend:
 
-- [Hướng dẫn Backend](D:/AEGIS/backend/README.md)
-- [Contract API](D:/AEGIS/backend/docs/API.md)
-- [Tracing và timing](D:/AEGIS/backend/docs/OBSERVABILITY.md)
-- [Quota và giới hạn tài nguyên](D:/AEGIS/backend/docs/RESOURCE_LIMITS.md)
-- [Idempotency](D:/AEGIS/backend/docs/IDEMPOTENCY.md)
-- [Kiểm chứng AI–Backend trước đây](D:/AEGIS/backend/docs/VERIFICATION_AI_BACKEND_20261021.md)
-- [Kiểm chứng idempotency](D:/AEGIS/backend/docs/VERIFICATION_IDEMPOTENCY_20261021.md)
-- [Hướng dẫn Postman](D:/AEGIS/backend/postman/README.md)
+- [Hướng dẫn Backend](backend/README.md)
+- [Contract API](backend/docs/API.md)
+- [Tracing và timing](backend/docs/OBSERVABILITY.md)
+- [Quota và giới hạn tài nguyên](backend/docs/RESOURCE_LIMITS.md)
+- [Idempotency](backend/docs/IDEMPOTENCY.md)
+- [Kiểm chứng AI–Backend trước đây](backend/docs/VERIFICATION_AI_BACKEND_20261021.md)
+- [Kiểm chứng idempotency](backend/docs/VERIFICATION_IDEMPOTENCY_20261021.md)
+- [Hướng dẫn Postman](backend/postman/README.md)
 
 ## 5. AI — dữ liệu, audit và sửa nhãn
 
@@ -160,10 +163,10 @@ Các ca còn giữ lại: blast_50/51 bất đồng nhóm trên cùng ảnh; bla
 
 Tham chiếu:
 
-- [Tổng hợp bằng chứng sửa nhãn](D:/AEGIS-AI/experiments/annotation_evidence_summary_20261022/REPORT_VI.md)
-- [Source-r1: kiểm chứng revision](D:/AEGIS-AI/experiments/source_restoration_revision_20261021/REPORT_VI.md)
-- [Quy ước nét chạm biên](D:/AEGIS-AI/experiments/boundary_source_bundle_20261022/POLICY_VI.md)
-- [Boundary-r2: kiểm chứng dataset](D:/AEGIS-AI/experiments/source_boundary_revision_20261022/REPORT_VI.md)
+- Tổng hợp bằng chứng sửa nhãn (`AEGIS-AI/experiments/annotation_evidence_summary_20261022/REPORT_VI.md`, workspace AI ngoài repo)
+- Source-r1: kiểm chứng revision (`AEGIS-AI/experiments/source_restoration_revision_20261021/REPORT_VI.md`, workspace AI ngoài repo)
+- Quy ước nét chạm biên (`AEGIS-AI/experiments/boundary_source_bundle_20261022/POLICY_VI.md`, workspace AI ngoài repo)
+- Boundary-r2: kiểm chứng dataset (`AEGIS-AI/experiments/source_boundary_revision_20261022/REPORT_VI.md`, workspace AI ngoài repo)
 
 ## 6. Các lượt train và kết quả
 
@@ -207,10 +210,10 @@ Boundary-r2 tăng mAP50–95 và F1 tổng ở cả ba cặp seed. Mức tăng n
 
 Đã xác minh đủ bốn checkpoint mới, 50 epoch/job, 1.034 prediction/job, 3.161 GT/job; tính lại trung bình/độ lệch chuẩn và đối chiếu aggregate.
 
-- [Đánh giá boundary-r2 seed42](D:/AEGIS-AI/experiments/ai_quality_source_boundary_r2_20261022/ASSESSMENT_VI.md)
-- [Báo cáo 3 cặp seed](D:/AEGIS-AI/experiments/paired_seed_stability_20261023/ASSESSMENT_VI.md)
-- [Aggregate đầy đủ](D:/AEGIS-AI/experiments/paired_seed_stability_20261023/aggregate.json)
-- [Verification kết quả nhiều seed](D:/AEGIS-AI/experiments/paired_seed_stability_20261023/assessment_verification.json)
+- Đánh giá boundary-r2 seed42 (`AEGIS-AI/experiments/ai_quality_source_boundary_r2_20261022/ASSESSMENT_VI.md`, workspace AI ngoài repo)
+- Báo cáo 3 cặp seed (`AEGIS-AI/experiments/paired_seed_stability_20261023/ASSESSMENT_VI.md`, workspace AI ngoài repo)
+- Aggregate đầy đủ (`AEGIS-AI/experiments/paired_seed_stability_20261023/aggregate.json`, workspace AI ngoài repo)
+- Verification kết quả nhiều seed (`AEGIS-AI/experiments/paired_seed_stability_20261023/assessment_verification.json`, workspace AI ngoài repo)
 
 ### Những lỗi đã phân tích sâu
 
@@ -220,7 +223,7 @@ Boundary-r2 tăng mAP50–95 và F1 tổng ở cả ba cặp seed. Mức tăng n
 - 24 vùng wrong-class trên 21 ảnh: 23 có prediction brown spot, 1 sheath blight; không đổi class nguồn theo model.
 - Đã xem 12 ca gồm ảnh mất và ảnh phục hồi; không dùng gallery chọn theo lỗi để ước lượng chất lượng toàn tập.
 
-[Phân tích hồi quy rice blast](D:/AEGIS-AI/experiments/boundary_r2_rice_review_20261023/FOLLOWUP_VI.md).
+Phân tích hồi quy rice blast (`AEGIS-AI/experiments/boundary_r2_rice_review_20261023/FOLLOWUP_VI.md`, workspace AI ngoài repo).
 
 ## 7. Benchmark AI → Backend gần nhất
 
@@ -241,7 +244,7 @@ Chỉ 5 request đo/model, chạy tuần tự: không đủ kết luận model n
 
 API đã được bổ sung cách truyền checkpoint/model_version cho đánh giá riêng; health/response phản ánh đúng checkpoint nạp. Mặc định vẫn V4. Inference dùng `quantize=None` thay tham số `half` deprecated.
 
-[Báo cáo benchmark](D:/AEGIS-AI/experiments/candidate_http_benchmark_20261023/REPORT_VI.md).
+Báo cáo benchmark (`AEGIS-AI/experiments/candidate_http_benchmark_20261023/REPORT_VI.md`, workspace AI ngoài repo).
 
 ## 8. Ảnh thực địa — phần đang chờ
 
@@ -261,7 +264,7 @@ Có thể báo cáo kết quả trên validation/dataset theo phạm vi đã ki�
 
 Mục tiêu thu thập ban đầu lớn hơn khoảng 120 ảnh là gợi ý tổ chức, không phải bảo đảm thống kê. Tách calibration và field_holdout theo nhóm nguồn/cây/chuyến chụp. Không đưa holdout vào train hoặc chọn threshold từ holdout. Kiểm tra hash chỉ chặn trùng chính xác, không bảo đảm phát hiện mọi ảnh gần trùng.
 
-[Hướng dẫn thu ảnh và metadata](D:/AEGIS-AI/datasets/field_evaluation_v1/README_VI.md).
+Hướng dẫn thu ảnh và metadata (`AEGIS-AI/datasets/field_evaluation_v1/README_VI.md`, workspace AI ngoài repo).
 
 ## 9. Công việc đã hoàn thành — mốc thời gian và bằng chứng
 
@@ -270,7 +273,7 @@ Tất cả giờ trong bảng là UTC+7. **Giờ train lấy từ log/status**, 
 | Hoàn tất / khoảng thời gian | Việc đã làm | Trạng thái / bằng chứng |
 |---|---|---|
 | 20–21/10/2026, theo hồ sơ đã lưu | Audit dataset/nhãn, baseline V4, kiểm tra confidence và geometry | Đã có inventory/hash và các báo cáo audit; không có giờ đầy đủ cho từng thao tác trong file tổng hợp |
-| Đến 21/10/2026, theo các báo cáo kiểm chứng Backend | Auth, detect, lịch sử/ảnh riêng tư, tracing, quota và idempotency | Đã kiểm tra ở các mốc trước; [hồ sơ Backend](D:/AEGIS/backend/docs/VERIFICATION_20261021.md) |
+| Đến 21/10/2026, theo các báo cáo kiểm chứng Backend | Auth, detect, lịch sử/ảnh riêng tư, tracing, quota và idempotency | Đã kiểm tra ở các mốc trước; [hồ sơ Backend](backend/docs/VERIFICATION_20261021.md) |
 | **21/10/2026 18:18:10** | Policy-r1 train và đánh giá hoàn tất | status completed; mAP50–95 không tăng so với V4; không đổi API |
 | **21/10/2026 20:07:31 → 23:50:25** | Source-r1: train và đánh giá seed42 | 8 file train sửa theo nguồn, +13 box; đã hoàn tất |
 | 22/10/2026, theo báo cáo kiểm chứng | Đối chiếu sheath blight, đo 817/1203, lập quy ước nét biên và tạo dataset boundary-r2 | Hai nhãn thêm +2 box so với source-r1; validation không đổi |
@@ -980,10 +983,10 @@ cần review dữ liệu/protocol. Không có checkpoint cảnh báo mới hoặ
 
 ### Bàn giao, giới hạn và tiếp theo
 
-[README](../AEGIS-AI/temporal_warning/README.md),
-[quy trình thu thập](../AEGIS-AI/temporal_warning/COLLECTION_PROTOCOL.md),
-[thiết kế model](../AEGIS-AI/temporal_warning/MODEL_DESIGN.md),
-[kiểm chứng](../AEGIS-AI/temporal_warning/VERIFICATION.md).
+README (`AEGIS-AI/temporal_warning/README.md`, workspace AI ngoài repo),
+quy trình thu thập (`AEGIS-AI/temporal_warning/COLLECTION_PROTOCOL.md`, workspace AI ngoài repo),
+thiết kế model (`AEGIS-AI/temporal_warning/MODEL_DESIGN.md`, workspace AI ngoài repo),
+kiểm chứng (`AEGIS-AI/temporal_warning/VERIFICATION.md`, workspace AI ngoài repo).
 
 Khung thu thập/dataset builder đã làm; **mô hình được train và xác thực còn bị
 chặn bởi thiếu dữ liệu thực**. Chưa triển khai nhật ký bệnh Backend/UI, chế độ
@@ -1118,8 +1121,8 @@ Workspace không có Git repo; manifest/hash phục vụ truy vết local.
 
 ### Phạm vi đã làm và phần còn chặn
 
-[Bàn giao/CLI](../AEGIS-AI/temporal_warning/BRIDGE.md),
-[kiểm chứng](../AEGIS-AI/temporal_warning/bridge_release_20261024/VERIFICATION.md).
+Bàn giao/CLI (`AEGIS-AI/temporal_warning/BRIDGE.md`, workspace AI ngoài repo),
+kiểm chứng (`AEGIS-AI/temporal_warning/bridge_release_20261024/VERIFICATION.md`, workspace AI ngoài repo).
 
 Hoàn thành snapshot và cầu nối replay kiểm thử; **xuất dữ liệu thực được duyệt
 để train chưa hoàn thành**. Telemetry hiện mock, can thiệp chưa thu và danh tính/
@@ -1583,9 +1586,9 @@ không tính lượt lỗi là đạt. Scan marker credential không hit, không
 quét mọi secret. Không chạy lại 60 wrapper/71 core/69 V4 HTTP vì runtime tương
 ứng giữ hash; 44 unit và 82 kiểm tra là bằng chứng mới của phiên này.
 
-[CLI/runbook](../AEGIS-AI/temporal_warning/RESEARCH_BRIDGE.md),
-[tổng duyệt](../AEGIS-AI/temporal_warning/research_replay_20261025/REHEARSAL.md),
-[kiểm chứng](../AEGIS-AI/temporal_warning/research_replay_20261025/VERIFICATION.md).
+CLI/runbook (`AEGIS-AI/temporal_warning/RESEARCH_BRIDGE.md`, workspace AI ngoài repo),
+tổng duyệt (`AEGIS-AI/temporal_warning/research_replay_20261025/REHEARSAL.md`, workspace AI ngoài repo),
+kiểm chứng (`AEGIS-AI/temporal_warning/research_replay_20261025/VERIFICATION.md`, workspace AI ngoài repo).
 
 Hoàn thành mục 1 cầu nối ledger và mục 2 tổng duyệt trong phạm vi replay phần
 mềm đã kiểm. Chưa có field training export, credential chuyên gia, nhãn thực
@@ -3269,9 +3272,9 @@ GT, không dùng test/ảnh demo chọn model/threshold. mAP không là accuracy
 đúng trên validation không chứng minh dự báo bệnh tương lai. Chưa có đánh giá
 field/healthy/OOD/calibration được duyệt; không lấy confidence làm % nguy cơ.
 
-Nguồn: [AI evaluation bàn giao](D:/AEGIS/handoff_20261024/AI_EVALUATION.md),
-[đối chứng nhiều seed](D:/AEGIS-AI/experiments/paired_seed_stability_20261023/ASSESSMENT_VI.md),
-[hồ sơ model](D:/AEGIS/handoff_20261024/MODEL_PROFILE.md).
+Nguồn: [AI evaluation bàn giao](handoff_20261024/AI_EVALUATION.md),
+đối chứng nhiều seed (`AEGIS-AI/experiments/paired_seed_stability_20261023/ASSESSMENT_VI.md`, workspace AI ngoài repo),
+[hồ sơ model](handoff_20261024/MODEL_PROFILE.md).
 
 ### 63.4. Trạng thái toàn bộ backlog TASK-01 đến TASK-22
 
@@ -3392,30 +3395,30 @@ mobile là client mục tiêu, V4 giữ, mượn thiết bị khi rảnh, chưa 
 
 ### 63.9. Tài liệu điều hướng và bằng chứng hiện hành
 
-- [Current handoff](D:/AEGIS/docs/CURRENT_HANDOFF.md) và
-  [current runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md): khả năng/entry point/lệnh.
-- [Source handoff guide](D:/AEGIS/docs/SOURCE_HANDOFF_GUIDE.md) và
-  [candidate batches](D:/AEGIS/task20_source_management_20261028/source_review_batches.json):
+- [Current handoff](docs/CURRENT_HANDOFF.md) và
+  [current runbook](docs/CURRENT_RUNBOOK.md): khả năng/entry point/lệnh.
+- [Source handoff guide](docs/SOURCE_HANDOFF_GUIDE.md) và
+  [candidate batches](task20_source_management_20261028/source_review_batches.json):
   source/artifact/private boundaries; chưa stage hoặc import.
-- [Core API](D:/AEGIS/backend/docs/API.md),
-  [mobile integration](D:/AEGIS/docs/MOBILE_INTEGRATION.md),
-  [pilot contract](D:/AEGIS/frontend/README.md): không nhầm core với pilot.
-- [Controlled raw](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md),
-  [backup/restore](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md): provenance và vận hành.
-- [Temporal](D:/AEGIS-AI/temporal_warning/README.md),
-  [protocol draft](D:/AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md),
-  [source/permissions](D:/AEGIS/task10_source_readiness_20261027/README.md): readiness.
-- Review từng task: [01](D:/AEGIS/task01_rehearsal_20261027/REVIEW_VI.md),
-  [02](D:/AEGIS/task02_rehearsal_20261027/REVIEW_VI.md),
-  [03](D:/AEGIS/task03_rehearsal_20261027/REVIEW_VI.md),
-  [07](D:/AEGIS/task07_assessment_replay_20261027/REVIEW_VI.md),
-  [08](D:/AEGIS/task08_leakage_audit_20261027/REVIEW_VI.md),
-  [09](D:/AEGIS/task09_protocol_20261027/REVIEW_VI.md),
-  [10](D:/AEGIS/task10_source_readiness_20261027/REVIEW_VI.md),
-  [11](D:/AEGIS/task11_controlled_raw_20261027/REVIEW_VI.md),
-  [17](D:/AEGIS/task17_backup_restore_20261028/REVIEW_VI.md),
-  [19](D:/AEGIS/task19_docs_handoff_20261028/REVIEW_VI.md),
-  [20](D:/AEGIS/task20_source_management_20261028/REVIEW_VI.md).
+- [Core API](backend/docs/API.md),
+  [mobile integration](docs/MOBILE_INTEGRATION.md),
+  [pilot contract](frontend/README.md): không nhầm core với pilot.
+- [Controlled raw](frontend/CONTROLLED_EXPERIMENT_RAW.md),
+  [backup/restore](frontend/PILOT_BACKUP_RESTORE.md): provenance và vận hành.
+- Temporal (`AEGIS-AI/temporal_warning/README.md`, workspace AI ngoài repo),
+  protocol draft (`AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md`, workspace AI ngoài repo),
+  [source/permissions](task10_source_readiness_20261027/README.md): readiness.
+- Review từng task: [01](task01_rehearsal_20261027/REVIEW_VI.md),
+  [02](task02_rehearsal_20261027/REVIEW_VI.md),
+  [03](task03_rehearsal_20261027/REVIEW_VI.md),
+  [07](task07_assessment_replay_20261027/REVIEW_VI.md),
+  [08](task08_leakage_audit_20261027/REVIEW_VI.md),
+  [09](task09_protocol_20261027/REVIEW_VI.md),
+  [10](task10_source_readiness_20261027/REVIEW_VI.md),
+  [11](task11_controlled_raw_20261027/REVIEW_VI.md),
+  [17](task17_backup_restore_20261028/REVIEW_VI.md),
+  [19](task19_docs_handoff_20261028/REVIEW_VI.md),
+  [20](task20_source_management_20261028/REVIEW_VI.md).
 
 ### 63.10. Phạm vi lần cập nhật báo cáo này
 
@@ -4054,10 +4057,10 @@ cứu/thu thập không có nghĩa đã có dữ liệu bệnh thật hoặc quy
 | H2 | Shared pilot API-only factory; serve_mobile core mặc định/pilot opt-in; capabilities và assessment-view required/current; contract/schema/acceptance | Hoàn thành Backend slice list→detail/version→ack/check; chưa sửa UI mobile |
 | H6 | Ma trận20 yêu cầu→63 file source/test→14 evidence, allowed/forbidden/remaining; curated metrics và demo8 stage lặp được | Hoàn thành hồ sơ kỹ thuật, không là rubric trường hoặc kết luận đủ tốt nghiệp |
 
-Nguồn điều hướng: [current handoff](D:/AEGIS/docs/CURRENT_HANDOFF.md),
-[contract H2](D:/AEGIS/backend/docs/MOBILE_FOLLOWUP_API.md),
-[ma trận H6](D:/AEGIS/docs/THESIS_EVIDENCE.md),
-[model profile](D:/AEGIS/handoff_20261024/MODEL_PROFILE.md).
+Nguồn điều hướng: [current handoff](docs/CURRENT_HANDOFF.md),
+[contract H2](backend/docs/MOBILE_FOLLOWUP_API.md),
+[ma trận H6](docs/THESIS_EVIDENCE.md),
+[model profile](handoff_20261024/MODEL_PROFILE.md).
 
 ### 67.3. Trạng thái backlog và các hướng đã chọn
 
@@ -4113,10 +4116,10 @@ H1/H2/H6 là các hướng công việc bổ sung, không cộng chúng thành t
 | H6 ngày28/10 |20 requirements/63 refs/14 evidence;2 demo×36 checkpoint; package136 file | Checkpoint không là unit test/mẫu bệnh; không inference/train; source package default chỉ kiểm3 bundled và báo11 external chưa kiểm |
 | Bản tổng hợp29/10 này | Chạy lại checker refs/hash:20 requirements,63 refs,14 evidence đạt | Chỉ đối chiếu file/hash, không rerun300 tests, demo, GPU hoặc soak |
 
-Bằng chứng: [H1](D:/AEGIS/h1_source_handoff_20261028/progress_verification.json),
-[H2](D:/AEGIS/h2_mobile_backend_20261028/progress_verification.json),
-[H6](D:/AEGIS/h6_thesis_evidence_20261028/progress_verification.json),
-[metadata lịch sử](D:/AEGIS/docs/evidence/THESIS_HISTORICAL_SUMMARY.json).
+Bằng chứng: [H1](h1_source_handoff_20261028/progress_verification.json),
+[H2](h2_mobile_backend_20261028/progress_verification.json),
+[H6](h6_thesis_evidence_20261028/progress_verification.json),
+[metadata lịch sử](docs/evidence/THESIS_HISTORICAL_SUMMARY.json).
 Hash không là chữ ký hoặc xác nhận nhãn/quyền; pass rate không là bệnh được
 dự báo đúng. Gallery/demo/synthetic không thay independent field holdout.
 
@@ -4234,10 +4237,10 @@ bản đọc riêng ở project_report_20261029/REPORT_VI.md; không chỉ để
 status. status_before.md giữ bytes trước append; record_progress.py và
 progress_verification.json kiểm prefix, nội dung append, refs và Git/source hashes.
 
-Các tài liệu hiện hành tiếp tục là [H1 guide](D:/AEGIS/docs/HANDOFF_REPRODUCIBLE.md),
-[H2 contract](D:/AEGIS/backend/docs/MOBILE_FOLLOWUP_API.md),
-[H6 evidence](D:/AEGIS/docs/THESIS_EVIDENCE.md) và
-[demo guide](D:/AEGIS/docs/THESIS_DEMO.md).
+Các tài liệu hiện hành tiếp tục là [H1 guide](docs/HANDOFF_REPRODUCIBLE.md),
+[H2 contract](backend/docs/MOBILE_FOLLOWUP_API.md),
+[H6 evidence](docs/THESIS_EVIDENCE.md) và
+[demo guide](docs/THESIS_DEMO.md).
 Để làm tiếp, chỉ định một mã Hx-Tyy; mỗi lượt triển khai một task chính rồi
 review/cập nhật status. Các mã task kế hoạch không phải cam kết đã bắt đầu.
 
@@ -7049,16 +7052,16 @@ checkpoint `experiments/yolo/baseline_v4_50epochs/weights/best.pt`, SHA256
   ảnh trùng/gần giống để hạn chế rò rỉ; vẫn có giới hạn audit được lưu riêng.
 - Cấu hình baseline:50epoch, imgsz640, batch4, seed42, GPU device0;
   chọn best checkpoint theo validation. Nguồn:
-  [script train](D:/AEGIS-AI/src/train_baseline_v4.py) và
-  [args thực chạy](D:/AEGIS-AI/experiments/yolo/baseline_v4_50epochs/args.yaml).
-- [Test baseline nội bộ20/10](D:/AEGIS-AI/experiments/baseline_test_v4_20261020/evaluation_summary.json):
+  script train (`AEGIS-AI/src/train_baseline_v4.py`, workspace AI ngoài repo) và
+  args thực chạy (`AEGIS-AI/experiments/yolo/baseline_v4_50epochs/args.yaml`, workspace AI ngoài repo).
+- Test baseline nội bộ20/10 (`AEGIS-AI/experiments/baseline_test_v4_20261020/evaluation_summary.json`, workspace AI ngoài repo):
   mAP50=72,69%, mAP50–95=33,71%, trên520ảnh. Đây là metric detection,
   không phải accuracy phân loại ảnh; không dùng một ảnh demo làm metric.
 - FT25 ngày30/10 đã fine-tune thêm25epoch từ V4 best trong thí nghiệm độc lập;
   optimizer/scheduler khởi tạo lại, không resume liên tục epoch51–75.
   Validation FP32 cùng cấu hình: V4 mAP50–95=32,58%, candidate=33,33%;
   AP50 đạo ôn lá giảm nhẹ. Candidate `deployed=false`, V4 mặc định giữ nguyên.
-  [Báo cáo FT25](D:/AEGIS-AI/experiments/v4_finetune25_20261030/REPORT_VI.md).
+  Báo cáo FT25 (`AEGIS-AI/experiments/v4_finetune25_20261030/REPORT_VI.md`, workspace AI ngoài repo).
 - Các candidate source-r1/boundary-r2, audit nhãn và thử nhiều seed giữ bằng
   chứng ở các mục trước; không tự promote hoặc cộng các run thành một model.
 
@@ -7088,11 +7091,11 @@ Artifact: `D:/AEGIS/fm01_synthetic_forecast_20261105/run02`.
 Đủ cấu trúc và nguồn demo cho MVP end-to-end; quy mô/độ đa dạng còn nhỏ.
 Nếu mở rộng giả lập, ưu tiên thêm cụm độc lập, seed và diễn biến khô→ướt→khô,
 missing/late; không chỉ nhân bản các hàng hiện có.
-[Chi tiết FM-01](D:/AEGIS/docs/FM01_SYNTHETIC_FORECAST_20261105.md).
+[Chi tiết FM-01](docs/FM01_SYNTHETIC_FORECAST_20261105.md).
 
 ### D. FM-02 — huấn luyện AI dự báo và kết quả
 
-[Source](D:/AEGIS-AI/temporal_warning/synthetic_baseline.py);
+Source (`AEGIS-AI/temporal_warning/synthetic_baseline.py`, workspace AI ngoài repo);
 artifact `D:/AEGIS/fm02_synthetic_baseline_20261105/run01`.
 
 - Logistic Regression scikit-learn; đặc trưng số qua StandardScaler,
@@ -7112,8 +7115,8 @@ artifact `D:/AEGIS/fm02_synthetic_baseline_20261105/run01`.
 | Test Logistic Regression |34|73,53% (25/34)|0,7604|0,5921|
 | Test Dummy |34|52,94%|0,5000|0,6945|
 
-Nguồn: [metrics](D:/AEGIS/fm02_synthetic_baseline_20261105/run01/metrics.json),
-[manifest](D:/AEGIS/fm02_synthetic_baseline_20261105/run01/manifest.json).
+Nguồn: [metrics](fm02_synthetic_baseline_20261105/run01/metrics.json),
+[manifest](fm02_synthetic_baseline_20261105/run01/manifest.json).
 Không chỉ báo accuracy rồi bỏ qua validation log loss kém Dummy.
 Score là điểm kỹ thuật chưa hiệu chuẩn, không gọi0,8 là80% chắc chắn có bệnh.
 YOLO và forecast hiện độc lập; output YOLO chưa là feature của Logistic Regression.
@@ -7201,12 +7204,12 @@ Mật khẩu và token không được ghi lại trong file status. Các lệnh 
 
 | Bộ kiểm | Kết quả thực chạy | Bằng chứng |
 |---|---|---|
-| Backend |120bài, OK; gồm worker thật và client TypeScript HTTP khi FM04_CHECK_MOBILE=1|[log](D:/AEGIS/docs/evidence/mvp_backend_20261105.log)|
-| Pilot/frontend Python |150bài, OK; telemetry/QC/follow-up/timeline/backup/restore…|[log](D:/AEGIS/docs/evidence/mvp_pilot_20261105.log)|
-| Temporal |129bài, OK bằng Python Backend có Flask|[báo cáo core](D:/AEGIS/docs/MVP_CORE_REVIEW_20261105.md)|
+| Backend |120bài, OK; gồm worker thật và client TypeScript HTTP khi FM04_CHECK_MOBILE=1|[log](docs/evidence/mvp_backend_20261105.log)|
+| Pilot/frontend Python |150bài, OK; telemetry/QC/follow-up/timeline/backup/restore…|[log](docs/evidence/mvp_pilot_20261105.log)|
+| Temporal |129bài, OK bằng Python Backend có Flask|[báo cáo core](docs/MVP_CORE_REVIEW_20261105.md)|
 | Mobile unit |27bài, OK: auth-validation/followup/forecast-client/token-storage|mobile/scripts/*.test.mjs tương ứng|
 | Typecheck/lint |npm run check và npm run lint đạt|Lượt sau sửa code cuối đã chạy|
-| Bundle Android |Export đạt,1353module|[metadata](D:/AEGIS/fm05_core_20261105/android02/metadata.json)|
+| Bundle Android |Export đạt,1353module|[metadata](fm05_core_20261105/android02/metadata.json)|
 
 Lần đầu chạy toàn temporal suite bằng Python model thiếu Flask có5lỗi import;
 đã chạy lại đủ129bài bằng Backend env và đạt. Không cài thêm thư viện để sửa
@@ -7237,12 +7240,12 @@ thực địa và deployment production. Tiếp tục giữ source/core/pilot t�
 
 ### J. Bàn giao và trạng thái source
 
-- [Báo cáo rà soát core](D:/AEGIS/docs/MVP_CORE_REVIEW_20261105.md).
-- [Runbook forecast/model/seed/simulation/API](D:/AEGIS/docs/FORECAST_MVP_MIDTERM_20261105.md).
-- [Dữ liệu FM-01](D:/AEGIS/docs/FM01_SYNTHETIC_FORECAST_20261105.md).
-- [Chỉ mục bàn giao hiện hành](D:/AEGIS/docs/CURRENT_HANDOFF.md).
-- [Mobile README](D:/AEGIS/mobile/README.md) và
-  [contract Backend](D:/AEGIS/backend/docs/API.md).
+- [Báo cáo rà soát core](docs/MVP_CORE_REVIEW_20261105.md).
+- [Runbook forecast/model/seed/simulation/API](docs/FORECAST_MVP_MIDTERM_20261105.md).
+- [Dữ liệu FM-01](docs/FM01_SYNTHETIC_FORECAST_20261105.md).
+- [Chỉ mục bàn giao hiện hành](docs/CURRENT_HANDOFF.md).
+- [Mobile README](mobile/README.md) và
+  [contract Backend](backend/docs/API.md).
 
 Giữ nguyên các mốc1–101. Không có commit/push/merge/deploy hoặc promote
 checkpoint trong lần ghi status. Source/artifact local chưa tự chứng minh
@@ -7290,3 +7293,647 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 - Static bundle/fixture SHA được đối chiếu khi đóng gói; chưa chạy cài sạch trên
   máy thành viên hoặc nghiệm thu native nên khả năng máy đó chạy thành công vẫn
   cần xác nhận tại buổi tích hợp.
+
+## 106. T01 hợp đồng tổng hợp raw thành hourly — 07/11/2026
+
+- Theo yêu cầu của Nhân, bắt đầu backlog phát triển phần AI/Backend/dữ liệu.
+  T01 trong backlog mới này là thiết kế hợp đồng raw → hourly, có phạm vi riêng
+  với các mã TASK-01 và H*-T01 lịch sử.
+- Hoàn thành tài liệu [hợp đồng hourly v1](docs/HOURLY_AGGREGATION_CONTRACT_V1.md)
+  và [policy synthetic mẫu](hourly_contract_v1/policy.synthetic.json).
+- Chốt giờ UTC, slot/cadence/tolerance, chọn mẫu deterministic theo từng biến,
+  coverage hữu tỷ, numeric mean, closure/grace, as_of, late receipt/exclusion,
+  lineage/hash và cách chiếu sang feature contract hiện hành. Có16ca nghiệm thu
+  làm đầu vào cho T02/T03.
+- Profile kỹ thuật do lượt T01 chọn: cadence600s, tolerance5s, grace60s và
+  minimum coverage4/5. Đây là lựa chọn synthetic cần đối chiếu khi có nguồn đo
+  thật. Đã kiểm JSON/UUID/cadence/coverage, phép tính ví dụ và source references.
+- Raw lá ướt hiện là point state. Adapter v1 giữ thống kê điểm và xuất
+  leaf_wet=null cho feature v1; luồng này trả insufficient_data cho model hiện
+  hành đến khi có whole-hour semantics tương thích. Không tự gán trạng thái cả
+  giờ từ tỷ lệ điểm.
+- T01 đạt ở mức thiết kế; T02 adapter offline và T03 acceptance chưa triển khai.
+  Lượt này chưa chạy thêm hồi quy dịch vụ/model. Các kết quả kiểm phần mềm của
+  lượt trước được ghi riêng trong docs/PROJECT_REVIEW_20261107.md.
+
+## 107. T02 adapter tổng hợp hourly offline — 07/11/2026
+
+- Triển khai `frontend/hourly_aggregation.py` với hàm aggregate và CLI theo
+  hợp đồng T01. Tái dùng raw validator, strict JSON loader và canonical digest.
+- Tổng hợp theo slot/biến, coverage hữu tỷ, mean bằng math.fsum, QC và lineage;
+  xử lý pending, late receipt/exclusion, biên UTC và deterministic selection.
+  Có policy/bucket/result hash và source bundle reference.
+- Thêm raw fixture sáu slot và output thực chạy trong `hourly_contract_v1/`.
+  Một bucket complete_numeric, T25°C/RH65%, wet_point_fraction1 và
+  whole_hour_value=null. [Hướng dẫn T02](hourly_contract_v1/README.md).
+- 16test adapter mới và18test raw audit/monitor đạt, tổng34bài. Kiểm CLI thực
+  chạy, replay, output không ghi đè, timezone và cửa sổ tối đa744giờ.
+- T02 hoàn thành phạm vi offline. T03 nghiệm thu với feature preparation và
+  T04 lưu/API nguồn hourly còn mở. Chưa nối adapter vào forecast service.
+
+## 108. T03 nghiệm thu hourly tới feature preparation — 07/11/2026
+
+- Thêm prepare_feature_input vào adapter hourly để chiếu raw đã tổng hợp sang
+  envelope feature v1, giữ as_of/availability, null/QC và context revisions.
+- Chạy720điểm synthetic thành120bucket; feature thực tế có coverage
+  temp120/rh120/wet0, status insufficient_data và predictors=null. Positive
+  control whole-hour hiện có trả ready với61predictor.
+- 42bài adapter/integration/audit/monitor và34bài feature/pipeline đạt, tổng76.
+  Runtime portable và workspace AI đã đối chiếu cùng response qua CLI.
+- Ma trận T01 A–P, evidence/hash và lệnh chạy lại nằm trong
+  [báo cáo T03](docs/HOURLY_FEATURE_ACCEPTANCE_T03.md).
+- T03 đạt phạm vi offline. T04 persistence/API còn mở. T03 chưa gọi model từ
+  raw point; whole-hour wetness vẫn cần semantics hoặc feature/model mới.
+
+## 109. T04 lưu nguồn hourly và API Backend — 07/11/2026
+
+- Thêm pilot_hourly.py và nạp qua create_pilot_app. Policy và source có revision
+  riêng theo owner/stream trong telemetry.sqlite3; source tham chiếu policy
+  bằng FK và lưu raw input snapshot, output coverage/lineage cùng hash.
+- API tạo/list/detail policy, tạo/list/detail source và đọc input kiểm Bearer,
+  owner của stream/season/plot, private/no-store và quota farm. Server tự lấy
+  raw từ DB; không nhận kết quả hourly do client tự khai báo.
+- BEGIN IMMEDIATE cùng base_revision và semantic replay key kiểm cập nhật
+  đồng thời, retry và snapshot raw nhất quán. Giới hạn compilation100000mẫu
+  mỗi cửa sổ1–744giờ. Availability live được đóng dấu server trong transaction;
+  không có wall-clock commit timestamp riêng trong SQLite hiện hành.
+- Refactor snapshot raw để API và CLI export dùng chung serialization/hash;
+  stopped-store export giữ phạm vi toàn stream. Hồi quy182bài pilot và120bài
+  Backend đạt. Bộ T04 cuối10bài đạt, có HTTP thật, hai owner, concurrency,
+  nâng cấp kho raw, mở lại kho, backup/verify, rollback/quota và hash corruption.
+  Các bộ có test trùng, không cộng số lượt thành tổng test độc lập.
+- [Contract API](backend/docs/HOURLY_SOURCE_API.md),
+  [evidence T04](hourly_contract_v1/t04_summary.json) và
+  [hướng dẫn](hourly_contract_v1/README.md). Kho/tài khoản kiểm thử là tạm,
+  evidence dùng dữ liệu synthetic với đồng hồ fixture có khai báo.
+- T04 hoàn thành. T05 nối nguồn hourly đã lưu vào forecast còn mở; whole-hour
+  wetness vẫn null theo T01. Các cấu hình/model forecast hiện hành giữ phạm vi
+  synthetic và chưa có nghiệm thu cảm biến thật.
+
+## 110. T05 nối nguồn hourly đã lưu vào forecast — 07/11/2026
+
+- Mở rộng scenario hourly tại API forecast theo mùa vụ với hourly_source_id
+  và issued_at. Server lấy source T04 theo owner/season/stream/plot, kiểm hash
+  và availability, chọn cultivation revision đã có tại issue rồi gửi worker.
+- Tái dùng projection T03, giới hạn input theo120giờ và giữ whole-hour wet=null.
+  Đối chiếu input hash/snapshot/issue của worker với payload Backend đã chuẩn bị.
+- Lưu forecast, input model và FK nguồn trong cùng transaction. Replay key giữ
+  provenance source; hai source revision cùng model input có forecast riêng.
+  Retry đúng nguồn/issue/context có thể trả record cũ khi worker ngừng; request
+  mới lỗi503 không ghi thêm forecast. Lỗi link giữa chừng rollback toàn bộ.
+- Hồi quy192bài pilot và120bài Backend đạt; bộ kiểm cuối32bài đạt, gồm8bài T05
+  và24bài adapter/projection. Các bộ có test trùng. Backend chạy cả client
+  TypeScript HTTP với FM04_CHECK_MOBILE=1.
+- Positive control gọi Logistic Regression thật và tạo score. Luồng raw720điểm
+  →120giờ →source T04 →worker trả insufficient_data với thiếu120giờ wet,
+  score=null. Không suy thành forecast_ready từ raw point.
+- [Contract T05](backend/docs/STORED_HOURLY_FORECAST_API.md) và
+  [summary/evidence](hourly_contract_v1/t05_summary.json) có input, provenance,
+  hash source/artifact và cleanup. Đồng hồ fixture raw/hourly là synthetic có
+  khai báo; HTTP và worker thực chạy, worker/kho tạm đã dọn.
+- T05 hoàn thành luồng chủ động qua API. T06 scheduler còn mở; chất lượng model
+  và semantics whole-hour wetness tiếp tục theo T07/T08 hoặc contract phù hợp.
+
+## 111. T06 lịch dự báo bền vững và worker — 07/11/2026
+
+- Thêm API tạo/list/đọc/đổi enabled và interval của job theo owner/stream cùng
+  lịch sử run/attempt. Các bảng forecast_jobs/runs/attempts nằm trong
+  telemetry.sqlite3 và được bootstrap qua pilot factory.
+- Worker CLI tools/run_forecast_scheduler.py dùng StoreLease automation để
+  tuần tự hóa poller, chọn source T04 mới nhất đã available và pin source,
+  issued_at, job_version, model pin cho run. Tái dùng hàm nghiệp vụ T05 đã tách
+  khỏi HTTP handler, cùng transaction forecast/input/source link.
+- Tối đa3attempt/run, backoff30/60giây. Claim/attempt được lưu trước inference.
+  Recovery đối soát forecast đã commit, gồm cả attempt cuối; chưa có forecast
+  thì retry có giới hạn. Kiểm cron downtime gộp mốc bị lỡ thành một run hiện tại.
+- Job enabled bền vững qua logout; user có thể tắt bằng PUT. Pending/retry của
+  version cũ được hủy; lượt running có thể hoàn tất. Mỗi job chỉ một active run.
+- 14test scheduler mới có worker FM-02 thật, CLI, concurrency, crash recovery,
+  source pinning, logout và audit. Hồi quy206bài pilot và120bài Backend đạt.
+  Backend bật cả client TypeScript HTTP; launcher nay ghi forecast_worker_port
+  trong ready.json để cấu hình scheduler cùng model worker.
+- Bổ sung ca thứ15 cho scheduler: process con os._exit(73) sau forecast commit,
+  process mới lấy lại OS lease và recovery đúng một forecast khi model port
+  không khả dụng. Ca này chạy riêng và đạt, log t06_process_crash.log.
+- [API/runbook T06](backend/docs/FORECAST_SCHEDULER_T06.md),
+  [summary](hourly_contract_v1/t06_summary.json) và các evidence synthetic ghi
+  run thành công, recovery và hết3attempt. Worker và kho tạm đã dọn. Run thành
+  công vẫn có thể mang forecast insufficient_data/score=null do thiếu wetness.
+- T06 hoàn thành cơ chế lịch. T07 đánh giá baseline và T08 mở rộng thí nghiệm
+  còn mở; chưa có dữ liệu/kiểm định cảm biến thực địa mới từ lượt này.
+
+## 112. T07 đánh giá baseline forecast đã đóng gói — 07/11/2026
+
+- Thêm tools/evaluate_forecast_baseline.py để kiểm hash dataset/split/model,
+  tái audit dữ liệu và đánh giá artifact FM-02 hiện có. 68score validation/test
+  khớp bản cũ với max delta0, metric cũ khớp tolerance1e-12. Scaler/category
+  encoder khớp train102row, reload giữ score. Tests chặn fit model/preprocessing.
+- Validation LR có accuracy64,71%, recall31,25% và FN11/16positive. Log loss
+  0,72285/Brier0,25372 so Dummy0,69453/0,25067. Test cũ đạt accuracy73,53%,
+  recall75%, log loss0,59211 và Brier0,19414. Các metric thuộc subset ready34/40
+  mỗi tập và split synthetic đã từng được xem.
+- Calibration5bin cho ECE validation0,2121 và test cũ0,1182. Paired bootstrap
+  2000lần theo18cụm ready mỗi tập cho khoảng delta log loss/Brier đều qua0.
+  Thử nghiệm chưa phản ánh biến động train lại hoặc dữ liệu ngoài generator.
+- Stress validation408ca thiếu1/6/24/120giờ theo từng biến đều abstain;
+  34ca late receipt abstain trước availability và khôi phục score gốc sau đó;
+  34ca append future giữ score quá khứ. Train có16feature hằng trong61feature.
+- Sáu test đánh giá đạt. Evaluation JSON run01/run02 giống từng byte. Có CSV
+  68dòng lỗi, calibration plot đã render/kiểm trực quan và verification/hash.
+- [Báo cáo T07](docs/FORECAST_BASELINE_EVALUATION_T07.md),
+  [kết quả cuối](forecast_evaluation_t07/run02/evaluation.json),
+  [biểu đồ](forecast_evaluation_t07/run02/calibration.png). T07 hoàn thành đánh
+  giá kỹ thuật; T08 tiếp tục thiết kế cohort mới, feature ablation, regularization
+  và đối chiếu model theo protocol đã chốt trước khi xem holdout mới.
+
+## 113. T08 mở rộng cohort và so sánh forecast — 08/11/2026
+
+- Freeze protocol trước sinh dữ liệu/fit, seed20261108, 300/150/150 cụm
+  train/validation/test. Tổng1.200 mẫu,1.020 ready; train510,val255,test255.
+  Giữ group/shared-environment guard, temporal purge và label maturity của FM-01.
+  Cohort riêng, không pooling seed42; các lần rút mới vẫn cùng generator synthetic.
+- So sánh9ứng viên gồm Dummy, LR C0,01/0,1/1 trên full61feature và weather41feature,
+  cùng2model HistGradientBoosting cố định. Preprocessing/model chỉ fit train.
+  Chọn full LR C0,01 bằng validation log loss0,532009; ghi selection trước chấm test.
+- Test255ready/135cụm: winner log loss0,530213,Brier0,176310,AUC0,798109,
+  accuracy75,29%,recall71,72%,ECE5bin0,031253. C1 train lại cùng cohort có loss0,558945;
+  Dummy0,670524. Bootstrap2.000lần theo cụm cho delta loss winner−Dummy
+  −0,140312,CI95%[−0,198809;−0,081661]. Chưa phản ánh biến động train nhiều seed.
+- Contract thử nghiệm weather bỏ wetness/categorical hằng, yêu cầu120giờ temp/RH
+  và tuổi lúa. Wet-null stress255mẫu validation:4weather model chấm được toàn bộ,
+  score giữ nguyên;4full model abstain. Cả8model abstain khi thiếu temp giờ cuối
+  hoặc tuổi lúa; nối future giữ feature quá khứ. Chưa tích hợp nhánh này vào raw/API.
+- Run01/run03 selection và test_predictions giống từng byte. Run02 bổ sung
+  score stress/provenance;run03 thêm guard từ chối protocol khác hash trước train.
+  13/13test T07+T08 đạt; có manifest/hash/runtime, artifact riêng và biểu đồ đã kiểm.
+- [Báo cáo T08](docs/FORECAST_EXPERIMENTS_T08.md),
+  [kết quả cuối](forecast_experiments_t08/run03/results.json),
+  [biểu đồ](forecast_experiments_t08/run03/comparison.png).
+  T08 hoàn thành thí nghiệm synthetic. Serving FM-02/API giữ pin hiện tại.
+  Tiếp theo đánh giá nhiều seed và missingness/shift sát raw, quyết định contract
+  rồi tích hợp model version/provenance cùng regression worker/API/scheduler.
+
+## 114. Kiểm tra lại dữ liệu forecast T02–T08 — 08/11/2026
+
+- Audit offline tái sinh toàn bộ1.200mẫu T08:5bảng inputs/metadata/features/labels/
+  future_worlds khớp chính xác. Audit split/temporal purge/maturity khớp; bootstrap
+  cluster khớp shared-environment registry; sample ID không trùng cohort seed42 cũ.
+- Kiểm63hash nguồn/artifact/dataset theo evidence T03–T08 và pin serving. Nạp lại
+  3model đúng hash, tái lập765score test; scaler mean/variance khớp train510 và
+  prior Dummy216/510. Tính độc lập metric test bằng công thức, khớp tolerance1e-12.
+- Replay T02 raw→hourly và T03 input→features khớp hoàn toàn. T05 stored input
+  tiếp tục cho insufficient_data/score null đúng lý do thiếu120giờ wetness.
+  Chạy lại13test T07+T08 đều đạt. Không phát hiện sai lệch trong phạm vi audit.
+- Giữ nguyên result/selection/model T08 và summary lịch sử; không fit hoặc deploy.
+  Các bằng chứng T04/T06 được kiểm hash trong lượt này, không chạy lại HTTP/service.
+  Raw chưa tự forecast_ready; weather branch vẫn là thử nghiệm riêng.
+- [Báo cáo kiểm tra](docs/FORECAST_DATA_RECHECK_20261108.md),
+  [audit JSON](forecast_experiments_t08/recheck_data_final.json),
+  [công cụ chạy lại](tools/audit_forecast_t08.py).
+
+## 115. T09 nhiều seed, raw missingness và tích hợp FM-03 — 08/11/2026
+
+- Theo yêu cầu kiểm chứng rồi tích hợp nếu đạt: freeze protocol trước generation/
+  fit/test;5seed20261109–13, mỗi seed300/150/150cụm train/validation/test. Tổng6.000unit,
+  5.100strict-ready được tạo raw720điểm/120giờ, qua adapter thực với jitter,
+  receipt delay, point noise và hash/QC. Fit510train/seed, giữ purge/group guards.
+- Recipe weather LR C0,01 cố định từ T08, không test-tuning/calibration/imputation.
+  5/5seed đạt loss/Brier thấp hơn prior train và AUC≥0,65 ở cả complete và mất1slot/giờ.
+  Loss complete0,538175–0,569795,AUC0,772967–0,804983; mean loss0,558377.
+  Mất1slot/giờ mean loss0,558452; tăng tối đa từng seed0,000397<gate0,03.
+- 13ca×8mẫu validation×5seed=520/520stress đạt, gồm mấtslot/late/QC/exclusion,
+  outside tolerance,RHnull,outage6h,unknown age,pointwet flip,future,duplicate và
+  late recovery. Hai kịch bản test có1.275score mỗi kịch bản,675cụm bootstrap.
+  CI95% delta loss complete−Dummy[−0,152312;−0,102764], sparse[−0,152203;−0,102725].
+- Sau acceptance, package seed20261109 đã chỉ định trước thành FM-03 weather,
+  manifest pin2961f7e30e93355fa0c498069a06c4dfd44b6f08567241268a06cd24180a2b6f.
+  Contract weather v1 dùng41feature, đủ120giờ temp/RH và tuổi lúa; wetness null
+  vẫn forecast_ready. Thiếu numeric/age vẫn abstain; không suy wetness từ điểm/RH.
+- Worker/API nguồn raw đã lưu/scheduler tích hợp FM-03; Backend kiểm lại snapshot,
+  readiness/reasons/predictor hash và pin. Cache theo model pin, forecast cũ giữ
+  nguyên; pending/running pin cũ failed/model_changed, lịch kế tiếp dùng pin mới.
+  Các route ready/insufficient/source/hourly trực tiếp giữ FM-02 và bundle cũ.
+- 22test ML,28test tích hợp,212test pilot và120test Backend đạt. Bộ28 là subset
+  của212, không cộng trùng. Có kiểm HTTP/process thật với clock fixture synthetic,
+  replay offline, pin migration, fail-closed, lịch sử và crash recovery. Không cần
+  dependency/schema DB mới, không sửa code giao diện. Serving bundle mới pin riêng.
+- [Báo cáo T09](docs/RAW_FORECAST_VALIDATION_T09.md),
+  [API/vận hành](backend/docs/RAW_WEATHER_FORECAST_T09.md),
+  [acceptance](forecast_raw_t09/run01/acceptance.json),
+  [biểu đồ](forecast_raw_t09/run01/comparison.png).
+  Kết quả vẫn synthetic của cùng generator; chưa xác nhận sensor/nhãn thực địa.
+
+## 116. T10 readiness, tổng quan raw và lộ trình phát triển dự báo — 08/11/2026
+
+- Nhân chọn cả hai hướng: tăng chức năng ngay và song song chuẩn bị dữ liệu thực.
+  Đã triển khai GET /api/farm/seasons/{id}/forecast-readiness theo owner/as-of,
+  dùng nguồn hourly raw mới nhất đã biết tại issue. Có coverage temp/RH, tuổi lúa,
+  nguồn/revision, lý do thiếu, next_actions và request tạo forecast khi dữ liệu đủ.
+- Readiness đánh giá dữ liệu, model_service_status=not_checked; GET không gọi
+  worker hoặc tạo forecast/job/source. Giờ server và explicit_as_of phân biệt rõ.
+  Nguồn qua biên giờ có thể thiếu119/120h; replay tại issue cũ giữ đúng readiness.
+  Query/auth/owner/cache headers và hash corruption có guard.
+- Forecast overview thêm raw_forecast_readiness theo mùa vụ; giữ source_revision
+  legacy tách riêng. Sửa khoảng trống tổng quan chỉ thấy synthetic_hourly_sources
+  trong khi nguồn raw đã lưu và FM-03 nằm ở luồng mới. Không sửa code giao diện.
+- 6test mới đạt, round-trip readiness→POST forecast qua worker thật khớp input hash;
+  hồi quy218test pilot và120test Backend đạt. Sáu test mới là subset của218.
+  Không thay model/feature/pin FM-02/FM-03 hoặc mở guard nhận nguồn thực.
+- Đã lập T11–T18: lịch sử/giải thích score, alert trong ứng dụng, outcome linkage,
+  dossier nguồn/thu thử, endpoint/quan sát, dataset readiness, thí nghiệm nguồn thực
+  đủ điều kiện và shadow rollout. Kế thừa journal/protocol draft và H4-T01–05,
+  không đánh dấu các gate nghiên cứu hoàn thành bằng test phần mềm.
+- [Lộ trình](docs/FORECAST_DEVELOPMENT_ROADMAP_T10.md),
+  [API readiness](backend/docs/FORECAST_READINESS_T10.md),
+  [hướng dẫn dữ liệu thực](docs/forecast_data/INTAKE_GUIDE.md),
+  [template trống](docs/forecast_data/INTAKE_TEMPLATE.json).
+  T10 Backend hoàn thành; T11 là ưu tiên chức năng kế tiếp. Chưa có dữ liệu
+  thực mới hoặc nhãn được xác minh phát sinh trong lượt này.
+
+## 117. T11 lịch sử diễn biến và giải thích score — 08/11/2026
+
+- Thêm GET /api/farm/seasons/{id}/forecast-trend theo owner, issue time,
+  model_pin,horizon,from/to và pagination. UTC/microsecond ordering độc lập
+  created_at. Series tách pin/version/feature contract/horizon/threshold/source/
+  input kind/device/policy revision; client nối bằng comparison_edges đã kiểm.
+- Không nối qua insufficient, snapshot thiếu, cùng issue nhiều revision hoặc gap
+  lớn hơn horizon. Same-issue count xét cả record ngoài trang để không tính delta
+  sai khi pagination chia revision. Comparison khác chỉ trong returned_page.
+- Thêm GET /api/farm/forecasts/{id}/explanation, dùng snapshot và pin gốc.
+  Worker /explain hỗ trợ LR FM-02 scaled/OHE và FM-03 weather41feature; coefficient×
+  transformed value là contribution logit, intercept+sum→decision→sigmoid khớp
+  score. Worker và Backend kiểm tolerance1e-12, metadata/input/predictor hash,
+  finite values, term uniqueness/order, phép nhân/tổng và score đã lưu.
+- Insufficient trả lý do/score null/terms rỗng không gọi worker. Snapshot thiếu
+  409, artifact/pin không hỗ trợ409, worker unavailable503, corrupt snapshot500,
+  phản hồi giải thích lệch502. GET không ghi lại forecast/context/source/job;
+  thay cultivation revision hiện tại không thay giải thích snapshot cũ.
+- 4test ML mới và8test lịch sử/API mới đạt. Hồi quy26ML,226pilot,120Backend đạt;
+  các test mới là subset của suite, không cộng trùng. Kiểm cả unknown category,
+  future invariant, chronology microseconds, cross-page ties, missing→recovery,
+  ownership/offline/corruption và worker response giả. Fixture recovery từng đặt
+  receipt sau as_of đã được sửa đúng timeline; guard as_of giữ nguyên.
+- Rehearsal qua Backend HTTP và worker HTTP thật đạt, kho/account tạm và worker
+  được dọn; clock nguồn synthetic cố định. Ví dụ41term FM-03 tái dựng score gốc
+  với error0; có forecast/trend/explanation JSON và biểu đồ đã render/kiểm trực quan.
+- [API/handoff T11](backend/docs/FORECAST_HISTORY_T11.md),
+  [bằng chứng](forecast_history_t11/run01/verification.json),
+  [biểu đồ](forecast_history_t11/run01/explanation.png).
+  T11 Backend hoàn thành. Model/pin/threshold/feature contract giữ nguyên,
+  không train thêm hoặc sửa UI; contribution là giải thích model, không là
+  nguyên nhân bệnh học hoặc xác suất đã xác minh. T12 alert trong ứng dụng là
+  ưu tiên chức năng tiếp theo của lộ trình đã chốt.
+
+## 118. T12 cảnh báo in-app, dedup/cooldown và acknowledge — 08/11/2026
+
+- Thêm policy version aegis-forecast-alert-policy-v1, hash
+  e084ddb29d150e726fcce4d40da6a3b7c4d68afd2cd28caca27d2936dcc76766.
+  Chỉ forecast nguồn raw đã lưu/pin FM-03 synthetic hiện tại; threshold0,5 trùng
+  inference, cooldown6giờ riêng score_threshold/data_quality, độ mới≤1giờ và
+  target window còn mở. Đây là rule vận hành demo, chưa calibration thực địa.
+- Forecast/input/source link/evaluation/alert/state commit cùng BEGIN IMMEDIATE.
+  Ledger unique forecast/policy, watermark issue tăng nghiêm ngặt theo owner/
+  season/stream/model/feature/horizon/hourly policy/alert policy. Cùng issue lần
+  đánh giá đầu thắng; out-of-order/stale/expired/future không tạo alert/advance.
+  Cooldown suppression giữ link anchor cũ, không đổi payload alert/forecast cũ.
+- Score≥0,5 tạo score_threshold; insufficient tạo data_quality với score null và
+  reasons gốc. Below threshold chỉ ghi evaluation, không gán low-risk/safe.
+  Ack là đã xem, không xác nhận bệnh/reset cooldown; source=synthetic,
+  field_validated=false và disease_confirmed=false giữ rõ trên alert.
+- Có GET policy/evaluation/list/detail; POST evaluation{} cho backfill rõ ràng;
+  POST acknowledge với base_version và replay idempotent. Owner/auth/query/
+  pagination/private headers/active-expired window có guard. Initialization
+  thêm5bảng telemetry, không tự backfill hoặc sửa forecast/schema core cũ.
+- 16test T12 đạt; hồi quy242pilot và120Backend đạt,16test là subset242.
+  Kiểm exact cooldown/freshness, independent kinds, replay, concurrency/ack,
+  source/model eligibility, hash corruption, reopen/backup và actual-process
+  crash exit73 sau commit→recovery offline không duplicate. Trigger failure sau
+  insert alert rollback cả forecast/input/link/alert/state/evaluation.
+- Rehearsal Backend HTTP và model-worker HTTP thật đạt với issue/evaluation UTC
+  hiện tại,120giờ lịch sử synthetic hồi tố. Có đúng2alert quality/threshold,
+  forecast replay/cooldown/ack replay đúng; temp store/worker/server được dọn.
+  Positive control waveform kiểm nhánh phần mềm, không là ground truth bệnh.
+- [API T12](backend/docs/FORECAST_ALERTS_T12.md),
+  [alert JSON](forecast_alerts_t12/run01/alerts.synthetic.json),
+  [verification](forecast_alerts_t12/run01/verification.json).
+  T12 Backend hoàn thành. Không thay model/pin, không train thêm, không sửa UI
+  hoặc gửi SMS/email/push. T13 liên kết observation/outcome sau forecast là
+  ưu tiên chức năng tiếp theo.
+
+## 119. T13 observation/follow-up links và outcome nghiệp vụ — 08/11/2026
+
+- Thêm POST/GET outcome-links theo forecast và GET outcome theo owner/as_of;
+  reference observation revision/follow-up version hiện hành được capture vào
+  snapshot/hash cùng forecast pin/input/hash toàn record. Cần cùng owner/season,
+  observation active và cùng source; không ghép field_observed thành bằng chứng
+  cho forecast synthetic. Follow-up mock chỉ là workflow reference.
+- Journal/follow-up mở mode=ro/query_only, giữ read transaction qua lúc telemetry
+  link commit. Race writer sửa observation được kiểm: link pin revision đã đọc,
+  sau commit nguồn đổi thì reference_status báo drift. Latest/void/changed source
+  không tự sửa snapshot cũ; observation không còn current bị loại khỏi tổng hợp.
+- Phase tự tính trước/tại issue, trong(issued,target_end] hoặc sau window;
+  observed/recorded/available/review provenance giữ riêng. Baseline nhập muộn được
+  ghi retrospective, không nói model biết lúc issue. as_of lọc link creation,
+  revision availability và retraction action; forecast chưa có tại cutoff có flag.
+- Status nghiệp vụ gồm following_up,uncertain,unverified_report,
+  review_reported_present,baseline_reported_present,censored; tracking/evidence
+  tách riêng. Không ghi bệnh≠negative; một lần absent dù có review tại horizon
+  vẫn không chứng minh không bệnh cả window. Khoảng giữa các linked visit được
+  giữ biên mở/đóng và cờ vượt issue/target, không gọi là onset đã xác minh.
+- Mọi outcome event_y=null,platform_verified=false,label_approved_for_training=false.
+  Đóng follow-up/ack alert/prediction ảnh hoặc khai báo external review không
+  trở thành nhãn. Evidence scope chỉ các tham chiếu được chọn, không exhaustive.
+- Có retraction version1→2 +reason/action, replay idempotent, history as_of;
+  reattach bằng ID mới sau retract, không duplicate active reference/revision.
+  Thêm2bảng telemetry, FK/unique/cap500link để giới hạn lưu trữ; không core
+  migration, không ghi source stores, không cần model khi liên kết/đọc outcome.
+- 18test mới đạt, hồi quy260pilot và120Backend đạt;18 là subset260.
+  Kiểm censored/horizon, retrospective baseline, source/owner/season, Unicode,
+  stale/void/review/retraction, corruption, concurrent journal edit/retry,
+  quota, readonly/reopen/backup và case closed không sinh outcome bệnh.
+- Tổng duyệt Backend HTTP và worker HTTP thật đạt. Run02 dùng UTC hiện tại cho
+  journal/link/outcome, source synthetic issue hôm trước, observations báo hồi tố;
+  chứng minh giữ snapshot/forecast, as_of và retraction. Case censored là một
+  forecast cũ unscored riêng, không giả future của forecast đang theo dõi.
+  Temp store/server/worker được kiểm đã dọn; không tạo train labels/dữ liệu thực.
+- [API T13](backend/docs/FORECAST_OUTCOMES_T13.md),
+  [outcome states](forecast_outcomes_t13/run02/outcome_states.synthetic.json),
+  [verification](forecast_outcomes_t13/run02/verification.json).
+  T13 Backend hoàn thành, model/pin/threshold và UI giữ nguyên. T14 dossier
+  nguồn/thu thử vận hành là nhánh dữ liệu thực tiếp theo theo lộ trình T10.
+
+## 120. T14 dossier nguồn và thu thử vận hành synthetic — 08/11/2026
+
+- Nhân xác nhận: **“Hiện nhóm sẽ giả lập toàn bộ dữ liệu ảo”**. Điều chỉnh T14
+  sang nguồn synthetic; cập nhật lộ trình/guide. T14 không đòi có thiết bị/site
+  thực để nghiệm thu. Các gate nghiên cứu thực địa H4 vẫn chưa được đóng bởi
+  bằng chứng mô phỏng; template nguồn thực giữ làm tài liệu chuẩn bị tương lai.
+- Thêm dossier aegis-synthetic-source-dossier-v1 với source/site/unit/season/
+  logger/shared-environment/batch, linkage owner/season/stream/raw SHA, instrument,
+  units, generator version/seed, schedule và clock/missingness logs có recorded_at.
+  Template riêng giữ null cho trường chưa điền, không nhận như hồ sơ hoàn chỉnh.
+- CLI offline forecast_intake package/replay tái sử dụng raw validator/audit/
+  synthetic monitor. Guard exact schema/source/identity/hash/units/cadence,
+  timezone và thời điểm biết log; không tự sửa clock, impute, aggregation hoặc QC.
+  Log nguyên nhân không làm slot mất trở lại; không có clock check thì drift null.
+- Package giữ nguyên byte dossier/raw, report và manifest SHA; chỉ nhận các file
+  thường với tên cố định. Replay kiểm hash rồi tính lại toàn report, chặn cả
+  report bị sửa và reseal nhưng sai diagnostics. Không overwrite; concurrent
+  cùng đích một caller thắng. Manifest ghi cuối, gói thiếu sau crash bị từ chối;
+  không tuyên bố atomic commit/chữ ký hoặc xác thực nguồn vật lý bằng hash.
+- Generator 3 seed20261108/09/10 ×4case/24giờ đạt: clean đủ144slot; dropout
+  thiếu19/22/19slot; delayed_receipt giữ139slot ở as_of cuối ngày và144 ở snapshot
+  muộn; clock_qc lệch+30s tạo72off-schedule kèm null/suspect/exclusion đúng clock.
+  Cùng seed/scenario tái lập chính xác; không tạo bệnh/outcome y hoặc nhãn train.
+- HTTP Backend thực trong kho tạm: nhập4điểm synthetic, retry4không trùng,
+  dừng server rồi export read-only/đóng gói/replay. Receipt server thật được ghi
+  riêng với observation/log ảo hồi tố; không gọi received−observed là network
+  latency. Kho/server tạm được kiểm đã dọn, không xuất token/password vào artifact.
+- 15test T14 mới đạt; **275test pilot hồi quy đạt** (315,468s),15 là subset275.
+  Kiểm nguồn/units/linkage, as_of receipt/exclusion/log, empty/unknown clock,
+  giữ byte, corruption/reseal, replay và concurrent output. Audit cuối13package
+  đạt; model FM02/FM03 manifest và artifact FM03 đối chiếu pin T09 không đổi.
+- Mọi report source=synthetic, physical_collection_performed=false,
+  hardware_verified=false, field_validated=false, training_approved=false,
+  disease_labels_approved=false. Bộ24giờ không thay gate120giờ/horizon72giờ.
+  Không sửa UI, schema/API dự báo, model/pin/threshold hoặc train thêm.
+- [Contract/CLI](backend/docs/FORECAST_INTAKE_T14.md),
+  [tổng duyệt](forecast_intake_t14/run01/verification.json),
+  [audit replay](forecast_intake_t14/replay_audit.json),
+  [kết quả/hash](forecast_intake_t14/summary.json).
+  T14 hoàn thành theo phạm vi synthetic đã được Nhân xác nhận. Tiếp theo T15:
+  định nghĩa observation/outcome và kịch bản giả lập có provenance để kiểm chức
+  năng dự báo; không đồng nhất synthetic ground truth với xác minh bệnh thực địa.
+
+## 121. T15 endpoint và quan sát kết quả synthetic — 08/11/2026
+
+- Theo phạm vi toàn bộ dữ liệu ảo đã chốt ở T14, thêm protocol phần mềm riêng
+  t15-first-simulated-leaf-symptom-v1; canonical SHA256
+  07f5ae4b14ee7c724ac0a7851e1721b79cdede80876b546d44f7e1e2c937201a.
+  Runtime kiểm pin; không sửa hoặc đóng draft protocol nghiên cứu thực địa H4.
+- Target là first simulator-attested leaf symptom event interval trên unit/season
+  synthetic, horizon72giờ, baseline absent trong24giờ và known tại issue,
+  planned follow-up +24/+48/+72giờ, max survey gap24giờ. Đây là lựa chọn mô phỏng,
+  không gọi là lịch quan sát hoặc độ chính xác đã xác nhận trên cây thật.
+- Evaluator offline chọn latest revision đã available tại cutoff, giữ observed/
+  recorded/available/review, full consecutive revision history, void tombstones,
+  interval lower-open/upper-closed, known interventions và knowledge hash.
+  Thêm revision tương lai đổi bundle hash nhưng giữ knowledge/kết quả quá khứ.
+- Chỉ xuất synthetic_y=1/0 khi window mature và đủ baseline/lịch/attestation.
+  Thiếu ghi bệnh không tạo0; status có prevalent,following_up,uncertain,
+  unverified,ambiguous,censored,intervened,baseline_unavailable_at_issue.
+  Present tại issue là prevalent; tại horizon có thể positive; interval vắt qua
+  issue/end giữ ambiguous. Negative chỉ nghĩa không thấy endpoint theo lịch mô
+  phỏng, không khẳng định không nhiễm/không bệnh cả cửa sổ ngoài thực địa.
+- Review/record/intervention tới muộn không chèn ngược vào kết quả đã biết.
+  Guard source/protocol/payload hash/timezone/identity/schema/prediction fields;
+  chỉ nhận origin simulator_attestation, không nhận external review/YOLO/score.
+  Export journal command cũng validate nguồn đầu vào trước khi tạo command.
+- Generator3seed ×15scenario đạt45case;60/96/120giờ tạo135result replay khớp.
+  Cuối cutoff120h:6positive,6negative,3uncertain,9censored,3prevalent,6ambiguous,
+  6intervened,3unverified,3baseline-unavailable. Những số này là test rules,
+  không là event recall/accuracy của model. Finding do scenario khai báo, không
+  lấy score/weather hoặc latent onset làm ground truth để báo hiệu năng giả.
+- Journal HTTP thực trong kho tạm tạo4visit synthetic/retry4không trùng;
+  sửa một visit thành uncertain revision2, đọc history2/1 giữ nguyên revision1.
+  Simulator attestation không chuyển thành user review: command review=null,
+  journal/platform/training flags vẫn false; actual receipt riêng clock ảo.
+  Có mapping simulator–journal ID để audit; không lấy response HTTP tự tạo y.
+  Server/kho tạm kiểm đã dọn, artifact không có token/password.
+- **290test pilot đạt (328,627s)**.15test endpoint mới được kiểm lại sau guard
+  source của journal command cuối cùng, đạt;15 là subset290 theo test cases,
+  không cộng trùng. Bao phủ boundary/maturity/receipt/revision/void/intervention,
+  source/review/prediction guards, corruption và input immutability.
+- Mọi result event_y=null,label_approved_for_training=false,platform_verified=false,
+  field_validated=false,training_approved=false. Synthetic_y là endpoint offline
+  riêng; chưa duyệt train/dataset/model evaluation. Source forecast/T13 và pin
+  FM02/FM03 đối chiếu audit giữ nguyên. Không thêm API/schema DB, không sửa UI.
+- [Contract/CLI](backend/docs/SYNTHETIC_ENDPOINTS_T15.md),
+  [protocol JSON](docs/forecast_data/SYNTHETIC_ENDPOINT_PROTOCOL_T15.json),
+  [45case/HTTP](forecast_endpoints_t15/run01/verification.json),
+  [audit replay](forecast_endpoints_t15/replay_audit.json),
+  [kết quả/hash](forecast_endpoints_t15/summary.json).
+  T15 hoàn thành ở phạm vi synthetic. Tiếp theo T16: ghép sensor/context/outcome
+  theo mapping có provenance, feature cutoff riêng label cutoff, kiểm maturity,
+  grouping phụ thuộc và split trước thí nghiệm dự báo T17.
+
+## 122. T16 dataset readiness và group/time split synthetic — 08/11/2026
+
+- Thêm builder offline aegis-synthetic-dataset-input-v1, mapping rõ owner/season/
+  unit/stream, raw/observation/context/hourly-policy hashes, groups và quyền dữ
+  liệu project_generated_simulation. Không ghép theo index/alias tự suy hoặc đổi
+  source thực thành synthetic; pin protocol T15 và feature contract FM03 giữ nguyên.
+- Tách relationship_available_at (quan hệ được biết trước issue) với
+  snapshot_linked_at (ghép hash sau export, trước/tại data lock). Không giả pin
+  của một tệp export hồi tố là đã có tại issue. Context/policy/snapshot clocks
+  được kiểm, mọi giá trị vẫn là khai báo mô phỏng, không chứng nhận nguồn vật lý.
+- Raw→hourly120giờ→41predictors FM03 dùng feature cutoff=issue; endpoint T15 dùng
+  label cutoff riêng từng split. Review/context/receipt/exclusion tới muộn không
+  backfill feature tại issue. Giữ feature evidence hash, selected context,
+  endpoint knowledge/status/availability và lý do loại ở audit row.
+- Union dependency bắc cầu theo unit/season/stream, site/logger/shared environment/
+  batch, raw sample/observation ID tái sử dụng. Component xuyên nhiều split bị
+  chặn, không random split row. Kiểm label maturity trước split sau, periods,
+  lock và purge khi target_end+embargo>=feature_start ở split sau, cả nhóm khác.
+- Matrices chỉ gồm row_id,predictors,synthetic_y; estimator tương lai chỉ dùng
+  predictors whitelist41, không flatten audit metadata/outcome/seed/IDs vào X.
+  Đếm row/class/component/event riêng. Ready yêu cầu3split còn cả hai lớp,
+  chỉ là gate kiểm kỹ thuật, không là cỡ mẫu đủ hoặc phê duyệt train.
+- Final run02 đạt18row/3seed/12960raw point, mỗi row120giờ, mỗi split6row class3/3
+  và3component; tổng9component khai báo/9event giả lập. Cặp outcome positive/
+  negative có cùng waveform môi trường để kiểm pipeline, không chứng minh dự báo.
+- 5control đạt: shared_environment gom xuyên3split→0eligible; late receipt giữ
+  thiếu feature dù nhãn mature; future context/QC không đổi feature evidence;
+  immature train labels không có binary train row; support overlap purge6train.
+  Audit cuối replay khớp report chính +5control và kết quả CLI, kiểm trực tiếp
+  feature/label cutoff, component/time separation và source/pin cũ giữ nguyên.
+- **15test T16 đạt;305test pilot hồi quy cuối đạt (381,845s)**;15 là subset305,
+  không cộng trùng. Lần hồi quy cuối dùng schema đã tách hai clock linkage.
+  Run01/pilot_regression.log là kiểm tra preliminary, không dùng thay evidence
+  schema cuối; final là run02/pilot_regression_final.log.
+- training_approved=false,training_performed=false,field_validated=false,
+  sufficient_for_scientific_claims=false. Test outcomes đã mở để audit,
+  blind_holdout_for_model_selection=false. Không đổi model/pin/threshold, không
+  thêm API/schema DB hoặc sửa UI; không suy CI/hiệu năng bệnh từ fixture.
+- [Contract/CLI](backend/docs/SYNTHETIC_DATASET_T16.md),
+  [final verification](forecast_dataset_t16/run02/verification.json),
+  [dataset/matrices](forecast_dataset_t16/run02/dataset.report.synthetic.json),
+  [audit replay](forecast_dataset_t16/replay_audit.json),
+  [kết quả/hash](forecast_dataset_t16/summary.json).
+  T16 hoàn thành trong phạm vi synthetic. T17 tiếp theo: chốt cohort dự báo mô
+  phỏng phù hợp, budget/baseline/comparator/calibration và holdout mới; không lấy
+  fixture split đã audit làm blind holdout chọn model hoặc đánh dấu gate H4 thực
+  địa hoàn thành. Lộ trình T17/T18 đã được cập nhật cùng phạm vi dữ liệu ảo.
+
+## 123. T17 thí nghiệm dự báo synthetic, calibration và holdout mới — 08/11/2026
+
+- **Thí nghiệm hoàn tất; candidate chưa qua gate shadow, không tích hợp thay FM03.**
+  Plan byte SHA25682553d3243cefded1346cc2b0e8d19cda4e1d87d35a110a848086f33d14581c0
+  được pin trước kiểm thử development và không đổi sau kết quả; source/runtime/
+  dependency versions đóng vào plan.freeze trước development đầy đủ.
+- Cohort mới3seed2026111701/02/03,576unit-window/288dependency group khai báo,
+  2unit/group. Train240/calibration96/selection96/test144; không dùng lại fixture
+  T16 hay holdout T08/T09. Issue clocks tháng07–08/2026 hoàn toàn mô phỏng.
+- Generator persistent weather +future72h stochastic hazard với hidden group
+  frailty/unit susceptibility. Các hệ số nhiệt/RH/hazard là tham số phần mềm,
+  không ngưỡng bệnh học thực địa. Latent event tạo visits/attestation; protocol
+  T15 đánh giá observations, không chép latent onset làm y. Raw dropout/unknown
+  age/uncertain/unreviewed/missed visit dùng RNG riêng, không đưa future world vào X.
+- Raw120giờ/600s→adapter/41feature FM03 và guard T16 thật; build chunk rồi union
+  dependency toànrole/seed, kiểm support/maturity. Fit scaler/estimator train,
+  fit sigmoid calibration riêng; selection chọn LR/HGB theo log-loss rồi Brier.
+  Comparator prior train và frozen FM03; không sweep thêm architecture/config.
+- Selected LR+sigmoid,threshold0,30 chọn từ grid19giá trị trên selection với
+  recall>=0,75 gồm abstention. Primaryseed2026111701 cố định.3candidate joblib/
+  manifest và lựa chọn/threshold được freeze trước holdout_opened có event/hash
+  ledger. Không chuyển sang HGB vì test point estimate HGB tốt hơn.
+- Holdout144opportunity:130decisive (61positive/69negative),14unknown
+  (6uncertain/5unverified/3censored);120đủfeature=83,33%,108decisive scored.
+  Selected recall43/61=70,49% gồm14positive abstention;54false alerts,
+  precision44,33%,13,846false alerts/100unit-days theo quy ước72h/decisive unit.
+  Không gọi đó là rate triển khai liên tục hoặc negative cho outcome chưa rõ.
+- LR Brier0,25134/log-loss0,69678 so prior0,25985/0,71331; paired bootstrap300
+  resample group trong seed cho delta Brier CI95%[-0,03883;+0,02533] và
+  delta log-loss[-0,08010;+0,05625]. Cả upper>0 nên2gate cải thiện chưa đạt;
+  coverage>=75% và recall>=65% đạt. CI điều kiện trên3replica, không refit models.
+  Calibration bins/raw-vs-calibrated và lead interval bounds giữ trong report,
+  không diễn giải thành xác suất bệnh thật hoặc ngày nhiễm.
+- Offline candidate runtime kiểm manifest/artifact/runtime/feature/endpoint/
+  plan/dependency pins trước load, chỉ source synthetic, giữ gate120valid giờ
+  và tuổi cây. Primary manifest pin
+  e200452a1d500312122369f09a932eb3c49c2b06e442a638f81bf1697afc478a.
+  Candidate load được phục vụ audit không có nghĩa được promote; không đăng ký
+  vào worker/Backend, không đổi active model/pin/threshold hoặc UI/schema DB.
+- **41test ML đạt,15test T17 là subset41**, bao gồm worker FM02/FM03 hiện có.
+  Replay audit tái sinh144holdout row, kiểm576row/288component, reopen3artifact,
+  raw→feature→candidate example và toànmetric/300bootstrap khớp, score error0.
+  Không refit/retune trong audit. Active serving manifest/artifact/source giữ nguyên.
+- Có [báo cáo](docs/FORECAST_EXPERIMENT_T17.md),
+  [runtime handoff](backend/docs/CANDIDATE_FORECAST_T17.md),
+  [metric/CI/gate](forecast_experiment_t17/run01/report.json),
+  [biểu đồ](forecast_experiment_t17/run01/comparison.png),
+  [audit](forecast_experiment_t17/replay_audit.json),
+  [kết quả/hash](forecast_experiment_t17/summary.json).
+  T17 hoàn thành về thực nghiệm, candidate_qualified_for_synthetic_shadow=false,
+  deployment_activated=false,field_validated=false. Đề xuất T17.1 tăng nhóm train/
+  calibration, comparator FM03 hiệu chuẩn, kế hoạch khóa trước và holdout seed/
+  group mới; T18 activation vẫn bị gate chặn. Không làm lại cùng holdout để tune.
+
+## 124. Trạng thái tổng hợp và kế hoạch tiếp theo — 09/11/2026
+
+Mục này là bảng điều hành ngắn gọn hiện hành cho Nhân. Các mục102–123 ghi lại
+chi tiết quyết định, thay đổi, lệnh kiểm chứng và artifact của từng mốc; mục124
+không thay thế chúng. Phạm vi công việc của Nhân là AI/ML, dữ liệu, Backend,
+pilot/IoT và vận hành. Frontend/mobile UI thuộc thành viên frontend.
+
+### Đã hoàn thành
+
+| Mốc | Kết quả hiện có | Trạng thái và giới hạn |
+|---|---|---|
+| T01 | Hợp đồng raw→hourly, cadence/tolerance/grace, quy tắc slot, QC và provenance | Đóng ở mức thiết kế; chi tiết mục106 |
+| T02 | Adapter hourly offline, strict input, audit/hash và replay | Hoàn tất offline; chưa nối serving tại thời điểm T02, mục107 |
+| T03 | Acceptance raw/hourly tới FM feature preparation | Ma trận contract/evidence/replay; mục108 |
+| T04 | Lưu nguồn hourly và API Backend theo owner/season/stream | HTTP/persistence/concurrency kiểm chứng; mục109 |
+| T05 | Nối nguồn hourly đã lưu vào forecast và worker | Source/hash/issue time giữ trong forecast; mục110 |
+| T06 | Scheduler/worker bền vững, pin source/model/job và chống poller trùng | Hoàn tất theo runbook; mục111 |
+| T07 | Đánh giá baseline forecast đã đóng gói | Đánh giá kỹ thuật synthetic; không phải xác nhận ngoài thực địa; mục112 |
+| T08 | Mở rộng cohort/feature ablation/so sánh model | Artifact và holdout lịch sử được lưu; không tái dùng holdout đã xem; mục113 |
+| T09 | Nhiều seed, raw missingness/shift và tích hợp FM03 weather | FM03 là model phục vụ hiện tại; manifest/artifact pin giữ nguyên; mục115 |
+| T10 | Readiness, raw overview và roadmap | API Backend giải thích đủ/thiếu dữ liệu; mục116 |
+| T11 | Forecast history/trend và giải thích đóng góp LR | Đóng góp khớp score nhưng không phải nguyên nhân sinh học; mục117 |
+| T12 | Alert in-app, dedup/cooldown/acknowledge | Không gửi SMS/email/push; không khuyến cáo thuốc; mục118 |
+| T13 | Observation/follow-up links, snapshot, as-of/retraction | Không tự sinh nhãn hoặc xác minh bệnh; mục119 |
+| T14 | Dossier, ingest/replay và lỗi receipt/clock/QC giả lập | Nhân xác nhận toàn bộ dữ liệu hiện tại là ảo; mục120 |
+| T15 | Protocol endpoint và visit/attestation giả lập | `synthetic_y` chỉ offline; `event_y=null`, không duyệt train; mục121 |
+| T16 | Mapping có provenance, feature/label clocks, group/time split và purge | Fixture kiểm kỹ thuật, không phải cohort đánh giá năng lực; mục122 |
+| T17 | Stochastic hazard cohort, calibration, selection freeze, holdout và replay audit | LR+sigmoid được chọn trước holdout; candidate không qua gate cải thiện CI; mục123 |
+
+**Trạng thái model hiện hành:** FM03 vẫn được phục vụ, không thay model/pin/
+threshold bởi candidate T17. T17 ghi nhận 576 unit-windows/288 dependency groups,
+3 seed; test144 opportunity, coverage83,33%, recall70,49% gồm abstention. Delta
+Brier và log-loss CI95% đều chứa0, vì vậy `candidate_qualified_for_synthetic_shadow=false`.
+Candidate không được promote, T18 chưa được mở để kích hoạt. Chi tiết số liệu,
+hash, test và replay nằm ở mục123 và report/artifact được liên kết tại đó.
+
+### Kế hoạch tiếp theo — chưa thực hiện
+
+| Ưu tiên | Công việc | Tiêu chí hoàn thành / quyết định |
+|---|---|---|
+| T17.1 | Thiết kế một experiment version mới; tăng train/calibration group độc lập; giữ train, calibration, selection và test tách theo dependency/time; đưa comparator FM03 hiệu chuẩn vào plan; đóng băng protocol, generator, metric, threshold rule, nguồn, environment và artifact policy trước khi mở test | Dùng seed/group holdout hoàn toàn mới, không quay lại tune T17. Báo coverage/abstention và unresolved denominators, event recall, false alerts/unit-time, lead interval bounds, Brier/log-loss/calibration và paired group CI. Audit tái tạo test/prediction/metric khớp. Chỉ qualify nếu mọi gate đặt trước đạt; nếu CI vẫn chứa0 thì ghi nhận chưa đủ bằng chứng và thiết kế cohort mới, không nới gate hậu nghiệm |
+| T17.1 review | Review report, manifest/runtime pins, lineage và giới hạn synthetic trước khi bàn T18 | Một người/nhóm review được phân công kiểm tra protocol, contamination, dependency/time separation, label maturity và tái lập; chưa có xác nhận người review trong hồ sơ hiện tại |
+| T18 (bị chặn bởi gate) | Nếu và chỉ nếu T17.1 candidate đạt qualification theo plan: xây shadow-only route tách khỏi FM03, logging/version/pin, so sánh không ảnh hưởng quyết định đang phục vụ, kill switch/rollback và audit | Trước khi bật phải có test ownership/auth, source pin, missing/stale/abstain, idempotency, retry/concurrency, rollback và chứng minh candidate không ghi đè forecast active. Shadow synthetic không được mô tả là vận hành/hiệu quả thực địa. Nếu T17.1 không đạt thì giữ FM03, không mở activation |
+| Frontend handoff | Chuyển contract/API changes đã chốt cho thành viên frontend khi có thay đổi cần hiển thị | Frontend tự triển khai UI; Backend status không đánh dấu hoàn tất giao diện/native/release thay họ |
+| Nghiên cứu thực địa (tương lai, chưa lên lịch) | Chỉ khi nhóm đổi phạm vi khỏi giả lập: xác định nguồn/site/logger, consent/quyền dữ liệu, protocol quan sát và người xác minh độc lập, lịch follow-up, endpoint/disease, quality gates và kế hoạch đánh giá | Cần nguồn vật lý và hồ sơ có provenance; dữ liệu ảo hiện tại không đóng gate này. Không train, calibrate, tuyên bố accuracy thực địa hoặc mở rollout theo dữ liệu synthetic |
+
+### Nguyên tắc giữ nguyên cho các task sau
+
+- Không dùng lại T17 test để chọn model, threshold, seed, feature hoặc hypothesis;
+  audit replay chỉ tái lập kết quả đã khóa, không tạo holdout mới.
+- Không chọn HGB chỉ vì các point estimates trên T17 test tốt hơn; lựa chọn LR
+  đã được freeze trước test và kết quả qualification là không đạt.
+- Mọi nguồn/outcome T14–T17 vẫn khai báo synthetic. Simulator attestation,
+  observation, image prediction, score hoặc user report không tự trở thành nhãn
+  bệnh đã xác minh hay được duyệt huấn luyện.
+- Giữ feature cutoff tại issue, label cutoff riêng; không đưa tương lai, seed,
+  identity, audit metadata hoặc endpoint vào predictor. Split theo dependency
+  component và thời gian; giữ unresolved/abstention trong mẫu số đã định nghĩa.
+- Không sửa hồi tố các báo cáo/hash lịch sử để làm kết quả cũ trông như đạt gate.
+  Thí nghiệm tiếp theo phải có version, plan pin, artifact và holdout riêng.
+
+Tham chiếu điều hành: [roadmap](docs/FORECAST_DEVELOPMENT_ROADMAP_T10.md),
+[báo cáo T17](docs/FORECAST_EXPERIMENT_T17.md),
+[handoff candidate offline](backend/docs/CANDIDATE_FORECAST_T17.md),
+[report và gate T17](forecast_experiment_t17/run01/report.json),
+[summary/hash T17](forecast_experiment_t17/summary.json).
+
+## 125. JWT/RBAC, PR tách và sửa rủi ro tài liệu — 15–19/11/2026
+
+| Mốc | Kết quả | Giới hạn |
+|---|---|---|
+| 15/11 Must | Nhân chốt bắt buộc JWT. Backend: JWT HS256 + session digest, RBAC farmer/admin đọc role từ DB, admin list/roles/role change có audit và chặn hạ admin cuối, CLI `bootstrap-admin`; chi tiết [MUST_DELIVERY](docs/MUST_DELIVERY_20261115.md), [JWT_RBAC](backend/docs/JWT_RBAC.md) | Chưa có UI admin; FR09 chờ ngưỡng confidence |
+| 19/11 PR #9 | Tách JWT/RBAC + `backend-tests.yml` thành PR draft xếp chồng lên #8 (phụ thuộc lớp repository MySQL/SQLite chỉ có trong #8). Regression Backend SQLite chạy lại: 174 test, OK (44 skip) | MySQL 13/13 theo log 15/11, chưa chạy lại; chưa có kết quả runner GitHub |
+| 19/11 tài liệu | 133 link tuyệt đối `D:/AEGIS` trong 15 file đổi sang tương đối; link `D:/AEGIS-AI` ghi rõ workspace ngoài repo. CURRENT_HANDOFF có bảng hiện hành ở đầu; README, CONTRIBUTING, GITHUB_TEAM_SETUP, TEAM_PROGRESS, MUST_DELIVERY cập nhật trạng thái auth/CI; rà soát 07/11 và 15/11 có ghi chú câu đã lỗi thời | Thư mục bằng chứng có ngày phần lớn không nằm trong Git nên link tới chúng hỏng trên bản clone; lệnh có `D:/...` vẫn là ví dụ máy gốc |
+
+Rủi ro còn mở: PR #8 xung đột với main; khoảng 230 MB artifact `forecast_*` chưa
+có chính sách lưu trữ (không commit vào Git); deadline 02/12 hay 20/12; Mongo
+delivery trên đường response và `runtime_lock` toàn cục chưa benchmark.

@@ -18,9 +18,9 @@ telemetry mock, assessment/history và liên kết ảnh theo owner. Xem
 [contract thực tế](FARM_WARNING_API.md) và
 [runbook tổng duyệt](../../integrated_warning_20261024/RUNBOOK.md).
 Core trigger thủ công. Câu “chưa scheduler/UI” thuộc mốc24/10; đến28/10 pilot
-đã có [mock worker opt-in](D:/AEGIS/frontend/MOCK_AUTOMATION.md), UI local,
+đã có [mock worker opt-in](../../frontend/MOCK_AUTOMATION.md), UI local,
 journal/follow-up/review và backup. Chưa có notification ra ngoài, scheduler
-production hoặc sensor thật được xác nhận. Xem [chỉ mục hiện hành](D:/AEGIS/docs/CURRENT_HANDOFF.md).
+production hoặc sensor thật được xác nhận. Xem [chỉ mục hiện hành](../../docs/CURRENT_HANDOFF.md).
 Đã bổ sung
 [hồ sơ canh tác theo mùa vụ](CULTIVATION_PROFILE.md) với revision/snapshot.
 Hồ sơ mới chỉ là metadata; các bổ sung pilot không xác thực rule ngoài ruộng.

@@ -91,7 +91,7 @@ dùng page/page_size; list sort observed_at DESC, history sort revision DESC.
 
 ## Backup/restore thủ công
 
-> TASK-17, 28/10/2026: xem [CLI backup/verify/restore bảy DB](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md)
+> TASK-17, 28/10/2026: xem [CLI backup/verify/restore bảy DB](PILOT_BACKUP_RESTORE.md)
 > với manifest, hai lease và guard restore dở. Rehearsal mới kiểm đủ bảy DB,
 > uploads/metadata cùng ownership/chain; đoạn Copy-Item dưới giữ làm lịch sử,
 > không là bằng chứng rằng đã restore kho thật của người dùng.

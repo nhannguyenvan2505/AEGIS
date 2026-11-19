@@ -108,7 +108,7 @@ telemetry trong transaction BEGIN IMMEDIATE để tránh đánh giá trên batch
 **Dữ liệu đến muộn không cập nhật assessment cũ**, kể cả bản insufficient_data.
 Để minh họa advisory, nạp đủ số đo trước khi evaluate. Khi có cửa sổ mới, nạp thêm
 bucket mới rồi evaluate; core không có force-recompute một cửa sổ. Pilot opt-in
-có [assessment versions](D:/AEGIS/frontend/ASSESSMENT_VERSIONS.md) v2/v3 khi late
+có [assessment versions](../../frontend/ASSESSMENT_VERSIONS.md) v2/v3 khi late
 bucket đủ điều kiện; v1 core vẫn bất biến. Không tự bật extension ở core/mobile.
 Không đổi profile chỉ để vượt khóa trùng. Khởi động lại Backend không mất lịch sử.
 

@@ -22,11 +22,11 @@ Launcher mở URL loopback và khởi chạy Backend + AI service; giữ termina
 Pilot store ở `pilot_data/browser-demo` tồn tại qua restart. Dừng bằng Ctrl+C.
 Đây là prototype desktop/browser; app mobile có hướng dẫn riêng.
 
-Cập nhật28/10/2026: [chỉ mục](D:/AEGIS/docs/CURRENT_HANDOFF.md) và
-[runbook hiện hành](D:/AEGIS/docs/CURRENT_RUNBOOK.md) phân biệt prototype local
+Cập nhật28/10/2026: [chỉ mục](../docs/CURRENT_HANDOFF.md) và
+[runbook hiện hành](../docs/CURRENT_RUNBOOK.md) phân biệt prototype local
 với mobile của nhóm. Vai trò người dùng là AI/ML và Backend; không cần xây thêm
-frontend để dùng API. Pilot nay có [raw khay opt-in](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md)
-và [backup bảy DB](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md). Các kết quả dưới
+frontend để dùng API. Pilot nay có [raw khay opt-in](CONTROLLED_EXPERIMENT_RAW.md)
+và [backup bảy DB](PILOT_BACKUP_RESTORE.md). Các kết quả dưới
 là mốc đã ghi, không phải chạy mới TASK-19.
 
 Đã có [đánh giá bổ sung khi bucket tới muộn](ASSESSMENT_VERSIONS.md): v1 giữ
