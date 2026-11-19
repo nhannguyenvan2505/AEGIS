@@ -226,7 +226,10 @@ db.grantRolesToUser('aegis_app',[{{role:'readWrite',db:'{cls.mongo_database}'}}]
                     UPLOAD_DIR=self.config['UPLOAD_DIR']))
                 self.assertEqual(core.config['STORAGE_BACKEND'],'mysql')
                 self.assertEqual(core.test_client().get('/api/auth/me',headers=self.headers[0]).status_code,200)
-                pilot=create_pilot_app(self.store,config=dict(TESTING=True,MYSQL=self.mysql,MONGO=self.mongo))
+                # Same UPLOAD_DIR as the issuing app, so both read the same JWT signing key
+                # (runtime core and pilot share backend/mysql-instance).
+                pilot=create_pilot_app(self.store,config=dict(TESTING=True,MYSQL=self.mysql,MONGO=self.mongo,
+                    UPLOAD_DIR=self.config['UPLOAD_DIR']))
                 self.assertEqual(pilot.config['STORAGE_BACKEND'],'mysql')
                 self.assertEqual(pilot.test_client().get('/api/farm/plots',headers=self.headers[0]).status_code,200)
 
