@@ -60,6 +60,9 @@ def check_schema(config):
         row=repo.one('SELECT status FROM schema_versions WHERE version=4')
         if not row or row['status']!='complete':
             raise RuntimeError('Apply MySQL migration 004_api_semantics.sql before selecting mysql')
+        row=repo.one('SELECT status FROM schema_versions WHERE version=5')
+        if not row or row['status']!='complete':
+            raise RuntimeError('Apply MySQL migration 005_outbox_delivery.sql (database/apply_hybrid.py) before selecting mysql')
 
 
 # Projections expose exactly the UUID/ISO strings expected by the existing API.

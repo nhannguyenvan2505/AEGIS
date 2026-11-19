@@ -61,6 +61,8 @@ jobs:
         run: docker compose --env-file backend/database/.env -f backend/database/compose.yaml up -d --wait
       - name: Run MySQL core and JWT RBAC acceptance
         run: python -B -m unittest discover -s backend/checks -p test_mysql_core.py
+      - name: Run hybrid MySQL/Mongo outbox and pilot acceptance
+        run: python -B -m unittest discover -s backend/checks -p test_hybrid_runtime.py
       - name: Remove CI database services and volumes
         if: always()
         run: docker compose --env-file backend/database/.env -f backend/database/compose.yaml down --volumes

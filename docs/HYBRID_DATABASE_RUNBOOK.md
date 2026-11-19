@@ -17,7 +17,7 @@ Các launcher pilot/browser/forecast hiện có gọi `create_pilot_app` và dù
 
 MySQL ở `127.0.0.1:3307`, MongoDB ở `127.0.0.1:27018`, database đều tên `aegis`. Cấu hình đọc từ `backend/database/.env`, environment có ưu tiên cao hơn. Password không nằm trong source. Ảnh riêng tư tập trung ở `backend/mysql-instance/uploads`; database lưu metadata và đường dẫn.
 
-Clone mới: sao chép `.env.example` thành `.env`, thay password rồi khởi động Compose. Volume rỗng tự chạy migrations 001–004. Với volume từ bước chuẩn bị cũ, chạy `apply_core_runtime.py` rồi `apply_hybrid.py` trước khi chạy API. Không chạy lại SQL bootstrap thủ công lên database có dữ liệu.
+Clone mới: sao chép `.env.example` thành `.env`, thay password rồi khởi động Compose. Volume rỗng tự chạy migrations 001–005. Với volume từ bước chuẩn bị cũ, chạy `apply_core_runtime.py` rồi `apply_hybrid.py` trước khi chạy API. Không chạy lại SQL bootstrap thủ công lên database có dữ liệu.
 
 ## Phạm vi dữ liệu
 
@@ -50,9 +50,26 @@ Hai document AI test được giữ nguyên theo yêu cầu người dùng; khô
 
 ## Outbox và phục hồi kết nối
 
-Thay đổi nghiệp vụ và outbox commit cùng transaction MySQL. Document Mongo có ObjectId và ingest key xác định; retry sau khi Mongo ghi thành công nhưng MySQL chưa đánh dấu delivery sẽ đối chiếu nội dung rồi hoàn tất, không ghi thêm bản trùng. Khi Mongo lỗi, bản ghi vẫn pending và chỉ lưu loại lỗi; request sau sẽ thử lại.
+Thay đổi nghiệp vụ và outbox commit cùng transaction MySQL. Document Mongo có ObjectId và ingest key xác định; retry sau khi Mongo ghi thành công nhưng MySQL chưa đánh dấu delivery sẽ đối chiếu nội dung rồi hoàn tất, không ghi thêm bản trùng.
 
-Với lưu lượng ingestion lớn, chạy dispatcher riêng để không phụ thuộc vào request tiếp theo:
+**BE-02 (19/11/2026):** delivery không còn chạy trong `after_request`. Mỗi process API khởi động một dispatcher nền (mặc định 2 giây/lượt, `AEGIS_MONGO_DELIVERY_INTERVAL`); response không chờ Mongo. Dispatcher không lấy `runtime_lock`: mỗi event được nhận bằng `FOR UPDATE SKIP LOCKED` dưới READ COMMITTED, nên Mongo chậm/mất kết nối không chặn giao dịch API và nhiều process không gửi trùng.
+
+| Tình huống | Xử lý |
+|---|---|
+| Mongo không kết nối được | Ghi loại lỗi, dừng lượt; không backoff vì không phải lỗi của event, lượt sau thử lại |
+| Payload khác cùng `_id`, document hỏng | Chuyển `status='failed'` ngay, không chặn các event sau |
+| Lỗi Mongo khác (ví dụ validator) | Backoff 5 s, 10 s, 20 s… tối đa 1 giờ; sau 8 lần chuyển `failed` |
+
+Cần migration 5 (`005_outbox_delivery.sql`): volume mới tự chạy; volume cũ chạy `backend/database/apply_hybrid.py` trước khi khởi động API, nếu không API báo thiếu migration 5.
+
+Theo dõi và xử lý event `failed`:
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/deliver_outbox.py --status
+& backend\.venv\Scripts\python.exe backend/database/deliver_outbox.py --retry-failed <event_key>
+```
+
+`--status` in số pending/delivered/failed và tuổi pending cũ nhất, trả mã 1 khi còn event `failed`. Chỉ `--retry-failed` sau khi đã xử lý nguyên nhân. Muốn chạy dispatcher như process riêng, đặt `AEGIS_MONGO_DELIVERY_ENABLED=0` cho API rồi chạy:
 
 ```powershell
 & backend\.venv\Scripts\python.exe backend/database/deliver_outbox.py --poll 5
