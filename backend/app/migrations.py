@@ -40,3 +40,12 @@ def apply_migrations(db):
                    ('inference_idempotency', datetime.now(timezone.utc).isoformat()))
     apply_farm_migration(db)
     apply_cultivation_migration(db)
+    if not db.execute('SELECT 1 FROM schema_migrations WHERE version=6').fetchone():
+        db.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'farmer' CHECK(role IN ('farmer','admin'))")
+        db.execute("ALTER TABLE users ADD COLUMN status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','inactive','locked'))")
+        db.execute('''CREATE TABLE role_audit (
+            id INTEGER PRIMARY KEY, actor_id TEXT REFERENCES users(id),
+            target_id TEXT NOT NULL REFERENCES users(id), old_role TEXT NOT NULL,
+            new_role TEXT NOT NULL, reason TEXT NOT NULL, created_at TEXT NOT NULL)''')
+        db.execute('INSERT INTO schema_migrations VALUES (6,?,?)',
+                   ('user_roles_and_status', datetime.now(timezone.utc).isoformat()))

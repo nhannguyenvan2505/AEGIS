@@ -1,5 +1,11 @@
 # Chỉ mục bàn giao hiện hành — AEGIS
 
+**15/11/2026 — hoàn thiện nhóm Must:** đã chuyển access token sang JWT có
+revocation và thêm Backend RBAC/admin list/role change/CLI bootstrap theo quyết
+định Nhân. Token opaque cũ cần đăng nhập lại. Xem [tiến độ và kiểm chứng](MUST_DELIVERY_20261115.md)
+và [contract JWT/admin](../backend/docs/JWT_RBAC.md). Chưa nghiệm thu UI admin,
+FR09 còn chờ ngưỡng confidence; không đánh dấu toàn bộ nhóm Must hoàn tất.
+
 **Cutover database 09/11/2026:** MySQL + MongoDB là runtime mặc định cho core/mobile/pilot. Dữ liệu runtime cũ đã nhập và đối chiếu; xem [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) và `backend/database/cutover_report.json`.
 
 **Bàn giao clone07/11:** xem [hướng dẫn mọi demo](../CLONE_DEMO.md),

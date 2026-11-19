@@ -52,10 +52,15 @@ def create_app(config=None):
     if app.config['STORAGE_BACKEND']=='mysql' and not (config and 'UPLOAD_DIR' in config):
         app.config['UPLOAD_DIR']=data_dir.parent/'mysql-instance'/'uploads'
     init_storage(app.config)
+    from .jwt_tokens import init_jwt
+    init_jwt(app)
     init_observability(app)
     init_limits(app)
     app.register_blueprint(api)
     app.register_blueprint(auth)
+    from .admin import admin, register_admin_cli
+    app.register_blueprint(admin)
+    register_admin_cli(app)
     app.register_blueprint(farm)
     from .mobile_contract import enable_mobile_contract
     enable_mobile_contract(app)

@@ -1,7 +1,6 @@
-"""Opaque bearer sessions; only token digests are persisted."""
+"""JWT bearer access with persisted revocation; only token digests are stored."""
 import hashlib
 import re
-import secrets
 import sqlite3
 import time
 import uuid
@@ -12,6 +11,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .repositories import repository as connect
 from .limits import limit_auth, check_limit
+from .jwt_tokens import issue_token, validate_token
+from jwt import InvalidTokenError
 
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 DUMMY_HASH = generate_password_hash('not-a-user-password')
@@ -29,17 +30,35 @@ def require_auth(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
         parts = request.headers.get('Authorization', '').split()
-        if len(parts) != 2 or parts[0].lower() != 'bearer' or len(parts[1]) > 256:
+        if len(parts) != 2 or parts[0].lower() != 'bearer' or len(parts[1]) > 4096:
             return error('unauthorized', 'Cần token Bearer hợp lệ.', 401)
+        now = int(time.time())
+        try:
+            claims = validate_token(current_app.config, parts[1], now)
+        except InvalidTokenError:
+            return error('unauthorized', 'Token không hợp lệ hoặc đã hết hạn.', 401)
         digest = token_digest(parts[1])
         with connect(current_app.config) as db:
-            row = db.session_user(digest, int(time.time()))
-        if row is None:
+            row = db.session_user(digest, now)
+        if row is None or row['id'] != claims['sub']:
             return error('unauthorized', 'Token không hợp lệ hoặc đã hết hạn.', 401)
         g.user = dict(row)
         g.token_hash = digest
         return view(*args, **kwargs)
     return wrapped
+
+
+def require_roles(*roles):
+    """Read the authoritative role on every request; JWT never grants a role."""
+    def decorate(view):
+        @require_auth
+        @wraps(view)
+        def wrapped(*args, **kwargs):
+            if g.user.get('role') not in roles:
+                return error('forbidden', 'Tài khoản không có quyền thực hiện thao tác này.', 403)
+            return view(*args, **kwargs)
+        return wrapped
+    return decorate
 
 
 def credentials():
@@ -71,7 +90,7 @@ def register():
             db.add_user(user_id, email, password_hash, int(time.time()))
         except sqlite3.IntegrityError:
             return error('email_exists', 'Email đã được đăng ký.', 409)
-    return jsonify(success=True, user={'id': user_id, 'email': email}), 201
+    return jsonify(success=True, user={'id': user_id, 'email': email, 'role': 'farmer'}), 201
 
 
 @auth.post('/login')
@@ -89,11 +108,12 @@ def login():
         valid = check_password_hash(user['password_hash'] if user else DUMMY_HASH, password)
         if user is None or not valid:
             return error('invalid_login', 'Email hoặc mật khẩu không đúng.', 401)
-        token = secrets.token_urlsafe(32)
-        expires_at = int(time.time()) + current_app.config['SESSION_TTL_SECONDS']
-        db.add_session(token_digest(token), user['id'], expires_at, int(time.time()))
+        now = int(time.time())
+        expires_at = now + current_app.config['SESSION_TTL_SECONDS']
+        token = issue_token(current_app.config, user['id'], now, expires_at)
+        db.add_session(token_digest(token), user['id'], expires_at, now)
     return jsonify(success=True, access_token=token, token_type='Bearer', expires_at=expires_at,
-                   user={'id': user['id'], 'email': user['email']})
+                   user={'id': user['id'], 'email': user['email'], 'role': user['role']})
 
 
 @auth.get('/me')

@@ -131,7 +131,8 @@ class MySQLRepository:
         return row['pk']
 
     def user_by_email(self, email):
-        return self.one("SELECT external_id id,email,password_hash FROM users WHERE email=%s AND status='active'", (email,))
+        return self.one("""SELECT u.external_id id,u.email,u.password_hash,r.role_name role
+            FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.email=%s AND u.status='active'""", (email,))
 
     def add_user(self, identifier, email, password_hash, created_at):
         if not self.one("SELECT role_id FROM roles WHERE role_name='farmer'"):
@@ -141,8 +142,32 @@ class MySQLRepository:
             (identifier,email,identifier,password_hash,datetime.fromtimestamp(created_at,timezone.utc).replace(tzinfo=None)))
 
     def session_user(self, token_hash, now):
-        return self.one('''SELECT u.external_id id,u.email FROM sessions s JOIN users u ON u.user_id=s.user_id
+        return self.one('''SELECT u.external_id id,u.email,r.role_name role FROM sessions s JOIN users u ON u.user_id=s.user_id
+            JOIN roles r ON r.role_id=u.role_id
             WHERE s.token_hash=%s AND s.expires_at>%s AND u.status='active' ''', (token_hash,now))
+
+    def admin_users(self, size, offset):
+        total = self.one('SELECT COUNT(*) n FROM users')['n']
+        rows = self.all('''SELECT u.external_id id,u.email,r.role_name role,u.status FROM users u
+            JOIN roles r ON r.role_id=u.role_id ORDER BY u.external_id LIMIT %s OFFSET %s''', (size, offset))
+        return total, rows
+
+    def role_user(self, identifier):
+        return self.one('''SELECT u.external_id id,u.email,r.role_name role,u.status FROM users u
+            JOIN roles r ON r.role_id=u.role_id WHERE u.external_id=%s''', (identifier,))
+
+    def active_admin_count(self):
+        return self.one("""SELECT COUNT(*) n FROM users u JOIN roles r ON r.role_id=u.role_id
+            WHERE r.role_name='admin' AND u.status='active'""")['n']
+
+    def set_user_role(self, identifier, role, actor_id, reason, created_at):
+        old = self.role_user(identifier)
+        self.execute('UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name=%s) WHERE external_id=%s',
+                     (role, identifier))
+        self.execute('''INSERT INTO audit_logs(user_id,action,entity_type,entity_id,details_json)
+            VALUES (%s,'user_role_changed','user',%s,%s)''',
+                     (self.uid(actor_id) if actor_id else None, identifier,
+                      json.dumps(dict(old_role=old['role'],new_role=role,reason=reason,recorded_at=created_at))))
 
     def add_session(self, token_hash, user_id, expires_at, now):
         self.execute('DELETE FROM sessions WHERE expires_at<=%s', (now,))
