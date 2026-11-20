@@ -17,7 +17,7 @@ Các launcher pilot/browser/forecast hiện có gọi `create_pilot_app` và dù
 
 MySQL ở `127.0.0.1:3307`, MongoDB ở `127.0.0.1:27018`, database đều tên `aegis`. Cấu hình đọc từ `backend/database/.env`, environment có ưu tiên cao hơn. Password không nằm trong source. Ảnh riêng tư tập trung ở `backend/mysql-instance/uploads`; database lưu metadata và đường dẫn.
 
-Clone mới: sao chép `.env.example` thành `.env`, thay password rồi khởi động Compose. Volume rỗng tự chạy migrations 001–005. Với volume từ bước chuẩn bị cũ, chạy `apply_core_runtime.py` rồi `apply_hybrid.py` trước khi chạy API. Không chạy lại SQL bootstrap thủ công lên database có dữ liệu.
+Clone mới: sao chép `.env.example` thành `.env`, thay password rồi khởi động Compose. Volume rỗng tự chạy migrations 001–006. Với volume từ bước chuẩn bị cũ, chạy `apply_core_runtime.py` rồi `apply_hybrid.py` trước khi chạy API. Không chạy lại SQL bootstrap thủ công lên database có dữ liệu.
 
 ## Phạm vi dữ liệu
 
@@ -60,7 +60,7 @@ Thay đổi nghiệp vụ và outbox commit cùng transaction MySQL. Document Mo
 | Payload khác cùng `_id`, document hỏng | Chuyển `status='failed'` ngay, không chặn các event sau |
 | Lỗi Mongo khác (ví dụ validator) | Backoff 5 s, 10 s, 20 s… tối đa 1 giờ; sau 8 lần chuyển `failed` |
 
-Cần migration 5 (`005_outbox_delivery.sql`): volume mới tự chạy; volume cũ chạy `backend/database/apply_hybrid.py` trước khi khởi động API, nếu không API báo thiếu migration 5.
+Cần migration 6 (`006_outbox_delivery.sql`); migration 5 là `005_farm_hierarchy.sql`. Volume mới tự chạy cả hai. Volume cũ chạy `backend/database/apply_farm_hierarchy.py` rồi `backend/database/apply_hybrid.py` trước khi khởi động API; nếu thiếu, API báo migration còn thiếu.
 
 Theo dõi và xử lý event `failed`:
 

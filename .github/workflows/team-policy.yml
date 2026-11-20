@@ -1,0 +1,44 @@
+name: Team policy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TEAM_FLOW: ${{ vars.TEAM_FLOW || 'github-flow' }}
+    steps:
+      - name: Validate PR metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const head = pr.head.ref;
+            const base = pr.base.ref;
+            const sameRepo = pr.head.repo?.full_name === pr.base.repo.full_name;
+            const task = /^(feature|feat|bugfix|fix|docs|chore|test|ci)\/[1-9]\d*-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+            const nvn = /^nvn\/[a-z0-9]+(?:-[a-z0-9]+)*$/;
+            const version = '(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)';
+            const release = new RegExp('^release/' + version + '$');
+            const hotfix = new RegExp('^hotfix/' + version + '-[a-z0-9]+(?:-[a-z0-9]+)*$');
+            const title = /^(feat|fix|refactor|docs|test|chore|build|ci|perf|style|revert)(\([a-z0-9-]+\))?!?: \S.*$/;
+            const errors = [];
+            const mode = process.env.TEAM_FLOW;
+            if (!['github-flow', 'gitflow'].includes(mode)) errors.push('TEAM_FLOW must be github-flow or gitflow.');
+            if (!title.test(pr.title)) errors.push('Use a Conventional Commit PR title, e.g. feat(mobile): add search filter.');
+            const sharedSource = sameRepo && (release.test(head) || hotfix.test(head));
+            const gitflowAllowed =
+              (base === 'develop' && (task.test(head) || nvn.test(head) || sharedSource || (sameRepo && head === 'main'))) ||
+              (base === 'main' && sharedSource) ||
+              (release.test(base) && ((sameRepo && head === 'main') || (task.test(head) && /^(bugfix|fix)\//.test(head))));
+            const allowed = mode === 'gitflow' ? gitflowAllowed :
+              (base === 'main' && (task.test(head) || nvn.test(head) || sharedSource));
+            if (!allowed) errors.push(`Invalid PR branch flow: ${head} -> ${base} (${mode}). See docs/TEAM_POLICY_ACTIONS.md.`);
+            if (errors.length) core.setFailed(errors.join('\n'));
+            else core.info(`Team policy passed: ${head} -> ${base}`);

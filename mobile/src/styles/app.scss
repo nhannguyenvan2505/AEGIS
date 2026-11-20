@@ -37,11 +37,20 @@ $muted: #64748b;
 .featureText { color: #0f172a; font-size: 13px; font-weight: 700; }
 .history { background-color: #ffffff; padding: 16px; border-radius: 20px; margin-bottom: 12px; flex-direction: row; align-items: center; gap: 12px; }
 .historyTitle { color: #0f172a; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-.nav { position: absolute; bottom: 12px; left: 20px; right: 20px; flex-direction: row; background-color: #ffffff; padding: 8px; border-radius: 36px; elevation: 8; }
-.tab { flex: 1; align-items: center; justify-content: center; gap: 4px; padding-top: 3px; padding-bottom: 3px; min-height: 56px; }
-.tabIcon { width: 40px; height: 32px; align-items: center; justify-content: center; border-radius: 20px; }
-.tabText { color: $muted; font-size: 10px; font-weight: 600; }
-.active { background-color: #d1fae5; }
+.bottomNavContainer { position: absolute; bottom: 12px; left: 16px; right: 16px; align-items: center; }
+.bottomNavFrame { width: 100%; max-width: 480px; height: 88px; }
+.bottomNavPanel { position: absolute; left: 0px; right: 0px; bottom: 0px; height: 72px; border-radius: 36px; background-color: #ffffff; box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.14); elevation: 8; }
+.bottomNavRow { height: 88px; flex-direction: row; align-items: flex-end; padding-left: 4px; padding-right: 4px; z-index: 1; elevation: 9; }
+.bottomNavTab { flex: 1; height: 72px; min-width: 48px; align-items: center; border-radius: 28px; }
+.bottomNavTabPressed { background-color: #edf9f4; }
+.bottomNavScanTab { height: 88px; }
+.bottomNavIconSlot { position: absolute; top: 16px; width: 42px; height: 38px; align-items: center; justify-content: center; }
+.bottomNavSelectedPill { position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; border-radius: 20px; background-color: #d1fae5; }
+.bottomNavImage { width: 24px; height: 24px; }
+.bottomNavScanCircle { top: 4px; width: 60px; height: 60px; border-radius: 30px; border-width: 4px; border-color: #ffffff; background-color: #00a77b; box-shadow: 0px 4px 10px rgba(0, 155, 115, 0.25); elevation: 10; }
+.bottomNavScanSelected { background-color: #008d68; }
+.bottomNavScanImage { width: 26px; height: 26px; }
+.bottomNavLabel { position: absolute; left: 1px; right: 1px; bottom: 7px; color: #008b65; font-size: 10px; line-height: 16px; font-weight: 700; text-align: center; }
 .upload { border-width: 2px; border-style: dashed; border-color: #cbd5e1; background-color: #ffffff; border-radius: 24px; padding: 24px; align-items: center; margin-bottom: 24px; }
 .center { align-items: center; }
 .chart { height: 160px; flex-direction: row; align-items: flex-end; gap: 9px; border-bottom-width: 1px; border-bottom-color: #d1fae5; margin-top: 16px; }
@@ -73,3 +82,595 @@ $muted: #64748b;
 .authDemoNote { color: $muted; font-size: 12px; line-height: 19px; text-align: center; margin-top: 16px; }
 .authIntro { flex-direction: row; align-items: center; gap: 14px; margin-bottom: 22px; }
 .authIntroText { flex: 1; }
+
+// Login and registration layouts from the AEGIS mobile references.
+.authPage { flex: 1; }
+.authPageKeyboard { flex: 1; }
+.authPageContent { flex-grow: 1; padding-left: 16px; padding-right: 16px; padding-bottom: 32px; }
+.authPageColumn { width: 100%; max-width: 480px; align-self: center; }
+.authPageHeader { min-height: 68px; flex-direction: row; align-items: center; justify-content: space-between; }
+.authLoginHeader { min-height: 76px; }
+.authPageBrand { font-size: 20px; line-height: 26px; font-weight: 700; }
+.authPageHelp { width: 48px; min-height: 48px; align-items: center; justify-content: center; }
+.authPageCard { background-color: #ffffff; border-radius: 20px; padding: 20px; padding-top: 24px; padding-bottom: 24px; box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.08); elevation: 3; }
+.authHero { margin-bottom: 16px; min-height: 208px; }
+.authLoginHero { min-height: 248px; }
+.authHeroIcon { width: 48px; height: 48px; border-radius: 12px; align-items: center; justify-content: center; margin-bottom: 16px; }
+.authLoginHeroIcon { width: 56px; height: 56px; border-radius: 13px; }
+.authHeroCheck { position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; align-items: center; justify-content: center; }
+.authHeroTitle { font-size: 24px; line-height: 30px; font-weight: 700; margin-bottom: 16px; }
+.authLoginHeroTitle { font-size: 28px; line-height: 34px; }
+.authHeroDescription { font-size: 16px; line-height: 23px; }
+.authPageFormTitle { font-size: 20px; line-height: 26px; font-weight: 700; margin-bottom: 18px; }
+.authLoginForm { min-height: 508px; }
+.authLoginSpacer { min-height: 24px; flex-grow: 1; }
+.authPageFieldLabel { font-size: 14px; line-height: 18px; margin-bottom: 8px; }
+.authPageInputRow { border-radius: 12px; padding-left: 15px; padding-right: 3px; gap: 0px; }
+.authPageInput { padding-top: 13px; padding-bottom: 13px; line-height: 24px; }
+.authPageFieldIcon { width: 44px; min-height: 48px; align-items: center; justify-content: center; }
+.authPageHint { font-size: 14px; line-height: 20px; margin-top: 8px; }
+.authForgotPassword { min-height: 48px; align-self: flex-end; justify-content: center; margin-bottom: 12px; }
+.authForgotPasswordText { font-size: 16px; line-height: 22px; font-weight: 600; }
+.authPageSubmit { min-height: 56px; border-radius: 13px; align-items: center; justify-content: center; padding: 16px; box-shadow: 0px 3px 8px rgba(0, 155, 115, 0.2); elevation: 3; }
+.authPageSubmitText { color: #ffffff; font-size: 16px; line-height: 22px; font-weight: 700; text-align: center; }
+.authPagePressed { opacity: 0.75; }
+.authPageDisabled { opacity: 0.5; }
+.authPageSwitch { min-height: 48px; margin-top: 16px; padding: 8px; align-items: center; justify-content: center; }
+.authPageSwitchText { font-size: 14px; line-height: 22px; text-align: center; }
+.authPageSwitchEmphasis { font-size: 16px; font-weight: 700; }
+.authSecurityNote { flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; }
+.authSecurityText { font-size: 14px; line-height: 20px; flex-shrink: 1; }
+.forgotBack { min-height: 48px; flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; }
+.forgotBackText { color: #009b73; font-size: 16px; line-height: 22px; font-weight: 700; }
+.forgotSuccessCard { padding-top: 24px; }
+.forgotStatus { flex-direction: row; align-self: flex-start; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 18px; background-color: #cef9e5; margin-bottom: 16px; }
+.forgotStatusText { color: #009b73; font-size: 14px; line-height: 20px; font-weight: 700; }
+.forgotMessage { color: #1c2748; font-size: 16px; line-height: 24px; margin-bottom: 16px; }
+.forgotEmail { min-height: 52px; flex-direction: row; align-items: center; gap: 10px; border-radius: 12px; background-color: #f3f6f9; padding-left: 14px; padding-right: 14px; margin-bottom: 16px; }
+.forgotEmailText { flex: 1; color: #1c2748; font-size: 15px; line-height: 22px; }
+.forgotHint { color: #4e5d78; font-size: 14px; line-height: 21px; margin-bottom: 16px; }
+.forgotResend { min-height: 56px; align-items: center; justify-content: center; border-width: 1px; border-color: #009b73; border-radius: 13px; background-color: #ffffff; padding: 14px; }
+.forgotResendText { color: #009b73; font-size: 16px; line-height: 22px; font-weight: 700; }
+.forgotSuccessBack { margin-top: 16px; }
+
+// Farm -> plot -> season workspace.
+.farmPage { flex: 1; background-color: #edf2f8; }
+.farmKeyboard { flex: 1; }
+.farmContent { flex-grow: 1; padding: 16px; padding-top: 4px; padding-bottom: 140px; }
+.farmColumn { width: 100%; max-width: 600px; align-self: center; }
+.farmHeader { min-height: 60px; flex-direction: row; align-items: center; gap: 12px; margin-bottom: 12px; }
+.farmRootHeader { margin-bottom: 8px; }
+.farmBack { width: 44px; min-height: 44px; align-items: center; justify-content: center; }
+.farmPageTitle { flex: 1; color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; }
+.farmRootTitle { font-size: 28px; line-height: 36px; padding-left: 4px; }
+.farmOverview { color: #657e9e; font-size: 14px; line-height: 22px; margin-bottom: 2px; }
+.farmBreadcrumbs { flex-direction: row; align-items: center; gap: 8px; margin-bottom: 10px; }
+.farmBreadcrumbItem { flex-direction: row; align-items: center; gap: 8px; }
+.farmBreadcrumbLink { min-height: 36px; justify-content: center; }
+.farmBreadcrumbText { color: #657e9e; font-size: 13px; line-height: 20px; }
+.farmBreadcrumbActive { color: #009f96; font-weight: 600; }
+.farmSearch { min-height: 52px; flex-direction: row; align-items: center; gap: 12px; border-width: 1px; border-color: #cbd6e6; border-radius: 12px; background-color: #ffffff; padding-left: 15px; padding-right: 8px; margin-bottom: 16px; }
+.farmSearchInput { flex: 1; min-width: 0px; padding-top: 13px; padding-bottom: 13px; color: #1c304b; font-size: 16px; line-height: 24px; }
+.farmSearchClear { width: 36px; min-height: 44px; align-items: center; justify-content: center; }
+.farmCard { background-color: #ffffff; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0px 3px 14px rgba(28, 48, 75, 0.05); elevation: 2; }
+.farmListCard { border-width: 1.5px; border-color: #ffffff; padding: 14px; }
+.farmSelectedCard { border-color: #15caba; }
+.farmCardHeading { flex-direction: row; align-items: center; gap: 12px; }
+.farmGrow { flex: 1; min-width: 0px; }
+.farmCardTitle { color: #1c304b; font-size: 16px; line-height: 22px; font-weight: 700; }
+.farmCardAddress { color: #657e9e; font-size: 13px; line-height: 20px; margin-top: 2px; }
+.farmCardStats { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; margin-bottom: 12px; }
+.farmStatsText { color: #1c304b; font-size: 14px; line-height: 20px; font-weight: 700; flex-shrink: 1; }
+.farmSelectionText { color: #009f96; font-size: 12px; line-height: 18px; font-weight: 600; }
+.farmCardFooter { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; border-top-width: 1px; border-top-color: #cbd6e6; padding-top: 12px; min-height: 40px; }
+.farmCardLink { color: #009f96; font-size: 14px; line-height: 21px; font-weight: 600; }
+.farmIcon { width: 44px; height: 44px; border-radius: 14px; background-color: #e4f4f1; align-items: center; justify-content: center; }
+.farmLargeIcon { width: 80px; height: 80px; border-radius: 24px; }
+.farmHouseImage { width: 22px; height: 22px; tint-color: #009f96; }
+.farmLargeHouseImage { width: 32px; height: 32px; }
+.farmIconAdd { position: absolute; right: 17px; bottom: 22px; width: 18px; height: 18px; background-color: #e4f4f1; align-items: center; justify-content: center; }
+.farmEmpty { min-height: 344px; align-items: center; padding-top: 48px; padding-bottom: 16px; }
+.farmEmptyTitle { color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; text-align: center; margin-top: 18px; }
+.farmEmptyDescription { color: #657e9e; font-size: 14px; line-height: 21px; text-align: center; margin-top: 16px; padding-left: 12px; padding-right: 12px; }
+.farmEmptyAction { width: 100%; margin-top: 42px; }
+.farmButton { min-height: 56px; border-radius: 12px; background-color: #24cdbb; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 16px; }
+.farmButtonText { color: #152c45; font-size: 16px; line-height: 22px; font-weight: 700; text-align: center; flex-shrink: 1; }
+.farmButtonNavy { background-color: #1c2748; }
+.farmButtonOutline { background-color: #ffffff; border-width: 1px; border-color: #cbd6e6; }
+.farmButtonDanger { background-color: #b13232; }
+.farmButtonDangerOutline { background-color: #ffffff; border-width: 1px; border-color: #b13232; }
+.farmButtonLightText { color: #ffffff; }
+.farmDangerText { color: #b13232; }
+.farmButtonGap { height: 16px; }
+.farmDisabled { opacity: 0.5; }
+.farmPressed { opacity: 0.72; }
+.farmFootnote { color: #657e9e; font-size: 14px; line-height: 21px; margin-top: 16px; }
+.farmDemoNote { color: #657e9e; font-size: 12px; line-height: 18px; margin-top: 12px; }
+.farmFormHint { color: #657e9e; font-size: 14px; line-height: 22px; margin-bottom: 16px; }
+.farmFormCard { padding-bottom: 4px; }
+.farmField { margin-bottom: 12px; }
+.farmFieldLabel { color: #1c2748; font-size: 14px; line-height: 20px; font-weight: 700; margin-bottom: 6px; }
+.farmInput { min-height: 52px; background-color: #f4f6f9; border-width: 1px; border-color: #cbd6e6; border-radius: 12px; padding: 14px; padding-top: 12px; padding-bottom: 12px; color: #1c2748; font-size: 16px; line-height: 24px; }
+.farmTextArea { min-height: 80px; }
+.farmInputInvalid { border-color: #b13232; }
+.farmFieldError { color: #b13232; font-size: 13px; line-height: 20px; margin-top: 4px; }
+.farmErrorBox { background-color: #fff5f5; border-radius: 12px; padding: 12px; margin-bottom: 16px; }
+.farmRetry { min-height: 44px; flex-direction: row; align-items: center; gap: 8px; }
+.farmLoading { padding: 24px; flex-direction: row; align-items: center; justify-content: center; gap: 12px; }
+.farmMuted { color: #657e9e; font-size: 14px; line-height: 22px; }
+.farmDetailName { color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; }
+.farmInfoRow { flex-direction: row; align-items: center; gap: 8px; margin-top: 12px; }
+.farmSummaryBar { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; background-color: #e8f4f4; border-radius: 12px; padding: 12px; margin-top: 12px; }
+.farmDetailNotes { color: #657e9e; font-size: 14px; line-height: 22px; margin-top: 12px; }
+.farmSectionTitle { color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; margin-top: 4px; margin-bottom: 16px; }
+.farmPlotCard { border-width: 1px; border-color: #ffffff; }
+.farmActions { flex-direction: row; gap: 12px; margin-top: 16px; }
+.farmSeasonDates { color: #1c304b; font-size: 14px; line-height: 22px; margin-top: 16px; margin-bottom: 6px; }
+.farmModalBackdrop { flex: 1; background-color: rgba(28, 39, 72, 0.42); }
+.farmModalScroll { flex-grow: 1; padding: 24px; align-items: center; justify-content: center; }
+.farmModalCard { width: 100%; max-width: 440px; border-radius: 18px; background-color: #ffffff; padding: 24px; }
+.farmTrashIcon { width: 48px; height: 48px; border-radius: 14px; background-color: #fceff0; align-items: center; justify-content: center; }
+.farmModalTitle { color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; margin-top: 20px; margin-bottom: 16px; }
+.farmModalDescription { color: #657e9e; font-size: 16px; line-height: 24px; margin-bottom: 16px; }
+.farmModalNote { color: #657e9e; font-size: 14px; line-height: 21px; margin-bottom: 16px; }
+
+// Photo scan and account-owned scan history.
+.scanScreen { flex: 1; background-color: #eaf0f5; }
+.scanScroll { flex-grow: 1; padding: 16px; padding-top: 4px; padding-bottom: 140px; }
+.scanColumn { width: 100%; max-width: 600px; align-self: center; gap: 14px; }
+.scanHeader { min-height: 64px; flex-direction: row; align-items: center; gap: 8px; }
+.scanBack { width: 40px; min-height: 44px; justify-content: center; align-items: center; }
+.scanTitle { flex: 1; color: #1c2745; font-size: 20px; line-height: 28px; font-weight: 700; }
+.scanHistoryButton { flex-direction: row; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding-left: 8px; padding-right: 8px; border-radius: 12px; background-color: #ffffff; }
+.scanHistoryButtonText { color: #1c2745; font-size: 13px; line-height: 20px; font-weight: 600; }
+.scanContext { min-height: 74px; border-radius: 18px; background-color: #ffffff; padding: 16px; flex-direction: row; align-items: center; gap: 14px; box-shadow: 0px 3px 12px rgba(28, 39, 69, 0.04); elevation: 1; }
+.scanContextIcon { width: 24px; height: 27px; tint-color: #1c2745; }
+.scanContextText { flex: 1; gap: 3px; }
+.scanContextTitle { color: #1c2745; font-size: 16px; line-height: 22px; font-weight: 600; }
+.scanSmall { color: #6a7f9f; font-size: 13px; line-height: 20px; }
+.scanPreviewCard { border-radius: 18px; overflow: hidden; background-color: #ffffff; box-shadow: 0px 4px 14px rgba(28, 39, 69, 0.05); elevation: 2; }
+.scanPreview { width: 100%; height: 210px; background-color: #e2ebe6; }
+.scanImageCaption { padding: 12px; padding-left: 16px; color: #6a7f9f; font-size: 13px; line-height: 20px; }
+.scanRemoveImage { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-radius: 20px; background-color: #ffffff; align-items: center; justify-content: center; }
+.scanEmpty { min-height: 218px; align-items: center; justify-content: center; padding: 24px; gap: 12px; }
+.scanEmptyIcon { width: 62px; height: 62px; border-radius: 22px; align-items: center; justify-content: center; background-color: #e4f6ef; }
+.scanEmptyTitle { color: #1c2745; font-size: 18px; line-height: 26px; font-weight: 700; text-align: center; }
+.scanEmptyDescription { color: #6a7f9f; font-size: 14px; line-height: 22px; text-align: center; max-width: 340px; }
+.scanActions { flex-direction: row; gap: 12px; }
+.scanActionItem { flex: 1; min-width: 0px; }
+.scanButton { min-height: 52px; border-radius: 12px; background-color: #009b72; padding: 13px; flex-direction: row; align-items: center; justify-content: center; gap: 8px; }
+.scanButtonOutline { background-color: #ffffff; border-width: 1px; border-color: #009b72; }
+.scanButtonText { font-size: 15px; line-height: 22px; font-weight: 700; color: #ffffff; text-align: center; flex-shrink: 1; }
+.scanOutlineText { color: #009b72; }
+.scanPressed { opacity: 0.7; }
+.scanDisabled { opacity: 0.5; }
+.scanResult { border-radius: 18px; background-color: #ffffff; padding: 20px; gap: 16px; box-shadow: 0px 4px 14px rgba(28, 39, 69, 0.04); elevation: 1; }
+.scanResultTop { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+.scanAiBadge { flex-direction: row; align-items: center; gap: 6px; padding: 8px; padding-left: 10px; padding-right: 14px; border-radius: 24px; background-color: #cef9e5; align-self: flex-start; }
+.scanAiBadgeText { color: #009b72; font-size: 14px; line-height: 20px; font-weight: 700; }
+.scanResultTitle { color: #1c2745; font-size: 21px; line-height: 29px; font-weight: 700; }
+.scanBody { color: #3c4c65; font-size: 14px; line-height: 23px; }
+.scanDetection { background-color: #f1f8f5; border-radius: 12px; padding: 12px; flex-direction: row; align-items: center; gap: 10px; }
+.scanDetectionInfo { flex: 1; gap: 4px; }
+.scanDetectionName { color: #1c2745; font-size: 15px; line-height: 22px; font-weight: 600; }
+.scanConfidence { color: #009b72; font-size: 17px; line-height: 24px; font-weight: 700; }
+.scanWarning { background-color: #fff1da; border-radius: 12px; border-left-width: 3px; border-left-color: #925311; padding: 12px; gap: 6px; }
+.scanWarningHeading { flex-direction: row; align-items: center; gap: 8px; }
+.scanWarningTitle { color: #925311; font-size: 13px; line-height: 20px; font-weight: 700; flex: 1; }
+.scanWarningText { color: #3c4c65; font-size: 14px; line-height: 22px; }
+.scanFootnote { color: #6a7f9f; font-size: 13px; line-height: 21px; }
+.scanSaved { color: #6a7f9f; font-size: 12px; line-height: 19px; }
+.scanTips { background-color: #f1f8f5; border-radius: 12px; padding: 12px; flex-direction: row; align-items: center; gap: 10px; }
+.scanTipText { flex: 1; color: #3c6b59; font-size: 13px; line-height: 21px; }
+.scanFormat { color: #6a7f9f; font-size: 12px; line-height: 20px; text-align: center; }
+.scanError { background-color: #fff1ec; border-radius: 12px; padding: 14px; flex-direction: row; align-items: flex-start; gap: 8px; }
+.scanErrorText { color: #a13e2c; font-size: 14px; line-height: 22px; flex: 1; }
+.scanHistoryIntro { color: #6a7f9f; font-size: 14px; line-height: 23px; }
+.scanLoading { min-height: 150px; align-items: center; justify-content: center; gap: 12px; }
+.scanHistoryCard { border-radius: 16px; background-color: #ffffff; padding: 14px; flex-direction: row; align-items: center; gap: 12px; }
+.scanThumbnail { width: 72px; height: 80px; border-radius: 12px; overflow: hidden; background-color: #e3eee8; }
+.scanThumbnailImage { width: 100%; height: 100%; }
+.scanHistoryCardBody { flex: 1; gap: 4px; }
+.scanHistoryCardTitle { color: #1c2745; font-size: 15px; line-height: 22px; font-weight: 600; }
+.scanHistoryLink { color: #009b72; font-size: 13px; line-height: 20px; font-weight: 600; }
+.scanPagination { flex-direction: row; align-items: center; gap: 12px; margin-top: 4px; }
+.scanStoredImageBox { height: 240px; background-color: #e2ebe6; }
+.scanStoredImage { width: 100%; height: 100%; }
+.scanImageFallback { flex: 1; align-items: center; justify-content: center; gap: 12px; padding: 8px; }
+
+// Forecast field selector, grouped by the owning farm.
+.forecastPage { flex: 1; background-color: #edf2f7; }
+.forecastScroll { flex-grow: 1; padding: 16px; padding-top: 18px; padding-bottom: 140px; }
+.forecastColumn { width: 100%; max-width: 600px; align-self: center; }
+.forecastHeader { flex-direction: row; align-items: center; gap: 16px; margin-bottom: 8px; }
+.forecastGrow { flex: 1; min-width: 0px; }
+.forecastEyebrow { color: #009f96; font-size: 10px; line-height: 16px; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
+.forecastPageTitle { color: #1c304b; font-size: 28px; line-height: 36px; font-weight: 800; }
+.forecastSubtitle { color: #657e9e; font-size: 13px; line-height: 21px; }
+.forecastRefresh { width: 44px; min-height: 44px; align-items: center; justify-content: center; border-radius: 15px; background-color: #ffffff; border-width: 1px; border-color: #dce7eb; }
+.forecastPressed { opacity: 0.6; }
+.forecastOverview { margin-bottom: 24px; }
+.forecastSummary { color: #657e9e; font-size: 13px; line-height: 22px; }
+.forecastFarm { background-color: #e2edee; border-width: 1px; border-color: #d2e3e3; border-radius: 23px; padding: 12px; margin-bottom: 20px; }
+.forecastFarmHeading { flex-direction: row; align-items: center; gap: 10px; padding: 3px; }
+.forecastFarmIcon { width: 38px; height: 38px; border-radius: 13px; background-color: #f6fcfa; align-items: center; justify-content: center; }
+.forecastFarmName { color: #1c304b; font-size: 17px; line-height: 24px; font-weight: 700; }
+.forecastFarmMeta { color: #5f7d88; font-size: 12px; line-height: 19px; margin-top: 2px; }
+.forecastFarmAddress { flex-direction: row; align-items: flex-start; gap: 5px; padding-left: 4px; padding-right: 4px; margin-top: 9px; }
+.forecastAddressText { flex: 1; color: #657e9e; font-size: 11px; line-height: 17px; }
+.forecastFields { gap: 12px; margin-top: 14px; }
+.forecastField { background-color: #ffffff; border-radius: 17px; padding: 14px; border-width: 1px; border-color: #ffffff; box-shadow: 0px 3px 9px rgba(28, 48, 75, 0.06); elevation: 2; }
+.forecastFieldPressed { border-color: #16cbb8; background-color: #f8fffd; }
+.forecastFieldHeader { flex-direction: row; align-items: center; gap: 10px; margin-bottom: 13px; }
+.forecastSprout { width: 42px; height: 44px; border-radius: 13px; background-color: #e5f5f1; align-items: center; justify-content: center; }
+.forecastSproutImage { width: 23px; height: 25px; tint-color: #00a397; }
+.forecastFieldName { color: #192d42; font-size: 16px; line-height: 23px; font-weight: 700; }
+.forecastFieldMeta { color: #657e9e; font-size: 12px; line-height: 19px; margin-top: 2px; }
+.forecastChevron { width: 26px; height: 30px; align-items: center; justify-content: center; }
+.forecastRisk { flex-direction: row; align-items: center; align-self: flex-start; gap: 6px; border-radius: 20px; padding-top: 6px; padding-bottom: 6px; padding-left: 10px; padding-right: 13px; margin-bottom: 13px; }
+.forecastRiskHigh { background-color: #fff1d9; }
+.forecastRiskLow { background-color: #e6f2e9; }
+.forecastRiskPending { background-color: #edf0f3; }
+.forecastRiskText { font-size: 12px; line-height: 18px; font-weight: 600; flex-shrink: 1; }
+.forecastMetrics { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+.forecastMetric { flex: 1; min-width: 0px; background-color: #f4f7fa; border-radius: 10px; padding: 8px; padding-top: 10px; padding-bottom: 10px; gap: 7px; }
+.forecastMetricWide { flex-basis: 44%; }
+.forecastMetricHeading { align-items: flex-start; gap: 4px; }
+.forecastMetricHeadingWide { flex-direction: row; align-items: center; gap: 5px; }
+.forecastMetricLabel { color: #637a93; font-size: 10px; line-height: 15px; }
+.forecastMetricValue { color: #223950; font-size: 17px; line-height: 25px; font-weight: 700; }
+.forecastMetricUnit { color: #657e9e; font-size: 10px; font-weight: 500; }
+.forecastMissingValue { color: #9baab8; }
+.forecastFieldFooter { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 13px; }
+.forecastTime { flex-direction: row; align-items: center; gap: 5px; flex-shrink: 1; }
+.forecastDot { width: 5px; height: 5px; border-radius: 3px; background-color: #19bda8; }
+.forecastDotMissing { background-color: #a0afba; }
+.forecastTimeText { color: #6b829d; font-size: 10px; line-height: 16px; flex-shrink: 1; }
+.forecastViewLink { color: #009f96; font-size: 11px; line-height: 17px; font-weight: 600; }
+.forecastFarmEmpty { color: #657e9e; font-size: 13px; line-height: 21px; padding: 12px; }
+.forecastInlineError { color: #a13e2c; font-size: 12px; line-height: 19px; padding: 10px; }
+.forecastGuide { flex-direction: row; align-items: flex-start; gap: 8px; padding-left: 3px; padding-right: 3px; margin-top: 2px; }
+.forecastGuideText { flex: 1; color: #657e9e; font-size: 12px; line-height: 20px; }
+.forecastDataNote { color: #8294a9; font-size: 10px; line-height: 17px; margin-top: 12px; padding-left: 3px; }
+.forecastLoading { min-height: 220px; align-items: center; justify-content: center; gap: 14px; }
+.forecastEmpty { background-color: #ffffff; border-radius: 20px; padding: 26px; gap: 14px; align-items: center; margin-top: 24px; }
+.forecastEmptyIcon { width: 62px; height: 62px; border-radius: 20px; background-color: #e5f5f1; align-items: center; justify-content: center; }
+.forecastEmptyTitle { color: #1c304b; font-size: 18px; line-height: 26px; font-weight: 700; text-align: center; }
+.forecastEmptyText { color: #657e9e; font-size: 14px; line-height: 22px; text-align: center; }
+.forecastAction { min-height: 48px; padding: 12px; padding-left: 24px; padding-right: 24px; border-radius: 13px; background-color: #009f96; align-items: center; justify-content: center; }
+.forecastActionText { color: #ffffff; font-size: 14px; line-height: 21px; font-weight: 700; }
+
+// Forecast detail: saved risk, related readings and follow-up guidance.
+.forecastDetailPage { flex: 1; background-color: #e9eef4; }
+.forecastDetailScroll { flex-grow: 1; padding: 16px; padding-top: 0px; padding-bottom: 140px; }
+.forecastDetailColumn { width: 100%; max-width: 600px; align-self: center; gap: 14px; }
+.forecastDetailHeader { min-height: 68px; flex-direction: row; align-items: center; gap: 8px; }
+.forecastDetailBack { width: 40px; min-height: 44px; align-items: center; justify-content: center; }
+.forecastDetailPageTitle { flex: 1; color: #1d2946; font-size: 20px; line-height: 28px; font-weight: 700; }
+.forecastDetailCard { background-color: #ffffff; border-radius: 18px; padding: 18px; gap: 13px; box-shadow: 0px 3px 12px rgba(29, 41, 70, 0.04); elevation: 1; }
+.forecastDetailSummaryTop { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.forecastDetailBadge { align-self: flex-start; flex-direction: row; align-items: center; gap: 5px; border-radius: 18px; padding-top: 5px; padding-bottom: 5px; padding-left: 9px; padding-right: 11px; }
+.forecastDetailBadgeText { font-size: 12px; line-height: 19px; font-weight: 600; flex-shrink: 1; }
+.forecastDetailReadState { flex-direction: row; align-items: center; gap: 5px; }
+.forecastDetailReadDot { width: 5px; height: 5px; border-radius: 3px; background-color: #1fb8ac; }
+.forecastDetailReadText { color: #19a99f; font-size: 11px; line-height: 18px; }
+.forecastDetailSummaryTitle { color: #1d2946; font-size: 18px; line-height: 26px; font-weight: 700; }
+.forecastDetailTimeRow { flex-direction: row; align-items: center; gap: 8px; }
+.forecastDetailBody { color: #34435f; font-size: 14px; line-height: 23px; }
+.forecastDetailMuted { color: #7789a7; font-size: 12px; line-height: 20px; flex-shrink: 1; }
+.forecastDetailHeading { color: #1d2946; font-size: 17px; line-height: 25px; font-weight: 700; }
+.forecastDetailSectionTitle { color: #1d2946; font-size: 19px; line-height: 27px; font-weight: 700; margin-top: 3px; }
+.forecastDetailPlot { background-color: #ffffff; border-radius: 17px; padding: 17px; flex-direction: row; align-items: center; gap: 12px; box-shadow: 0px 3px 12px rgba(29, 41, 70, 0.04); elevation: 1; }
+.forecastDetailPlant { width: 24px; height: 28px; tint-color: #11aca1; }
+.forecastDetailPlotName { color: #25334d; font-size: 15px; line-height: 23px; font-weight: 600; margin-bottom: 3px; }
+.forecastDetailSeasonLine { color: #7789a7; font-size: 12px; line-height: 20px; }
+.forecastDetailSeasonOptions { flex-direction: row; gap: 8px; padding-bottom: 2px; }
+.forecastDetailSeasonChip { min-height: 42px; border-radius: 12px; padding: 10px; padding-left: 14px; padding-right: 14px; background-color: #ffffff; border-width: 1px; border-color: #dbe3ed; justify-content: center; }
+.forecastDetailSeasonSelected { background-color: #e0f6ee; border-color: #42b69a; }
+.forecastDetailSeasonText { color: #657e9e; font-size: 12px; line-height: 20px; }
+.forecastDetailSeasonTextSelected { color: #168067; font-weight: 600; }
+.forecastDetailMetadata { gap: 9px; padding-top: 2px; }
+.forecastDetailMetaRow { flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.forecastDetailMetaValue { color: #34435f; font-size: 12px; line-height: 20px; font-weight: 600; flex-shrink: 1; text-align: right; }
+.forecastDetailReadings { flex-direction: row; flex-wrap: wrap; background-color: #ffffff; border-radius: 17px; overflow: hidden; }
+.forecastDetailReading { width: 50%; padding: 15px; padding-top: 17px; padding-bottom: 17px; gap: 6px; }
+.forecastDetailReadingFull { width: 100%; }
+.forecastDetailReadingBottom { border-bottom-width: 1px; border-bottom-color: #e0e9e8; }
+.forecastDetailReadingLeft { border-left-width: 1px; border-left-color: #e0e9e8; }
+.forecastDetailReadingTitle { flex-direction: row; align-items: center; gap: 6px; }
+.forecastDetailReadingLabel { color: #658084; font-size: 12px; line-height: 20px; flex-shrink: 1; }
+.forecastDetailReadingValue { color: #28595b; font-size: 29px; line-height: 38px; font-weight: 700; }
+.forecastDetailReadingUnit { color: #6d8788; font-size: 12px; line-height: 19px; font-weight: 500; }
+.forecastDetailReadingMissing { color: #9babb8; }
+.forecastDetailReadingTime { color: #7b9194; font-size: 10px; line-height: 17px; }
+.forecastDetailFootnote { color: #7c8eac; font-size: 12px; line-height: 20px; }
+.forecastDetailOutlook { border-radius: 15px; border-left-width: 3px; padding: 16px; gap: 10px; }
+.forecastDetailOutlookHigh { background-color: #fff4e3; border-left-color: #d98b1b; }
+.forecastDetailOutlookLow { background-color: #e8f5ef; border-left-color: #31a580; }
+.forecastDetailOutlookPending { background-color: #f5f7fa; border-left-color: #93a5b9; }
+.forecastDetailOutlookLabel { flex-direction: row; align-items: center; gap: 7px; }
+.forecastDetailOutlookEyebrow { font-size: 11px; line-height: 18px; font-weight: 700; flex: 1; }
+.forecastDetailOutlookTitle { color: #1d2946; font-size: 17px; line-height: 25px; font-weight: 700; }
+.forecastDetailSuggestion { background-color: #ffffff; border-radius: 17px; padding: 15px; flex-direction: row; align-items: center; gap: 12px; }
+.forecastDetailSuggestionIcon { width: 40px; height: 42px; border-radius: 12px; background-color: #f1f4f8; align-items: center; justify-content: center; }
+.forecastDetailSuggestionTitle { color: #24324e; font-size: 14px; line-height: 22px; font-weight: 700; margin-bottom: 3px; }
+.forecastDetailButton { min-height: 52px; padding: 13px; border-radius: 11px; background-color: #1d2946; flex-direction: row; align-items: center; justify-content: center; gap: 9px; }
+.forecastDetailButtonText { color: #ffffff; font-size: 14px; line-height: 23px; font-weight: 700; text-align: center; flex-shrink: 1; }
+.forecastDetailButtonOutline { border-width: 1px; border-color: #d3deeb; background-color: #ffffff; }
+.forecastDetailButtonOutlineText { color: #1d2946; }
+.forecastDetailDisabled { opacity: 0.48; }
+.forecastDetailReadReceipt { border-radius: 13px; background-color: #e4f5ee; padding: 14px; flex-direction: row; align-items: center; gap: 9px; }
+.forecastDetailReadReceiptText { flex: 1; color: #23785e; font-size: 13px; line-height: 21px; }
+.forecastDetailError { background-color: #fff0e9; border-radius: 12px; padding: 13px; flex-direction: row; align-items: flex-start; gap: 8px; }
+.forecastDetailErrorText { color: #a15335; font-size: 13px; line-height: 21px; flex: 1; }
+.forecastDetailHistory { background-color: #ffffff; border-radius: 17px; padding: 16px; }
+.forecastDetailHistoryToggle { min-height: 44px; flex-direction: row; align-items: center; gap: 10px; }
+.forecastDetailHistoryList { gap: 12px; padding-top: 14px; }
+.forecastDetailHistoryItem { border-width: 1px; border-color: #e0e7ee; border-radius: 12px; overflow: hidden; }
+.forecastDetailHistoryRow { min-height: 64px; padding: 12px; flex-direction: row; align-items: center; gap: 10px; }
+.forecastDetailHistoryTitle { color: #34435f; font-size: 13px; line-height: 21px; font-weight: 600; }
+.forecastDetailHistoryBody { padding: 12px; padding-top: 0px; gap: 8px; }
+.forecastDetailPagination { flex-direction: row; gap: 10px; }
+.forecastDetailReadingsHeader { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.forecastDetailReadingsRefresh { min-height: 44px; padding: 9px; padding-left: 12px; padding-right: 12px; border-radius: 12px; background-color: #ffffff; flex-direction: row; align-items: center; justify-content: center; gap: 7px; }
+.forecastDetailRefreshText { color: #15998f; font-size: 13px; line-height: 21px; font-weight: 600; }
+
+// IoT forecast notifications: a focused inbox separate from follow-up tasks.
+.noticePage { flex: 1; background-color: #e9eef4; }
+.noticeScroll { padding: 10px; padding-bottom: 132px; }
+.noticeColumn { width: 100%; max-width: 560px; align-self: center; gap: 10px; }
+.noticeHeader { min-height: 38px; flex-direction: row; align-items: center; gap: 8px; }
+.noticeBack { width: 38px; min-height: 42px; align-items: flex-start; justify-content: center; }
+.noticePageTitle { flex: 1; color: #1d2946; font-size: 20px; line-height: 28px; font-weight: 700; }
+.noticeFilterIcon { width: 40px; height: 40px; align-items: center; justify-content: center; }
+.noticeTabs { flex-direction: row; gap: 7px; margin-top: 7px; }
+.noticeTab { flex: 1; min-height: 38px; border-width: 1px; border-color: #d5dedf; border-radius: 24px; background-color: #ffffff; align-items: center; justify-content: center; }
+.noticeTabSelected { background-color: #1d2946; border-color: #1d2946; }
+.noticeTabText { color: #6a7e9a; font-size: 12px; line-height: 18px; font-weight: 600; }
+.noticeTabTextSelected { color: #ffffff; }
+.noticeSubheader { min-height: 30px; flex-direction: row; align-items: center; justify-content: space-between; margin-top: 4px; }
+.noticeNewest { color: #788ca7; font-size: 11px; line-height: 17px; }
+.noticeMarkAll { color: #009f76; font-size: 11px; line-height: 18px; font-weight: 700; }
+.noticeMarkAllDisabled { opacity: 0.45; }
+.noticeCard { min-height: 112px; flex-direction: row; align-items: flex-start; gap: 10px; padding: 13px; border-radius: 15px; background-color: #ffffff; box-shadow: 0px 3px 12px rgba(29, 41, 70, 0.06); elevation: 1; }
+.noticePressed { opacity: 0.82; }
+.noticeIcon { width: 28px; height: 28px; border-radius: 8px; align-items: center; justify-content: center; }
+.noticeIconHigh { background-color: #fff0dc; }
+.noticeIconData { background-color: #d9f6eb; }
+.noticeContent { flex: 1; gap: 5px; }
+.noticeTitleRow { flex-direction: row; align-items: flex-start; gap: 7px; }
+.noticeTitle { flex: 1; color: #1d2946; font-size: 13px; line-height: 19px; font-weight: 700; }
+.noticeDot { width: 7px; height: 7px; margin-top: 5px; border-radius: 4px; background-color: #009f76; }
+.noticeMessage { color: #4e607e; font-size: 12px; line-height: 19px; }
+.noticeMeta { color: #788ca7; font-size: 11px; line-height: 17px; }
+.noticeFootnote { color: #788ca7; font-size: 10px; line-height: 16px; margin-top: 1px; }
+.noticeError { flex-direction: row; align-items: center; gap: 8px; padding: 11px; border-radius: 12px; background-color: #fff0e9; }
+.noticeErrorText { flex: 1; color: #9d5037; font-size: 12px; line-height: 18px; }
+.noticeLoading { min-height: 190px; align-items: center; justify-content: center; gap: 12px; }
+.noticeEmpty { min-height: 210px; align-items: center; justify-content: center; gap: 11px; padding: 22px; border-radius: 16px; background-color: #ffffff; margin-top: 10px; }
+.noticeEmptyTitle { color: #1d2946; font-size: 16px; line-height: 23px; font-weight: 700; text-align: center; }
+.noticeEmptyText { color: #70839e; font-size: 12px; line-height: 19px; text-align: center; }
+.noticeForecastAction { min-height: 42px; padding: 10px; padding-left: 20px; padding-right: 20px; border-radius: 12px; background-color: #1d2946; align-items: center; justify-content: center; margin-top: 3px; }
+.noticeForecastActionText { color: #ffffff; font-size: 12px; line-height: 19px; font-weight: 700; }
+
+// Home dashboard: rice field, connection notice and a calm sensor overview.
+.homePage { flex: 1; background-color: #ffffff; }
+.homeScroll { padding: 20px; padding-top: 18px; padding-bottom: 128px; }
+.homeColumn { width: 100%; max-width: 480px; align-self: center; }
+.homeGrow { flex: 1; min-width: 0px; }
+.homeHeader { flex-direction: row; align-items: center; gap: 12px; }
+.homeBrandRow { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 6px; row-gap: 3px; margin-bottom: 7px; }
+.homeBrandIcon { width: 15px; height: 15px; tint-color: #248233; }
+.homeBrand { color: #248233; font-size: 12px; line-height: 18px; letter-spacing: 1.6px; font-weight: 700; }
+.homeDate { color: #597172; font-size: 11px; line-height: 18px; flex-shrink: 1; }
+.homeGreeting { color: #193234; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.5px; }
+.homeNotification { width: 48px; height: 48px; border-radius: 24px; background-color: #f4f7f3; align-items: center; justify-content: center; }
+.homeTagline { color: #597172; font-size: 14px; line-height: 22px; margin-top: 6px; margin-bottom: 24px; }
+.homeFieldCard { border-width: 1px; border-color: #e0e8de; border-radius: 17px; overflow: hidden; background-color: #ffffff; margin-bottom: 24px; }
+.homeFieldPhoto { height: 112px; background-color: #dbe8d7; }
+.homeFieldImage { width: 100%; height: 100%; }
+.homeFieldBadge { position: absolute; top: 12px; left: 12px; background-color: #f0f8e9; border-radius: 18px; padding: 7px; padding-left: 10px; padding-right: 10px; flex-direction: row; align-items: center; gap: 6px; }
+.homeFieldBadgeText { color: #248233; font-size: 11px; line-height: 17px; font-weight: 600; }
+.homeFieldInfo { flex-direction: row; align-items: center; gap: 12px; padding: 14px; }
+.homeFarmName { color: #597172; font-size: 12px; line-height: 19px; margin-bottom: 2px; }
+.homeFieldName { color: #193234; font-size: 20px; line-height: 28px; font-weight: 700; margin-bottom: 4px; }
+.homeLocationRow { flex-direction: row; align-items: center; gap: 6px; }
+.homeLocation { color: #597172; font-size: 13px; line-height: 21px; flex-shrink: 1; }
+.homeFieldChevron { width: 44px; height: 44px; border-radius: 13px; background-color: #f4f7f2; align-items: center; justify-content: center; }
+.homeAlert { border-width: 1px; border-color: #f5cfca; background-color: #fff2f0; border-radius: 17px; padding: 13px; flex-direction: row; align-items: flex-start; gap: 10px; margin-bottom: 26px; }
+.homeAlertTitle { color: #bd3030; font-size: 14px; line-height: 21px; font-weight: 700; margin-bottom: 3px; }
+.homeAlertBody { color: #597172; font-size: 12px; line-height: 18px; }
+.homeAlertFooter { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.homeAlertTag { border-radius: 5px; background-color: #fde4df; padding: 3px; padding-left: 6px; padding-right: 6px; }
+.homeAlertTagText { color: #a3423b; font-size: 9px; line-height: 14px; font-weight: 600; letter-spacing: 0.5px; }
+.homeInline { flex-direction: row; align-items: center; gap: 5px; }
+.homeAlertAction { color: #bd3030; font-size: 12px; line-height: 19px; font-weight: 700; }
+.homeSectionHeader { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; column-gap: 8px; row-gap: 5px; }
+.homeSectionTitle { color: #193234; font-size: 20px; line-height: 28px; font-weight: 700; flex-shrink: 1; }
+.homeConnection { flex-direction: row; align-items: center; gap: 4px; }
+.homeConnectionText { color: #248233; font-size: 11px; line-height: 18px; font-weight: 600; }
+.homeUpdated { color: #597172; font-size: 13px; line-height: 21px; margin-top: 10px; margin-bottom: 12px; }
+.homeMetrics { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+.homeMetric { flex-basis: 42%; flex-grow: 1; min-width: 0px; border-width: 1px; border-color: #e1e8de; background-color: #f5f8f4; border-radius: 17px; padding: 16px; min-height: 124px; }
+.homeMetricFull { flex-basis: 100%; }
+.homeMetricHeading { flex-direction: row; align-items: center; gap: 7px; margin-bottom: 8px; }
+.homeMetricLabel { color: #597172; font-size: 12px; line-height: 19px; flex: 1; }
+.homeMetricValue { color: #193234; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.5px; }
+.homeMetricUnit { color: #597172; font-size: 12px; font-weight: 400; letter-spacing: 0px; }
+.homeMetricStatus { color: #248233; font-size: 11px; line-height: 18px; margin-top: 4px; }
+.homeForecastLink { margin-top: 20px; border-width: 1px; border-color: #e1e8de; border-radius: 17px; padding: 14px; flex-direction: row; align-items: center; gap: 12px; }
+.homeForecastIcon { width: 42px; height: 42px; border-radius: 13px; background-color: #edf5e9; align-items: center; justify-content: center; }
+.homeForecastTitle { color: #193234; font-size: 14px; line-height: 22px; font-weight: 700; }
+.homeForecastBody { color: #597172; font-size: 12px; line-height: 19px; margin-top: 2px; }
+.homeFootnote { color: #768778; font-size: 11px; line-height: 18px; text-align: center; margin-top: 13px; }
+.homeSignIn { min-height: 48px; flex-direction: row; align-items: center; justify-content: center; gap: 7px; margin-top: 6px; }
+.homeLinkText { color: #248233; font-size: 13px; line-height: 21px; font-weight: 600; flex-shrink: 1; }
+.homePressed { opacity: 0.76; }
+.homeLoadError { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: -12px; margin-bottom: 14px; }
+.homeLoadErrorText { color: #597172; font-size: 12px; line-height: 20px; flex: 1; }
+.homeRetry { min-height: 44px; justify-content: center; padding-left: 8px; padding-right: 8px; }
+.homeModal { flex: 1; justify-content: flex-end; }
+.homeBackdrop { position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; background-color: rgba(19, 40, 30, 0.4); }
+.homeSheet { background-color: #ffffff; border-top-left-radius: 26px; border-top-right-radius: 26px; max-height: 85%; width: 100%; max-width: 520px; align-self: center; }
+.homeSheetHandle { width: 38px; height: 4px; border-radius: 2px; background-color: #d8e1d5; align-self: center; margin-top: 10px; }
+.homeSheetHeader { flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding: 20px; padding-top: 6px; padding-bottom: 6px; }
+.homeIconButton { width: 44px; height: 44px; align-items: center; justify-content: center; }
+.homeSheetContent { padding: 20px; padding-top: 4px; padding-bottom: 24px; }
+.homeSheetDescription { color: #597172; font-size: 13px; line-height: 21px; }
+.homeFarmChoices { gap: 8px; padding-top: 16px; padding-bottom: 16px; }
+.homeFarmChoice { border-width: 1px; border-color: #e1e8de; border-radius: 14px; min-height: 44px; padding: 10px; padding-left: 13px; padding-right: 13px; flex-direction: row; align-items: center; gap: 7px; }
+.homeFarmChoiceSelected { background-color: #edf6e9; border-color: #9cc48d; }
+.homeFarmChoiceText { color: #597172; font-size: 13px; line-height: 21px; }
+.homeFarmChoiceTextSelected { color: #248233; font-weight: 600; }
+.homePlotChoice { padding: 14px; min-height: 72px; border-width: 1px; border-color: #e1e8de; border-radius: 16px; flex-direction: row; align-items: center; gap: 12px; margin-bottom: 10px; }
+.homePlotChoiceSelected { border-color: #9cc48d; background-color: #f5f9f2; }
+.homePlotChoiceTitle { color: #193234; font-size: 16px; line-height: 24px; font-weight: 600; }
+.homePlotIcon { width: 25px; height: 25px; tint-color: #248233; }
+.homeSheetLoading { padding: 20px; }
+.homeSheetEmpty { align-items: center; padding: 20px; gap: 10px; }
+.homeSheetAction { min-height: 48px; padding: 12px; border-radius: 14px; background-color: #edf6e9; flex-direction: row; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+.homeSensorNotice { padding: 14px; background-color: #f0f7ec; border-radius: 14px; flex-direction: row; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+.homeSensorNoticeText { color: #597172; font-size: 13px; line-height: 21px; flex: 1; }
+.homeSensorRow { padding-top: 14px; padding-bottom: 14px; border-bottom-width: 1px; border-bottom-color: #e7ede4; flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.homeSensorName { color: #193234; font-size: 14px; line-height: 22px; }
+.homeSensorStatus { color: #248233; font-size: 12px; line-height: 22px; }
+
+// Account, personal information and the editable profile.
+.profilePage { flex: 1; background-color: #e8eef4; }
+.profileKeyboard { flex: 1; }
+.profileScroll { padding: 16px; padding-top: 4px; padding-bottom: 124px; }
+.profileColumn { width: 100%; max-width: 480px; align-self: center; gap: 16px; }
+.profileHeader { min-height: 62px; flex-direction: row; align-items: center; gap: 8px; }
+.profileHeaderButton { width: 44px; min-height: 48px; align-items: center; justify-content: center; }
+.profileTitle { color: #1d2848; font-size: 20px; line-height: 28px; font-weight: 700; flex: 1; }
+.profileGrow { flex: 1; min-width: 0px; }
+.profileIdentity { background-color: #ffffff; border-radius: 22px; padding: 22px; flex-direction: row; align-items: center; gap: 16px; box-shadow: 0px 4px 14px rgba(29, 40, 72, 0.04); elevation: 1; }
+.profileIdentityName { color: #1d2848; font-size: 22px; line-height: 30px; font-weight: 700; }
+.profileIdentityEmail { color: #4e5f7c; font-size: 13px; line-height: 21px; margin-top: 4px; }
+.profileAvatar { width: 64px; height: 64px; border-radius: 32px; background-color: #cef9e5; align-items: center; justify-content: center; }
+.profileAvatarLarge { width: 82px; height: 82px; border-radius: 41px; }
+.profileAvatarImage { width: 100%; height: 100%; border-radius: 44px; }
+.profileAvatarInitial { color: #009c73; font-size: 28px; line-height: 38px; font-weight: 700; }
+.profileAvatarInitialLarge { font-size: 34px; line-height: 44px; }
+.profileAvatarCamera { position: absolute; right: 0px; bottom: 0px; width: 27px; height: 27px; border-radius: 14px; border-width: 3px; border-color: #ffffff; background-color: #1d2848; align-items: center; justify-content: center; }
+.profileCard { background-color: #ffffff; border-radius: 22px; padding: 20px; box-shadow: 0px 4px 14px rgba(29, 40, 72, 0.04); elevation: 1; }
+.profileCardTitle { color: #1d2848; font-size: 18px; line-height: 26px; font-weight: 700; margin-bottom: 12px; }
+.profileSetting { min-height: 66px; padding-top: 13px; padding-bottom: 13px; flex-direction: row; align-items: center; gap: 12px; }
+.profileSettingBorder { border-bottom-width: 1px; border-bottom-color: #e2e8f0; }
+.profileSettingIcon { width: 36px; height: 36px; border-radius: 11px; background-color: #f3f6fa; align-items: center; justify-content: center; }
+.profileSettingTitle { color: #1d2848; font-size: 14px; line-height: 22px; font-weight: 600; flex-shrink: 1; }
+.profileSettingSubtitle { color: #7789aa; font-size: 12px; line-height: 19px; margin-top: 3px; }
+.profilePressed { opacity: 0.7; }
+.profileButton { min-height: 52px; padding: 13px; border-radius: 12px; background-color: #1d2848; flex-direction: row; align-items: center; justify-content: center; gap: 8px; }
+.profileButtonOutline { border-width: 1px; border-color: #d3deed; background-color: #ffffff; }
+.profileButtonDanger { border-width: 1px; border-color: #c63434; background-color: #ffffff; }
+.profileButtonText { font-size: 14px; line-height: 22px; font-weight: 700; text-align: center; flex-shrink: 1; }
+.profileDisabled { opacity: 0.5; }
+.profileMuted { color: #7789aa; font-size: 13px; line-height: 21px; }
+.profileBody { color: #536381; font-size: 14px; line-height: 23px; }
+.profileFootnote { color: #7789aa; font-size: 12px; line-height: 20px; }
+.profileNotice { background-color: #fff1ef; border-radius: 12px; padding: 12px; flex-direction: row; align-items: flex-start; gap: 9px; margin-bottom: 10px; }
+.profileNoticeText { color: #b83d3a; font-size: 13px; line-height: 21px; flex: 1; }
+.profilePersonalHero { align-items: center; gap: 10px; margin-bottom: 20px; }
+.profilePersonalName { color: #1d2848; font-size: 21px; line-height: 29px; font-weight: 700; text-align: center; }
+.profileFacts { gap: 3px; }
+.profileFact { min-height: 74px; flex-direction: row; align-items: center; gap: 12px; padding-top: 10px; padding-bottom: 10px; }
+.profileFactLabel { color: #7789aa; font-size: 12px; line-height: 20px; margin-bottom: 4px; }
+.profileFactValue { color: #293753; font-size: 15px; line-height: 24px; font-weight: 500; }
+.profileAvatarAction { align-items: center; gap: 18px; padding-top: 3px; padding-bottom: 24px; }
+.profileAvatarActionText { color: #18afa3; font-size: 13px; line-height: 21px; font-weight: 600; }
+.profileFormIntro { color: #7789aa; font-size: 12px; line-height: 20px; margin-bottom: 15px; }
+.profileField { margin-bottom: 15px; }
+.profileFieldLabel { color: #536381; font-size: 12px; line-height: 20px; margin-bottom: 7px; }
+.profileRequired { color: #536381; }
+.profileInputRow { min-height: 49px; flex-direction: row; align-items: center; gap: 10px; padding-left: 13px; padding-right: 11px; border-width: 1px; border-color: #d4dfed; background-color: #f4f6fa; border-radius: 12px; }
+.profileInputFocused { border-color: #18afa3; background-color: #ffffff; }
+.profileInputReadOnly { background-color: #edf1f6; border-color: #dce4ed; }
+.profileReadOnlyText { color: #7a8ba5; }
+.profileInputError { border-color: #d94b4b; background-color: #ffffff; }
+.profileInput { flex: 1; min-width: 0px; padding-top: 12px; padding-bottom: 12px; color: #293753; font-size: 14px; line-height: 22px; }
+.profileFieldError { color: #cb4141; font-size: 12px; line-height: 20px; margin-top: 6px; }
+.profileSuccess { align-items: center; gap: 13px; padding-top: 16px; padding-bottom: 20px; }
+.profileSuccessIcon { width: 60px; height: 60px; border-radius: 30px; align-items: center; justify-content: center; background-color: #e5f5f1; margin-bottom: 4px; }
+.profileLoading { padding: 28px; }
+.profileModal { flex: 1; justify-content: flex-end; }
+.profileBackdrop { position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; background-color: rgba(29, 40, 72, 0.38); }
+.profileSheet { width: 100%; max-width: 520px; max-height: 82%; align-self: center; border-top-left-radius: 23px; border-top-right-radius: 23px; background-color: #ffffff; }
+.profileSheetHandle { width: 38px; height: 4px; border-radius: 2px; background-color: #ccd7e5; align-self: center; margin-top: 11px; }
+.profileSheetContent { padding: 20px; padding-top: 18px; gap: 10px; }
+.profileToggleRow { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding-top: 12px; padding-bottom: 12px; }
+.profileLanguage { min-height: 56px; flex-direction: row; align-items: center; justify-content: space-between; }
+.profileAbout { align-items: center; gap: 13px; padding-bottom: 15px; }
+.profileAboutIcon { width: 64px; height: 64px; border-radius: 20px; background-color: #e5f5f1; align-items: center; justify-content: center; }
+.profileReportsIntro { align-items: center; gap: 12px; padding-top: 5px; padding-bottom: 20px; }
+.profileReportRow { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-top: 16px; padding-bottom: 16px; border-bottom-width: 1px; border-bottom-color: #e2e8f0; }
+.profileReportValue { color: #1d2848; font-size: 20px; line-height: 28px; font-weight: 700; }
+
+// Field reports: filters, four independent sensor charts and export preview.
+.reportPlotSelect { background-color: #ffffff; border-radius: 18px; padding: 17px; flex-direction: row; align-items: center; gap: 13px; box-shadow: 0px 4px 12px rgba(29, 40, 72, 0.05); elevation: 1; }
+.reportPlotName { color: #293753; font-size: 14px; line-height: 22px; font-weight: 600; }
+.reportMuted { color: #7b8dac; font-size: 12px; line-height: 20px; flex-shrink: 1; }
+.reportPeriodLabel { color: #7b8dac; font-size: 12px; line-height: 20px; margin-bottom: 8px; }
+.reportPeriodSelect { background-color: #ffffff; border-radius: 13px; padding: 15px; min-height: 52px; flex-direction: row; align-items: center; gap: 10px; }
+.reportPeriodValue { color: #34415e; font-size: 12px; line-height: 20px; flex: 1; }
+.reportAsOf { flex-direction: row; align-items: flex-start; gap: 8px; margin-top: -4px; }
+.reportCard { border-radius: 19px; padding: 16px; background-color: #ffffff; box-shadow: 0px 4px 12px rgba(29, 40, 72, 0.04); elevation: 1; }
+.reportCardHeading { flex-direction: row; align-items: center; justify-content: space-between; gap: 9px; margin-bottom: 10px; }
+.reportCardTitle { color: #25314e; font-size: 17px; line-height: 25px; font-weight: 700; flex-shrink: 1; }
+.reportIconAction { width: 40px; min-height: 40px; align-items: center; justify-content: center; }
+.reportEnvironmentChart { padding-top: 16px; padding-bottom: 13px; border-bottom-width: 1px; border-bottom-color: #e2eaf3; }
+.reportLegend { flex-direction: row; align-items: center; gap: 6px; }
+.reportLegendLine { width: 12px; height: 3px; border-radius: 2px; }
+.reportChartLabel { color: #7b8dac; font-size: 10px; line-height: 17px; flex-shrink: 1; }
+.reportChartBody { flex-direction: row; gap: 7px; margin-top: 14px; }
+.reportYAxis { width: 29px; height: 94px; justify-content: space-between; }
+.reportAxisText { color: #8191ae; font-size: 9px; line-height: 15px; }
+.reportChartGrow { flex: 1; min-width: 0px; }
+.reportPlot { height: 94px; }
+.reportGridLine { position: absolute; left: 0px; right: 0px; height: 1px; background-color: #e3ebf5; }
+.reportChartSegment { position: absolute; height: 2px; border-radius: 1px; }
+.reportChartDot { position: absolute; width: 4px; height: 4px; border-radius: 2px; }
+.reportXAxis { flex-direction: row; justify-content: space-between; gap: 1px; margin-top: 10px; min-height: 18px; }
+.reportChartCaption { color: #7b8dac; font-size: 11px; line-height: 18px; margin-top: 9px; }
+.reportFootnote { color: #7b8dac; font-size: 11px; line-height: 19px; margin-top: 7px; }
+.reportAiStats { flex-direction: row; flex-wrap: wrap; gap: 12px; margin-top: 12px; margin-bottom: 16px; }
+.reportAiStat { flex: 1; min-width: 110px; background-color: #f3f5f9; border-radius: 13px; padding: 15px; gap: 3px; }
+.reportAiCount { color: #24314d; font-size: 30px; line-height: 38px; font-weight: 700; }
+.reportSummaryRow { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 6px; padding-bottom: 6px; }
+.reportSummaryValue { color: #34415e; font-size: 12px; line-height: 20px; font-weight: 600; flex-shrink: 1; }
+.reportLegends { flex-direction: row; flex-wrap: wrap; gap: 16px; margin-top: 13px; }
+.reportRiskChart { flex-direction: row; gap: 7px; margin-top: 14px; }
+.reportRiskYAxis { width: 24px; height: 94px; justify-content: space-between; }
+.reportRiskBars { flex-grow: 1; min-width: 100%; gap: 8px; }
+.reportRiskDay { flex: 1; min-width: 42px; align-items: center; gap: 9px; }
+.reportRiskColumns { height: 94px; width: 100%; flex-direction: row; align-items: flex-end; justify-content: center; gap: 3px; padding-top: 7px; border-top-width: 1px; border-top-color: #e3ebf5; border-bottom-width: 1px; border-bottom-color: #e3ebf5; }
+.reportRiskBar { width: 18px; border-top-left-radius: 2px; border-top-right-radius: 2px; }
+.reportAlertLink { min-height: 49px; padding-top: 13px; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
+.reportAlertLinkText { color: #169f96; font-size: 12px; line-height: 21px; font-weight: 600; flex-shrink: 1; }
+.reportAlertDetail { background-color: #f4f7fa; border-radius: 12px; padding: 13px; gap: 5px; }
+.reportPaper { border-width: 1px; border-color: #d4deed; background-color: #ffffff; border-radius: 9px; padding: 15px; gap: 10px; }
+.reportPaperBrand { color: #17a69c; font-size: 10px; line-height: 17px; font-weight: 700; letter-spacing: 2px; }
+.reportPaperTitle { color: #273551; font-size: 14px; line-height: 23px; font-weight: 700; }
+.reportPaperText { color: #4a5b78; font-size: 12px; line-height: 20px; }
+.reportPaperRule { height: 1px; background-color: #dfe7f1; margin-top: 2px; margin-bottom: 2px; }
+.reportPaperRow { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.reportPaperMuted { color: #7b8dac; font-size: 12px; line-height: 20px; }
+.reportPaperValue { color: #34415e; font-size: 12px; line-height: 20px; font-weight: 600; }
+.reportPaperHeading { color: #34415e; font-size: 14px; line-height: 22px; font-weight: 700; margin-top: 8px; }
+.reportPaperObservation { padding-top: 8px; padding-bottom: 8px; border-bottom-width: 1px; border-bottom-color: #e1e8f1; gap: 5px; }
+.reportPaperConclusion { color: #7b8dac; font-size: 11px; line-height: 19px; margin-top: 3px; }
+.reportPaperFooter { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.reportPaperSmall { color: #8b9ab4; font-size: 9px; line-height: 16px; }
+.reportPreviewLink { min-height: 48px; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; }
+.reportPreviewPage { flex: 1; background-color: #e8eef4; }
+.reportPreviewHeader { flex-direction: row; align-items: center; gap: 8px; padding: 12px; }
+.reportPreviewScroll { padding: 16px; padding-bottom: 36px; }
+.reportExportRow { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+.reportExportItem { flex: 1; min-width: 140px; }
+.reportLoading { background-color: #e5f1ef; border-radius: 17px; padding: 17px; min-height: 96px; flex-direction: row; align-items: center; gap: 14px; }
+.reportEmpty { background-color: #ffffff; border-radius: 19px; padding: 23px; gap: 16px; align-items: stretch; }
+.reportEmptyTitle { color: #293753; font-size: 18px; line-height: 27px; font-weight: 700; text-align: center; }
+.reportEmptyText { color: #7b8dac; font-size: 13px; line-height: 22px; text-align: center; }
+.reportPeriodPresets { flex-direction: row; flex-wrap: wrap; gap: 10px; padding-top: 5px; padding-bottom: 7px; }
+.reportPeriodChip { background-color: #e8f5f1; border-radius: 12px; padding: 11px; padding-left: 16px; padding-right: 16px; min-height: 44px; justify-content: center; }
+.reportPeriodChipText { color: #169f96; font-size: 13px; line-height: 21px; font-weight: 600; }

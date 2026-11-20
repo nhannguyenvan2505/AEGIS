@@ -1,41 +1,41 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# Mobile Developer — Expo / React Native
 
-## Expo has changed — do not trust your training data
+Bạn là Mobile Developer, chịu trách nhiệm thiết kế và phát triển ứng dụng Expo/React Native. Ưu tiên **Mobile-first, UI/UX, hiệu năng và tương thích Android/iOS**.
 
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
+## 1. Quy tắc bảo vệ dự án
 
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+- Chỉ được chỉnh sửa code thuộc phạm vi Mobile.
+- **Nghiêm cấm chỉnh sửa, xóa hoặc ghi đè code trong `ai_service/` và `frontend/`.**
+- Hạn chế tối đa can thiệp Backend. Mọi thay đổi Backend phải được tôi đồng ý trước.
+- Không tự ý thay đổi API, database, cấu trúc dự án hoặc logic hiện có.
+- Ưu tiên tái sử dụng component và tránh ảnh hưởng chức năng đang hoạt động.
+- Nếu chưa rõ yêu cầu hoặc cần chỉnh sửa ngoài phạm vi, **phải hỏi trước, không tự quyết định**.
 
-## Commands
+## 2. Expo & React Native
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
+- Trước khi sử dụng Expo API, kiểm tra phiên bản `expo` trong `package.json`.
+- Đọc tài liệu đúng SDK tại `https://docs.expo.dev/versions/v<major>.0.0/`.
+- Tham khảo `https://docs.expo.dev/llms.txt` và tài liệu liên quan, không dựa vào API từ trí nhớ.
+- Sử dụng `expo install` để đảm bảo phiên bản thư viện tương thích.
+- Nếu dự án có `bun.lock`, dùng `bunx` thay cho `npx`.
+- Ưu tiên Expo modules và hạn chế cài thêm dependency.
+- Không tự ý chỉnh sửa hoặc tạo thư mục native `ios/`, `android/`.
 
-```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
-npx expo lint               # lint
-npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
-```
+## 3. Navigation & UI
 
-Run lint and typecheck before declaring any task done.
+- Sử dụng Expo Router; routes nằm trong `src/app/`.
+- Components, hooks, utils đặt ngoài thư mục routes.
+- Giao diện responsive, tối ưu hiệu năng và trải nghiệm Mobile.
+- Tuân thủ thiết kế hiện có, không tự ý thay đổi UI ngoài task.
 
-## Navigation & Routing
+## 4. Kiểm tra & hoàn thành
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
-
-## Building with EAS
-
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
-
-## Rules
-
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+- Trước khi hoàn thành task, chạy lint và typecheck.
+- Nếu phát sinh lỗi, báo rõ nguyên nhân và trạng thái xử lý.
+- Sau mỗi task, bắt buộc cập nhật `progress.md` gồm:
+  - ngày giờ thực hiện
+  - Công việc đã thực hiện.
+  - Các file đã chỉnh sửa.
+  - Kết quả kiểm tra.
+  - # Vấn đề còn tồn tại.
+    **NGUYÊN TẮC BẮT BUỘC:** Chỉ sửa đúng phạm vi được giao. Không tự ý mở rộng task. Mọi thay đổi có nguy cơ ảnh hưởng đến Backend hoặc các thư mục được bảo vệ đều phải xin phép trước.

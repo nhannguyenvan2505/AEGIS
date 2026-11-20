@@ -4,13 +4,13 @@ Default is inventory only. --apply writes only destination databases, private
 backups and copied uploads. SQLite source files are always opened read-only.
 """
 import argparse
+import copy
 from datetime import datetime,timezone
 from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
 import sqlite3
-import subprocess
 import sys
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -19,6 +19,7 @@ from app.database_config import settings
 from app.repositories.mysql import mysql_repository
 from app.hybrid_pilot import provision,store_key,SCOPES,LAYOUT,PilotConnection
 from app.mongo_delivery import deliver
+from native_tools import mysql_dump
 
 
 def canonical(value): return json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':'),allow_nan=False)
@@ -49,6 +50,37 @@ def sources():
     return result
 
 
+def rename_demo_duplicates(datasets):
+    """Explicit opt-in: preserve UUID/ownership and rename only duplicate demo emails."""
+    owners={}
+    for path,data in datasets.items():
+        for row in data.get('users',[]):
+            owners.setdefault(row['id'],[]).append((path,row))
+    def priority(entry):
+        path,_=entry
+        return (0 if path.parent.name=='instance' else 1 if path.parent.name=='forecast-midterm' else 2,str(path))
+    records=sorted((min(entries,key=priority) for entries in owners.values()),key=priority)
+    reserved={row['email'] for _,row in records}
+    seen=set();aliases={}
+    for path,row in records:
+        email=row['email']
+        if email not in seen:
+            seen.add(email)
+            continue
+        local,domain=email.rsplit('@',1)
+        suffix='+demo-'+row['id'].replace('-','')[:8]
+        candidate=local[:min(64-len(suffix),254-len(domain)-1-len(suffix))]+suffix+'@'+domain
+        if candidate in reserved:
+            raise RuntimeError('Generated demo email collides; provide a reviewed explicit alias')
+        reserved.add(candidate)
+        aliases[row['id']]=dict(original_email=email,email=candidate,source=str(path))
+    rewritten=copy.deepcopy(datasets)
+    for data in rewritten.values():
+        for row in data.get('users',[]):
+            if row['id'] in aliases: row['email']=aliases[row['id']]['email']
+    return rewritten,aliases
+
+
 def archive(repo,path,table,row,reason):
     payload=canonical(row);key=sha256((str(path)+':'+table+':'+digest(row)).encode()).hexdigest()
     old=repo.one('SELECT row_sha256 FROM legacy_archive WHERE source_key=%s',(key,))
@@ -75,11 +107,39 @@ def migrate_core(repo,path,data,uploads,report):
             collision=repo.one('SELECT external_id FROM users WHERE email=%s',(row['email'],))
             if collision: raise RuntimeError('Email belongs to a different UUID; refusing account merge')
             repo.add_user(row['id'],row['email'],row['password_hash'],row['created_at'])
+    imported_holdings=set()
+    for row in data.get('farm_holdings',[]):
+        actual=repo.owned('farm_holdings',row['id'],row['user_id'])
+        if actual: assert_equal(actual,row,'farm holdings')
+        else:
+            repo.add_holding(row)
+            imported_holdings.add(row['id'])
+        assert_equal(repo.owned('farm_holdings',row['id'],row['user_id']),row,'farm holdings')
+    memberships={row['plot_id']:row for row in data.get('farm_plot_memberships',[])}
     for table,method in [('farm_plots',repo.add_plot),('farm_seasons',repo.add_season),('farm_devices',repo.add_device)]:
         for row in data.get(table,[]):
             actual=repo.owned(table,row['id'],row['user_id'])
             if actual: assert_equal(actual,row,table)
+            elif table=='farm_plots' and row['id'] in memberships:
+                membership=memberships[row['id']]
+                if membership['user_id']!=row['user_id']:
+                    raise RuntimeError('Farm membership owner differs from plot')
+                method(row,farm_id=membership['farm_id'],area_ha=membership['area_ha'])
             else: method(row)
+            if table=='farm_plots' and row['id'] in memberships:
+                expected=memberships[row['id']]
+                current=repo.one('''SELECT h.external_id farm_id,f.area_ha,d.farm_id default_farm
+                    FROM farm_fields f JOIN farms h ON h.farm_id=f.farm_id
+                    LEFT JOIN owner_default_farms d ON d.user_id=f.user_id AND d.farm_id=f.farm_id
+                    WHERE f.external_id=%s AND f.user_id=%s''',(row['id'],repo.uid(row['user_id'])))
+                if current['farm_id']!=expected['farm_id'] or current['area_ha']!=expected['area_ha']:
+                    # An older cutover grouped plots in an automatic placeholder.
+                    # Only move that placeholder's plots into a newly imported farm.
+                    if expected['farm_id'] not in imported_holdings or current['default_farm'] is None or current['area_ha'] is not None:
+                        raise RuntimeError('Existing MySQL farm membership differs; refusing overwrite')
+                    target=repo.pk('farm_holdings',expected['farm_id'],row['user_id'])
+                    repo.execute('UPDATE farm_fields SET farm_id=%s,area_ha=%s WHERE external_id=%s AND user_id=%s',
+                                 (target,expected['area_ha'],row['id'],repo.uid(row['user_id'])))
             assert_equal(repo.owned(table,row['id'],row['user_id']),row,table)
     for row in data.get('farm_cultivation_revisions',[]):
         actual=repo.one('SELECT * FROM api_farm_cultivation_revisions WHERE id=%s',(row['id'],))
@@ -153,7 +213,8 @@ def migrate_core(repo,path,data,uploads,report):
     # Quota is process/runtime state; preserve its source snapshot for audit rather
     # than reviving stale windows from multiple stores in the shared limiter.
     known={'users','sessions','analyses','detections','inference_requests','farm_plots','farm_seasons','farm_devices',
-           'farm_telemetry','farm_assessments','farm_assessment_analyses','farm_cultivation_revisions'}
+           'farm_telemetry','farm_assessments','farm_assessment_analyses','farm_cultivation_revisions',
+           'farm_holdings','farm_plot_memberships'}
     for table,rows in data.items():
         if table not in known:
             for row in rows: archive(repo,path,table,row,'legacy operational metadata snapshot')
@@ -192,7 +253,10 @@ def migrate_scope(repo,path,data,config):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--apply',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--apply',action='store_true')
+    parser.add_argument('--rename-demo-duplicates',action='store_true',help='Keep mobile email and rename colliding demo emails; never merge UUIDs')
+    args=parser.parse_args()
     paths=sources();datasets={path:read(path) for path in paths}
     counts={str(path.relative_to(ROOT)):{name:len(rows) for name,rows in data.items()} for path,data in datasets.items()}
     if not args.apply:
@@ -201,10 +265,7 @@ def main():
     backup.mkdir(parents=True)
     config=dict(settings(),STORAGE_BACKEND='mysql',UPLOAD_DIR=ROOT/'backend'/'mysql-instance'/'uploads')
     config['UPLOAD_DIR'].mkdir(parents=True,exist_ok=True)
-    from verify_databases import COMPOSE
-    dump=subprocess.run(COMPOSE+['exec','-T','mysql','sh','-c','MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --single-transaction --no-tablespaces -u "$MYSQL_USER" aegis'],capture_output=True,timeout=60)
-    if dump.returncode: raise RuntimeError('Pre-migration MySQL backup failed')
-    (backup/'mysql-before.sql').write_bytes(dump.stdout)
+    mysql_dump(config,backup/'mysql-before.sql')
     before={str(path):{suffix:file_hash(Path(str(path)+suffix)) for suffix in ('','-wal','-shm')} for path in paths}
     for path in paths:
         target=backup/(sha256(str(path).encode()).hexdigest()[:12]+'_'+path.name)
@@ -213,11 +274,15 @@ def main():
         try: source.backup(destination)
         finally: source.close();destination.close()
         datasets[path]=read(target)
+    import_datasets,aliases=(rename_demo_duplicates(datasets) if args.rename_demo_duplicates else (datasets,{}))
+    if aliases:
+        (backup/'account-aliases.json').write_text(json.dumps(aliases,indent=2,ensure_ascii=False),encoding='utf-8')
     for path in paths:
         if path.name in SCOPES: provision(config,path.parent)
-    report=dict(source_counts=counts,images={},archived_analyses=0,source_files_unchanged=False,reconciled=False)
+    report=dict(source_counts=counts,images={},archived_analyses=0,source_files_unchanged=False,reconciled=False,
+                renamed_demo_accounts=len(aliases))
     with mysql_repository(config) as repo:
-        for path,data in datasets.items():
+        for path,data in import_datasets.items():
             if path.name not in SCOPES: migrate_core(repo,path,data,config['UPLOAD_DIR'],report)
         for path,data in datasets.items():
             if path.name in SCOPES: migrate_scope(repo,path,data,config)
@@ -229,17 +294,19 @@ def main():
         after={str(path):{suffix:file_hash(Path(str(path)+suffix)) for suffix in ('','-wal','-shm')} for path in paths}
         if before!=after: raise RuntimeError('Source files changed during migration; cutover refused')
         report.update(source_files_unchanged=True,reconciled=True)
-    report['mongo_delivery']=deliver(config,limit=10000)
+    report['mongo_delivery']=(deliver(config,limit=10000) if config.get('MONGO_DELIVERY_ENABLED',True)
+                              else {'enabled':False,'reason':'explicitly disabled; payloads retained in MySQL outbox'})
     with mysql_repository(config) as repo:
         report['mongo_pending']=repo.one("SELECT COUNT(*) total FROM mongo_outbox WHERE status='pending'")['total']
-        report['destination_counts']={name:repo.one('SELECT COUNT(*) total FROM '+name)['total'] for name in ['users','farm_fields','crop_cycles','analysis_runs','disease_detections','mock_hourly_readings','mock_assessments','cultivation_revisions']}
+        report['destination_counts']={name:repo.one('SELECT COUNT(*) total FROM '+name)['total'] for name in ['users','farms','farm_fields','crop_cycles','analysis_runs','disease_detections','mock_hourly_readings','mock_assessments','cultivation_revisions']}
     (backup/'manifest.json').write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
     # Public report contains counts and status only; paths/row content stay private.
     public={k:v for k,v in report.items() if k not in ('images',)}
     public['backup_directory']=str(backup)
     (ROOT/'backend'/'database'/'cutover_report.json').write_text(json.dumps(public,indent=2,ensure_ascii=False),encoding='utf-8')
     print(json.dumps(public,indent=2,ensure_ascii=False))
-    if report['mongo_pending']: raise RuntimeError('Mongo delivery is incomplete; resolve queue before cutover')
+    if report['mongo_pending'] and config.get('MONGO_DELIVERY_ENABLED',True):
+        raise RuntimeError('Mongo delivery is incomplete; resolve queue before cutover')
 
 
 if __name__=='__main__': main()
