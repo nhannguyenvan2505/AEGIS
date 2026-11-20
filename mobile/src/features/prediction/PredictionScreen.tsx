@@ -147,11 +147,11 @@ function SeasonForecast({ season, token }: { season: Named; token: string }) {
   </Card></View>;
 }
 
-export function PredictionScreen({ token }: { token: string }) {
-  const [plot, setPlot] = useState<Named>();
-  const [season, setSeason] = useState<Named>();
+export function PredictionScreen({ token, initialPlot, initialSeason }: { token: string; initialPlot?: Named; initialSeason?: Named }) {
+  const [plot, setPlot] = useState<Named | undefined>(initialPlot);
+  const [season, setSeason] = useState<Named | undefined>(initialSeason);
   if (!plot) return <Selector token={token} select={setPlot} />;
-  return <><Button secondary title={'Đổi ruộng · '+plot.name} onPress={() => { setPlot(undefined); setSeason(undefined); }} />
+  return <>{!initialPlot && <Button secondary title={'Đổi ruộng · '+plot.name} onPress={() => { setPlot(undefined); setSeason(undefined); }} />}
     {!season ? <Selector key={plot.id} token={token} plot={plot.id} select={setSeason} /> :
       <><Button secondary title={'Đổi mùa vụ · '+season.name} onPress={() => setSeason(undefined)} />
         <SeasonForecast key={season.id} token={token} season={season} /></>}

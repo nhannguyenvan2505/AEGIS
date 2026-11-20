@@ -32,3 +32,13 @@ IoT readings and forecasts in the midterm flow are synthetic. See the clone guid
 for model/data limits; field validation and device acceptance remain pending.
 
 Team workflow: issue → task branch → PR into `develop` → independent review → release into `main`. See [CONTRIBUTING.md](CONTRIBUTING.md) for team rules and [GitHub setup](docs/GITHUB_TEAM_SETUP.md) for activation status. Do not push directly to shared branches.
+
+==================
+
+# 1. Bật MySQL
+
+.\backend\.venv\Scripts\python.exe backend/database/setup_native_mysql.py
+
+# 2. Chạy backend
+
+.\backend\.venv\Scripts\python.exe -u -X utf8 -B backend/serve_mobile.py --pilot-dir pilot_data/forecast-midterm

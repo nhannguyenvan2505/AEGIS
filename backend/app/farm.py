@@ -1,5 +1,6 @@
 """Owned farm context, mock telemetry, immutable assessments and image follow-up."""
 import json
+import math
 import re
 import sqlite3
 import uuid
@@ -16,7 +17,7 @@ from .cultivation import (validate_profile, latest_profile, serialize as cultiva
 
 farm = Blueprint('farm', __name__, url_prefix='/api/farm')
 LOCAL_TZ = timezone(timedelta(hours=7))
-TABLES = {'plots': 'farm_plots', 'seasons': 'farm_seasons', 'devices': 'farm_devices', 'assessments': 'farm_assessments'}
+TABLES = {'farms': 'farm_holdings', 'plots': 'farm_plots', 'seasons': 'farm_seasons', 'devices': 'farm_devices', 'assessments': 'farm_assessments'}
 
 
 class FarmError(Exception):
@@ -123,7 +124,7 @@ def owned(db, kind, identifier):
     return row
 
 
-def paginate(db, table, where, params, serialize=dict, order=None, allowed_query=()):
+def paginate(db, table, where, params, serialize=dict, order=None, allowed_query=(), fetch_page=None):
     if isinstance(db, sqlite3.Connection):
         from .repositories.sqlite import SQLiteRepository
         db = SQLiteRepository(db)
@@ -137,7 +138,8 @@ def paginate(db, table, where, params, serialize=dict, order=None, allowed_query
         values.append(int(value))
     page, size = values
     order = order or ('start_at DESC' if table == 'farm_telemetry' else 'created_at DESC, id DESC')
-    total, rows = db.page(table, where, params, size, (page-1)*size, order)
+    total, rows = (fetch_page(size, (page-1)*size) if fetch_page else
+                   db.page(table, where, params, size, (page-1)*size, order))
     pages = (total + size - 1) // size
     return jsonify(success=True, items=[serialize(r) for r in rows],
                    pagination=dict(page=page, page_size=size, total=total, total_pages=pages, has_next=page < pages))
@@ -160,6 +162,99 @@ def within_season(instant, season):
         raise FarmError('outside_season', 'Thời điểm ngoài ngày mùa vụ (UTC+7).')
 
 
+def farm_fields(data):
+    notes = data.get('notes', '')
+    if (not isinstance(notes, str) or len(notes.strip()) > 1000 or
+            any(ord(character) < 32 and character not in '\n\r\t' for character in notes)):
+        raise FarmError('invalid_fields', 'Ghi chú không hợp lệ hoặc dài quá 1.000 ký tự.')
+    return dict(name=text(data['name']), address=text(data['address'], 500),
+                manager=text(data.get('manager', ''), 120, True),
+                notes=notes.strip())
+
+
+def checked_version(data, row):
+    value = data['version']
+    if type(value) is not int or value < 1:
+        raise FarmError('invalid_version', 'Phiên bản nông trại không hợp lệ.')
+    if value != row['version']:
+        raise FarmError('farm_version_conflict', 'Nông trại đã thay đổi. Hãy tải lại trước khi lưu.', 409)
+
+
+@farm.route('/farms', methods=['GET', 'POST'])
+@require_auth
+def holdings():
+    if request.method == 'GET':
+        with connect(current_app.config) as db:
+            db.begin()
+            return paginate(db, 'farm_holdings', 'user_id=?', (g.user['id'],),
+                            db.holding_summary)
+    data = body({'name', 'address'}, {'manager', 'notes'})
+    stamp = now().isoformat()
+    item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], **farm_fields(data),
+                version=1, created_at=stamp, updated_at=stamp)
+    with connect(current_app.config) as db:
+        db.begin(True)
+        db.add_holding(item)
+        result = db.holding_summary(owned(db, 'farms', item['id']))
+    return jsonify(success=True, item=result), 201
+
+
+@farm.route('/farms/<uuid:identifier>', methods=['GET', 'PUT', 'DELETE'])
+@require_auth
+def holding_detail(identifier):
+    data = None
+    if request.method == 'PUT':
+        data = body({'name', 'address', 'version'}, {'manager', 'notes'})
+    elif request.method == 'DELETE':
+        data = body({'version'})
+    with connect(current_app.config) as db:
+        db.begin(data is not None)
+        row = owned(db, 'farms', identifier)
+        if request.method == 'GET':
+            return jsonify(success=True, item=db.holding_summary(row))
+        checked_version(data, row)
+        if request.method == 'DELETE':
+            if db.holding_summary(row)['plot_count']:
+                raise FarmError('farm_not_empty', 'Chỉ có thể xóa nông trại khi chưa có ruộng.', 409)
+            db.delete_holding(str(identifier), g.user['id'])
+            return jsonify(success=True, deleted_id=str(identifier))
+        fields = dict(**farm_fields(data), updated_at=now().isoformat(), id=str(identifier), user_id=g.user['id'])
+        db.update_holding(fields)
+        return jsonify(success=True, item=db.holding_summary(owned(db, 'farms', identifier)))
+
+
+def create_plot(db, data, farm_id=None):
+    size = data.get('area_ha')
+    if size is not None and (type(size) not in (int, float) or not 0 < size <= 1000000 or not math.isfinite(size)):
+        raise FarmError('invalid_area', 'Diện tích phải lớn hơn 0 và không vượt quá 1.000.000 ha.')
+    item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], name=text(data['name']),
+                location_text=text(data.get('location_text', ''), 500, True), created_at=now().isoformat())
+    if farm_id is None:
+        candidate = data.get('farm_id')
+        if candidate is not None:
+            try:
+                candidate = str(uuid.UUID(candidate))
+            except (ValueError, TypeError, AttributeError):
+                raise FarmError('invalid_farm_id', 'Mã nông trại không hợp lệ.')
+            farm_id = owned(db, 'farms', candidate)['id']
+        else:
+            farm_id = None
+    return db.add_plot(item, farm_id=farm_id, area_ha=size)
+
+
+@farm.route('/farms/<uuid:identifier>/plots', methods=['GET', 'POST'])
+@require_auth
+def holding_plots(identifier):
+    data = body({'name'}, {'location_text', 'area_ha'}) if request.method == 'POST' else None
+    with connect(current_app.config) as db:
+        db.begin(data is not None)
+        parent = owned(db, 'farms', identifier)
+        if data is not None:
+            return jsonify(success=True, item=create_plot(db, data, parent['id'])), 201
+        return paginate(db, 'farm_plots', '', (),
+            fetch_page=lambda size, offset: db.holding_plots(g.user['id'], parent['id'], size, offset))
+
+
 @farm.route('/plots', methods=['GET', 'POST'])
 @require_auth
 def plots():
@@ -167,12 +262,12 @@ def plots():
         with connect(current_app.config) as db:
             db.begin()
             return paginate(db, 'farm_plots', 'user_id=?', (g.user['id'],))
-    data = body({'name'}, {'location_text'})
-    item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], name=text(data['name']),
-                location_text=text(data.get('location_text', ''), 500, True), created_at=now().isoformat())
+    data = body({'name'}, {'location_text', 'farm_id', 'area_ha'})
     with connect(current_app.config) as db:
-        db.add_plot(item)
-    return jsonify(success=True, item=item), 201
+        db.begin(True)
+        item = create_plot(db, data)
+    # Keep the legacy create/detail response contract unchanged.
+    return jsonify(success=True, item={key: item[key] for key in ('id', 'user_id', 'name', 'location_text', 'created_at')}), 201
 
 
 @farm.get('/plots/<uuid:identifier>')

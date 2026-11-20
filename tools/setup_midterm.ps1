@@ -53,6 +53,7 @@ try {
     $backendPython = Join-Path $projectRoot 'backend/.venv/Scripts/python.exe'
     Invoke-Checked -Executable $backendPython -TaskArguments @('backend/database/apply_core_runtime.py')
     Invoke-Checked -Executable $backendPython -TaskArguments @('backend/database/apply_hybrid.py')
+    Invoke-Checked -Executable $backendPython -TaskArguments @('backend/database/apply_farm_hierarchy.py')
     if ($IncludeImageAI) {
         $modelArguments = @('tools/provision_midterm_model.py')
         if ($CheckpointPath) { $modelArguments += @('--source',$CheckpointPath) }

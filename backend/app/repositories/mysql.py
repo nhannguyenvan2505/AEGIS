@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import json
 import math
 import sqlite3
+import uuid
 
 
 def open_connection(config):
@@ -60,10 +61,20 @@ def check_schema(config):
         row=repo.one('SELECT status FROM schema_versions WHERE version=4')
         if not row or row['status']!='complete':
             raise RuntimeError('Apply MySQL migration 004_api_semantics.sql before selecting mysql')
+        row=repo.one('SELECT status FROM schema_versions WHERE version=5')
+        if not row or row['status']!='complete':
+            raise RuntimeError('Apply MySQL migration 005_farm_hierarchy.sql before selecting mysql')
 
 
 # Projections expose exactly the UUID/ISO strings expected by the existing API.
 PROJECTIONS = {
+ 'farm_holdings': ('''h.external_id id,u.external_id user_id,h.farm_name name,
+                    COALESCE(h.address,'') address,h.manager,COALESCE(h.description,'') notes,
+                    h.version,h.api_created_at created_at,h.api_updated_at updated_at,
+                    (SELECT COUNT(*) FROM farm_fields p WHERE p.farm_id=h.farm_id AND p.user_id=h.owner_user_id) plot_count,
+                    (SELECT COALESCE(SUM(p.area_ha),0) FROM farm_fields p WHERE p.farm_id=h.farm_id AND p.user_id=h.owner_user_id) area_ha,
+                    (SELECT COUNT(*) FROM farm_fields p WHERE p.farm_id=h.farm_id AND p.user_id=h.owner_user_id AND p.area_ha IS NULL) plots_without_area''',
+                    'farms h JOIN users u ON u.user_id=h.owner_user_id','h.farm_id','h.external_id','u.external_id'),
  'farm_plots': ('''f.external_id id,u.external_id user_id,f.field_name name,f.location_text,
                   f.api_created_at created_at''', 'farm_fields f JOIN users u ON u.user_id=f.user_id', 'f.field_id', 'f.external_id', 'u.external_id'),
  'farm_seasons': ('''c.external_id id,u.external_id user_id,f.external_id plot_id,c.name,c.crop_type crop,
@@ -210,7 +221,9 @@ class MySQLRepository:
         projection, source, _, _, _ = PROJECTIONS[table]
         # Fixed query mappings, never SQL supplied by a request.
         queries = {
+          ('farm_holdings','user_id=?'): ('u.external_id=%s', 'h.api_created_at DESC,h.external_id DESC'),
           ('farm_plots','user_id=?'): ('u.external_id=%s', 'f.api_created_at DESC,f.external_id DESC'),
+          ('farm_seasons','user_id=?'): ('u.external_id=%s', 'c.api_created_at DESC,c.external_id DESC'),
           ('farm_seasons','user_id=? AND plot_id=?'): ('u.external_id=%s AND f.external_id=%s', 'c.api_created_at DESC,c.external_id DESC'),
           ('farm_devices','user_id=? AND season_id=?'): ('u.external_id=%s AND c.external_id=%s', 'd.api_created_at DESC,d.external_id DESC'),
           ('farm_telemetry','device_id=? AND user_id=?'): ('d.external_id=%s AND u.external_id=%s', 't.start_at DESC'),
@@ -227,16 +240,56 @@ class MySQLRepository:
         rows = self.all(f'SELECT {projection} FROM {source} WHERE {condition} ORDER BY {ordering} LIMIT %s OFFSET %s', (*params,size,offset))
         return total,rows
 
-    def add_plot(self, item):
+    def holding_summary(self, row):
+        return dict(row)
+
+    def add_holding(self, item):
+        self.execute('''INSERT INTO farms(external_id,owner_user_id,farm_name,address,manager,description,
+            version,api_created_at,api_updated_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+            (item['id'],self.uid(item['user_id']),item['name'],item['address'],item['manager'],item['notes'],
+             item['version'],item['created_at'],item['updated_at']))
+
+    def update_holding(self, fields):
+        self.execute('''UPDATE farms SET farm_name=%s,address=%s,manager=%s,description=%s,
+            api_updated_at=%s,version=version+1 WHERE external_id=%s AND owner_user_id=%s''',
+            (fields['name'],fields['address'],fields['manager'],fields['notes'],fields['updated_at'],
+             fields['id'],self.uid(fields['user_id'])))
+
+    def delete_holding(self, identifier, user_id):
+        numeric = self.pk('farm_holdings', identifier, user_id)
+        self.execute('DELETE FROM owner_default_farms WHERE farm_id=%s AND user_id=%s', (numeric,self.uid(user_id)))
+        self.execute('DELETE FROM farms WHERE farm_id=%s AND owner_user_id=%s', (numeric,self.uid(user_id)))
+
+    def holding_plots(self, user_id, farm_id, size, offset):
+        projection, source, *_ = PROJECTIONS['farm_plots']
+        source += ' JOIN farms h ON h.farm_id=f.farm_id AND h.owner_user_id=f.user_id'
+        condition = 'u.external_id=%s AND h.external_id=%s'
+        params = (user_id, farm_id)
+        total = self.one(f'SELECT COUNT(*) total FROM {source} WHERE {condition}', params)['total']
+        rows = self.all(f'''SELECT {projection},h.external_id farm_id,f.area_ha FROM {source}
+            WHERE {condition} ORDER BY f.api_created_at DESC,f.external_id DESC LIMIT %s OFFSET %s''', (*params,size,offset))
+        return total, rows
+
+    def add_plot(self, item, farm_id=None, area_ha=None):
         user = self.uid(item['user_id'])
-        row = self.one('SELECT farm_id FROM owner_default_farms WHERE user_id=%s', (user,))
-        if row:
-            farm = row['farm_id']
+        if farm_id is not None:
+            farm = self.pk('farm_holdings', farm_id, item['user_id'])
         else:
-            farm = self.execute('INSERT INTO farms(owner_user_id,farm_name) VALUES (%s,%s)', (user,'API default farm')).lastrowid
-            self.execute('INSERT INTO owner_default_farms VALUES (%s,%s)', (user,farm))
-        self.execute('''INSERT INTO farm_fields(external_id,farm_id,user_id,field_name,crop_type,location_text,api_created_at)
-            VALUES (%s,%s,%s,%s,'rice',%s,%s)''', (item['id'],farm,user,item['name'],item['location_text'],item['created_at']))
+            row = self.one('SELECT farm_id FROM owner_default_farms WHERE user_id=%s', (user,))
+            if row:
+                farm = row['farm_id']
+                farm_id = self.one('SELECT external_id FROM farms WHERE farm_id=%s', (farm,))['external_id']
+            else:
+                farm_id = str(uuid.uuid5(uuid.NAMESPACE_URL, 'aegis:default-farm:' + item['user_id']))
+                existing = self.owned('farm_holdings', farm_id, item['user_id'])
+                if existing is None:
+                    self.add_holding(dict(id=farm_id,user_id=item['user_id'],name='Nông trại của tôi',
+                        address='',manager='',notes='',version=1,created_at=item['created_at'],updated_at=item['created_at']))
+                farm = self.pk('farm_holdings', farm_id, item['user_id'])
+                self.execute('INSERT INTO owner_default_farms VALUES (%s,%s)', (user,farm))
+        self.execute('''INSERT INTO farm_fields(external_id,farm_id,user_id,field_name,crop_type,location_text,api_created_at,area_ha)
+            VALUES (%s,%s,%s,%s,'rice',%s,%s,%s)''', (item['id'],farm,user,item['name'],item['location_text'],item['created_at'],area_ha))
+        return dict(item, farm_id=farm_id, area_ha=area_ha)
 
     def add_season(self, item):
         field = self.pk('farm_plots',item['plot_id'],item['user_id'])
