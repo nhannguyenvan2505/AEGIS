@@ -89,3 +89,4 @@ service-account*.json
 /*_20??????/
 /frontend/evidence/
 /backend/postman/reports/
+/backend/mongo-instance/
