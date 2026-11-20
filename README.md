@@ -6,7 +6,7 @@ Database update 09/11/2026: core/mobile/pilot now default to MySQL with MongoDB 
 
 AI and IoT for rice disease monitoring: rice blast, brown spot and sheath blight.
 
-**Documentation index:** [docs/README.md](docs/README.md) groups every guide, API contract and dated report.
+**Documentation index:** [docs/README.md](docs/README.md) groups every guide, API contract and dated report. Current scope and decisions: [docs/DECISIONS_20261120.md](docs/DECISIONS_20261120.md); full route list: [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
 
 - backend/: Flask API, JWT bearer auth with revocable sessions and farmer/admin RBAC ([contract](backend/docs/JWT_RBAC.md), PR #9), private analyses/history, farm context, forecast and mock warning rules.
 - mobile/: Expo / React Native frontend from Minh-Tam-tgd, integrated with authentication, image detection/history, farm create/list and opt-in pilot follow-up APIs.

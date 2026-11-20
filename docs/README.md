@@ -1,6 +1,6 @@
 # Tài liệu AEGIS — chỉ mục
 
-Cập nhật 20/11/2026. Đọc theo thứ tự: **Bắt đầu** → nhóm tài liệu của phần mình
+Cập nhật 20/11/2026 (sau đợt sửa nhóm 4). Đọc theo thứ tự: **Bắt đầu** → nhóm tài liệu của phần mình
 phụ trách. Tài liệu có ngày trong tên (`*_2026MMDD.md`) là bản ghi tại mốc đó;
 khi mâu thuẫn với tài liệu hiện hành thì theo
 [chỉ mục bàn giao hiện hành](CURRENT_HANDOFF.md).
@@ -13,7 +13,8 @@ khi mâu thuẫn với tài liệu hiện hành thì theo
 | [CURRENT_HANDOFF](CURRENT_HANDOFF.md) | Trạng thái hiện hành, bảng quyết định đang chờ |
 | [Quickstart nhóm](MIDTERM_TEAM_QUICKSTART.md), [CLONE_DEMO](../CLONE_DEMO.md) | Clone, cài đặt và chạy demo |
 | [CONTRIBUTING](../CONTRIBUTING.md) | Quy trình nhánh, PR, review |
-| [AEGIS_PROJECT_STATUS](../AEGIS_PROJECT_STATUS.md) | Nhật ký đầy đủ; đọc tổng quan, mục 124 và 125 trước |
+| [DECISIONS_20261120](DECISIONS_20261120.md) | Phạm vi và quyết định đang áp dụng (D-01…D-08) |
+| [AEGIS_PROJECT_STATUS](../AEGIS_PROJECT_STATUS.md) | Trạng thái tổng hợp (tổng quan, mục 124–126); nhật ký mục 1–123 ở [AEGIS_PROJECT_HISTORY](../AEGIS_PROJECT_HISTORY.md) |
 
 ## Vận hành
 
@@ -24,11 +25,11 @@ khi mâu thuẫn với tài liệu hiện hành thì theo
 | [FORECAST_MVP_MIDTERM](FORECAST_MVP_MIDTERM_20261105.md) | Chạy forecast, seed dữ liệu, tiến thời gian |
 | [OPERATIONS_RECOVERY](OPERATIONS_RECOVERY.md) | Chẩn đoán và phục hồi theo phiên bản |
 | [HANDOFF_MODEL_RUNTIME](HANDOFF_MODEL_RUNTIME.md), [HANDOFF_REPRODUCIBLE](HANDOFF_REPRODUCIBLE.md) | Cấp checkpoint V4, bàn giao không GPU |
-| [SOURCE_HANDOFF_GUIDE](SOURCE_HANDOFF_GUIDE.md) | Những gì được/không được đưa vào Git |
+| [SOURCE_HANDOFF_GUIDE](SOURCE_HANDOFF_GUIDE.md), [ARTIFACT_STORAGE](ARTIFACT_STORAGE.md) | Những gì được/không được đưa vào Git; chia sẻ artifact qua Release |
 
 ## API và contract cho frontend
 
-Contract nằm rải ở nhiều file; bảng dưới gom theo khu vực.
+Bảng đủ 95 route, sinh từ code: [API_REFERENCE](API_REFERENCE.md) (chạy lại `tools/gen_api_reference.py` khi đổi route). Chi tiết request/response nằm ở các contract dưới đây.
 
 | Khu vực | Tài liệu |
 |---|---|

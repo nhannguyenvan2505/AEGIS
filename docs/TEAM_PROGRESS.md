@@ -1,11 +1,14 @@
 # Tiến độ Git/GitHub AEGIS
 
-**Cập nhật 19/11/2026 (hiện hành):**
+**Cập nhật 20/11/2026 (hiện hành):**
 
 | PR | Nhánh → đích | Trạng thái |
 |---|---|---|
 | #9 | `nvn/jwt-rbac` → `nvn/portable-forecast-demo` | Draft; JWT/RBAC + workflow Backend tests; chờ #8 rồi đổi base sang main |
-| #8 | `nvn/portable-forecast-demo` → main | Draft; 252 file; đang xung đột với main, cần gỡ trước khi merge |
+| #8 | `nvn/portable-forecast-demo` → main | Draft; 20/11 đã merge main vào nhánh, hết xung đột; chờ review |
+| #11 | `nvn/outbox-dispatcher` → `nvn/jwt-rbac` | Draft; BE-02 Mongo outbox chạy nền; Auto-fix bật |
+| #12 | `nvn/team-gitflow-rules` → main | Draft; đề xuất Gitflow, chờ cả nhóm review |
+| #10 | `nvn/docs-current-handoff` → `nvn/jwt-rbac` | Draft; tài liệu, quyết định 20/11, API reference |
 | #4 | `feat/3-mobile-integration` → main | Mở từ 25/10, chưa xử lý |
 | #7, #2, #5 | → main | Đã merge (team policy, quy ước, forecast demo) |
 

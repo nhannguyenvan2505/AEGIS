@@ -1,18 +1,22 @@
 # Chỉ mục bàn giao hiện hành — AEGIS
 
-## Trạng thái hiện hành — 19/11/2026
+## Trạng thái hiện hành — 20/11/2026
 
 Đọc bảng này trước. Mọi đoạn có ngày phía dưới là nhật ký theo mốc: câu nào mâu
-thuẫn với bảng này thì bảng này đúng.
+thuẫn với bảng này thì bảng này đúng. Phạm vi và quyết định: [DECISIONS_20261120](DECISIONS_20261120.md).
 
 | Khối | Hiện hành | Nguồn |
 |---|---|---|
-| Auth | JWT HS256 + session digest để thu hồi; RBAC farmer/admin đọc role từ DB. Token opaque cũ không còn hợp lệ. Mã nằm ở PR #9 (draft, xếp chồng lên #8), chưa vào main | [JWT_RBAC](../backend/docs/JWT_RBAC.md), [Must 15/11](MUST_DELIVERY_20261115.md) |
-| Database | MySQL + MongoDB (outbox) mặc định cho core/mobile/pilot từ 09/11; SQLite chỉ còn là fixture test và nguồn khôi phục | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
-| AI ảnh | YOLO11n V4 mặc định (mAP50 ≈ 68,8% validation); candidate chưa promote | [status](../AEGIS_PROJECT_STATUS.md) |
+| Phạm vi | Kết thúc 02/12/2026. Bệnh: Rice Blast, Brown Spot, Sheath Blight. Biến môi trường: nhiệt độ, độ ẩm, leaf wetness. Bắt buộc thêm MQTT/ESP32, deploy cloud, push, xuất PDF/Excel. Bỏ multimodal fusion, OAuth2 | [DECISIONS_20261120](DECISIONS_20261120.md) |
+| Auth | JWT HS256 + session digest để thu hồi; RBAC farmer/admin đọc role từ DB; scrypt. PR #9 (draft) | [JWT_RBAC](../backend/docs/JWT_RBAC.md) |
+| Database | MySQL + MongoDB mặc định. Outbox gửi Mongo bằng dispatcher nền, có trạng thái failed và retry (PR #11, cần migration 5) | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
+| AI ảnh | YOLO11 V4 mặc định. Test 520 ảnh: mAP50 72,7%, mAP50-95 33,7%. Ngưỡng Low Confidence 0,50 | [DECISIONS_20261120](DECISIONS_20261120.md) |
 | Forecast | FM03 phục vụ; T17 không qua gate; dữ liệu toàn bộ synthetic | [status mục 124](../AEGIS_PROJECT_STATUS.md) |
-| CI | `Team policy` trên main từ 17/11 (#7); `Backend tests` nằm trong PR #9, chưa có lượt chạy runner | [TEAM_POLICY_ACTIONS](TEAM_POLICY_ACTIONS.md) |
-| Việc mở / quyết định chờ | Ngưỡng confidence FR09, deadline (02/12 hay 20/12), phạm vi MQTT/push/report/RAG, Rice Hispa, bcrypt/scrypt, benchmark NFR | [rà soát sau demo](POST_DEMO_REVIEW_20261115.md) |
+| API | 95 route, bảng sinh tự động từ code | [API_REFERENCE](API_REFERENCE.md) |
+| CI / PR | `Team policy` trên main; `Backend tests` xanh trên PR #9. PR #8 đã gỡ xung đột với main (20/11). Thứ tự merge: #8 → #9 → #10, #11 | [TEAM_PROGRESS](TEAM_PROGRESS.md) |
+| Hồ sơ môn học | Bộ hồ sơ C1SE.21 đã cập nhật theo quyết định 20/11; thêm SRS, Test Plan, User Guide, Test Report (nháp). Nằm ngoài repo, xem `DANH_MUC.txt` trong thư mục hồ sơ | — |
+| Artifact | Artifact forecast T07–T17 và bằng chứng có ngày không vào Git; chia sẻ qua Release riêng tư | [ARTIFACT_STORAGE](ARTIFACT_STORAGE.md) |
+| Việc mở | Benchmark NFR01, E2E trên thiết bị, 4 hạng mục bắt buộc ở D-04, nhãn Low Confidence trên mobile, mentor xác nhận thay đổi phạm vi | [DECISIONS_20261120](DECISIONS_20261120.md) |
 
 **Phạm vi của link trong repo.** Các thư mục bằng chứng có ngày ở gốc repo
 (`task*_2026…`, `handoff_2026…`, `h*_2026…`, `fm0*_2026…`, `docs/evidence/`…)
