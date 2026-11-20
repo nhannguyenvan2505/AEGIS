@@ -89,3 +89,6 @@ service-account*.json
 /*_20??????/
 /frontend/evidence/
 /backend/postman/reports/
+
+# Text extracts of course documents (C1SE.21); contain members' phone numbers and emails.
+/_doc_review/
