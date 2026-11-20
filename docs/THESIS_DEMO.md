@@ -22,7 +22,7 @@ proxy env; không gọi AI/internet. Cuối demo dừng server và dọn temp. S
 quyền loopback; không giảm kiểm thử để né WinError10013. Chỉ dừng process của mình.
 
 Expected: success=true, server_stopped=true, temporary_store_cleaned=true,
-checkpoint_loaded=false, training_performed=false. Có36 checkpoint; đây không
+checkpoint_loaded=false, training_performed=false. Có 36 checkpoint; đây không
 phải36 unit test/mẫu bệnh. UUID/thời điểm thay đổi giữa các lần chạy là đúng;
 so sánh stage/status/invariant thay vì so hash hai summary động.
 
@@ -32,11 +32,11 @@ so sánh stage/status/invariant thay vì so hash hai summary động.
 |---|---|---|---|
 | D01 | Login/Auth: không token bị từ chối, tạo2 account tạm |401 và login200 | Không đánh giá native SecureStore |
 | D02 | Discovery cho biết đây là pilot API, source mock | Worker/raw-write off; AI not_checked | Không giả health V4 đã nạp |
-| D03 | Tạo ruộng/mùa/device và24 bucket mock26°C/95%RH/wet | advisory theo rule hiện có | Không sensor thật/chẩn đoán/ML forecast |
+| D03 | Tạo ruộng/mùa/device và 24 bucket mock26°C/95%RH/wet | advisory theo rule hiện có | Không sensor thật/chẩn đoán/ML forecast |
 | D04 | Tạo/list follow-up, mở required/current | v1 đúng case/owner, training=false | Không UI inbox đã tích hợp |
 | D05 | Acknowledge, retry nguyên UUID/payload, thử stale version |201→200 cùng event; stale409 | Không retry bằng UUID mới khi timeout |
-| D06 | Quan sát synthetic uncertain, check, sửa revision, thử close | Quan sát đổi→recheck; close409 trước recheck, sau đó201; assessment cũ giữ nguyên | Closed không là hết bệnh hoặc nhãn train |
-| D07 | Owner khác đọc case, logout rồi token cũ |404 và401 | Không production penetration test |
+| D06 | Quan sát synthetic uncertain, check, sửa revision, thử close | Quan sát đổi→recheck; close409 trước recheck, sau đó 201; assessment cũ giữ nguyên | Closed không là hết bệnh hoặc nhãn train |
+| D07 | Owner khác đọc case, logout rồi token cũ |404 và 401 | Không production penetration test |
 | D08 | Build offline fixture positive | source synthetic; blocked_no_field_data; metrics=null; no training | Positive label là thiết kế fixture, không prediction đúng/lead time72h |
 
 Nếu server lỗi/invariant sai, summary success=false và error_type, không fallback

@@ -43,8 +43,8 @@ lý do 1–500. JSON tối đa 64 KiB, không nhận trường dư/khóa trùng/
 
 PUT gửi đủ `base_revision`, `kind`, `action_details`, `notes`, `record_status`,
 `change_reason`; không gửi nguồn/thời điểm. Response `{success:true,item:...}`:
-id,season_id,source,at,revision,payload,payload_sha256,change_reason,recorded_at,
-available_at,request_id. Payload có verification=user_reported và
+id, season_id, source, at, revision, payload, payload_sha256,change_reason, recorded_at,
+available_at, request_id. Payload có verification=user_reported và
 platform_verified=false. Cờ item management_stream_complete=false và
 training_approved=false luôn giữ. Timestamp API UTC, UI UTC+7. at là lúc làm;
 recorded/available là lúc server nhập phiên bản, không lùi về lúc thực hiện.

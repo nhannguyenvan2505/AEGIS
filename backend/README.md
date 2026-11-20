@@ -39,7 +39,8 @@ Login/detection quotas and bounded inference: [docs/RESOURCE_LIMITS.md](docs/RES
 
 Python 3.11. The backend forwards image bytes to the separate AI service;
 it never imports YOLO or loads model weights. MySQL persistence and MongoDB delivery are included;
-authentication uses server-side bearer sessions.
+authentication uses JWT bearer tokens backed by revocable server-side sessions,
+with farmer/admin RBAC (see [JWT_RBAC](docs/JWT_RBAC.md)).
 
 ## PowerShell
 
@@ -188,7 +189,7 @@ Image bytes retain original EXIF. The client must display EXIF-corrected orienta
 to match returned bbox coordinates and image dimensions. These endpoints do not
 draw bounding boxes or resize images. React Native image requests must include
 the Authorization header; do not put bearer tokens in image URLs. All disease
-responses use private,no-store to avoid retaining a previous user's results.
+responses use private, no-store to avoid retaining a previous user's results.
 
 Persistence tests use temporary databases and exercise multiple/empty detections,
 restart/readback, rollback cleanup and missing records:

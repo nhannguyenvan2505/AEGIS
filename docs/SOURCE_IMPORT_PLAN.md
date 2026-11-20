@@ -3,7 +3,7 @@
 TASK-20,28/10/2026: đọc [source handoff guide hiện hành](SOURCE_HANDOFF_GUIDE.md)
 và inventory/redacted audit trong gói Task20. Core/mobile đã có tracked source,
 pilot còn untracked và AI root chưa Git. Cấu trúc monorepo/các PR bên dưới là
-đề xuất lịch sử25/10, chưa được tự thực hiện hoặc đồng nghĩa đã nhập AI/pilot.
+đề xuất lịch sử 25/10, chưa được tự thực hiện hoặc đồng nghĩa đã nhập AI/pilot.
 Không add/commit/push/di chuyển workspace trong Task20; giữ nhánh/thay đổi sẵn có.
 
 ## Hiện trạng đã kiểm tra — 25/10/2026

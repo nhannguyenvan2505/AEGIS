@@ -98,13 +98,13 @@ Rehearsal tạo 3 seed20261108/20261109/20261110 ×4 scenario:
 | clean | 144 điểm/24giờ, cadence600s, receipt+2s | Due144, received144, coverage1 |
 | dropout | Bỏ block3giờ và thêm một phần điểm ngẫu nhiên | Ít nhất18slot thiếu; log nguyên nhân nhập sau không sửa coverage |
 | delayed_receipt | Receipt+3600s | As-of cuối ngày139slot; snapshot muộn144slot; quá khứ không được backfill |
-| clock_qc | Nửa ngày cuối lệch+30s, null RH/suspect/exclusion | 72điểm off-schedule; giữ offset/QC, không tự sửa |
+| clock_qc | Nửa ngày cuối lệch+30s, null RH/suspect/exclusion | 72 điểm off-schedule; giữ offset/QC, không tự sửa |
 
 Generator không mô phỏng bệnh hoặc gán y; waveform chỉ là tín hiệu vận hành ảo.
 Wetness để null. Cùng seed/scenario tái lập raw/dossier giống nhau.
 
 Phần HTTP dùng kho tạm, đăng nhập tài khoản test rồi tạo stream synthetic, nhập4
-điểm ảo và retry. Server nhận4điểm mới, retry4điểm không trùng. Sau khi dừng server,
+điểm ảo và retry. Server nhận4 điểm mới, retry4 điểm không trùng. Sau khi dừng server,
 export read-only theo owner/stream, đóng gói/replay và dọn kho/server. Không xuất
 token/password vào artifact. Đây là backfill hồi tố: stream chỉ được biết tại lúc
 tạo, không giả raw đã available vào ngày observation.

@@ -6,6 +6,8 @@ Database update 09/11/2026: core/mobile/pilot now default to MySQL with MongoDB 
 
 AI and IoT for rice disease monitoring: rice blast, brown spot and sheath blight.
 
+**Documentation index:** [docs/README.md](docs/README.md) groups every guide, API contract and dated report.
+
 - backend/: Flask API, JWT bearer auth with revocable sessions and farmer/admin RBAC ([contract](backend/docs/JWT_RBAC.md), PR #9), private analyses/history, farm context, forecast and mock warning rules.
 - mobile/: Expo / React Native frontend from Minh-Tam-tgd, integrated with authentication, image detection/history, farm create/list and opt-in pilot follow-up APIs.
 - The repo includes the mobile/API pilot, browser prototype, synthetic IoT tools,
@@ -31,4 +33,4 @@ See [mobile integration and setup](docs/MOBILE_INTEGRATION.md), [upstream attrib
 IoT readings and forecasts in the midterm flow are synthetic. See the clone guide
 for model/data limits; field validation and device acceptance remain pending.
 
-Team workflow: issue → task branch → PR into `develop` → independent review → release into `main`. See [CONTRIBUTING.md](CONTRIBUTING.md) for team rules and [GitHub setup](docs/GITHUB_TEAM_SETUP.md) for activation status. Do not push directly to shared branches.
+Team workflow (current): issue → task branch → PR into `main` → independent review; the `Team policy` check validates branch name and PR title. A Gitflow (`develop`) variant is proposed but not yet adopted. See [CONTRIBUTING.md](CONTRIBUTING.md). Do not push directly to shared branches.

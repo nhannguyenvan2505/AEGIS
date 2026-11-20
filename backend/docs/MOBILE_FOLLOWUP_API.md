@@ -3,7 +3,7 @@
 BE-03,04/11/2026: client local đã có tab Cảnh báo theo contract này; xem
 [ma trận màn/API và giới hạn hiện hành](../../docs/BE03_MOBILE_API_HANDOFF_20261104.md).
 Đã kiểm lại controller TypeScript qua HTTP pilot; chưa nghiệm thu UI/native.
-Các ghi chú H2 ngày28/10–02/11 bên dưới mô tả mốc triển khai Backend gốc.
+Các ghi chú H2 ngày 28/10–02/11 bên dưới mô tả mốc triển khai Backend gốc.
 
 H2-T02, 02/11/2026: [action_capabilities cho acknowledge/check](MOBILE_ACTIONS.md)
 là field additive trong assessment-view; command guards vẫn quyết định cuối cùng.
@@ -14,7 +14,7 @@ H2-T04, 02/11/2026: [bộ bàn giao một luồng follow-up](MOBILE_SLICE_HANDOF
 H2-T03, 02/11/2026: [refresh, retry và chẩn đoán client](MOBILE_RECOVERY.md)
 chuẩn hóa xử lý các contract hiện có; không thêm API hoặc thay DTO.
 
-Contract `aegis-mobile-followup-v1` giữ từ28/10/2026, UTC+7. Đây là Backend slice
+Contract `aegis-mobile-followup-v1` giữ từ 28/10/2026, UTC+7. Đây là Backend slice
 đã có client local; native acceptance chưa có. **Chỉ mock**, không cảnh báo bệnh thực địa hoặc nhãn train.
 Mobile chỉ gọi Backend qua HTTP; Backend gọi AI riêng khi có yêu cầu ảnh.
 
@@ -69,7 +69,7 @@ Vary Authorization; request ID trong header cho hỗ trợ lỗi. Không log bod
 
 Danh sách follow-up mặc định là toàn bộ state trong mùa vụ, không chỉ việc mở; chưa có
 query `source`/search ở endpoint này. Có `page`(1..1.000.000),
-`page_size`(1..100), default1/20. Unknown/duplicate query400. Client có thể nhóm
+`page_size`(1..100), default 1/20. Unknown/duplicate query400. Client có thể nhóm
 state của trang đang tải, không gọi số đếm trang là tổng số việc đang mở toàn mùa.
 Danh sách rỗng đúng nghĩa `items=[]`, không fallback demo. Có thể tạo follow-up
 thủ công từ assessment mock advisory/insufficient_data theo API pilot hiện có;
@@ -94,7 +94,7 @@ Endpoint cần login;401 không phải capability=false.
 | AssessmentView.followup_version | Workflow version tại lần đọc; vẫn có thể đổi trước POST |
 | required | Snapshot Backend yêu cầu kiểm của episode/case, có thể thuộc window/base khác với snapshot tạo case |
 | current | Revision mới nhất **của base mà required trỏ đến**, không phải đánh giá mới nhất mọi window/thiết bị hoặc thay thế required |
-| required/current.id, base_assessment_id, revision | ID immutable snapshot, base để mở /versions, revision đánh giá từ1 |
+| required/current.id, base_assessment_id, revision | ID immutable snapshot, base để mở /versions, revision đánh giá từ 1 |
 | snapshot/snapshot_sha256 | Snapshot gốc bất biến và hash; không phải truth/nhãn bệnh |
 | available_at | created_at của snapshot đã ghi; khác observed_at/giờ quan sát và projection_read_at |
 | display_freshness | expired hoặc within_display_window, tính tại Backend; không suy “lá khỏe” từ freshness |
@@ -121,7 +121,7 @@ engine. Kiểu thời gian ISO8601 có timezone; hiển thị giờ địa phư�
 ```
 
 UUID trên chỉ minh họa; client tạo UUID mới cho **mỗi ý định hành động**, lưu
-nguyên payload khi gửi. 201 là event mới; retry cùng UUID/case/owner/payload trả200,
+nguyên payload khi gửi. 201 là event mới; retry cùng UUID/case/owner/payload trả 200,
 cùng event ID. Nếu timeout, đọc trạng thái/history hoặc retry nguyên payload;
 không tạo UUID mới tự động. Event replay có thể trả `item` trạng thái hiện tại
 muộn hơn event gốc, vì vậy dùng version response để refresh chứ không giảm version.
@@ -134,7 +134,7 @@ recheck dù workflow vẫn checked/closed. Check không tự xác minh bệnh. `
 cần resolution followup_recorded/referred_for_review; `reopen` có guard episode.
 
 H5-T02 đã kiểm một [race sửa quan sát trong lúc check](FOLLOWUP_OBSERVATION_RACE.md):
-check có thể trả201 cùng needs_recheck=true vì event giữ revision đã đọc còn
+check có thể trả 201 cùng needs_recheck=true vì event giữ revision đã đọc còn
 quan sát hiện tại đã đổi. Retry nguyên command giữ event cũ; refresh và check
 bằng ý định mới để chấp nhận revision mới, không suy từ checked/replay200.
 
@@ -175,7 +175,7 @@ Quyền mùa vụ được kiểm trước filter (thiếu token401, không thu�
 Lọc trong mùa vụ/owner trước COUNT và LIMIT/OFFSET: pagination.total/total_pages
 là số case khớp state, has_next theo tập đã lọc; trang vượt phạm vi trả items=[].
 Không có kết quả: total=0,total_pages=0,has_next=false. Giữ thứ tự
-created_at DESC,id DESC. Phân trang offset không giữ snapshot giữa các request;
+created_at DESC, id DESC. Phân trang offset không giữ snapshot giữa các request;
 case đổi state giữa hai lần tải có thể làm thay đổi trang, client cần refresh.
 Không thêm field response, task_kind/device/search/order filter hoặc endpoint mới.
 State chỉ là workflow, không phải chẩn đoán bệnh hay xác nhận đủ dữ liệu train.

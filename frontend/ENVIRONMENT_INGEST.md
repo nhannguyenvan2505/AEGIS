@@ -41,8 +41,8 @@ ownership dùng Backend hiện có. Không thêm migration/endpoint vào core m�
 
 POST stream đủ client_stream_id (UUID), name (1–120 ký tự), source, method,
 instrument (1–500), reference (1–500), nominal_interval_seconds (int1–86400/null).
-Response success,item có id,season_id,client_stream_id,metadata,metadata_sha256,
-created_at,request_id,training_approved=false. Units/measurement_semantics do
+Response success, item có id, season_id, client_stream_id, metadata, metadata_sha256,
+created_at, request_id, training_approved=false. Units/measurement_semantics do
 server cố định; calibration_verified=false. Retry cùng UUID owner/nội dung200,
 khác nội dung409 stream_conflict; tạo mới201. Không có PUT metadata.
 
@@ -66,14 +66,14 @@ Không cho client gửi received_at/available_at: server tự ghi lúc nhận, k
 lùi về lúc đo. Mỗi batch1–100 bản, JSON<=64KiB; kiểm toàn batch trong transaction.
 Một bản sai gây rollback cả batch, không nhận dở. UUID hoặc timestamp trùng
 trong batch409. Cùng UUID/stream/giờ/nội dung đọc lại bản cũ, không đổi thời
-điểm nhận; UUID khác cùng stream/giờ409 sample_conflict. Không tự gộp/ghi đè.
+điểm nhận; UUID khác cùng stream/giờ 409 sample_conflict. Không tự gộp/ghi đè.
 Không tái dùng UUID sample cho stream khác.
 
-Response success,items,created,replayed:201 nếu có bản mới,200 nếu tất cả retry.
-Item có id,stream_id,observed_at,payload,payload_sha256,qc,received_at,
-available_at,request_id,training_approved=false,exclusion (null hoặc lý do/giờ).
-Danh sách GET dùng page/page_size theo farm, samples sort observed_at DESC,id
-DESC. GET stream sort created_at DESC,id DESC. Thiếu auth401, sai owner404;
+Response success, items, created, replayed:201 nếu có bản mới,200 nếu tất cả retry.
+Item có id, stream_id, observed_at, payload, payload_sha256,qc, received_at,
+available_at, request_id, training_approved=false, exclusion (null hoặc lý do/giờ).
+Danh sách GET dùng page/page_size theo farm, samples sort observed_at DESC, id
+DESC. GET stream sort created_at DESC, id DESC. Thiếu auth401, sai owner404;
 nhập sai400, content-type415, quá dung lượng413, quota429 giữ Retry-After.
 
 ## QC v1: kiểm kỹ thuật, chưa chứng nhận đo đúng
@@ -85,7 +85,7 @@ nhập sai400, content-type415, quá dung lượng413, quota429 giữ Retry-Afte
   lá khô. reported_quality chỉ unknown/nominal/suspect, là khai báo từ nguồn.
 - qc.status=incomplete khi có null; nếu đủ nhưng reported suspect thì suspect;
   còn lại within_technical_bounds. Cờ reported_suspect vẫn giữ khi thiếu dữ liệu.
-- Mọi bản có calibration_verified=false,hourly_eligible=false. Giá trị trong
+- Mọi bản có calibration_verified=false, hourly_eligible=false. Giá trị trong
   giới hạn vẫn có thể sai, lệch chuẩn hoặc khác vi khí hậu lá. Chưa kiểm stuck
   sensor, tốc độ thay đổi, drift, đồng bộ đồng hồ, độ phủ hay độ đại diện ruộng.
 
@@ -132,7 +132,7 @@ $streamId = $created.item.id
 & D:/AEGIS/backend/.venv/Scripts/python.exe D:/AEGIS/frontend/telemetry_tool.py import --url $baseUrl --stream-id $streamId --file D:/AEGIS/environment_ingest_20261025/synthetic_records.json
 ```
 
-Fixture có ngày25/10/2026; chọn vụ bao phủ ngày này. Dùng cùng file/stream để
+Fixture có ngày 25/10/2026; chọn vụ bao phủ ngày này. Dùng cùng file/stream để
 kiểm retry: lần đầu created=2/replayed=0, lần hai created=0/replayed=2. Nếu đổi
 stream/kho và UUID đã có, cần fixture mới có UUID mới; không sửa đè artifact cũ.
 CLI không tự retry, không follow redirect, không dùng proxy environment; chỉ

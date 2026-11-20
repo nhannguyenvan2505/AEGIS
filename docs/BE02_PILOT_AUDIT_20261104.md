@@ -1,15 +1,15 @@
 # BE-02 — Nghiệp vụ pilot và liên kết module
 
-Ngày04/11/2026, Asia/Bangkok. **Đạt phạm vi BE-02**: hoàn tất batch S2 của
+Ngày 04/11/2026, Asia/Bangkok. **Đạt phạm vi BE-02**: hoàn tất batch S2 của
 H2-T10, đọc source/test pilot, lập ma trận và kiểm luồng xuyên các DB tạm.
 Không sửa implementation sản phẩm, schema, migration hoặc API; chưa có lỗi mới
 được xác nhận trong các ca đã chọn để mở task sửa Backend.
 
 ## 1. Phạm vi, bằng chứng và mức đọc
 
-- Đọc toàn bộ **38file Python trực tiếp trong frontend/**:13pilot_*.py,
+- Đọc toàn bộ **38 file Python trực tiếp trong frontend/**:13pilot_*.py,
   controlled_source.py, server.py, continuous_mock.py, soak_warning.py,
-  telemetry_tool.py, telemetry_audit.py và19test_*.py.
+  telemetry_tool.py, telemetry_audit.py và 19test_*.py.
 - Đọc đầy đủ backend/pilot_app.py, backend/serve_mobile.py và
   frontend/test_record_pickers.cjs: tổng41file source/test trong inventory.
   Test CJS chỉ đọc; chưa chạy Node/browser trong BE-02.
@@ -65,12 +65,12 @@ Tên hàm là căn cứ source; test nêu dưới đã nằm trong lượt chạ
 | [pilot_assessment_versions](../frontend/pilot_assessment_versions.py): ensure_version, current, item | Worker payload cùng window; GET current/versions/version-detail/follow-up/attempts | v2+ riêng, previous_id/input/snapshot hash; v1 bất biến; attempt ledger | Chỉ thêm bucket cũ bất biến; runtime profile/source/window phải khớp; hash kiểm khi đọc;503 integrity; không POST phiên bản trực tiếp | test_assessment_versions: v1_immutable_v2_current_with_same_profile_window_and_expiry, rollback_and_sanitized_failed_attempt_then_retry |
 | [pilot_automation](../frontend/pilot_automation.py): Runner.inspect/assess/run/tick; jobs/detail/manual_run | Job opt-in/name/reason; PUT enable theo version; POST run{} hiện tại | Core assessment -> case/episode/version -> run/attempt audit | Process + job cùng bật; OS execution lock; scope/profile/season checks; không backfill giờ cũ;503 có thể đã ghi một phần | test_automation: failure_after_assessment_and_after_followup_retry, interrupted_executor_recovers_without_duplicate_case, default_off_and_owner_opt_in_required |
 | [pilot_research](../frontend/pilot_research.py): replay_create, replay_event, append | Command UUID/base_version và actor từ auth | Ledger append-only dùng chung cho survey/coverage/review | Owner cho record; replay kiểm record/actor/command hash; không sửa event cũ | test_surveillance, test_review, test_review_email |
-| [pilot_surveillance](../frontend/pilot_surveillance.py): plans, plan_events, coverage/events | Khoảng [start,end), source; state/reason; observation hoặc reference | Lịch khảo sát và đối soát can thiệp; snapshot revision/inventory | Completed cần observation active cùng nguồn/vụ và trong cửa sổ; không dùng một observation cho hai lịch completed; coverage đã kết thúc; inventory consistency | test_surveillance: wrong_source_time_duplicate_plan_and_stale_version, coverage_changes_after_late_management_revision |
+| [pilot_surveillance](../frontend/pilot_surveillance.py): plans, plan_events, coverage/events | Khoảng [start, end), source; state/reason; observation hoặc reference | Lịch khảo sát và đối soát can thiệp; snapshot revision/inventory | Completed cần observation active cùng nguồn/vụ và trong cửa sổ; không dùng một observation cho hai lịch completed; coverage đã kết thúc; inventory consistency | test_surveillance: wrong_source_time_duplicate_plan_and_stale_version, coverage_changes_after_late_management_revision |
 | [pilot_review](../frontend/pilot_review.py): grants, grant_events, requests, decisions, evidence_image | Reviewer ID/email; grant; đúng observation revision/hash; command của đúng actor | Offered/active/revoked grant; pending/decided/withdrawn/cancelled review; scoped image | Reviewer khác owner; accept bởi target; chỉ owner revoke/cancel; chỉ assigned reviewer decide/withdraw; revoked/cancelled làm reviewer mất quyền; không tự duyệt nhãn | test_review: revoke_removes_reviewer_access_history_retained_for_owner, evidence_image_scoped_and_core_image_still_private, unassigned_account_cancel_and_concurrent_decisions |
 | [pilot_timeline](../frontend/pilot_timeline.py): read_store, timeline | GET season timeline: kind/axis/from/to/as_of/page | Events theo occurred_at/recorded_at, bản sửa riêng, linked images only | Read-only DB, owner, cutoff không tương lai; không atomic historical backup; không trả token/bytes ảnh | test_timeline: revision_history_and_recorded_axis_cutoff, raw_exclusion_not_applied_before_available |
 | [pilot_backup](../frontend/pilot_backup.py): backup, verify, restore, audit_data | CLI kho đã dừng writer, output/target mới | Manifest/inventory/hash và bản sao7DB/uploads/metadata; sentinel | Hai leases; no overwrite/traversal/reparse/sidecar; FK/hash/owner/revision-chain checks; restore incomplete chặn mở | test_pilot_backup; test_restore_interruption |
 
-Module pilot có45route decorators; server browser thêm3. Số decorator không phải
+Module pilot có 45 route decorators; server browser thêm3. Số decorator không phải
 số chức năng hoàn thành, vì một route có thể hỗ trợ nhiều HTTP method.
 
 Tooling còn lại đã đọc: telemetry_tool(import loopback/no redirect và export
@@ -83,7 +83,7 @@ chạy soak nhiều giờ hoặc import dữ liệu vào kho thật trong BE-02.
 | Actor | Cho phép | Từ chối / điều cần giữ |
 |---|---|---|
 | Khách / token không hợp lệ | Health và auth public theo core | Pilot data/commands401 trước đọc/ghi nghiệp vụ |
-| Owner đã auth | Tài nguyên của mình, cùng mùa vụ; tạo/check/close theo state/version | Owner khác404; không tin user_id từ body; query/state/fields lạ400 |
+| Owner đã auth | Tài nguyên của mình, cùng mùa vụ; tạo/check/close theo state/version | Owner khác404; không tin user_id từ body; query/state/fields lạ 400 |
 | Tài khoản khác chưa được giao | Dữ liệu của chính mình | Case/observation/image của owner khác404 |
 | Reviewer được chỉ định | Inbox/grant của mình; sau accept xem đúng request/ảnh được giao | Không đọc trực tiếp journal/ảnh core của owner; không tự accept thay owner/reviewer khác; grant revoked hoặc request cancelled làm mất access request/history/image |
 | Worker nội bộ | Job do owner bật và process cho phép, cùng scope; mock-only | Không giả đăng nhập, không dùng token, không gọi YOLO, không tự bật job |
@@ -99,7 +99,7 @@ Các khai báo field_observed không được biến thành source đã xác min
 
 | State trước | Action -> state sau | Điều kiện ngoài auth/owner/quota |
 |---|---|---|
-| Chưa có case | create -> open,version1 | Assessment mock advisory hoặc insufficient_data; reason hợp lệ; giữ case sẵn có khi replay |
+| Chưa có case | create -> open, version1 | Assessment mock advisory hoặc insufficient_data; reason hợp lệ; giữ case sẵn có khi replay |
 | open | acknowledge -> acknowledged | base_version hiện tại; observation_id/resolution null |
 | acknowledged | check -> checked | Advisory cần observation synthetic active cùng owner/vụ, observed_at >= required.window_end; check_data có thể null |
 | checked | check -> checked | Tương tự; UUID ý định mới để chấp nhận evidence mới; vẫn cho check khi needs_recheck=false |
@@ -109,7 +109,7 @@ Các khai báo field_observed không được biến thành source đã xác min
 Căn cứ `pilot_followup.TRANSITIONS`, `events`, `check_status`,
 `pilot_episodes.check_requirement`; tests full lifecycle/recheck/concurrent/reopen.
 Không có open->close hoặc check ở closed. Sai transition409. Exact replay được
-đối soát trước version/transition nên có thể trả200 dù action hiện tại đã disabled;
+đối soát trước version/transition nên có thể trả 200 dù action hiện tại đã disabled;
 đó là event cũ, không phải bypass để tạo event mới.
 
 `check_status.needs_recheck` là projection, không phải một state mới. Các reason:
@@ -162,9 +162,9 @@ No-pattern mới có thể vào membership nhưng không tự xóa yêu cầu ad
 | Close đọc journal -> ghi event | Guard kiểm tại thời điểm đọc | Chưa có bảo đảm evidence không đổi ngay sau lần đọc hoặc sau response. Race đang close là giới hạn riêng, không gọi test race-check đã kiểm mọi race |
 | Timeline/dashboard đọc nhiều DB | RO/owner/cutoff và projection nhất quán trong phạm vi đọc có code | Không snapshot atomic toàn hệ thống, không dùng làm dataset feature đã được duyệt |
 | Backup/restore | Stopped store, hai leases, all-file hashes,7DB audit; sentinel tới khi verify xong | Không encryption/signature/fsync/power-loss guarantee. Tool từ chối overwrite; thiếu writer tuân thủ leases vẫn là điều kiện vận hành |
-| Khởi tạo factory pilot | Guard marker/schema và thêm bảng/file ở từng module | Không transaction bao trùm khởi tạo cả7DB; không suy startup fail nghĩa không có file nào mới. BE-02 chỉ mở kho tạm |
+| Khởi tạo factory pilot | Guard marker/schema và thêm bảng/file ở từng module | Không transaction bao trùm khởi tạo cả 7DB; không suy startup fail nghĩa không có file nào mới. BE-02 chỉ mở kho tạm |
 
-Lỗi API dùng envelope success=false,error,request_id; no-store/Vary Authorization.
+Lỗi API dùng envelope success=false, error, request_id; no-store/Vary Authorization.
 400 sửa input;401 login lại;403 sai actor/opt-in;404 foreign/unknown;409 refresh hoặc
 đối soát ý định;429 chờ Retry-After;503 integrity/automation xem đúng code và lịch sử.
 Không retry mutation bằng payload/UUID mới để lách conflict. Các field command
@@ -174,8 +174,8 @@ khác nhau: client_event_id của workflow không phải Idempotency-Key của �
 
 | Lượt | Kết quả | Phạm vi thực tế |
 |---|---|---|
-| unittest discovery frontend/test_*.py | **140/140pass,109,272s**, exit0 |19module test Python: workflow/owner/validation/revisions, late data, concurrency, deterministic HTTP race, partial failure/restart, backup và subprocess restore |
-| Acceptance riêng | **26bước có trace đạt**, success=true, temporary_store_cleaned=true |Flask test client trên API-only pilot; đồng hồ fixture lịch sử, worker gọi đồng bộ, không start background thread |
+| unittest discovery frontend/test_*.py | **140/140pass,109,272s**, exit0 |19 module test Python: workflow/owner/validation/revisions, late data, concurrency, deterministic HTTP race, partial failure/restart, backup và subprocess restore |
+| Acceptance riêng | **26 bước có trace đạt**, success=true, temporary_store_cleaned=true |Flask test client trên API-only pilot; đồng hồ fixture lịch sử, worker gọi đồng bộ, không start background thread |
 | Source integrity | Hash41file giữ nguyên |Không sửa implementation hoặc test sẵn có trong đợt audit |
 
 Logs/trace mới: [pilot_suite.log](../be02_pilot_audit_20261104/pilot_suite.log),
@@ -183,12 +183,12 @@ Logs/trace mới: [pilot_suite.log](../be02_pilot_audit_20261104/pilot_suite.log
 [acceptance.log](../be02_pilot_audit_20261104/acceptance.log).
 Suite được chạy với quyền loopback vì sandbox BE-01 đã chặn socket; không sửa
 test để bỏ HTTP. Actual HTTP nằm trong test_followup_observation_race; acceptance
-26bước dùng Flask test client, không được gọi là26request HTTP qua socket.
+26 bước dùng Flask test client, không được gọi là 26 request HTTP qua socket.
 
 Luồng acceptance:
 
-1. Seed23/24bucket -> job run lỗi giả lập sau core commit ->503,1assessment/0case.
-2. Retry cùng window ->200,1assessment/1case check_data; acknowledge rồi check null.
+1. Seed 23/24bucket -> job run lỗi giả lập sau core commit ->503,1 assessment/0case.
+2. Retry cùng window ->200,1 assessment/1case check_data; acknowledge rồi check null.
 3. Nạp bucket cuối -> run replay200 kèm v2 advisory; core v1 vẫn23bucket, thêm case
    điều kiện. Required/current của case dữ liệu trỏ v2 nhưng loại case vẫn check_data.
 4. Close case dữ liệu trước recheck ->409, số event giữ nguyên; check lại rồi close.
@@ -210,8 +210,8 @@ và nguồn code, chưa được gọi là chứng minh mọi constraint của s
 | Mã | Nhận định có căn cứ | Loại / hành động | Ưu tiên |
 |---|---|---|---|
 | D01 | Một số đoạn FOLLOWUP_TIMELINE/ASSESSMENT_VERSIONS vẫn nói chỉ qua UI launcher; factory/API-only đã đăng ký module đó |Tài liệu theo mốc cũ cần liên kết entrypoint hiện hành; BE-03 cập nhật, không xây route mới |P1 bàn giao |
-| D02 | MOBILE_FOLLOWUP_API/RECOVERY/ACTIONS còn câu chưa có client/UI ở mốc cũ; MOBILE_SLICE_HANDOFF có update03/11 |Đối chiếu từng màn/client ở BE-03 rồi thống nhất trạng thái source vs native; không tự nghiệm thu native |P1 |
-| D03 | Bảng F09 khảo sát03/11 chưa ghi đủ dashboard/timeline pilot |Đã hiệu chỉnh bảng: warning-dashboard và timeline Backend đã có; không mặc định thiếu aggregate API |Đã sửa nhận định |
+| D02 | MOBILE_FOLLOWUP_API/RECOVERY/ACTIONS còn câu chưa có client/UI ở mốc cũ; MOBILE_SLICE_HANDOFF có update 03/11 |Đối chiếu từng màn/client ở BE-03 rồi thống nhất trạng thái source vs native; không tự nghiệm thu native |P1 |
+| D03 | Bảng F09 khảo sát 03/11 chưa ghi đủ dashboard/timeline pilot |Đã hiệu chỉnh bảng: warning-dashboard và timeline Backend đã có; không mặc định thiếu aggregate API |Đã sửa nhận định |
 | I01 | Raw telemetry không đưa vào hourly farm_telemetry/worker; controlled raw không vào temporal pipeline |Ranh giới đã thiết kế, không bug. BE-04/H3 chờ nguồn/time/unit/semantics trước adapter/QC/hourly |Chờ điều kiện |
 | P01 | Worker skip planned/completed/archived; core manual assessment vẫn kiểm khoảng ngày mà không dùng season_status |Khác biệt giữa manual/historical và automation, chưa đủ căn cứ gọi lỗi. Nếu muốn khóa thủ công phải chốt nghiệp vụ trước; không tự đồng nhất guards |Đề xuất sau |
 | Q01 | Có schema composition; chưa có full JSON Schema engine acceptance |Giới hạn kiểm chứng, không thiếu endpoint. Chỉ thêm validation suite nếu cần bảo đảm schema cho client thực tế |P2 tùy chọn |

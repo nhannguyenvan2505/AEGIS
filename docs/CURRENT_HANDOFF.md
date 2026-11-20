@@ -31,7 +31,7 @@ FR09 còn chờ ngưỡng confidence; không đánh dấu toàn bộ nhóm Must 
 
 **Cutover database 09/11/2026:** MySQL + MongoDB là runtime mặc định cho core/mobile/pilot. Dữ liệu runtime cũ đã nhập và đối chiếu; xem [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) và `backend/database/cutover_report.json`.
 
-**Bàn giao clone07/11:** xem [hướng dẫn mọi demo](../CLONE_DEMO.md),
+**Bàn giao clone 07/11:** xem [hướng dẫn mọi demo](../CLONE_DEMO.md),
 [package chạy Android forecast](../forecast_demo/README.md),
 [rà soát core hiện hành](MVP_CORE_REVIEW_20261105.md)
 và [runbook dự báo](FORECAST_MVP_MIDTERM_20261105.md). Model synthetic đã chạy
@@ -41,13 +41,13 @@ chưa inference” bên dưới thuộc mốc cũ. Chưa nghiệm thu điện th
 Nhánh demo thêm browser pilot, simulator IoT và source AI API. Checkpoint YOLO,
 dataset ảnh, evidence cục bộ và dữ liệu pilot vẫn nằm ngoài Git.
 
-**Tổng duyệt midterm04/11:** [AI thật + Backend + client TypeScript](MIDTERM_REHEARSAL_20261104.md)
+**Tổng duyệt midterm 04/11:** [AI thật + Backend + client TypeScript](MIDTERM_REHEARSAL_20261104.md)
 đạt30checkpoint, V4 trên cuda:0; fallback không GPU đạt36checkpoint. Kho tạm/server
 đã dọn. Đây là kiểm HTTP mới, chưa là nghiệm thu UI/native hoặc cảm biến thật.
 
 **BE-03,04/11/2026:** [ma trận màn mobile/API và kết quả mới](BE03_MOBILE_API_HANDOFF_20261104.md).
 Core và pilot đã được đối chiếu ở BE-01/02/03; client follow-up local đã có,
-native chưa nghiệm thu. Các phần/mốc TASK-19 bên dưới giữ bối cảnh28/10;
+native chưa nghiệm thu. Các phần/mốc TASK-19 bên dưới giữ bối cảnh 28/10;
 không dùng câu “chưa sửa client” của mốc đó để mô tả source hiện hành.
 
 H6: [ma trận yêu cầu–bằng chứng–giới hạn](THESIS_EVIDENCE.md) và
@@ -84,7 +84,7 @@ Giữ hai workspace riêng; đây là kiểm source copy, chưa phải clean clo
 | Nghiên cứu/nguồn | Protocol DRAFT (`AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md`, workspace AI ngoài repo), [nguồn/quyền/roles](../task10_source_readiness_20261027/README.md) | Dự kiến khay, chưa người xác minh; protocol/nguồn/quyền thật chưa chốt |
 | Quản lý pilot | [backup/restore](../frontend/PILOT_BACKUP_RESTORE.md) | Bảy DB+uploads/marker/metadata, hai lease/manifest/sentinel; retention chưa áp dụng |
 
-Checkout kiểm28/10 có core/mobile nhưng pilot và nhiều artifact đang untracked;
+Checkout kiểm 28/10 có core/mobile nhưng pilot và nhiều artifact đang untracked;
 AI nằm ngoài repository core/mobile. Có file local không chứng minh clone mới
 đã chứa hoặc PR đã merge. Không add/commit/push ở TASK-19; không kiểm remote/
 PR/invite/branch protection. Chưa kiểm clean install trên máy khác.
@@ -108,22 +108,22 @@ vẫn chờ khi người dùng rảnh; contract raw không tạo thiết bị/qu
 
 ## Đọc lịch sử đúng mốc
 
-| Nội dung cũ | Đọc thế nào ở28/10 |
+| Nội dung cũ | Đọc thế nào ở 28/10 |
 |---|---|
-| handoff_20261024 nói không Git/chưa đủ UI/nghiệp vụ | Giữ như kết quả ngày24/10; xem chỉ mục này và core/mobile docs cho hiện hành |
-| BLAST_WARNING_MVP nói chưa scheduler/UI | Mốc core24/10; pilot nay có mock worker/UI/journal/follow-up, không tự có production scheduler |
+| handoff_20261024 nói không Git/chưa đủ UI/nghiệp vụ | Giữ như kết quả ngày 24/10; xem chỉ mục này và core/mobile docs cho hiện hành |
+| BLAST_WARNING_MVP nói chưa scheduler/UI | Mốc core 24/10; pilot nay có mock worker/UI/journal/follow-up, không tự có production scheduler |
 | Temporal đề xuất tích hợp journal/kho pilot | Kế hoạch gói offline ban đầu; module pilot đã có |
 | Raw chỉ synthetic/field_observed | Legacy default; controlled opt-in riêng từ Task11, export v2 |
 | Restore hai/sáu DB ở test cũ | Chỉ schema/mốc thử tương ứng; hiện yêu cầu bảy DB |
 
 Không sửa báo cáo/metric cũ thành hiện hành. Riêng chuỗi encoding fixture trong
 warning_rehearsal_20261026/rehearse.py sửa ASCII ở TASK-19; source trước sửa lưu
-trong gói mới, browser/rehearsal26/10 không được gọi là đã chạy lại.
+trong gói mới, browser/rehearsal 26/10 không được gọi là đã chạy lại.
 
 ## Contract và Postman
 
 [Postman README](../backend/postman/README.md) tách collection image/farm/
-cultivation lịch sử có thể gọi V4 thật khỏi **AEGIS-Pilot-Raw** chỉ22 request
+cultivation lịch sử có thể gọi V4 thật khỏi **AEGIS-Pilot-Raw** chỉ 22 request
 software fixture, yêu cầu controlled opt-in. Không dùng raw collection trên
 kho thật. Runner mới chỉ xuất summary đã lọc; không export environment/full
 Newman report có token. Backup là CLI, temporal offline không có endpoint

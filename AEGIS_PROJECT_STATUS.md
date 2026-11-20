@@ -13,9 +13,9 @@ Không có bằng chứng thu thập/xác minh bệnh trên cây thật. Ưu ti�
 T17.1 với cohort và holdout mới; T18 chỉ được xem xét sau gate. Frontend/mobile
 UI do thành viên frontend phụ trách.
 
-| Khối | Trạng thái hiện hành đến09/11 | Phần còn lại / giới hạn |
+| Khối | Trạng thái hiện hành đến 09/11 | Phần còn lại / giới hạn |
 |---|---|---|
-| AI nhận diện | YOLO11n V4 fine-tune từ pretrained,50epoch; API local và luồng Backend đã có | V4 vẫn mặc định; không đổi sang candidate. Không có nghiệm thu thực địa |
+| AI nhận diện | YOLO11n V4 fine-tune từ pretrained,50 epoch; API local và luồng Backend đã có | V4 vẫn mặc định; không đổi sang candidate. Không có nghiệm thu thực địa |
 | Thí nghiệm AI ảnh | Boundary-r2/source-r1 và FT25 có artifact/báo cáo; FT25 hoàn thành25epoch mới | FT25 chưa deploy, không gọi model đang phục vụ là train75epoch liên tục |
 | Dữ liệu/AI dự báo | T01–T09: raw→hourly, adapter, feature acceptance, persistence/API, forecast/scheduler, FM02/FM03 và đánh giá nhiều seed/missingness | Các cohort hiện tại đều synthetic; kết quả không xác nhận năng lực bệnh ngoài thực địa |
 | Forecast Backend và dữ liệu | T10–T16: readiness, lịch sử/giải thích, alert, outcome links, dossier, endpoint, mapping/group-time split | Nguồn, outcome và nhãn đều synthetic; external review không tự thành nhãn được duyệt |
@@ -36,7 +36,7 @@ số kiểm thử hoặc kết quả synthetic thành tỷ lệ hoàn thành to�
 khả năng dự báo bệnh thật.
 
 Chi tiết mới nhất ở **mục124** cuối file; lịch sử forecast ở mục102–123 và
-[rà soát core05/11](docs/MVP_CORE_REVIEW_20261105.md).
+[rà soát core 05/11](docs/MVP_CORE_REVIEW_20261105.md).
 Lệnh chạy/seed/tiến thời gian ở
 [runbook forecast](docs/FORECAST_MVP_MIDTERM_20261105.md).
 [Chỉ mục bàn giao](docs/CURRENT_HANDOFF.md) tập hợp các mốc khác.
@@ -45,8 +45,8 @@ Lệnh chạy/seed/tiến thời gian ở
 
 **Lịch sử được bảo toàn:** các mục1–101 bên dưới ghi trạng thái tại từng mốc;
 những mục102–124 được bổ sung sau.
-Phần mở đầu cũ được lập24/10/2026,09:43; các câu “chưa có forecast/mobile”
-hoặc ưu tiên nhận diện ở mốc cũ không thay thế tổng quan05/11 bên trên.
+Phần mở đầu cũ được lập 24/10/2026,09:43; các câu “chưa có forecast/mobile”
+hoặc ưu tiên nhận diện ở mốc cũ không thay thế tổng quan 05/11 bên trên.
 
 ## 1. Trạng thái hiện tại
 
@@ -178,7 +178,7 @@ Tham chiếu:
 | Policy-r1 | Thử chính sách nhãn có phạm vi rộng hơn | Không cải thiện tổng thể so với V4; không đưa vào API |
 | Source-r1, seed42 | Chỉ các sửa nguồn đã giới hạn phạm vi | Tăng nhẹ mAP50–95, F1 tổng giảm nhẹ so với V4 |
 | Boundary-r2, seed42 | Bổ sung quy ước và hai sửa nhãn | mAP/F1 tổng tăng nhẹ; có đánh đổi theo bệnh |
-| Source-r1 và boundary-r2, seed43/44 | Bốn job bổ sung, chạy tuần tự | Hoàn tất đủ 50 epoch/job; đã tổng hợp với seed42 |
+| Source-r1 và boundary-r2, seed 43/44 | Bốn job bổ sung, chạy tuần tự | Hoàn tất đủ 50 epoch/job; đã tổng hợp với seed42 |
 
 Cấu hình đối chứng: pretrained YOLO11n gốc, 50 epoch, imgsz 640, batch 4, GPU 0, workers 0, optimizer auto; chỉ đổi dataset/seed theo protocol. Không fine-tune từ checkpoint tốt nhất của model đối chứng để giả định cùng điều kiện ban đầu.
 
@@ -279,7 +279,7 @@ Tất cả giờ trong bảng là UTC+7. **Giờ train lấy từ log/status**, 
 | 22/10/2026, theo báo cáo kiểm chứng | Đối chiếu sheath blight, đo 817/1203, lập quy ước nét biên và tạo dataset boundary-r2 | Hai nhãn thêm +2 box so với source-r1; validation không đổi |
 | **22/10/2026 20:00:22 → 23:06:48** | Boundary-r2 seed42: train 50 epoch và đánh giá | Epoch tốt nhất theo log: 49; model chỉ là ứng viên |
 | 23/10/2026, theo báo cáo hồi quy | Phân tích rice blast, xem 12 ca mất/phục hồi, đo 24 vùng khác class | Giữ class nguồn; không sửa nhãn validation theo model |
-| **23/10/2026 22:07:28** | Hoàn tất 4 job seed43/44, mỗi job 50 epoch, và aggregate ba cặp seed | status completed; thời điểm bắt đầu toàn bộ suite không được lưu trong run_started.json nên không ghi giờ suy đoán |
+| **23/10/2026 22:07:28** | Hoàn tất 4 job seed 43/44, mỗi job 50 epoch, và aggregate ba cặp seed | status completed; thời điểm bắt đầu toàn bộ suite không được lưu trong run_started.json nên không ghi giờ suy đoán |
 | 23/10/2026, theo báo cáo benchmark | Benchmark GPU thật hai checkpoint qua AI → Backend | 12 inference + 12 replay; 8 test API và 3 test intake đạt ở mốc này |
 | 23/10/2026, theo bộ intake đã lưu | Tạo thư mục, metadata mẫu và validator ảnh thực địa | Đã chuẩn bị công cụ, chưa có ảnh mới |
 | **24/10/2026 09:26** | Tạo file AEGIS_PROJECT_STATUS.md | Metadata tạo file đã kiểm tra; 19 liên kết đã được kiểm tra ở lượt tạo |
@@ -380,16 +380,16 @@ chứng trong phiên hiện tại, không tự gán lại ngày hoàn tất cho 
 | Mốc | Trạng thái hiện tại | Việc thực hiện / bằng chứng |
 |---|---|---|
 | P1 | Hoàn thành | Giữ V4, hồ sơ 2 checkpoint hash/mapping đọc thật, train args/dataset provenance; [MODEL_PROFILE](handoff_20261024/MODEL_PROFILE.md), [models.json](handoff_20261024/models.json) |
-| P2 | Hoàn thành | 15 ảnh validation đủ3 class, tiêu chí ghi trước, hash/nguồn/split/lời dẫn, không đổi dataset; [manifest](handoff_20261024/demo_manifest.json), [gallery](handoff_20261024/DEMO_IMAGES.md) |
+| P2 | Hoàn thành | 15 ảnh validation đủ 3 class, tiêu chí ghi trước, hash/nguồn/split/lời dẫn, không đổi dataset; [manifest](handoff_20261024/demo_manifest.json), [gallery](handoff_20261024/DEMO_IMAGES.md) |
 | P3 | Hoàn thành | 35 Backend test hiện có +1 test contract mới đạt ở hai lượt;12 AI test detector giả;18 inference V4+18 replay thật;Postman29 request/98 assertion;integration script xác nhận AI unavailable503; [VERIFICATION](handoff_20261024/VERIFICATION.md) |
 | P4 | Hoàn thành | Runbook PowerShell/launcher cô lập, health/version/hash, flow/EXIF/error, Postman đã chạy; sửa docs quota lỗi thời và thứ tự collection; [RUNBOOK](handoff_20261024/RUNBOOK.md) |
-| P5 | Hoàn thành | Tính lại mean/SD mẫu từ aggregate khớp; hash4 checkpoint seed43/44,50 epoch,1034 predictions/3161GT mỗi job; không metric inference mới; [AI_EVALUATION](handoff_20261024/AI_EVALUATION.md) |
+| P5 | Hoàn thành | Tính lại mean/SD mẫu từ aggregate khớp; hash4 checkpoint seed 43/44,50 epoch,1034 predictions/3161GT mỗi job; không metric inference mới; [AI_EVALUATION](handoff_20261024/AI_EVALUATION.md) |
 | P6 | Hoàn thành | Người dùng xác nhận cần đủ ruộng→mùa vụ→thiết bị→IoT mock trong phiên; đã khảo sát thiếu module, chốt backlog tối thiểu và phụ thuộc; [BUSINESS_SCOPE](handoff_20261024/BUSINESS_SCOPE.md). Chốt phạm vi không đồng nghĩa đã triển khai |
 | P7 | Một phần | Tổng duyệt AI–Backend/Postman và launcher đạt; đã có kịch bản/checklist/bàn giao. **Chưa có bốn module nghiệp vụ vừa chốt nên chưa tổng duyệt được demo Capstone đầy đủ** |
 
 ### Phân biệt nguồn và chênh lệch
 
-- **Báo cáo cũ:** metric/benchmark23/10 là kết quả lịch sử, không phải được chạy lại
+- **Báo cáo cũ:** metric/benchmark 23/10 là kết quả lịch sử, không phải được chạy lại
   toàn bộ hôm nay. Benchmark candidate seed42 vẫn là lịch sử; phiên này chỉ load
   checkpoint candidate kiểm mapping/hash, không chạy inference candidate lại.
 - **Vừa xác minh artifact:** checkpoint V4 SHA
@@ -400,14 +400,14 @@ chứng trong phiên hiện tại, không tự gán lại ngày hoàn tất cho 
   imgsz640/conf0,25/IoU0,7/max_det300. Mean/SD mẫu tính lại có raw input/hash/công
   thức tại metrics_recomputed.json; xác minh run cũ tại saved_runs_verification.json.
 - **Vừa chạy test:** logs tại handoff_20261024. Sandbox ban đầu chặn socket
-  WinError10013 làm một test HTTP fail; chạy lại có quyền loopback đạt35/35.
+  WinError10013 làm một test HTTP fail; chạy lại có quyền loopback đạt 35/35.
   Không sửa logic idempotency để bỏ qua lỗi. CUDA RTX3050 có sẵn, không có test
   bị chặn vì thiếu checkpoint/GPU/dependency. Hai synthetic no_detection không
   tạo bằng chứng accuracy healthy/OOD. Timeout/response lỗi kiểm bằng mock;
   unavailable503 kiểm qua HTTP thật sau dừng instance AI của test.
 - **Chênh lệch tài liệu/code:** health AI thiếu version/IoU/max_det đã bổ sung
   metadata, không đổi inference; docs quota còn ghi chưa có idempotency và Postman
-  còn thứ tự01–26 đã sửa cho implementation29 request. Không có Git repository tại
+  còn thứ tự 01–26 đã sửa cho implementation29 request. Không có Git repository tại
   hai gốc hoặc Backend, không xác nhận commit/remote; before_hashes lưu source trước
   sửa. Không tìm thấy AGENTS.md trong workspace/parent đã kiểm.
 
@@ -449,14 +449,14 @@ cảnh báo. Kiểm tra Git Backend vẫn không phải repository; không tìm 
 trong hai workspace/parent đã kiểm. Không có sửa code sẵn có ngoài thêm liên kết
 README; lõi mới chưa đăng ký vào create_app, không có migration hoặc ghi DB thật.
 
-- Đã đối chiếu UC IPM Rice Blast và bài UC Cooperative Extension17/07/2024 về vai
+- Đã đối chiếu UC IPM Rice Blast và bài UC Cooperative Extension 17/07/2024 về vai
   trò lá ướt/nhiệt độ theo thời gian. Nguồn/cách diễn giải/giới hạn có tại
   [đặc tả](backend/docs/BLAST_WARNING_MVP.md). Không coi nguồn California là model
   cảnh báo đã xác thực ở Việt Nam.
 - Đã tạo app/blast_conditions.py: monitor hẹp cho đạo ôn, profile
-  blast-conditions-mock-v0.1, chỉ nhận dữ liệu mock; cửa sổ24h, bucket1h, chuỗi6h
+  blast-conditions-mock-v0.1, chỉ nhận dữ liệu mock; cửa sổ 24h, bucket1h, chuỗi6h
   đồng thời nhiệt độ trong khoảng tối ưu được dẫn nguồn/RH>90/lá ướt. **6h và cửa
-  sổ24h là giả định kỹ thuật demo, không phải ngưỡng nhiễm đã xác thực**.
+  sổ 24h là giả định kỹ thuật demo, không phải ngưỡng nhiễm đã xác thực**.
 - Output advisory/no_pattern_detected/insufficient_data; không có xác suất bệnh,
   không dự báo ngày xuất hiện, không coi không match hoặc thiếu dữ liệu là khỏe.
   Có hash input/profile và lý do để truy vết. Không thay thế độ ướt lá bằng RH.
@@ -490,7 +490,7 @@ là snapshot lịch sử; trạng thái mới nhất của phần tích hợp n�
 - API /api/farm có create/list/detail cho ruộng/mùa vụ/thiết bị; season cố địnhrice,
   device source=mock, các quan hệ gắn owner từ session. Không tin user_id từ client.
 - Telemetry1..24 bucket/batch, nhiệt độ/RH/leaf_wet theo giờ; timezoneUTC, ngày mùa
-  vụUTC+7; kiểm số hữu hạn/bucket hoàn tất. Cùng giờ/cùng giá trị replay; khác409,
+  vụ UTC+7; kiểm số hữu hạn/bucket hoàn tất. Cùng giờ/cùng giá trị replay; khác409,
   transaction rollback toàn batch. Không ghi đè số đo cũ.
 - Assessment dùng lõi blast-conditions-mock-v0.1 đã bàn giao, lưu input/profile/
   output/request ID/hash; advisory/no_pattern_detected/insufficient_data. Có mode
@@ -509,13 +509,13 @@ là snapshot lịch sử; trạng thái mới nhất của phần tích hợp n�
 |---|---|
 | Suite Backend cuối | 60/60 đạt; integrated_warning_20261024/backend_suite_final.log |
 | Farm tập trung | 14/14 đạt, gồm ownership/validation/rollback/replay/concurrency/HEAD read-only; farm_tests_final.log |
-| HTTP thực tế qua V4/Backend/Postman | 57request/176assertion,0lỗi; http_final/postman.log |
+| HTTP thực tế qua V4/Backend/Postman | 57 request/176assertion,0 lỗi; http_final/postman.log |
 | Model thực nạp | V4 CUDA0, SHA1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a; http_final/summary.json |
-| Storage cô lập cuối lượt | 1ruộng,1mùa vụ,1thiết bị,24bucket,2assessment,1analysis,1link; foreign_key_check rỗng |
-| Cleanup | Cả2service dừng; DB/uploads tạm đã dọn;3cờtrue trong http_final/summary.json |
+| Storage cô lập cuối lượt | 1 ruộng,1 mùa vụ,1 thiết bị,24 bucket,2 assessment,1 analysis,1 link; foreign_key_check rỗng |
+| Cleanup | Cả 2 service dừng; DB/uploads tạm đã dọn;3 cờtrue trong http_final/summary.json |
 
 Unit test dùng inference mock; collection HTTP tạo1analysis bằng inferenceV4 thật
-và replay. Không coi57request là57inference hoặc phép đo chất lượng dự báo bệnh.
+và replay. Không coi57request là 57 inference hoặc phép đo chất lượng dự báo bệnh.
 Lượt đầu HTTP đạt assertion nhưng cleanup lỗi do runner chưa đóng connection
 SQLite kiểm đếm. Đã sửa closing, dọn đúng thư mục còn lại và chạy lại thành công;
 cleanup_attempt1.json ghi remaining=false, log lỗi giữ để truy vết.
@@ -561,7 +561,7 @@ quy tắc và thiết kế đánh giá; chưa yêu cầu đổi profile hoặc k
   khuyến nông Hải Dương. Không tự coi tài liệu nước ngoài là đã kiểm chứng AEGIS
   tại Việt Nam. Vùng mục tiêu của AEGIS chưa được chốt trong hồ sơ.
 - Xác định khoảng tối ưu nhiệt độ không là toàn bộ khoảng có thể nhiễm. Mốc6h,
-  cửa sổ24h và phép AND theo hourly mean vẫn là giả định thiết kế của prototype.
+  cửa sổ 24h và phép AND theo hourly mean vẫn là giả định thiết kế của prototype.
 - BLASTAM có bảng thời lượng theo nhiệt độ và điều kiện nhiệt độ nhiều ngày;
   không đủ căn cứ thay6h bằng10h cố định. Đã lưu bảng tham chiếu có link nguồn,
   không nội suy/làm tròn/ngoại suy khi nguồn chưa xác định cách xử lý.
@@ -577,9 +577,9 @@ quy tắc và thiết kế đánh giá; chưa yêu cầu đổi profile hoặc k
 
 ### Kết quả vừa thực thi
 
-4/4 test công cụ lookup offline đạt;8ví dụ tham chiếu,2snapshot cũ replay khớp.
+4/4 test công cụ lookup offline đạt;8ví dụ tham chiếu,2 snapshot cũ replay khớp.
 Hash toàn bộ runtime Backend đã ghi và AIapi/checkpointV4 giữ nguyên. Không có
-fullcandidate inference/đánh giá bệnh hoặc metric mới. Snapshot hiện có23/24h
+fullcandidate inference/đánh giá bệnh hoặc metric mới. Snapshot hiện có 23/24h
 mock thiếu5ngày nhiệt độ và adapter, không tự bổ sung giả để báo đã đánh giá.
 
 Bằng chứng tại [blast_evidence_20261024](blast_evidence_20261024/README.md):
@@ -587,7 +587,7 @@ Bằng chứng tại [blast_evidence_20261024](blast_evidence_20261024/README.md
 [ma trận](blast_evidence_20261024/EVIDENCE_MATRIX.md),
 [protocol](blast_evidence_20261024/EVALUATION_PROTOCOL.md),
 [verification](blast_evidence_20261024/VERIFICATION.md),
-source_registry.json,reference_tests.log,audit_result.json.
+source_registry.json, reference_tests.log, audit_result.json.
 
 ### Giới hạn và bước tiếp theo
 
@@ -623,7 +623,7 @@ MVP mock có thể tiếp tục, không phải chờ thu ảnh thực địa.
 
 ## 18. Đặc tả bản thích nghi và adapter nghiên cứu offline
 
-**Ghi nhận 2026-10-24T14:55:15+07:00 (UTC+7).** Thực hiện yêu cầu làm1và2: hoàn thiện đặc tả tham
+**Ghi nhận 2026-10-24T14:55:15+07:00 (UTC+7).** Thực hiện yêu cầu làm1và 2: hoàn thiện đặc tả tham
 chiếu và xây adapter nghiên cứu offline. Trong lúc làm người dùng hỏi bước tiếp;
 đã giải thích trạng thái và tiếp tục công việc đang được giao.
 
@@ -636,7 +636,7 @@ references trong blast_adapter_20261024. Không sửa lịch sử để giả đ
 trước. Ibaraki hiện tải trực tiếp lỗiHTTP, không giả có file mới.
 
 Chốt profile nghiên cứu aegis-blastam-sensor-research-v0.1 với A1–A10: bucket1h,
-đo wet/dry trực tiếp trong mock; đoạn ban đêm/cutoff16:00; mean đủ5 ngày lịch
+đo wet/dry trực tiếp trong mock; đoạn ban đêm/cutoff16:00; mean đủ 5 ngày lịch
 UTC+7 gồm ngày đánh giá; availability theo giờ phát hành; lúa cấy ngày0, tuổi21..55;
 tra đúng bảng nhiệt độ, không tự nội suy. Chọn duration>=hàng bảng, mean5days>=20
 và<25, công khai khác biệt cách diễn đạt giữa các nguồn. Ghi rõ tuổi/day/bucket
@@ -655,17 +655,17 @@ phát hành sauD+1 00:00, không giả cảnh báo từ sáng bằng dữ liệu
 | Unit/acceptance tests |18/18 đạt; tests_final.log |
 | Case tổng hợp nhiều ngày |25/25 đạt; fixtures/ và results/summary.json,120h trước khi cố ý bỏ giờ |
 | CLI một case |exit0,conditions_met; cli.log và cli_example.json |
-| So sánh hành vi với demo |25case; BEHAVIOR_COMPARISON.md, không cóGT bệnh hoặc đánh giá model thắng/thua |
-| Integrity runtime và nguồn | Hash Backend/AI/checkpoint giữ nguyên;2file nguồn hash khớp; runtime_integrity_verification.json |
+| So sánh hành vi với demo |25 case; BEHAVIOR_COMPARISON.md, không có GT bệnh hoặc đánh giá model thắng/thua |
+| Integrity runtime và nguồn | Hash Backend/AI/checkpoint giữ nguyên;2 file nguồn hash khớp; runtime_integrity_verification.json |
 
-Đã kiểm đoạn ướt qua nửa đêm/ngắt quãng/bị cắt, mean5days20/25, age/ngoài phạmvi,
+Đã kiểm đoạn ướt qua nửa đêm/ngắt quãng/bị cắt, mean5days 20/25, age/ngoài phạmvi,
 thiếu giờ/suspect/dữ liệu đến muộn, duplicateoffset, NaN/Inf/bool, inputkhôngđổi.
 Nhiệt độ mean20,5°C trảindeterminate chứ không tự nội suy hoặc épnegative.
 
 Status adapter gồm conditions_met/conditions_not_met/insufficient_data/
-indeterminate/outside_scope; luônmock,field_validated=false,
-full_blastam_reproduction=false,forecast_horizon_hours=null. Scope ngoài không
-coi là câykhỏe. So sánhv0.1 cóRH95%synthetic được khai báo rõ và cửa sổ khác;
+indeterminate/outside_scope; luônmock, field_validated=false,
+full_blastam_reproduction=false, forecast_horizon_hours=null. Scope ngoài không
+coi là câykhỏe. So sánhv0.1 có RH95%synthetic được khai báo rõ và cửa sổ khác;
 6hwet25°C ởcase00:00 có thểkíchhoạtdemo nhưng khôngmatchadapter. Đây không là
 falsepositive đã xác nhận hoặc bằng chứng adapter tốt hơn về bệnh.
 
@@ -683,7 +683,7 @@ và nhãn bệnh thật vẫn thiếu. Chưa tích hợpAPI, chưa đổi profil
 liệu nguồn. Không train/testYOLO/field, không migrateDB/deploy/restartdịchvụ.
 
 Không chạy lại60test/57request khiruntimekhôngđổi; bằngchứng đó vẫn ởmốc15.
-PNG render tạm đã dọn; giữPDF/HTMLgốc/code/results có chủ đích; không cóservice/
+PNG render tạm đã dọn; giữ PDF/HTMLgốc/code/results có chủ đích; không cóservice/
 DBtạm cần dọn. Tiếp theo: reviewA1–A10/phạmvi và xử lýgiữa hàng bảng có căn cứ;
 chỉ cânnhắc chạy song song sau khi giải quyết hạn chế, chưa chuyển mặc định.
 Giao diệnMVPmock có thể tiếp tục độc lập với việc thu dữ liệu thực địa.
@@ -745,29 +745,29 @@ chạy trọn luồng cô lập và chốt dữ liệu giao diện cần hiển 
 | Hạng mục | Kết quả / bằng chứng mới |
 |---|---|
 | Backend suite cuối |60/60 đạt,30,364s; mvp_rehearsal_20261024/backend_suite_final.log |
-| HTTP/Newman cuối |57request,176assertion,0lỗi; http_final/postman.log |
+| HTTP/Newman cuối |57 request,176 assertion,0 lỗi; http_final/postman.log |
 | AI thật |V4,Cuda0,hash1b755ca0…70940a; http_final/summary.json |
-| Inference thành công |1request AI/predict HTTP200; requestID/hash khớp Backend; audit.json |
+| Inference thành công |1 request AI/predict HTTP200; requestID/hash khớp Backend; audit.json |
 | Snapshot mock |advisory và insufficient_data; đầy đủ input/profile/result; assessment_snapshots.json |
-| Storage trước dọn |1plot,1season,1device,24bucket,2assessment,1analysis,1link |
-| Cleanup |DB/uploads đã dọn; hai service test đã dừng,3cờtrue trong summary |
-| Bảo toàn runtime |16file gồm Backend/AI/checkpoint/runner/collection khớp SHA-256 baseline |
+| Storage trước dọn |1 plot,1 season,1 device,24 bucket,2 assessment,1 analysis,1 link |
+| Cleanup |DB/uploads đã dọn; hai service test đã dừng,3 cờtrue trong summary |
+| Bảo toàn runtime |16 file gồm Backend/AI/checkpoint/runner/collection khớp SHA-256 baseline |
 
 Đã tổng duyệt đăng ký/login/me → ruộng/vụ/thiết bị → số đo mock → assessment/
 history/detail → detectV4 → gắn ảnh → history/ảnh riêng tư → chặn user khác →
 logout/revokedtoken. Bộ Backend chủ yếu dùng mockinference; một test đồng thời
 HTTP thật dùng inferencegiả. Collection gọi V4thật, replay không chạy thêm YOLO;
-không coi57request là57inference. Không tính metricYOLO hoặc accuracydựbáo từ demo.
+không coi57request là 57 inference. Không tính metricYOLO hoặc accuracydựbáo từ demo.
 
 Lượt sandbox đầu bị WinError10013 ở loopback; HTTP dừng trướccollection,
-suite59/60 với testHTTPđồng thời fail. Chạy lại cùng code với quyền loopback
+suite 59/60 với testHTTPđồng thời fail. Chạy lại cùng code với quyền loopback
 đạt đầy đủ. Giữ log đầu và log final, không sửa code/rule hoặc bỏ test để qua.
 Không nhận được từ chối automaticapproval trong lượt này.
 
 ### Bàn giao và phạm vi
 
 Tạo gói [mvp_rehearsal_20261024/README.md](mvp_rehearsal_20261024/README.md),
-[kịch bản6–8phút](mvp_rehearsal_20261024/DEMO_SCRIPT.md),
+[kịch bản6–8 phút](mvp_rehearsal_20261024/DEMO_SCRIPT.md),
 [đặc tả UI tối thiểu](mvp_rehearsal_20261024/UI_REQUIREMENTS.md),
 audit_rehearsal.py/audit.json và runtime_before.json. Audit khớp ảnhsample.jpg
 với nguồn validationblast__blast_100.jpg và lưu hash; chỉ dùng minh họa chức năng.
@@ -775,9 +775,9 @@ Audit log không thấy mẫu Bearer/password/access_token/dataURLảnh/toànbyt
 base64fixture theo phạm vi đã ghi; không tuyên bố phát hiện mọi loại secret.
 Không export environment/tài khoản/token của phiên Newman.
 
-Cửa sổ mock cố định kết thúc24/10/2026 07:00UTC+7 là lịch sử, không phải số đo
+Cửa sổ mock cố định kết thúc 24/10/2026 07:00UTC+7 là lịch sử, không phải số đo
 hiện tại. Chưa chạy launcher tương tác/UI trong lượt này. Chưa có scheduler,
-notification,sensor thật hoặc đánh giá cảnh báo trước triệu chứng ngoài thực địa.
+notification, sensor thật hoặc đánh giá cảnh báo trước triệu chứng ngoài thực địa.
 Adapter offline không được đưa vào API. Giữ V4, rulemock6h và các giới hạn cũ.
 
 **Mục1 Hoàn thành** trong phạm vi Backend/Postman local; P7 tổng duyệt local có
@@ -799,15 +799,15 @@ làm/đang hoàn thiện, tiếp tục bàn giao. Không mở rộng module nghi
 
 ### Thay đổi
 
-Tạo frontend/static/index.html,style.css,app.js: giao diện tiếng Việt responsive
+Tạo frontend/static/index.html, style.css, app.js: giao diện tiếng Việt responsive
 với đăng ký/login/logout; tạo/chọn ruộng→mùa vụ→thiết bị; nạp24bucketmock và
-đánhgiá/history/detail có lý do/hash; ảnh V4 quaHTTP,canvasEXIF/box; liên kết
+đánhgiá/history/detail có lý do/hash; ảnh V4 quaHTTP, canvasEXIF/box; liên kết
 ảnh/lịch sử riêng tư và pagination. Giữ nhãn mock, không suy thiếu dữ liệu hoặc
 no_detection thành khỏe; confidence ghi điểmmodel, không là xác suất bệnh.
 
 frontend/server.py là launcher opt-in, hai venv riêng; wrapper phục vụ UI cùng
 origin và APIcũ trên loopback/randomport, DB/uploads tạm. /demo-info là snapshot
-model lúc khởi động, không giả healthliêntục. CSP/no-store,token bộnhớ,khônglog
+model lúc khởi động, không giả healthliêntục. CSP/no-store, token bộnhớ, khônglog
 credentials. Reload cần login lại; không tự thu hồi session cũ serverside,
 TTL/cleanup DBtạm xử lý theo contractcũ. Không đổi Backend/AI/checkpoint.
 
@@ -816,39 +816,39 @@ TTL/cleanup DBtạm xử lý theo contractcũ. Không đổi Backend/AI/checkpoi
 | Hạng mục | Kết quả / bằng chứng |
 |---|---|
 | JS syntax bản cuối |node --check exit0 |
-| Test wrapper mới |4/4đạt,1,599s; frontend/evidence/server_tests.log |
+| Test wrapper mới |4/4 đạt,1,599s; frontend/evidence/server_tests.log |
 | Browser thực |CUA/IAB chạy register/login/context/telemetry/assessment/V4/link/history/logout/user2 |
-| V4 inference |3lượt thành công:samplevalidation,EXIFkỹthuật,PNGtrắngkỹthuật; CUDA0/hashV4đúng |
-| Replay |Gửi lại cùngfile/key giữ1analysis trước khi thêmfixture; snapshotkhôngđổi |
+| V4 inference |3 lượt thành công:samplevalidation, EXIFkỹthuật, PNGtrắngkỹthuật; CUDA0/hashV4 đúng |
+| Replay |Gửi lại cùngfile/key giữ 1 analysis trước khi thêmfixture; snapshotkhôngđổi |
 | EXIF |orientation6 raw100x60→canvas60x100,khớpcontract |
-| Nhánh lỗi |8MiB+1 chặnởUI; textlỗi→400invalid_image; missingdata liệt kê8giờthiếu tại mốcchạy |
+| Nhánh lỗi |8MiB+1 chặnở UI; textlỗi→400invalid_image; missingdata liệt kê 8 giờthiếu tại mốcchạy |
 | Session/user2 |logout xóaảnh/file/canvas/history/password; user2thấy0ruộng/0analysis |
-| Responsive |1440px3cột;390px1cột,khôngtrànngang; đãresetviewport |
-| Runtime integrity |16file baseline vẫnkhớp; evidence/verification.json |
-| Cleanup |ba cờtrue,error=null; runs/verification_01/cleanup.json; thưmụctạmkhôngcòn |
+| Responsive |1440px3cột;390px1cột, khôngtrànngang; đãresetviewport |
+| Runtime integrity |16 file baseline vẫnkhớp; evidence/verification.json |
+| Cleanup |ba cờtrue, error=null; runs/verification_01/cleanup.json; thưmụctạmkhôngcòn |
 
 Đã sửa lỗi UI FormData bỏ fielddisabled khi busy; reload/rerun tạo context đạt,
 không nới validationBackend. Giữ selection khi lật trang, giới hạnảnhnhỏvà cập
-nhật nhãn hạn hiển thị30s. Chưa kiểm nhiềutrang>20mục hoặc tìnhhuốngnetworkfault
+nhật nhãn hạn hiển thị 30s. Chưa kiểm nhiềutrang>20 mục hoặc tìnhhuốngnetworkfault
 quaUI; không nâng phần chỉ đọccode thành đãtest. Một số locatorwait hếtdeadline
 khi GPUvẫnxửlý, sauđó response/ảnh thànhcông; không retryinference để giảqua.
-Uploadfixturelớn quacôngcụbrowser mất~6phút,không là sốđobenchmark sảnphẩm.
+Uploadfixturelớn quacôngcụbrowser mất~6 phút, không là sốđobenchmark sảnphẩm.
 
-DBtạm trước dọn:2user,1plot,1season,1device,24bucket,2assessment,1link,3analysis,
-2detection; foreignkeycheck0vi phạm. evidence/database_evidence.json lưu snapshot
+DBtạm trước dọn:2user,1 plot,1 season,1 device,24 bucket,2 assessment,1 link,3 analysis,
+2 detection; foreignkeycheck0vi phạm. evidence/database_evidence.json lưu snapshot
 và metadata khôngcredentials; không exportpassword/token/session. Logscan mẫu
-không cóBearer/password/access_token/dataURL; không khẳng định tìm mọi secret.
+không có Bearer/password/access_token/dataURL; không khẳng định tìm mọi secret.
 
 ### Giới hạn và bàn giao
 
-Ảnh EXIF làkhốimàukỹthuật,khôngnhãnbệnh; V4trả1boxsheath_blight~0,313,khôngđổi
-classnguồn theo prediction. PNGtrắngtrảno_detection,UIkhôngkếtluậnkhỏe. Hai ảnh
-chỉtesthiểnthị/nhánhresponse,khôngđánhgiáhealthy/OOD. Samplevalidationra1box
-rice_blast~0,639chỉkiểmchứcnăng,khôngđomAP/accuracy hoặc chọnmodel/threshold.
+Ảnh EXIF làkhốimàukỹthuật, khôngnhãnbệnh; V4trả 1boxsheath_blight~0,313,khôngđổi
+classnguồn theo prediction. PNGtrắngtrảno_detection, UIkhôngkếtluậnkhỏe. Hai ảnh
+chỉtesthiểnthị/nhánhresponse, khôngđánhgiáhealthy/OOD. Samplevalidationra1box
+rice_blast~0,639 chỉkiểmchứcnăng, khôngđomAP/accuracy hoặc chọnmodel/threshold.
 
 [Hướngdẫnchạy](frontend/README.md),[kiểmchứng](frontend/VERIFICATION.md),
 [ảnhdesktop](frontend/evidence/desktop_overview.jpg),[mobile](frontend/evidence/mobile.jpg).
-READMEcólệnhPowerShell,ngàyvụmẫu,cáchkhởiđộng/dừngvàkiểmcleanup. Không dùng
+READMEcólệnhPowerShell, ngàyvụmẫu, cáchkhởiđộng/dừngvàkiểmcleanup. Không dùng
 port50420củaphiêntestđãdừnglàmURLhiệnđangchạy; lầnmớilấyURLlauncher in.
 
 **Hoàn thành MVPgiao diệnlocal trong phạmviđãtest**; chưa production/mobile
@@ -857,7 +857,7 @@ native/push/scheduler/sensor thật hoặc dựbáobệnhthựcđịa. Không ch
 đổinhãn/split/threshold/migrateDBthật hoặc restartdịchvụcósẵn. Tabtestđãđóng,
 khôngcònservice/DB/uploads tạm. Giữ nguyêntoànbộlịchsửmục1–20.
 
-Tiếptheo: người demo tổngduyệtUItheoREADME,ưu tiênfeedbackgiảngviên vàchốtphạmvi
+Tiếptheo: người demo tổngduyệtUItheoREADME, ưu tiênfeedbackgiảngviên vàchốtphạmvi
 báocáo. Nhánhnghiêncứu:chọntỉnh/vụ/giống/gieocấy vàphảnbiệnA1–A10,trướcpilot.
 
 
@@ -894,18 +894,18 @@ khiển scheduler. Gieo sạ không bị ép thành lúa cấy cho adapter nghi�
 | Test hồ sơ mới |11/11 đạt; cultivation_profile_20261024/profile_tests.log |
 | Full Backend cuối |71/71 đạt,39,533s; backend_suite_final.log |
 | Wrapper UI |4/4 đạt; ui_wrapper_tests.log |
-| HTTP/Newman |69request,214assertion,0lỗi; postman.log; gồm luồng V4 thật |
+| HTTP/Newman |69 request,214 assertion,0 lỗi; postman.log; gồm luồng V4 thật |
 | Browser |Tạo hồ sơ gieo sạ, tuổi19ngày từ gieo, chặn ngày cấy mâu thuẫn, update/history/snapshot/logout |
 | Bố cục |Desktop1440 ba cột; mobile390 một cột, không tràn ngang ở kích thước đã thử |
-| Bảo toàn AI/rule |4file then chốt khớp hash trước sửa; integrity_and_log_scan.json |
+| Bảo toàn AI/rule |4 file then chốt khớp hash trước sửa; integrity_and_log_scan.json |
 | Cleanup |Backend/AI đã dừng, DB/uploads tạm đã xóa; ui_session/cleanup.json |
 
 71 test Backend dùng mock inference, ngoại trừ một test HTTP đồng thời vẫn dùng
-inference giả. Collection69 request có1ảnh hợp lệ chạy V4 thật qua HTTP; replay
+inference giả. Collection69 request có 1 ảnh hợp lệ chạy V4 thật qua HTTP; replay
 không tạo inference mới. Không coi số request là số inference hoặc metric ảnh.
 Collection mới mở rộng57request cũ, không ghi đè collection cũ.
 
-Lượt full đầu70/71 đạt: test migration legacy hardcode tổng4 migration. Đã sửa
+Lượt full đầu 70/71 đạt: test migration legacy hardcode tổng4 migration. Đã sửa
 assertion kiểm đúng tập1–5, giữ kiểm bảo toàn dữ liệu và chạy lại toàn bộ đạt.
 Không bỏ test hoặc nới validation. Giữ log đầu/cuối và bản trước của test.
 
@@ -916,8 +916,8 @@ Không bỏ test hoặc nới validation. Giữ log đầu/cuối và bản trư
 [contract](backend/docs/CULTIVATION_PROFILE.md),
 [ảnh giao diện](cultivation_profile_20261024/browser/desktop.jpg).
 
-DB tạm trước dọn có2ruộng,2mùa vụ,2thiết bị,48bucket,3assessment,5revision,
-1analysis,1link; foreign_key_check không có vi phạm. database_evidence.json lưu
+DB tạm trước dọn có 2 ruộng,2 mùa vụ,2 thiết bị,48 bucket,3 assessment,5 revision,
+1 analysis,1 link; foreign_key_check không có vi phạm. database_evidence.json lưu
 metadata/snapshot, không xuất password/token/session. Log scan mẫu không có
 credentials theo phạm vi đã ghi; không khẳng định phát hiện mọi loại secret.
 
@@ -930,7 +930,7 @@ Các lần khởi động DB thật sau này cần backup và quyết định c�
 **Hoàn thành phần hồ sơ canh tác trong phạm vi local đã kiểm.** Chưa có đối
 chiếu danh mục địa danh/giống, xác nhận chuyên môn, nhật ký bệnh hoặc cảnh báo
 thực địa. Launcher UI vẫn dùng dữ liệu tạm; chế độ lưu trữ pilot bền vững chưa
-được thêm trong bước này. Không còn tài nguyên test cần dọn; lịch sử1–21 giữ nguyên.
+được thêm trong bước này. Không còn tài nguyên test cần dọn; lịch sử 1–21 giữ nguyên.
 
 Bước tiếp phù hợp: nhật ký quan sát đồng ruộng liên kết mùa vụ/ảnh, cùng môi
 trường pilot lưu trữ riêng, để chuẩn bị dữ liệu đánh giá cảnh báo sớm. Không
@@ -973,10 +973,10 @@ không dùng nhãn chưa trưởng thành ở thời điểm train/validation ch
 | CLI tổng hợp |5/5 ca đúng trạng thái fixture; results_v01/ và verification_v01.json |
 | Input lỗi |Exit2,không tạo output |
 | Chống ghi đè |Exit2,artifact cũ giữ nguyên |
-| Runtime integrity |19file Backend/UI/AI/V4/adapter giữ nguyên hash |
-| Training/metric thực địa |Chưa có; model_artifact/model_metrics=null,training_performed=false |
+| Runtime integrity |19 file Backend/UI/AI/V4/adapter giữ nguyên hash |
+| Training/metric thực địa |Chưa có; model_artifact/model_metrics=null, training_performed=false |
 
-20test và5case chỉ xác nhận hành vi phần mềm; không là100%accuracy của model.
+20 test và 5 case chỉ xác nhận hành vi phần mềm; không là 100%accuracy của model.
 Synthetic source bị chặn eligibility cho dữ liệu train thực. Việc khai báo
 field_observed trong file cũng chưa tự chứng minh nguồn thật/đủ cỡ mẫu; vẫn
 cần review dữ liệu/protocol. Không có checkpoint cảnh báo mới hoặc inference API.
@@ -1000,7 +1000,7 @@ train, sửa nhãn/split/threshold, tải dataset hoặc đổi model mặc đ�
 
 Không chạy lại metric/suite YOLO/Backend vì runtime không đổi; không service,
 DB hoặc tài nguyên tạm cần dọn. Workspace vẫn không có Git repository; có hash/
-manifest local, không báo commit. Giữ lịch sử1–22. Bước tiếp: chốt địa bàn và
+manifest local, không báo commit. Giữ lịch sử 1–22. Bước tiếp: chốt địa bàn và
 nguồn số đo/người xác nhận, đưa nhật ký quan sát vào hệ thống và bắt đầu thu dữ
 liệu có lịch trước khi chọn/train mô hình.
 
@@ -1020,8 +1020,8 @@ qua frontend launcher trong vùng dữ liệu được kiểm tra. Không chạy
 tiếp trên DB cũ, không thêm migration/router vào core Backend. Core vẫn1–5.
 Phương án thay thế an toàn đã triển khai xong; không còn blocker xin quyền.
 
-Thêm frontend/pilot_journal.py,pilot_store.py và UI nhật ký. Visit có nguồn,
-thời điểm quan sát/cờ theo lịch cố định; finding,ghi chú,ảnh tùy chọn,review và
+Thêm frontend/pilot_journal.py, pilot_store.py và UI nhật ký. Visit có nguồn,
+thời điểm quan sát/cờ theo lịch cố định; finding, ghi chú, ảnh tùy chọn, review và
 trạng thái active/voided được cập nhật bằng revision. Retry cùng UUID không
 nhân lần ghi; stale edit409; owner được kiểm với core DB, revision có FK nội
 bộ journal. observed_at khác recorded_at/available_at do server cấp. Không
@@ -1036,20 +1036,20 @@ Launcher thêm --pilot-dir, chỉ nhận thư mục con pilot_data có marker AE
 Kho mới phải chưa tồn tại; kho không marker/path ngoài vùng bị từ chối.
 Guard chặn DB/uploads/lock trỏ ra ngoài kho. Server giữ OS lock, không mở hai
 instance cùng kho. Không truyền flag vẫn là demo tạm. Pilot giữ dữ liệu khi
-dừng, summary ghi temporary_storage_cleaned=null,pilot_data_preserved=true.
+dừng, summary ghi temporary_storage_cleaned=null, pilot_data_preserved=true.
 
 ### Kiểm chứng vừa chạy
 
 | Hạng mục | Kết quả / bằng chứng |
 |---|---|
-| Unit journal/storage + wrapper |12/12đạt,9,137s; journal_pilot_20261024/unit_release.log |
-| HTTP nhật ký riêng |16check đạt; http_journal.json/check_http.py |
-| Hồi quy luồng cũ + V4 thật |69request,214assertion,0lỗi; postman.log |
+| Unit journal/storage + wrapper |12/12 đạt,9,137s; journal_pilot_20261024/unit_release.log |
+| HTTP nhật ký riêng |16 check đạt; http_journal.json/check_http.py |
+| Hồi quy luồng cũ + V4 thật |69 request,214 assertion,0 lỗi; postman.log |
 | Browser |Ghi visit chưa xác minh, thêm review mô phỏng tạo rev2, đọc rev1, khóa thời điểm và xóa state khi logout |
 | Restart |Session1 hết duration, mở lại cùng kho ởsession2; visit HTTP vẫn revision2 |
 | Backup/restore |Copy khi đã dừng/giữ StoreLease, restore sang kho mới; đăng nhập và đọc rev2 đạt |
-| Bảo toàn core/AI |15file core/AI/checkpoint/adapter so baseline giữ nguyên; storage_verification.json |
-| Kết thúc |Hai phiên đều dừng Backend/AI,error=null; tab test đóng |
+| Bảo toàn core/AI |15 file core/AI/checkpoint/adapter so baseline giữ nguyên; storage_verification.json |
+| Kết thúc |Hai phiên đều dừng Backend/AI, error=null; tab test đóng |
 
 Unit đầu có lỗi teardown SQLite file lock vì test chưa close connection; sửa
 bằng closing(), chạy lại đạt. Folder test lỗi đã kiểm không còn. Một lần
@@ -1061,7 +1061,7 @@ thành công, không sửa API để vượt. Không coi những lỗi đó là 
 D:/AEGIS/pilot_data/verification_journal_20261024 là kho kiểm thử synthetic;
 journal_pilot_20261024/pilot_backup là backup; pilot_data/verification_journal_restored_20261024
 là kho restore test. Giữ để truy vết retention, không trộn với dữ liệu thực.
-Kho có2visit/4revision và core3ruộng; không service test còn chạy. Root .gitignore
+Kho có 2 visit/4revision và core3ruộng; không service test còn chạy. Root .gitignore
 bổ sung pilot_data/pilot_backups/backup test để tránh commit dữ liệu riêng.
 Log scan các mẫu credentials không có hit; phạm vi không bảo đảm tìm mọi secret.
 
@@ -1073,10 +1073,10 @@ Log scan các mẫu credentials không có hit; phạm vi không bảo đảm t�
 Hoàn thành chức năng nhật ký opt-in và lưu/khôi phục pilot local trong phạm vi
 đã kiểm. Chưa có xuất dữ liệu đã duyệt sang temporal_warning, role chuyên gia,
 nhật ký can thiệp, sensor thật hoặc backup tự động. Source core giữ nguyên nên
-không chạy lại71unit Backend;12unit wrapper và69HTTP là bằng chứng mới. V4/rule/
+không chạy lại71unit Backend;12 unit wrapper và 69HTTP là bằng chứng mới. V4/rule/
 AI pipeline giữ nguyên; không train/đổi dataset/nhãn/split/threshold hoặc deploy.
 
-Lịch sử1–23 giữ nguyên. Bước tiếp: chốt địa bàn/người xác nhận/nguồn số đo thực,
+Lịch sử 1–23 giữ nguyên. Bước tiếp: chốt địa bàn/người xác nhận/nguồn số đo thực,
 thu nhật ký có lịch, rồi cầu nối export có provenance/QC/phê duyệt trước train.
 
 
@@ -1086,7 +1086,7 @@ thu nhật ký có lịch, rồi cầu nối export có provenance/QC/phê duy�
 kiểm soát. Không có dữ liệu thực/sensor/intervention/reviewer workflow mới;
 không tự mở train hoặc duyệt nhãn từ khai báo trong nhật ký.
 
-Thêm D:/AEGIS-AI/temporal_warning/bridge.py,test_bridge.py và BRIDGE.md.
+Thêm D:/AEGIS-AI/temporal_warning/bridge.py, test_bridge.py và BRIDGE.md.
 Snapshot CLI lọc rõ owner/season/device, yêu cầu kho đã dừng/StoreLease, mở
 core/journal bằng SQLite mode=ro/query_only. Không import create_app hoặc chạy
 migration khi export. Chỉ dùng file lock, không sửa DB. Không đọc account/
@@ -1105,17 +1105,17 @@ Mapping source revision sang chuỗi trạng thái chuẩn hóa ở provenance.j
 
 | Hạng mục | Kết quả / bằng chứng |
 |---|---|
-| Unit cuối |30/30đạt,1,991s; gồm20pipeline và10bridge; bridge_release_20261024/tests_final.log |
+| Unit cuối |30/30 đạt,1,991s; gồm20pipeline và 10 bridge; bridge_release_20261024/tests_final.log |
 | Snapshot CLI |Exit0 từ kho temporary hoàn toàn mới, không dùng kho pilot cũ |
-| Compile CLI |Exit0; compiled_release_cli/input.json,dataset.json,provenance.json |
+| Compile CLI |Exit0; compiled_release_cli/input.json, dataset.json, provenance.json |
 | Nội dung DB |Byte hash demo.db/journal.sqlite3 trước/sau giữ nguyên |
-| Nguồn mô phỏng |120h đủ feature,1row,censored vì chưa có follow-up72h; không gán âm |
+| Nguồn mô phỏng |120h đủ feature,1 row, censored vì chưa có follow-up72h; không gán âm |
 | Field conversion |Exit2,không tạo output |
 | Chống ghi đè |Exit2,artifact có sẵn giữ nguyên |
-| Runtime integrity |24file Backend/UI/AI/V4/pipeline giữ nguyên hash |
+| Runtime integrity |24 file Backend/UI/AI/V4/pipeline giữ nguyên hash |
 
-30test/CLI chỉ kiểm phần mềm, không là metric dự báo. Source synthetic,
-training_performed=false,model_metrics=null. Không có mô hình mới hoặc GPU
+30 test/CLI chỉ kiểm phần mềm, không là metric dự báo. Source synthetic,
+training_performed=false, model_metrics=null. Không có mô hình mới hoặc GPU
 inference. Kho nguồn temporary đã dọn, không mở service hoặc sửa DB hiện có.
 Workspace không có Git repo; manifest/hash phục vụ truy vết local.
 
@@ -1132,9 +1132,9 @@ ruộng thật không có can thiệp. Chưa có UI/API export có Bearer hoặc
 lịch sử quyết định review độc lập đầy đủ; giữ từng artifact review bất biến.
 
 Không đổi model/rule/threshold/split gốc, không thu dữ liệu thật hoặc tải dataset.
-Không chạy lại71Backend/69HTTP vì runtime không đổi;30test là bằng chứng mới.
-Lịch sử1–24 giữ nguyên. Bước tiếp: bổ sung nhật ký can thiệp và nguồn số đo thực
-cóQC/availability, chốt quy trình xác nhận/phê duyệt rồi mới mở nhánh field và train.
+Không chạy lại71Backend/69HTTP vì runtime không đổi;30 test là bằng chứng mới.
+Lịch sử 1–24 giữ nguyên. Bước tiếp: bổ sung nhật ký can thiệp và nguồn số đo thực
+có QC/availability, chốt quy trình xác nhận/phê duyệt rồi mới mở nhánh field và train.
 
 
 ## 26. Nhật ký can thiệp canh tác và replay theo thời gian
@@ -1172,9 +1172,9 @@ tái tạo qua bridge compile (không chỉ pipeline.build(input.json) riêng).
 | Browser |Tạo synthetic, sửa rev2, đọc rev1, khóa nguồn/at, logout clear state; browser.jpg |
 | Snapshot không sửa DB |Hash ba DB trước/sau giữ nguyên |
 | Protected source |16 file core/AI/V4/pipeline khớp baseline cũ; integrity.json |
-| Kết thúc |Dừng host,đóng tab,dọn kho temporary; không inference AI |
+| Kết thúc |Dừng host, đóng tab, dọn kho temporary; không inference AI |
 
-Unit đầu phát hiện quota trả500 thay429; sửa handler LimitResponse ở blueprint
+Unit đầu phát hiện quota trả 500 thay429; sửa handler LimitResponse ở blueprint
 can thiệp và quan sát, test429/Retry-After đạt. HTTP sandbox10013 và fixture
 thiếu device_code ở lượt đầu được ghi riêng, không tính đạt; sửa fixture rồi
 chạy HTTP lại thành công. Không chạy lại71core/69V4HTTP vì source bảo toàn.
@@ -1188,8 +1188,8 @@ không đánh dấu kiểm thử Postman đã hoàn thành trong mốc này.
 Hoàn thành nhật ký can thiệp local và replay synthetic trong phạm vi đã chạy.
 Chưa hoàn thành nguồn sensor thực/QC, xác nhận độ đầy đủ nhật ký hoặc workflow
 chuyên gia có danh tính/thẩm quyền được xác minh. Field compile vẫn chặn,
-management_stream_complete=false,training_approved=false; chưa train hoặc có
-metric cảnh báo mới. V4/rule/threshold/split không đổi. Lịch sử1–25 giữ nguyên.
+management_stream_complete=false, training_approved=false; chưa train hoặc có
+metric cảnh báo mới. V4/rule/threshold/split không đổi. Lịch sử 1–25 giữ nguyên.
 Bước tiếp: nguồn telemetry thật và cách xác nhận phủ đủ can thiệp, chốt địa bàn/
 người xác minh rồi thu dữ liệu theo lịch; chưa tự hứa thời gian đủ sự kiện bệnh.
 
@@ -1200,17 +1200,17 @@ người xác minh rồi thu dữ liệu theo lịch; chưa tự hứa thời gi
 Chưa có phần cứng/nguồn đo cụ thể hoặc dữ liệu thực mới; không tự giả định loại
 sensor, đơn vị/tần suất hoặc ngưỡng biến tín hiệu lá ướt thành trạng thái bệnh.
 
-Thêm frontend/pilot_telemetry.py,telemetry_tool.py,test_telemetry.py và hướng dẫn
+Thêm frontend/pilot_telemetry.py, telemetry_tool.py, test_telemetry.py và hướng dẫn
 ENVIRONMENT_INGEST.md. Nguồn đo owner/season với source synthetic/field_observed,
 method sensor_reading/manual_reading và instrument/reference tự khai báo.
-Metadata bất biến; point samples gồm nhiệt°C,RH%,leafwet boolean/null,
+Metadata bất biến; point samples gồm nhiệt°C, RH%,leafwet boolean/null,
 reported_quality/reference. Observed_at khác received_at/available_at server,
-không backdate. Nhận batch1–100/64KiB,atomic; UUID retry giữ timestamp cũ,
+không backdate. Nhận batch1–100/64KiB, atomic; UUID retry giữ timestamp cũ,
 trùng giờ khácUUID hoặc khácpayload409; không tự gộp/ghi đè hoặc điền giá trị thiếu.
 
-QCv1 kiểm finite/type/bounds theo temporal design (-50..60°C,RH0..100%),
+QCv1 kiểm finite/type/bounds theo temporal design (-50..60°C, RH0..100%),
 missing/suspect giữ nguyên. Đây là giới hạn kỹ thuật, không threshold bệnh/
-chứng nhận đo đúng. Luôn hourly_eligible=false,calibration_verified=false,
+chứng nhận đo đúng. Luôn hourly_eligible=false, calibration_verified=false,
 training_approved=false. Point leafwet không được biến thành số giờ ướt.
 Exclusion append-only giữ giá trị và lúc loại; không sửa/xóa raw.
 
@@ -1218,8 +1218,8 @@ API chỉ bật trong launcher local, lưu telemetry.sqlite3 riêng, không core
 migration mới hoặc đưa field vào farm_devices mock. Kho cũ tạo thêm file riêng
 khi mở launcher; phiên này chỉ dùng temp/bản sao, không mở kho pilot hiện có.
 Backup toàn bộ bốn DB + uploads khi dừng writer. CLI import chỉ loopback,
-Bearer từ env,không proxy/redirect/tựretry; snapshot đọc raw bằng mode=ro,
-query_only và StoreLease,owner filter,hash,không ghiđè. Raw staging không phải
+Bearer từ env, không proxy/redirect/tựretry; snapshot đọc raw bằng mode=ro,
+query_only và StoreLease, owner filter, hash, không ghiđè. Raw staging không phải
 field training export; bridge temporal vẫn chặn field/chưa đọc raw bundle.
 
 | Kiểm chứng vừa chạy | Kết quả / artifact |
@@ -1230,10 +1230,10 @@ field training export; bridge temporal vẫn chặn field/chưa đọc raw bundl
 | Snapshot |Raw+QC+exclusion; hash bốn DB trước/sau không đổi; raw_snapshot.json |
 | Legacy/restore |Ba DB cũ giữ hash khi tạo file telemetry; copy bốn DB/đọc sample lại đạt |
 | Bảo toàn |16 file core/AI/V4/pipeline khớp baseline; integrity.json |
-| Kết thúc |Dừng host,dọn kho temporary; không sensor thật/AI inference |
+| Kết thúc |Dừng host, dọn kho temporary; không sensor thật/AI inference |
 
-Unit initial30/30 đạt; bổ sung assertion JSONduplicate/NaN,allnull,restore bốn
-DB rồi chạy release đạt. Scan log marker credential fixture khônghit,không bảo
+Unit initial 30/30 đạt; bổ sung assertion JSONduplicate/NaN, allnull, restore bốn
+DB rồi chạy release đạt. Scan log marker credential fixture khônghit, không bảo
 đảm quét mọisecret. Không có thay UI/browser nên không test browser mới. Không
 chạy lại34temporal/71core vì code lõi không đổi; wrapper mới đã nằm trong30test.
 Không train/tảidata/chỉnhnhãn/split/threshold/deploy hoặc sửa DB thật.
@@ -1243,32 +1243,32 @@ Không train/tảidata/chỉnhnhãn/split/threshold/deploy hoặc sửa DB thậ
 [kiểm chứng](environment_ingest_20261025/VERIFICATION.md).
 
 Hoàn thành API/CLI raw staging và kiểm kỹ thuật trong phạm vi đã chạy. Chưa
-hoàn thành sensor thực,hiệu chuẩn/QC ngoài hiện trường,tổng hợpgiờ,UI nhập liệu,
+hoàn thành sensor thực, hiệu chuẩn/QC ngoài hiện trường, tổng hợpgiờ, UI nhập liệu,
 gateway thiết bị hoặc field training export. V4/cảnh báo online giữ nguyên.
-Cần chọn nguồnđo/vịtrí/cadence/đơnvị/hiệuchuẩn,thu thử quan sát dropout/drift,
+Cần chọn nguồnđo/vịtrí/cadence/đơnvị/hiệuchuẩn, thu thử quan sát dropout/drift,
 rồi chốt tổng hợp giờ/availability; song song xác nhận đủ nhật ký can thiệp,
-lịch khảo sát và người xác minh bệnh. Lịch sử1–26 giữ nguyên.
+lịch khảo sát và người xác minh bệnh. Lịch sử 1–26 giữ nguyên.
 
 
 ## 28. Chuẩn bị thu thử và audit raw khi chưa có thiết bị/điểm thu
 
 **Ghi nhận 2026-10-25T10:48:04.212220+07:00 (UTC+7).** Người dùng xác nhận “Chưa có thiết bị hoặc điểm thu”.
 Không giả định đã chọn cảm biến/tỉnh/ruộng hoặc đã có chuỗi thực. Không tự đặt
-mua,đặt chu kỳ/vị trí/threshold lá ướt hoặc mở train. collection_readiness.json
-mới ghi preparation_only,field_collection_started=false.
+mua, đặt chu kỳ/vị trí/threshold lá ướt hoặc mở train. collection_readiness.json
+mới ghi preparation_only, field_collection_started=false.
 
-Thêm frontend/telemetry_audit.py,test_telemetry_audit.py và bộ biểu mẫu
-pilot_preparation_20261025/site_setup.template.json,collection_session.template.json,
+Thêm frontend/telemetry_audit.py, test_telemetry_audit.py và bộ biểu mẫu
+pilot_preparation_20261025/site_setup.template.json, collection_session.template.json,
 COLLECTION_PLAN.md. Biểu mẫu trống chưa là việc đã thu/đã xác minh. Protocol ghi
 thứ tự chọn điểm thu/người vận hành → thiết bị/đơn vị/đồng hồ → thu thử/đối chiếu
 → chốt tổng hợp giờ; sensor analog hoặc bench thật không ép nguồn vào schema
-field/synthetic khi chưa có căn cứ,thiếu enumbench cần bổ sung sau.
+field/synthetic khi chưa có căn cứ, thiếu enumbench cần bổ sung sau.
 
-Audit offline chỉ đọc raw snapshot: kiểm hash/schema/unit/QC,thống kê null,
-reportedquality,latency,intervals,giá trị lặp. Giữ cutoff receipt/exclusion và
+Audit offline chỉ đọc raw snapshot: kiểm hash/schema/unit/QC, thống kê null,
+reportedquality, latency, intervals, giá trị lặp. Giữ cutoff receipt/exclusion và
 metadata as-of; không dùng void tới muộn để thay lịch sử đã biết. Coverage,
 missingexpected và wetduration luôn null khi chưa có protocol/schedule. Lặp
-không tự là stuck,vượt cadence không tự là lostsample,latency không riêng
+không tự là stuck, vượt cadence không tự là lostsample, latency không riêng
 latency mạng. Raw diagnostics gồm bản đã loại để review; không phải feature
 forecast hoặc kiểm chứng hiệu chuẩn. Không aggregate hoặc train.
 
@@ -1281,16 +1281,16 @@ forecast hoặc kiểm chứng hiệu chuẩn. Không aggregate hoặc train.
 | Runtime |16 file core/AI/V4/pipeline khớp baseline; integrity.json |
 | Nguồn thực |Chưa có; không mở service/DB/HTTP/GPU hoặc thu thật |
 
-Report demo2received,1excluded,1missing leafwet là fixture kiểm phần mềm,không
+Report demo2received,1 excluded,1 missing leafwet là fixture kiểm phần mềm, không
 metric bệnh. Không chạy lại30ingest/34temporal/71core vì runtime không đổi;
-8test mới kiểm offline audit. Không sửa DB/pilot/source dataset/checkpoint,
-không đổi rule/threshold/split hoặc deploy. Lịch sử1–27 giữ nguyên.
+8 test mới kiểm offline audit. Không sửa DB/pilot/source dataset/checkpoint,
+không đổi rule/threshold/split hoặc deploy. Lịch sử 1–27 giữ nguyên.
 
 [Quy trình/lệnh](pilot_preparation_20261025/COLLECTION_PLAN.md),
 [kiểm chứng](pilot_preparation_20261025/VERIFICATION.md).
 
 Hoàn thành bộ chuẩn bị/audit offline trong phạm vi phần mềm; chọn điểm thu,
-thiết bị,thu thử thật,hiệu chuẩn và tổng hợp giờ chưa hoàn thành. Cần xác định
+thiết bị, thu thử thật, hiệu chuẩn và tổng hợp giờ chưa hoàn thành. Cần xác định
 điểm có thể tiếp cận và ngân sách/khả năng mượn thiết bị rồi mới so phần cứng
 có căn cứ. Song song người xác minh bệnh/lịch khảo sát/độ phủ can thiệp vẫn còn.
 Không coi thời gian còn lại là bằng chứng đủ sự kiện bệnh để train/đánh giá.
@@ -1302,46 +1302,46 @@ Không coi thời gian còn lại là bằng chứng đủ sự kiện bệnh đ
 mượn và khả năng tiếp cận ruộng/khay lúa; tại lúc ghi chưa có đáp án mới. Giữ
 bằng chứng trước: chưa có thiết bị hoặc điểm thu. Không tự chốt giá/model/site.
 
-Thêm hardware_options_20261025/OPTIONS.md,sources.json,decision_record.json.
+Thêm hardware_options_20261025/OPTIONS.md, sources.json, decision_record.json.
 So sánh A:mượn logger/đầu đo có tài liệu;B:ESP32+temperature/RH từng phần;
 C:bộ có thêm leafwetness. Đề xuất có điều kiện xem khả năng mượn trước; không
 khẳng định giá khi chưa có báo giá và phụ thuộc địa bàn. B chưa đủ điều kiện
-120h feature hiện tại,không dùng RH thay wetness hoặc mock bù. PHYTOS31 vàSHT40
-là ví dụ có nguồn hãng để giải thích giao tiếp/measurement,không là BOM đã
+120h feature hiện tại, không dùng RH thay wetness hoặc mock bù. PHYTOS31 và SHT40
+là ví dụ có nguồn hãng để giải thích giao tiếp/measurement, không là BOM đã
 được chọn/mua hoặc khẳng định tối ưu cho ngân sách.
 
 Đã browse nguồn chính thức Sensirion SHT40,Espressif ESP32 vàmanual METER
 PHYTOS31; URL/thời điểm/claim tối thiểu ởsources.json. Trang sản phẩm METER
-fetch timeout,manual hãng đọc được; không giả đã kiểm giá/tồn kho tạiViệtNam.
-Không tải dataset,cài thư viện,viết firmware chân nối hoặc đổi threshold sensor.
+fetch timeout, manual hãng đọc được; không giả đã kiểm giá/tồn kho tạiViệtNam.
+Không tải dataset, cài thư viện, viết firmware chân nối hoặc đổi threshold sensor.
 
 ### Kiểm chứng và giới hạn
 
 Đối chiếu pipeline.py vàpilot_telemetry.py xác nhận rawpoint!=hourly/wetduration,
-fieldcompile chưa mở. Hash 21file core/AI/V4/pipeline/ingestPython giữ nguyên
-so baseline; integrity.json. Chỉ bổ sung tài liệu/JSON,không chạy test runtime
-mới,không mởDB/service/HTTP/inference hoặc thử phần cứng. Chưa có đo thực,
-benchtest,mô hình mới hoặc metric dự báo. decision_record giữpending/null,
+fieldcompile chưa mở. Hash 21 file core/AI/V4/pipeline/ingestPython giữ nguyên
+so baseline; integrity.json. Chỉ bổ sung tài liệu/JSON, không chạy test runtime
+mới, không mở DB/service/HTTP/inference hoặc thử phần cứng. Chưa có đo thực,
+benchtest, mô hình mới hoặc metric dự báo. decision_record giữpending/null,
 không coi chuẩn bị phương án là đã chọn/thu thiết bị.
 
 [So sánh và phụ thuộc](hardware_options_20261025/OPTIONS.md).
-Lịch sử1–28 giữ nguyên. Bước tiếp phụ thuộc ngân sách/điểm có thể tiếp cận;
-khi có thông tin mới xác minh modelboard,sensor,nguồn/lưu dữ liệu/đồng hồ và
+Lịch sử 1–28 giữ nguyên. Bước tiếp phụ thuộc ngân sách/điểm có thể tiếp cận;
+khi có thông tin mới xác minh modelboard, sensor, nguồn/lưu dữ liệu/đồng hồ và
 báo giá toàn bộ rồi mới chốtBOM. Không tự mua hoặc giả địnhđủ dữ liệu bệnh.
 
 
 ## 30. Chốt hướng ưu tiên mượn thiết bị, thu thử trên chậu/khay lúa
 
-**Ghi nhận 2026-10-25T11:20:01.774496+07:00 (UTC+7).** Người dùng trả lời: ngân sách chưa chốt,ưu tiên
+**Ghi nhận 2026-10-25T11:20:01.774496+07:00 (UTC+7).** Người dùng trả lời: ngân sách chưa chốt, ưu tiên
 mượn thiết bị; có thể bố trí chậu/khay lúa thử nghiệm. Đây là khả năng bố trí,
-không phải bằng chứng đã có khay,đã mượn thiết bị hoặc đã thu số đo. Chưa có
-model/logger,nguồn điện/mạng/ngày thu hoặc điểm ruộng được xác nhận.
+không phải bằng chứng đã có khay, đã mượn thiết bị hoặc đã thu số đo. Chưa có
+model/logger, nguồn điện/mạng/ngày thu hoặc điểm ruộng được xác nhận.
 
-Cập nhật hardware_options_20261025/decision_record.json vàOPTIONS.md sau câu
-trả lời; thêm LOAN_AND_TRAY_PILOT.md,loan_inventory.template.json. Chuẩn bị bản
+Cập nhật hardware_options_20261025/decision_record.json và OPTIONS.md sau câu
+trả lời; thêm LOAN_AND_TRAY_PILOT.md, loan_inventory.template.json. Chuẩn bị bản
 nháp hỏi mượn và kế hoạch raw/timing/units/nhật ký khay; chưa liên hệ/gửi tin
-cho bất kỳ ai,không mua. Ưu tiên mượn logger/đầu đo có tài liệu; bộ chỉ nhiệtRH
-vẫn là thu từng phần,leafwetnull không bùRH/mock.
+cho bất kỳ ai, không mua. Ưu tiên mượn logger/đầu đo có tài liệu; bộ chỉ nhiệtRH
+vẫn là thu từng phần, leafwetnull không bù RH/mock.
 
 Phân biệt dữ liệu khay thật với synthetic vàfield: schema hiện chưa hỗ trợ
 controlled_experiment; đề xuất bổ sung raw nguồn/ngữ cảnh riêng trước nhập,
@@ -1349,9 +1349,9 @@ giữ cổng train/fieldcompile chặn. Chưa triển khai enum mới trong mố
 không báo đã ingest khay hoặc kiểm phần cứng. Không dùng dữ liệu khay để chứng
 minh tổng quát ruộng hoặc hứa có đủ bệnh. Thu kỹ thuật không gồm gây nhiễm.
 
-Chỉ cập nhật docs/JSON theo đáp án,không sửa runtime/DB/model hoặc chạy test
+Chỉ cập nhật docs/JSON theo đáp án, không sửa runtime/DB/model hoặc chạy test
 mới. Chưa có kết quả đo/metric mới. Biểu mẫu model/cost/calibration vẫntrống;
-field_collection_started=false,training_approved=false. Lịch sử1–29 giữ nguyên.
+field_collection_started=false, training_approved=false. Lịch sử 1–29 giữ nguyên.
 Bước độc lập tiếp: hỗ trợ nguồn/ngữ cảnh khay thật trong raw staging; phụ thuộc
 ngoài phần mềm là tìm model/logger mượn được và vị trí/nguồn điện cho khay.
 
@@ -1360,17 +1360,17 @@ ngoài phần mềm là tìm model/logger mượn được và vị trí/nguồn
 
 **Ghi nhận 2026-10-25T11:55:07.550547+07:00 (UTC+7).** Người dùng yêu cầu note việc thiết bị/khay lúa,
 sẽ làm khi rảnh; hiện muốn các hướng tiếp theo của dự án. Thêm
-FOLLOW_UP_WHEN_AVAILABLE.md chứa trạng thái,điểm quay lại và liên kết hỏi mượn/
-biểu mẫu/thu thử. Không đặt lịch/tạo automation,không liên hệ hoặc mua thiết bị.
+FOLLOW_UP_WHEN_AVAILABLE.md chứa trạng thái, điểm quay lại và liên kết hỏi mượn/
+biểu mẫu/thu thử. Không đặt lịch/tạo automation, không liên hệ hoặc mua thiết bị.
 
-Ngân sách chưa chốt,ưu tiên mượn,có thể bố trí chậu/khay vẫn là thông tin đã
+Ngân sách chưa chốt, ưu tiên mượn, có thể bố trí chậu/khay vẫn là thông tin đã
 xác nhận; chưa thu thật. Chưa triển khai controlled_experiment hoặc mở train.
 Hướng phần mềm đề xuất ưu tiên: vòng đời cảnh báo và theo dõi theo thời gian
-trên dữ liệu demo có provenance; tiếp theo là UI timeline,workflow khảo sát/
+trên dữ liệu demo có provenance; tiếp theo là UI timeline, workflow khảo sát/
 xác minh và xác nhận độ phủ can thiệp. Đây là đề xuất chưa triển khai/kiểm thử,
 không đánh dấu hoàn thành hoặc tự đổi rule/threshold hiện tại.
 
-Chỉ ghi chú/tài liệu,không thay runtime/DB/model. Lịch sử1–30 giữ nguyên.
+Chỉ ghi chú/tài liệu, không thay runtime/DB/model. Lịch sử 1–30 giữ nguyên.
 
 
 
@@ -1410,7 +1410,7 @@ assessment, workflow event, observation/intervention revision, cultivation,
 raw/mock telemetry, exclusion và ảnh đã gắn. Không tự đưa ảnh chưa liên kết
 vào mùa vụ; nguồn ảnh vẫn chưa xác minh.
 
-Timeline có occurred_at/recorded_at, bộ lọc [from,to), kind/axis, as_of cutoff
+Timeline có occurred_at/recorded_at, bộ lọc [from, to), kind/axis, as_of cutoff
 và phân trang. Mỗi revision là event riêng; chỉ nhận event đã ghi <=cutoff.
 Exclusion tới muộn không xuất hiện trước thời điểm ghi. Với ảnh, recorded_at
 là lúc gắn/ghi revision, không lùi về lúc tạo ảnh. Nút liên quan mở bản hiện
@@ -1455,14 +1455,14 @@ nhật ký. Lịch sử mục 1–31 giữ nguyên.
 
 ## 34. Lịch khảo sát và đối soát độ đầy đủ nhật ký can thiệp
 
-**Ghi nhận 2026-10-25T13:30:05.378965+07:00 (UTC+7).** Thực hiện yêu cầu làm mục1 và2. Thêm
-frontend/pilot_research.py,pilot_surveillance.py,test_surveillance.py và UI
+**Ghi nhận 2026-10-25T13:30:05.378965+07:00 (UTC+7).** Thực hiện yêu cầu làm mục1 và 2. Thêm
+frontend/pilot_research.py, pilot_surveillance.py, test_surveillance.py và UI
 khảo sát/đối soát trong static/research.js. research.sqlite3 riêng, không core
 migration mới; chỉ chạy temporary/bản sao, không mở pilot thật của người dùng.
 
-Lịch dự kiến có cửa sổ [start,end),nguồn,lý do và thời điểm lập thực. Lập sau
+Lịch dự kiến có cửa sổ [start, end),nguồn, lý do và thời điểm lập thực. Lập sau
 cửa sổ giữ cờ hồi cứu. Planned quá hạn chỉ overdue, không tự missed. Completed
-cần quan sát active cùng owner/vụ/nguồn,trong cửa sổ và không gắn hai lịch đang
+cần quan sát active cùng owner/vụ/nguồn, trong cửa sổ và không gắn hai lịch đang
 completed. Missed chỉ sau cửa sổ; unable/cancelled có lý do. Mỗi cập nhật là
 revision, giữ bản chụp quan sát/hash; nguồn sửa/void sau làm cờ cần xem lại.
 Không sửa cờ scheduled tự khai báo cũ hoặc tự lấy lịch làm nhãn âm.
@@ -1475,10 +1475,10 @@ Tất cả vẫn là khai báo chủ mùa vụ, coverage_approved_for_training=f
 
 ## 35. Nhận xét độc lập theo tài khoản và bằng chứng được chia sẻ
 
-**Ghi nhận 2026-10-25T13:30:05.378965+07:00 (UTC+7).** Thêm frontend/pilot_review.py,test_review.py và UI.
+**Ghi nhận 2026-10-25T13:30:05.378965+07:00 (UTC+7).** Thêm frontend/pilot_review.py, test_review.py và UI.
 Owner chỉ định tài khoản khác, scope chỉ assigned_observations_and_images;
 reviewer tự accept, sau đó owner tạo request đúng revision/hash quan sát.
-Reviewer xem snapshot/ảnh qua route riêng; không được xem cả mùa vụ,nhật ký
+Reviewer xem snapshot/ảnh qua route riêng; không được xem cả mùa vụ, nhật ký
 hoặc ảnh core. Không đổi quyền global hoặc gửi tin tới bất kỳ ai.
 
 Chỉ reviewer ghi supports_present/supports_absent/inconclusive/reject_evidence
@@ -1490,7 +1490,7 @@ Không sửa finding/source/class của quan sát theo quyết định hoặc YO
 
 Hai tài khoản chưa chứng minh khác người hoặc đủ chuyên môn. Expert identity/
 qualification verified và label_approved_for_training luôn false. Owner alias/
-qualification_reference chỉ tự khai báo. Bridge chưa đọc research ledger,không
+qualification_reference chỉ tự khai báo. Bridge chưa đọc research ledger, không
 biến workflow thành approval manifest/nhãn confirmed; field compile vẫn chặn.
 
 | Kiểm chứng vừa chạy | Kết quả / bằng chứng |
@@ -1498,33 +1498,33 @@ biến workflow thành approval manifest/nhãn confirmed; field compile vẫn ch
 | Unit đầu |12/12,13,768s;unit_initial.log |
 | Hồi quy giữa |57/57,56,726s;unit_regression.log |
 | Unit CUỐI |60/60,65,056s:7surveillance+8review+45pilot/wrapper;unit_final.log |
-| HTTP/stub/restart |33check đạt;http_browser/verification.json |
-| Browser lịch |Tạo trước cửa sổ→unable,giữ bảnplanned;lịch hồi cứu gắn quan sát |
+| HTTP/stub/restart |33 check đạt;http_browser/verification.json |
+| Browser lịch |Tạo trước cửa sổ→unable, giữ bảnplanned;lịch hồi cứu gắn quan sát |
 | Browser đối soát |Thấy nhập muộn→reviewed_records bản2,giữ bản1;coverage_browser.jpg |
 | Browser hai tài khoản |Offer→accept→giao revision/hash→xem ảnh32×32→inconclusive;review_browser.jpg |
 | Nguồn thay đổi |Owner sửa notes→reviewer thấy nguồnđổi→withdraw bản3;lịch báo cần xem lại |
 | Thu hồi quyền |Owner revoke→reviewer refresh mất request/detail/ảnh;logout hai tab clear |
 | Legacy/restore |Thêm research giữ hash5DB cũ;copy6DB đọc lịchcompleted đạt |
-| Bảo toàn |16file core/AI/V4/pipeline khớp baseline;integrity.json |
-| Kết thúc |Host dừng,temp store dọn,hai tab đóng;không AI inference thật |
+| Bảo toàn |16 file core/AI/V4/pipeline khớp baseline;integrity.json |
+| Kết thúc |Host dừng, temp store dọn, hai tab đóng;không AI inference thật |
 
-Artifacts trong surveillance_review_20261025. Không cộng các lượt12/57 vào60.
+Artifacts trong surveillance_review_20261025. Không cộng các lượt 12/57 vào60.
 Image predictor là stub no_detection;ảnh PNG kỹ thuật được tạo cho kiểm tra
-quyền/chức năng,không đánh giá bệnh. Không train hoặc có metric mới. Không chạy
-lại71core/34temporal/69V4HTTP vì nguồn được bảo toàn;60unit kiểm wrapper hiện tại.
-Scan marker credential khônghit,không bảo đảm tìm mọi secret. Backup hiện sáu
+quyền/chức năng, không đánh giá bệnh. Không train hoặc có metric mới. Không chạy
+lại71core/34temporal/69V4HTTP vì nguồn được bảo toàn;60 unit kiểm wrapper hiện tại.
+Scan marker credential khônghit, không bảo đảm tìm mọi secret. Backup hiện sáu
 DB vàuploads khi dừng mọi writer; các hướng dẫn hiện hành đã được đối chiếu.
 
 [Runbook/API](frontend/SURVEILLANCE_REVIEW.md),
 [bàn giao](surveillance_review_20261025/README.md),
 [kiểm chứng](surveillance_review_20261025/VERIFICATION.md).
 
-Hoàn thành mục1 và2 trong phạm vi local/pilot và tách tài khoản đã kiểm. Chưa
-có xác minh danh tính/chuyên môn thực,duyệt nhãn ML hoặc nghiên cứu thực địa.
+Hoàn thành mục1 và 2 trong phạm vi local/pilot và tách tài khoản đã kiểm. Chưa
+có xác minh danh tính/chuyên môn thực, duyệt nhãn ML hoặc nghiên cứu thực địa.
 Chưa có scheduling/notification tự động hoặc dữ liệu thật mới. Phần cứng/khay
 lúa giữ backlog theo yêu cầu trước;controlled_experiment chưa triển khai.
 Hướng tiếp: thiết kế cầu nối ledger nghiên cứu as-of có retraction trước khi
-nối temporal;chưa tự mở train hoặc đổi protocol. Lịch sử1–33 giữ nguyên.
+nối temporal;chưa tự mở train hoặc đổi protocol. Lịch sử 1–33 giữ nguyên.
 
 
 
@@ -2162,7 +2162,7 @@ Artifact: D:/AEGIS/late_assessment_20261025/soak_four_hours_restart_20261026_074
 
 UTC+7: 26/10/2026 22:28. Phiên soak chạy lại đã completed lúc 11:44:22, coverage=True, 2799 mẫu giám sát; không còn chạy. Không thay lịch sử phiên stopped trước đó.
 
-Vừa chạy tổng duyệt trên backend/timer HTTP thật, kho/cổng tạm, số đo mock: `D:/AEGIS/warning_rehearsal_20261026/run_verified/verification.json` đạt 28 kiểm tra (không phải 28 test độc lập); `ui_verification.json` đạt 9 kiểm tra từ thao tác trình duyệt/text hiển thị. Đã xem thiếu23/24, khô24/24 không khớp mẫu, dữ liệu tới muộn v2/24 trong khi v1/23 giữ nguyên, timeline hai thời điểm, case đúng version, đăng xuất; HTTP kiểm thêm owner404/auth401/replay/restart không nhân bản.
+Vừa chạy tổng duyệt trên backend/timer HTTP thật, kho/cổng tạm, số đo mock: `D:/AEGIS/warning_rehearsal_20261026/run_verified/verification.json` đạt 28 kiểm tra (không phải 28 test độc lập); `ui_verification.json` đạt 9 kiểm tra từ thao tác trình duyệt/text hiển thị. Đã xem thiếu 23/24, khô 24/24 không khớp mẫu, dữ liệu tới muộn v 2/24 trong khi v 1/23 giữ nguyên, timeline hai thời điểm, case đúng version, đăng xuất; HTTP kiểm thêm owner404/auth401/replay/restart không nhân bản.
 
 File bàn giao: `D:/AEGIS/warning_rehearsal_20261026/REHEARSAL.md`, script `rehearse.py`, text/screenshot trong cùng thư mục. README frontend cập nhật kết quả soak và liên kết kịch bản. Hai lỗi script fixture ban đầu (tên trường/status sai) đã sửa; lượt đạt nằm riêng trong run_verified, giữ log cũ. Không sửa runtime ứng dụng. Hash so runtime_manifest của soak được ghi ở integrity.json; log phiên đạt không chứa các marker token/password được dò (không coi đây là audit bảo mật toàn diện).
 
@@ -2220,7 +2220,7 @@ không phải toàn bộ kiểm thử vừa được chạy lại ngày 27/10.
 | DONE-24 | Gom đợt theo dõi và bảng điều hành | Có episode/member bất biến, phân biệt kiểm dữ liệu/điều kiện, stale/missing/current; chỉ con người kết thúc | `D:/AEGIS/episode_dashboard_20261025`; `D:/AEGIS/frontend/WARNING_EPISODES.md`; mục 40–41 |
 | DONE-25 | Kiểm vận hành nhiều thiết bị và mock liên tục | Có mô phỏng ngắt quãng/outage/late/paused, restart, real clock, đo native PID/RAM/handles/CPU và freeze source | `D:/AEGIS/operations_soak_20261025`; `D:/AEGIS/continuous_mock_20261025`; mục 42–45 |
 | DONE-26 | Phiên bản bổ sung khi nhận bucket muộn | V1 giữ nguyên; v2+ riêng/chain/hash/context/expiry; current/history/audit, UI/case/timeline liên kết version | `D:/AEGIS/frontend/ASSESSMENT_VERSIONS.md`; `D:/AEGIS/late_assessment_20261025`; mục 46–47 |
-| DONE-27 | Soak 4 giờ thực | Phiên chạy lại completed; 12 thiết bị, 2 owner, 56 v1/20 supplement, 8439 HTTP, 2799 resource sample; temp đã dọn | `D:/AEGIS/late_assessment_20261025/soak_four_hours_restart_20261026_074411/RESULT.json`; phiên stopped trước đó vẫn giữ riêng |
+| DONE-27 | Soak 4 giờ thực | Phiên chạy lại completed; 12 thiết bị, 2 owner, 56 v 1/20 supplement, 8439 HTTP, 2799 resource sample; temp đã dọn | `D:/AEGIS/late_assessment_20261025/soak_four_hours_restart_20261026_074411/RESULT.json`; phiên stopped trước đó vẫn giữ riêng |
 | DONE-28 | Tổng duyệt giao diện ba tình huống | 28 HTTP/fixture checks + 9 UI checks; thiếu/khô/late v1-v2/timeline/case/logout; restart và cleanup đạt | `D:/AEGIS/warning_rehearsal_20261026/REHEARSAL.md`, `run_verified/verification.json`, `ui_verification.json`; mục 48 |
 
 ### 49.2. Các bằng chứng kiểm thử không được cộng hoặc đổi ý nghĩa
@@ -2531,17 +2531,17 @@ worker nền, không mô phỏng đồng hồ. Browser IAB mở đúng case v2 v
 luồng present/absent/uncertain, cộng luồng check_data không observation. Cả bốn
 case closed v4. Uncertain ghi referred_for_review, chưa có người nhận/thông báo;
 present/absent/data ghi followup_recorded. Lịch sử vẫn nêu không xác nhận khỏe;
-assessment dữ liệu vẫn thiếu23/24 sau khi đóng việc. Dashboard còn0 đợt mở.
+assessment dữ liệu vẫn thiếu 23/24 sau khi đóng việc. Dashboard còn0 đợt mở.
 
 | Kiểm thử mới | Kết quả/bằng chứng trong task01_rehearsal_20261027 |
 |---|---|
-| HTTP harness và đối chiếu sau browser |126 assertion đạt qua89 request của harness, không tính request browser; run02/verification.json,traffic.json,workflow_evidence.json |
+| HTTP harness và đối chiếu sau browser |126 assertion đạt qua89 request của harness, không tính request browser; run02/verification.json, traffic.json, workflow_evidence.json |
 | Browser |Ba finding/hai loại việc/hai kết quả close;13 bản ghi text, gồm lỗi400 thiếu quan sát đúng kỳ vọng; run02/ui_evidence.json và bốn PNG |
 | Kiểm bằng chứng đã lưu |22 kiểm tra artifact đạt, không là browser chạy mới; run02/artifact_audit.json |
 | Follow-up unit mới chạy |8/8,8,736s; followup_tests.log |
 | Episode/version unit mới chạy |23/23,24,906s; episode_version_tests.log |
 | Audit/ownership |401/404; thiếu/sai nguồn/giờ/voided/foreign observation bị chặn; stale version409/replay200/conflict409; snapshot/hash/revision/request ID khớp |
-| DB/cleanup |Bảy DB integrity ok/FK rỗng; server dừng,cổng đóng,kho temporary/account/uploads dọn,tab đóng; run02/database_integrity.json,verification.json,logout.json |
+| DB/cleanup |Bảy DB integrity ok/FK rỗng; server dừng, cổng đóng, kho temporary/account/uploads dọn, tab đóng; run02/database_integrity.json, verification.json, logout.json |
 
 Lượt run01 bị WinError10013 của sandbox trước request thành công, cleanup đạt;
 giữ run01.log/verification success=false. Run02 chạy lại với quyền loopback,
@@ -2549,14 +2549,14 @@ không nới validation hoặc sửa rule. Một locator select trên browser kh
 đã đọc lại form/chọn control đúng; không tính thao tác lỗi là đạt. Scan ba mẫu
 credential trong run02.log không hit; không là audit bảo mật toàn diện.
 
-File mới: task01_rehearsal_20261027/rehearse.py,audit_artifacts.py,REVIEW_VI.md,
-progress_append.md,run01/02 và log,hai log unit,status_before.md,
+File mới: task01_rehearsal_20261027/rehearse.py, audit_artifacts.py, REVIEW_VI.md,
+progress_append.md, run 01/02 và log, hai log unit, status_before.md,
 progress_verification.json. File sửa: chỉ append AEGIS_PROJECT_STATUS.md.
 Review chi tiết10 mục/cách chạy lại: D:/AEGIS/task01_rehearsal_20261027/REVIEW_VI.md.
 
 Giới hạn: chỉ mock/synthetic local, không có metric bệnh/lead time mới; không
 chạy lại toàn112frontend/71core/69AIHTTP/44temporal hay inference/GPU. Không mở
-DB/pilot thật,không train,đổi V4/threshold/nhãn/split,deploy hoặc gửi tin ngoài.
+DB/pilot thật, không train, đổi V4/threshold/nhãn/split, deploy hoặc gửi tin ngoài.
 Thay đổi sau check (v2 tới sau checkv1/sửa-thu hồi quan sát/expiry/cửa sổ mới)
 chưa tổng duyệt browser lượt này, giữ TASK-02 riêng. Đề xuất TASK-02 tiếp theo;
 dừng sau một task chính theo yêu cầu. Không cần thông tin bổ sung cho TASK-01.
@@ -2580,52 +2580,52 @@ Close trước đó so assessment mới nhưng chưa so source revision hiện t
 Sửa pilot_followup.py thêm check_status so owner/season/revision/hash/active;
 close409 followup_observation_changed khi nguồn đổi/void. pilot_episodes.py
 dùng cùng logic, trả check_status và cờ cần xem lại. UI static/app.js nêu
-revision đã kiểm/current,ID/revision assessment yêu cầu,lý do; chọn recheck và
-đọc lại sau conflict,không tự retry mutation. Giữ snapshot/event cũ;case đã
+revision đã kiểm/current, ID/revision assessment yêu cầu, lý do; chọn recheck và
+đọc lại sau conflict, không tự retry mutation. Giữ snapshot/event cũ;case đã
 closed không auto reopen;expiry chỉ đổi freshness. Không migration/schema mới.
 
-File sửa: frontend/pilot_followup.py,pilot_episodes.py,static/app.js,
-test_followup.py,FOLLOWUP_TIMELINE.md,WARNING_EPISODES.md; append status này.
-File mới: frontend/test_followup_recheck.py (5test),
-task02_rehearsal_20261027/rehearse.py,audit_artifacts.py,finalize_evidence.py,
-REVIEW_VI.md,progress_append.md,before/log/run01/diff/hash/progress verification.
+File sửa: frontend/pilot_followup.py, pilot_episodes.py, static/app.js,
+test_followup.py, FOLLOWUP_TIMELINE.md, WARNING_EPISODES.md; append status này.
+File mới: frontend/test_followup_recheck.py (5 test),
+task02_rehearsal_20261027/rehearse.py, audit_artifacts.py, finalize_evidence.py,
+REVIEW_VI.md, progress_append.md, before/log/run01/diff/hash/progress verification.
 
 | Test mới chạy/bằng chứng trong task02_rehearsal_20261027 | Kết quả |
 |---|---|
 | frontend_full_final.log |117/117,117,157s;112cũ+5mới;không cộng lượt33focused |
-| run01/verification.json,traffic.json |161assertion đạt qua110request harness,không gồm request browser |
-| run01/ui_evidence.json và5PNG |IAB v2 sau checkv1;sửa/void quan sát;closedv1→casev2mới;expiry;cửa sổ mới |
-| run01/artifact_audit.json |23kiểm artifact đạt,không phải browser chạy lại;bốn bản ghi UI sớm không dùng |
-| run01/workflow_final.json,episodes_final.json |6base/5check gốc giữ nguyên;7episode/case đúng;membership unique/hash đúng |
+| run01/verification.json, traffic.json |161 assertion đạt qua110request harness, không gồm request browser |
+| run01/ui_evidence.json và 5PNG |IAB v2 sau checkv1;sửa/void quan sát;closedv1→casev2mới;expiry;cửa sổ mới |
+| run01/artifact_audit.json |23 kiểm artifact đạt, không phải browser chạy lại;bốn bản ghi UI sớm không dùng |
+| run01/workflow_final.json, episodes_final.json |6 base/5check gốc giữ nguyên;7 episode/case đúng;membership unique/hash đúng |
 | run01/database_integrity.json |Bảy DB integrity ok/FK rỗng |
-| run01/verification.json,logout.json |server dừng,cổng đóng,kho/account/uploads tạm dọn;UI clear,tab đóng |
-| source_verification.json,implementation.diff |JS node--check exit0;diff/hash có before;3marker credential không hit ở4artifact đã chọn |
+| run01/verification.json, logout.json |server dừng, cổng đóng, kho/account/uploads tạm dọn;UI clear, tab đóng |
+| source_verification.json, implementation.diff |JS node--check exit0;diff/hash có before;3 marker credential không hit ở 4 artifact đã chọn |
 
 Phiên HTTP/browser thực **18:51:01–18:58:38 UTC+7**. Backend clock mô phỏng từ
 17:30→18:30→20:00 để thử window/expiry, browser giữ clock thật. Không gọi đây
-là chờ qua giờ/TTL thật. Worker nền không start,chỉ manual run quaHTTP;
-hai owner/sáu thiết bị synthetic,kho temporary/StoreLease/cổng riêng.
+là chờ qua giờ/TTL thật. Worker nền không start, chỉ manual run quaHTTP;
+hai owner/sáu thiết bị synthetic, kho temporary/StoreLease/cổng riêng.
 
 V2 sau checkv1 bị chặn409;check lại rồiclosev5. Observation sửa/void bịclose409;
 void dùng lạicheck400. Sửa dùngrevision2,void thay bằngobservation active mới.
-Cửa sổ mới chặnclose cũ409/quan sát quá sớm400. Case dữ liệuclosedv4 giữ nguyên;
-v2tạo caseopenv1 riêng,reopen cũ409;case mới cố ý đểopen chứng minh khôngauto
-close và được dọn cùng kho. Expiry casecheckedv3 giữstate,close thủ côngv4.
+Cửa sổ mới chặnclose cũ 409/quan sát quá sớm400. Case dữ liệuclosedv4 giữ nguyên;
+v2tạo caseopenv1 riêng, reopen cũ 409;case mới cố ý đểopen chứng minh khôngauto
+close và được dọn cùng kho. Expiry casecheckedv3 giữstate, close thủ côngv4.
 
-Lượt full đầu117test có1error fixture mới đọc sai change_reason;đã sửa fixture,
+Lượt full đầu117test có 1 error fixture mới đọc sai change_reason;đã sửa fixture,
 giữ frontend_full.log và chạy lại toàn bộđạt. Một sốclick/locator chưa mở đúng
 record hoặc text được lấy trước response;đã đọc lạiDOM/dùngEnter/đợiversionđích,
 không tính bản ghi sớm là đạt. Không sửa validation để bỏ kiểm tra.
 
-Giới hạn: đối chiếu nguồn tại lần đọc,không atomic xuyên journal/followup DB,
-chưa stress race edit/close đồng thời hoặc mất điện. UI refresh/open,chưa push;
+Giới hạn: đối chiếu nguồn tại lần đọc, không atomic xuyên journal/followup DB,
+chưa stress race edit/close đồng thời hoặc mất điện. UI refresh/open, chưa push;
 expiry không chứng minh timer browser30s/TTL thật. Không chạy core71/AIHTTP69/
-temporal44/inference/GPU/train,không metric bệnh/lead time,không mởDB/pilot thật,
+temporal44/inference/GPU/train, không metric bệnh/lead time, không mở DB/pilot thật,
 đổiV4/ngưỡng/nhãn/split/deploy hoặc gửi tin ngoài. Scan marker không toàn diện.
 
 Review10mục/lệnh Windows: D:/AEGIS/task02_rehearsal_20261027/REVIEW_VI.md.
-Đề xuất TASK-03 giảm nhậpUUID còn lại,nút dùng quan sát đang mở đã đủ dùng.
-Dừng sau TASK-02 theo yêu cầu,không tự bắt đầu task tiếp.Không cần thông tin
+Đề xuất TASK-03 giảm nhậpUUID còn lại, nút dùng quan sát đang mở đã đủ dùng.
+Dừng sau TASK-02 theo yêu cầu, không tự bắt đầu task tiếp.Không cần thông tin
 bổ sung để chốt phạm vi này.
 
 
@@ -2650,46 +2650,46 @@ tự chuyển sang revision mới chưa xem. Đổi vụ/logout dọn picker;res
 context không điền. Nút dùng observation đang mở giữ lại.
 
 UI chỉ định reviewer bằng email đầy đủ đã biết;API opt-in cho đúng một trong
-reviewer_email hoặc reviewer_id legacy,trim/lowercase,guard owner/quota/self/
-scope/replay giữ nguyên. Chỉ offered,người nhận phải tự accept. Không gửi email,
+reviewer_email hoặc reviewer_id legacy, trim/lowercase, guard owner/quota/self/
+scope/replay giữ nguyên. Chỉ offered, người nhận phải tự accept. Không gửi email,
 tin nhắn hoặc duyệt chuyên môn/nhãn train;không có autocomplete/list account.
 
-File sửa: frontend/static/index.html,app.js,research.js;frontend/pilot_review.py,
-test_server.py,SURVEILLANCE_REVIEW.md,JOURNAL_PILOT.md;append status này.
-File mới: frontend/static/record-pickers.js,frontend/test_record_pickers.cjs,
-test_review_email.py,RECORD_PICKERS.md;task03_rehearsal_20261027 chứa harness/
-audit/finalize,review,before/diff/hash,logs,JSON,screenshot,progress verification.
+File sửa: frontend/static/index.html, app.js, research.js;frontend/pilot_review.py,
+test_server.py, SURVEILLANCE_REVIEW.md, JOURNAL_PILOT.md;append status này.
+File mới: frontend/static/record-pickers.js, frontend/test_record_pickers.cjs,
+test_review_email.py, RECORD_PICKERS.md;task03_rehearsal_20261027 chứa harness/
+audit/finalize, review, before/diff/hash, logs, JSON, screenshot, progress verification.
 
 | Kiểm thử mới — bằng chứng trong task03_rehearsal_20261027 | Kết quả |
 |---|---|
 | frontend_full.log |120/120,112,841s;117cũ+3email mới |
-| picker_tests.log |4/4Node VM logic async,không phải browser/layout |
-| run02/verification.json,traffic.json |62assertion/50request harness đạt,không gồm request browser |
-| run02/ui_evidence.json và2screenshot đạt |IAB hai account;ảnh→nhật ký,theo dõi,lịch,email→accept→reviewrequest/decision;không nhậpUUID/hash thủ công |
-| run02/artifact_audit.json |18kiểm artifact đã lưu đạt,không phải browser chạy lại |
-| explicit_binding.json,stale_not_bound.json,context_reset.json |Nguồnrev1→rev2 bị chặn trước bind;resetcontext trống;requestrev2/hash khớp |
-| workflow_final.json |Closedfollowup/survey giữrev1;requestrev2;1image link,không duplicate/silent save;assessment giữ nguyên |
-| database_integrity.json,verification.json,logout.json |BảyDBok/FKrỗng;server dừng,cổng đóng,kho/account/uploads tạm dọn;hai tab đóng,pickerstate dọn |
-| source_verification.json,implementation.diff |3JSsyntax exit0,diff/hash lưu;3marker credential không hit4artifact đã chọn |
+| picker_tests.log |4/4Node VM logic async, không phải browser/layout |
+| run02/verification.json, traffic.json |62 assertion/50request harness đạt, không gồm request browser |
+| run02/ui_evidence.json và 2 screenshot đạt |IAB hai account;ảnh→nhật ký, theo dõi, lịch, email→accept→reviewrequest/decision;không nhậpUUID/hash thủ công |
+| run02/artifact_audit.json |18 kiểm artifact đã lưu đạt, không phải browser chạy lại |
+| explicit_binding.json, stale_not_bound.json, context_reset.json |Nguồnrev1→rev2 bị chặn trước bind;resetcontext trống;requestrev2/hash khớp |
+| workflow_final.json |Closedfollowup/survey giữrev1;requestrev2;1 image link, không duplicate/silent save;assessment giữ nguyên |
+| database_integrity.json, verification.json, logout.json |BảyDBok/FKrỗng;server dừng, cổng đóng, kho/account/uploads tạm dọn;hai tab đóng, pickerstate dọn |
+| source_verification.json, implementation.diff |3JSsyntax exit0,diff/hash lưu;3 marker credential không hit4artifact đã chọn |
 
-Phiên HTTP/browser đạt **19:17:33–19:22:08 UTC+7**, clock thật,kho/cổng riêng;
-ảnhPNG32×32 fixture được lưu trực tiếp,không AI inference. Hai vụ/15quan sát
+Phiên HTTP/browser đạt **19:17:33–19:22:08 UTC+7**, clock thật, kho/cổng riêng;
+ảnhPNG32×32 fixture được lưu trực tiếp, không AI inference. Hai vụ/15quan sát
 fixture vụchính (gồm alternate-source/void để kiểmfilter),thêm đúng1observation
 quaUI. Không dùng khai báo fixture field_observed làm bằng chứng thực địa.
-Foreign401/404 giữ đúng;reviewer chỉ có inbox/evidence được giao,không ruộngowner.
+Foreign401/404 giữ đúng;reviewer chỉ có inbox/evidence được giao, không ruộngowner.
 
-Lượt focused đầu có3error do helper test trùng self.payload;đã đổi tên và
-full120đạt,giữ focused.log. Run01 HTTP thiếurequest_id fixture ảnh,cleanuptrue;
-sửa theo contract save_analysis,chạy run02mới,không tính run01 đạt. Khi chụp
-survey,automation chạmBỏlựachọn,lưu400đúng;đã đọcDOM,chọn lại,lưucompleted.
-Screenshot trướcchọnlại được giữ nhưng auditloại,không dùng như bằngchứng đạt.
+Lượt focused đầu có 3 error do helper test trùng self.payload;đã đổi tên và
+full120 đạt, giữ focused.log. Run01 HTTP thiếurequest_id fixture ảnh, cleanuptrue;
+sửa theo contract save_analysis, chạy run02mới, không tính run01 đạt. Khi chụp
+survey, automation chạmBỏlựachọn, lưu400 đúng;đã đọcDOM, chọn lại, lưucompleted.
+Screenshot trướcchọnlại được giữ nhưng auditloại, không dùng như bằngchứng đạt.
 
-Giới hạn:filter từngtrang có thểít/khôngmục phùhợp,không global search;
+Giới hạn:filter từngtrang có thểít/khôngmục phùhợp, không global search;
 chưa mobile/nhiềubrowser/push hoặc stressrace sauApply trướcSubmit. Server vẫn
-guardcuối. EmailPOST404/201 có thể cho biết account tồn tại,không phải private
+guardcuối. EmailPOST404/201 có thể cho biết account tồn tại, không phải private
 directory production. Không chạy71core/69AIHTTP/44temporal/GPU/train/inference,
-không metric bệnh/leadtime;không mởDB/pilotthật,đổiV4/ngưỡng/nhãn/split hoặc
-gửi tinngoài. Scan marker chỉphạmviđãghi,không auditsecret toàn diện.
+không metric bệnh/leadtime;không mở DB/pilotthật, đổiV4/ngưỡng/nhãn/split hoặc
+gửi tinngoài. Scan marker chỉphạmviđãghi, không auditsecret toàn diện.
 
 Review10mục/lệnhWindows: D:/AEGIS/task03_rehearsal_20261027/REVIEW_VI.md.
 Đề xuất TASK-04 màn hình việc cần kiểm tra hôm nay;TASK-07 có thể chọn nhánh
@@ -2851,11 +2851,11 @@ và delay. Episode/matching/mẫu số là dự thảo chưa triển khai evalua
 | Manifest/code/state | 16/16 điều kiện; verification.json; source Python/SPEC giữ nguyên |
 | Positive gap 72h | Builder vẫn positive dù chỉ âm tại t/dương t+72h; SOP cadence gate chưa tự đầy đủ |
 | Empty management log | Có thể negative cấu trúc dù coverage chưa biết; chưa là research eligibility |
-| Tưới thường lệ trên khay | Intervention ở giờ12 => intervened/null; không đổi policy để giữ mẫu |
+| Tưới thường lệ trên khay | Intervention ở giờ 12 => intervened/null; không đổi policy để giữ mẫu |
 | Late review | Cutoff96 unverified, cutoff144 positive khi review available120; synthetic only |
 | Source khay mới | controlled_experiment bị builder từ chối đúng; tray_source_rejection.json |
 
-Lượt verify/test cuối **21:09:48 ngày27/10/2026 UTC+7**. Không có failure trong
+Lượt verify/test cuối **21:09:48 ngày 27/10/2026 UTC+7**. Không có failure trong
 lượt đó. Một lần đọc đầu dùng nhầm path protocol, đã tìm/đọc path thật; factsheet
 IRRI trực tiếp timeout nên không dùng làm bằng chứng. Đã xem nguồn sơ cấp UC
 IPM về phạm vi leaf/neck blast, RRDI về chẩn đoán và sklearn về leakage; các
@@ -2901,7 +2901,7 @@ nhận/thời hạn và thay đổi; quyền app không tự cho phép train/pub
 Evidence mẫu giữ unverified, không tạo confirmed path. Không chỉ định người
 dùng là reviewer/chăm sóc, không xác minh chuyên môn bằng qualification tự khai.
 
-Lượt kiểm mới **21:18:41–21:18:59 ngày27/10/2026 UTC+7**:
+Lượt kiểm mới **21:18:41–21:18:59 ngày 27/10/2026 UTC+7**:
 
 | Kiểm tra | Kết quả thực tế / bằng chứng trong run_final |
 |---|---|
@@ -2971,7 +2971,7 @@ raw controlled vào hourly/rule/temporal compiler hoặc train.
 | Pilot toàn bộ | 128/128, 132,667s; 120 kế thừa +8 mới; pilot_full_final.log |
 | Temporal toàn bộ | 65/65, 8,209s; temporal_final.log |
 | Nhóm raw sau sửa | 26/26, 21,061s; telemetry_regression.log |
-| Backend HTTP/CLI cuối | 14 điều kiện qua26 request và6 CLI; http_cli_final/verification.json, traffic.json |
+| Backend HTTP/CLI cuối | 14 điều kiện qua26 request và 6 CLI; http_cli_final/verification.json, traffic.json |
 | Opt-in/filter/owner | Default403, enabled201/retry200,3 source filter riêng, other owner404; opt-out GET200/POST403 |
 | Raw/export/audit | Controlled v2, legacy v1, null giữ nguyên, hourly/train false; JSON output |
 | Tính toàn vẹn/read-only | SHA bảy DB trước/sau CLI giữ nguyên; database_sha256.json |
@@ -2979,13 +2979,13 @@ raw controlled vào hourly/rule/temporal compiler hoặc train.
 | Cleanup | Ba Backend process dừng exit0, kho/account tạm được dọn; HTTP verification |
 | Help | Flag launcher và snapshot có thật; launcher_help.log, snapshot_help.log |
 
-HTTP/CLI cuối chạy **21:32:18–21:32:24 ngày27/10/2026 UTC+7**, Backend --backend
+HTTP/CLI cuối chạy **21:32:18–21:32:24 ngày 27/10/2026 UTC+7**, Backend --backend
 với fake AI URL không được gọi, không nạp checkpoint/inference. Loopback chạy
 qua sandbox escalation được auto-review duyệt; không có rejection. Unit clock
 mô phỏng 24/10 cho availability, không phải chờ ngày thật. Không cộng các lượt
 suite/điều kiện HTTP thành số mẫu bệnh hoặc accuracy.
 
-Lượt8 test đầu có1 failure filter bị core paginate từ chối query source và1
+Lượt8 test đầu có 1 failure filter bị core paginate từ chối query source và 1
 cleanup error vì test chưa đóng SQLite connection. Đã sửa pagination ở raw
 endpoint (không sửa helper core), dùng closing trong test, dọn đúng temp root
 của lượt lỗi; new_tests_initial.log và initial_cleanup.json giữ bằng chứng.
@@ -2999,8 +2999,8 @@ protocol Task09; không commit/push/liên hệ/mua/mượn/thu thật/train.
 
 Review 10 mục và lệnh Windows: D:/AEGIS/task11_controlled_raw_20261027/REVIEW_VI.md.
 TASK-12 tiếp theo vẫn chờ khi người dùng rảnh; cần model/logger/file mẫu để làm
-TASK-13. Nếu muốn Backend độc lập trước phần cứng có thể chọn17/19 riêng.
-Dừng TASK-11, không tự bắt đầu task tiếp hoặc coi nguồn Task09/10 đã được duyệt.
+TASK-13. Nếu muốn Backend độc lập trước phần cứng có thể chọn 17/19 riêng.
+Dừng TASK-11, không tự bắt đầu task tiếp hoặc coi nguồn Task 09/10 đã được duyệt.
 
 ## 60. TASK-17 — Sao lưu, khôi phục và quản lý kho pilot
 
@@ -3030,14 +3030,14 @@ launcher không mở kho dở. Không tự xóa partial/ảnh/lịch sử hoặc
 | Pilot full trước strict sub-schema bổ sung | 136/136,155,595s; pilot_full_initial.log |
 | Pilot full source cuối | 136/136,158,254s; pilot_full_final.log và artifact verification; 128 kế thừa chạy lại +8 mới |
 | Temporal | 65/65,5,621s; temporal_final.log |
-| CLI/API rehearsal cuối | 53/53 điều kiện,8 CLI (3 exit0/5 exit2 dự kiến),11 GET và2 POST kiểm restore; run02/verification.json |
-| Byte/integrity/ownership | Inventory toàn bộ và7 DB hash giống trước mở; marker/metadata/empty dirs/ảnh được giữ |
+| CLI/API rehearsal cuối | 53/53 điều kiện,8 CLI (3 exit 0/5 exit2 dự kiến),11 GET và 2 POST kiểm restore; run02/verification.json |
+| Byte/integrity/ownership | Inventory toàn bộ và 7 DB hash giống trước mở; marker/metadata/empty dirs/ảnh được giữ |
 | Auth/business | Session/password login, observation rev2, assessment3/2/1, followup3 event, review scope/cờ false, raw controlled và jobs giữ |
 | Replay sau restore | AssessmentStream/Ledger và selected snapshot streams/raw metadata/readings giống trước |
 | Cleanup | Worker manual dừng, ba temp roots của run02 dọn, backup DB/ảnh fixture đầy đủ không giữ trong artifact |
 | Failure guards | Hai lease, corrupt upload, missing DB/extra/traversal/schema, owner/gap/parent, interrupted copy được kiểm trên kho tạm |
 
-Rehearsal cuối **15:17:15–15:17:21 ngày28/10/2026 UTC+7**. Run_final trước
+Rehearsal cuối **15:17:15–15:17:21 ngày 28/10/2026 UTC+7**. Run_final trước
 strict unknown followup/assessment sub-schema và run02 sau bổ sung đều53 điều
 kiện, giữ riêng không cộng. Các lượt test/rehearsal không có failure được ghi.
 API dùng Flask test client trong process, không socket HTTP hoặc launcher V4;
@@ -3058,7 +3058,7 @@ từ chối, không tự xóa/checkpoint. Chưa đo mất điện/đĩa hỏng/S
 production; schema cũ thiếu DB bị từ chối, không auto-upgrade.
 
 Không sửa Backend core/schema, static frontend/mobile, AI/checkpoint V4,
-threshold/label/split/protocol, không commit/push/liên hệ ngoài. Task09/10 vẫn
+threshold/label/split/protocol, không commit/push/liên hệ ngoài. Task 09/10 vẫn
 chưa có nguồn/reviewer thật; Task12 chờ người dùng rảnh. Review10 mục/lệnh
 Windows: D:/AEGIS/task17_backup_restore_20261028/REVIEW_VI.md. Đề xuất TASK-19
 đồng bộ tài liệu/chỉ mục bàn giao; dừng TASK-17, chưa tự làm task tiếp.
@@ -3091,7 +3091,7 @@ Task19; không chạy lại hoặc sửa báo cáo/browser/soak cũ, không gi�
 
 Gói D:/AEGIS/task19_docs_handoff_20261028 có before/hash, protected hashes,
 smoke_docs.py, logs/run_final lỗi/run02 cuối, review/diff/artifact/progress QA.
-Lượt cuối **15:54:37–15:55:23 ngày28/10/2026 UTC+7**:
+Lượt cuối **15:54:37–15:55:23 ngày 28/10/2026 UTC+7**:
 
 | Kiểm tra mới chạy | Kết quả / bằng chứng |
 |---|---|
@@ -3102,7 +3102,7 @@ Lượt cuối **15:54:37–15:55:23 ngày28/10/2026 UTC+7**:
 | Help/generation | 5 CLI help exit0, JS syntax OK, collection regenerated byte-identical trong temp |
 | Smoke tổng | 22 điều kiện đạt; verification.json |
 | Preservation | 59 runtime/static/legacy Postman files giữ SHA; protected_source_sha256.json |
-| Cleanup | Worker/thread dừng,cổng đóng,store/account tạm dọn; verification |
+| Cleanup | Worker/thread dừng, cổng đóng, store/account tạm dọn; verification |
 
 Lượt đầu run_final đã qua12/1/20 test nhưng lỗi đọc cp1252 dash trong output
 help bằng UTF-8, dẫn đến stdoutNone; chưa được gọi complete. Đã đặt UTF-8 riêng
@@ -3127,7 +3127,7 @@ chưa tự commit/push hoặc làm task tiếp. Các kết quả lịch sử và
 
 Cập nhật **28/10/2026, UTC+7 (Asia/Bangkok)**. **Hoàn thành audit/ignore/danh
 mục và review guide**, không stage/commit/push, không switch/reset/stash hoặc
-Git init/move AI. HEAD/branch/index/staged diff và109 tracked file giữ nguyên;
+Git init/move AI. HEAD/branch/index/staged diff và 109 tracked file giữ nguyên;
 nhánh local feat/3-mobile-integration, các thay đổi Task19 chưa commit được giữ.
 
 Sửa D:/AEGIS/.gitignore và backend/.gitignore để chặn uploads/backups/raw_exports,
@@ -3146,7 +3146,7 @@ trắng/scripts/technical fixtures phải curate riêng, không add -f cả thư
 Gói D:/AEGIS/task20_source_management_20261028 có before/status/index/worktree/
 runtime hashes, audit_sources.py, run_final partial/run02/run03, redacted scan,
 inventory/review batches/literal context resolution, diff/QA/review/progress.
-Lượt cuối **16:21:32–16:21:38 ngày28/10/2026 UTC+7**:
+Lượt cuối **16:21:32–16:21:38 ngày 28/10/2026 UTC+7**:
 
 | Kiểm tra | Kết quả thực tế / bằng chứng |
 |---|---|
@@ -3160,15 +3160,15 @@ Lượt cuối **16:21:32–16:21:38 ngày28/10/2026 UTC+7**:
 | Diff |git diff --check exit0; LF→CRLF warning ở docs sẵn có không là failure |
 
 Lượt đầu partial sau inventory/scan không qua Git init thử trong temp; không
-tạo AI repo. Chuyển sang projected worktree chỉ đọc, run02 đạt11/38. Sau phân
+tạo AI repo. Chuyển sang projected worktree chỉ đọc, run02 đạt 11/38. Sau phân
 loại rõ các metadata cases, mở scan .ps1/.scss/LICENSE và batch Git ignore,
-run03 source cuối đạt11/38; không cộng lượt. Một inline context command bị
+run03 source cuối đạt 11/38; không cộng lượt. Một inline context command bị
 PowerShell quoting từ chối, đã dùng script file che string. Không có auto-review
 rejection hoặc network/remote contact. Ignore tests không tạo DB/ảnh thật.
 
 Không đọc .env/key/DB/dataset/runtime/private artifact contents vào report;
 không scan đầy đủ lịch sử Git/ignored files/binary/notebook outputs hoặc chứng
-nhận toàn workspace secret-free. 32 literal không là32 secret thực bị lộ.
+nhận toàn workspace secret-free. 32 literal không là 32 secret thực bị lộ.
 AI src/train/data tools chỉ được đọc audit, không execute. Không chạy lại API/
 model/mobile suites hoặc inference/train cho thay đổi ignore/docs; không sửa
 Backend/pilot/AI runtime, static/mobile, checkpoint/threshold/label/split.
@@ -3182,7 +3182,7 @@ ignore/docs thuộc Task20 thay đổi; lịch sử status append giữ prefix.
 Review10 mục/lệnh Windows: D:/AEGIS/task20_source_management_20261028/REVIEW_VI.md.
 Nếu muốn bàn giao tiếp, người dùng chọn batch source cụ thể trong guide rồi
 curate fixture/test trước commit được yêu cầu. Task09/10/12 vẫn chờ điều kiện
-thực; Task21/22 tùy chọn, không tự notification/train. Dừng TASK-20.
+thực; Task 21/22 tùy chọn, không tự notification/train. Dừng TASK-20.
 
 ## 63. Báo cáo tổng hợp toàn dự án và các hướng phát triển mới — sau TASK-20
 
@@ -3236,7 +3236,7 @@ qua HTTP. V4 ảnh giữ mặc định, boundary-r2 vẫn là candidate, không 
 | Late assessment versions | V1 immutable; v2/v3 bổ sung khi có bucket muộn, parent/base/hash/frozen profile/window/expiry; current/history và recheck workflow | Có version/replay, không force-recompute làm mất lịch sử hoặc dùng thông tin tới muộn cho quá khứ |
 | Temporal dataset/replay | Feature120h, windows6/24/72/120h; label interval/censoring, as-of availability, revision; group/time split/purge; snapshot v1/v2 legacy và v3/v4 research | Có builder/replay/tests; 72h/24h là đề xuất; chưa trainer/inference temporal hoặc field dataset được duyệt |
 | Leakage audit | Mutation xuyên assessment/profile/observation/peer/intervention/coverage/schedule, predictor ready và positive controls; tách future label/diagnostic | Đã kiểm meaningful synthetic cases, không là chứng minh mọi leakage path đều an toàn hoặc fit-time preprocessing đã audit |
-| Nghiên cứu Task09/10 | Protocol v0.2 DRAFT/manifest, decision register, source dossier, people/schedule, purpose permissions và evidence intake | Có hồ sơ có version; protocol chưa frozen, nguồn/quyền/SOP/chuyên môn chưa được xác nhận |
+| Nghiên cứu Task 09/10 | Protocol v0.2 DRAFT/manifest, decision register, source dossier, people/schedule, purpose permissions và evidence intake | Có hồ sơ có version; protocol chưa frozen, nguồn/quyền/SOP/chuyên môn chưa được xác nhận |
 | Controlled raw | Source controlled_experiment opt-in riêng cho pot/tray; context/cluster/control/provenance, filter, export/audit v2; legacy v1 giữ | Contract phần mềm được người dùng đồng ý, không mở controlled disease labels/hourly/rule/field evaluation/train |
 | Vận hành | Case nhiều thiết bị, missing/late/outage/paused/restart; mock liên tục, theo dõi resource; phiên4h real-clock và rehearsal browser có artifact | Có bằng chứng theo phiên; 168h mô phỏng không là uptime7ngày, chưa24h/SLA/đĩa hỏng/mất điện thật |
 | Backup/restore | CLI backup/verify/restore bảy DB+uploads/marker/metadata, hai lease, hashes/integrity/FK/ownership/chain; sentinel chặn restore dở | Đã restore/reopen/auth/image/replay trên kho tạm; không restore production; retention chỉ đề xuất chưa xóa tự động |
@@ -3244,7 +3244,7 @@ qua HTTP. V4 ảnh giữ mặc định, boundary-r2 vẫn là candidate, không 
 | Tài liệu/contract | Current handoff/runbook, cập nhật scope core/pilot/offline, Postman raw riêng, sửa nhãn fixture encoding và giữ mốc cũ | Có smoke mới ở Task19; không coi fixture metadata là checkpoint V4 đã nạp hoặc số test cũ vừa chạy |
 | Quản lý source | Inventory/candidate batches, redacted scan, ignore root/backend/AI, source review guide và kiểm index/branch/HEAD | Đã audit/chuẩn bị; chưa stage/import/commit/push pilot/AI, chưa clean-clone/CI/provision được xác minh |
 
-Chi tiết theo từng mốc ở mục1–48 và49–62; không bỏ các lần thử lỗi, khác biệt
+Chi tiết theo từng mốc ở mục1–48 và 49–62; không bỏ các lần thử lỗi, khác biệt
 scope hoặc số liệu gốc. Báo cáo này gom năng lực, không đếm số script/file như
 mức hoàn thành sản phẩm và không tự gán một phần trăm tiến độ tổng thể.
 
@@ -3253,7 +3253,7 @@ mức hoàn thành sản phẩm và không tự gán một phần trăm tiến �
 Dữ liệu baseline lịch sử:5.174 ảnh,3.620 train/1.034 validation/520 test.
 Các đối chứng source-r1/boundary-r2 dùng validation1034 ảnh/3161 GT cố định.
 Train boxes V4/source-r1/boundary-r2 lần lượt11812/11825/11827 theo audit cũ.
-Các con số này được trích từ mục5–6, không vừa tính lại dataset ngày28/10.
+Các con số này được trích từ mục5–6, không vừa tính lại dataset ngày 28/10.
 
 | Kết quả validation seed42 lịch sử | mAP50 | mAP50–95 | F1 @0,25 |
 |---|---:|---:|---:|
@@ -3262,8 +3262,8 @@ Các con số này được trích từ mục5–6, không vừa tính lại dat
 | Boundary-r2 |69,24%|32,89%|66,46%|
 
 Đối chứng ba seed42/43/44 là **source-r1 so với boundary-r2**, không là ba seed
-boundary-r2 so với V4. Mean mAP50–95:32,81%±0,10 và33,02%±0,15; F1:65,97%±0,35
-và66,57%±0,17. Đây là SD mẫu của các run đã lưu, cải thiện nhỏ; không chứng minh
+boundary-r2 so với V4. Mean mAP50–95:32,81%±0,10 và 33,02%±0,15; F1:65,97%±0,35
+và 66,57%±0,17. Đây là SD mẫu của các run đã lưu, cải thiện nhỏ; không chứng minh
 ý nghĩa thống kê hoặc hiệu năng thực địa. V4 tiếp tục mặc định. Benchmark HTTP
 cũ có mẫu đo nhỏ, không đủ kết luận tải/latency production; chưa chạy mới.
 
@@ -3297,13 +3297,13 @@ Nguồn: [AI evaluation bàn giao](handoff_20261024/AI_EVALUATION.md),
 |15|Bị chặn, chưa được phép train|Chỉ mở baseline khi nguồn/nhãn/protocol/eligibility và authorization đủ|
 |16|Chưa làm, có điều kiện|Inference/model temporal sau đánh giá phù hợp, không chọn deep model mặc định|
 |17|Hoàn thành rehearsal/công cụ kho hiện hành|Bảy DB/uploads/metadata; retention chưa áp dụng, chưa production restore|
-|18|Một phần, nâng cấp có điều kiện|Có4h và failure cases; không cần soak tiếp chỉ tăng thời lượng|
+|18|Một phần, nâng cấp có điều kiện|Có 4h và failure cases; không cần soak tiếp chỉ tăng thời lượng|
 |19|Hoàn thành docs/contract smoke local|Current index/runbook/Postman, không claim clean-clone/native/GPU mới|
 |20|Hoàn thành audit/ignore/review guide|Chưa source import/stage/commit/push/AI Git hoặc clone-ready|
 |21|Chưa làm, tùy chọn|Notification/deploy cần mục tiêu/kênh/người nhận/consent; không tự gửi ra ngoài|
 |22|Hoãn nâng cấp ảnh theo ưu tiên người dùng|Giữ V4, chưa mở train/relabel/model replacement mới|
 
-Có9 task có bản ghi hoàn thành trong scope phần mềm được chọn:01/02/03/07/08/
+Có 9 task có bản ghi hoàn thành trong scope phần mềm được chọn:01/02/03/07/08/
 11/17/19/20. Đây không là “9/22 phần trăm sản phẩm” vì độ lớn và dependency
 khác nhau; Task04–06 có nền tảng nhưng chưa được ghi thành hoàn thành. Không
 tự đánh dấu09/10/12–16 đã xong vì source mock hoặc contract raw hoạt động.
@@ -3315,14 +3315,14 @@ tự đánh dấu09/10/12–16 đã xong vì source mock hoặc contract raw ho�
 | Image/Backend các mốc đầu | Unit/contract/storage/auth/quota/idempotency, HTTP inference V4 thật, Postman, seed artifact/benchmark | Có model thật ở phiên đó; không chạy lại trong lượt báo cáo này |
 | Vận hành25–26/10 |4h real-clock có restart,12 device/2 owner; cùng các case mô phỏng dài/missing/late | Không SLA/uptime7ngày hoặc field evidence |
 | Task01–03 | Full workflow/browser, late correction/recheck và pickers | Chỉ luồng/config đã kiểm; không thay test mobile native hiện hành |
-| Task07 |56 temporal tests,74 kiểm tra qua37 HTTP request và CLI/legacy replay | Bằng chứng scope assessment bridge ngày27/10 |
-| Task08 |65 temporal tests,7 mutation pairs/56 điều kiện và30 artifact checks | Meaningful synthetic audit, không metric model |
-| Task09 |20 pipeline tests,15 scenario và16 đối chiếu | Kiểm design/feasibility, protocol vẫn unfrozen |
+| Task07 |56 temporal tests,74 kiểm tra qua37 HTTP request và CLI/legacy replay | Bằng chứng scope assessment bridge ngày 27/10 |
+| Task08 |65 temporal tests,7 mutation pairs/56 điều kiện và 30 artifact checks | Meaningful synthetic audit, không metric model |
+| Task09 |20 pipeline tests,15 scenario và 16 đối chiếu | Kiểm design/feasibility, protocol vẫn unfrozen |
 | Task10 |16 API tests+10 research replay,21 đối chiếu;16 root tạm dọn | Không xác nhận người/quyền/source thật |
 | Task11 |128 pilot+65 temporal;14 điều kiện qua26 request/6CLI | Controlled raw software fixture; legacy tương thích |
-| Task17 |136 pilot+65 temporal;53 điều kiện,8CLI,restore/open/auth/image/replay | Toàn bộ byte trước mở khớp; login mới đổi demo.db do session, không giả hash sau login giữ |
+| Task17 |136 pilot+65 temporal;53 điều kiện,8CLI, restore/open/auth/image/replay | Toàn bộ byte trước mở khớp; login mới đổi demo.db do session, không giả hash sau login giữ |
 | Task19 |12 pilot+1 core AI contract+20 pipeline,22 Newman request/30 assertion | Không checkpoint/inference/native, giữ runtime/static/legacy collection |
-| Task20 |38 ignore probes,11 kiểm Git,inventory1455 record,scan320 file chọn lọc | HEAD/index/branch giữ;0 high-confidence pattern hit không chứng nhận toàn workspace sạch secret;32 literal là context review |
+| Task20 |38 ignore probes,11 kiểm Git, inventory1455 record, scan320 file chọn lọc | HEAD/index/branch giữ;0 high-confidence pattern hit không chứng nhận toàn workspace sạch secret;32 literal là context review |
 
 Số suite ở các mốc thường chứa lại test cũ; không cộng56+65+128+136 thành số
 test độc lập hoặc lấy pass rate làm độ chính xác bệnh. Hash nguyên không là
@@ -3361,8 +3361,8 @@ chưa biết lịch người dùng/nhóm và nguồn lực thực.
 |---|---|---|
 | H1 — Bản bàn giao source tái lập được | Chọn allowlist pilot/Backend/AI source; curate fixture synthetic tối thiểu vào vị trí ổn định; tách env/runtime/data; document provision weights/hash; test ở checkout/copy sạch | Reviewer chạy bộ kiểm không GPU mà không dựa artifact riêng; phần V4 có điều kiện provisioning rõ. Commit/PR chỉ khi được yêu cầu, chưa tự chọn monorepo |
 | H2 — Backend làm điểm tích hợp thống nhất cho mobile | Chọn một lát cắt nghiệp vụ hữu ích (ví dụ danh sách việc cần kiểm tra→chi tiết current/version→ack/check); chuẩn hóa contract/DTO/error/availability/source và acceptance tests cho client | Chốt core/pilot entry point và subset được hỗ trợ; owner/role/version đúng, không buộc nhóm mobile tái dựng prototype web. Phần việc người dùng là API/logic/test/docs |
-| H3 — Từ raw staging đến chất lượng dữ liệu | Khi có logger/file mẫu: adapter có lineage,units/clock/late/QC,missingness và contract hourly được chứng minh; ghép nhật ký chăm sóc/quan sát độc lập alert | Giữ raw, không suy duration từ point; không tạo giờ đủ bằng dữ liệu giả. Có thể thu thử kỹ thuật trước, chưa cần chứng minh bệnh để kiểm vận hành |
-| H4 — Nghiên cứu dự báo có thể bảo vệ về phương pháp | Chốt endpoint/case definition/SOP với chuyên môn; protocol frozen trước đánh giá, nguồn/quyền,cụm độc lập,split/holdout/censoring và metric theo sự kiện | Chỉ sau readiness và user authorization mới train baseline dễ kiểm; so comparator cùng protocol. Không ưu tiên LSTM/Transformer chỉ vì dữ liệu chuỗi hoặc dùng YOLO/rule làm GT |
+| H3 — Từ raw staging đến chất lượng dữ liệu | Khi có logger/file mẫu: adapter có lineage, units/clock/late/QC, missingness và contract hourly được chứng minh; ghép nhật ký chăm sóc/quan sát độc lập alert | Giữ raw, không suy duration từ point; không tạo giờ đủ bằng dữ liệu giả. Có thể thu thử kỹ thuật trước, chưa cần chứng minh bệnh để kiểm vận hành |
+| H4 — Nghiên cứu dự báo có thể bảo vệ về phương pháp | Chốt endpoint/case definition/SOP với chuyên môn; protocol frozen trước đánh giá, nguồn/quyền, cụm độc lập, split/holdout/censoring và metric theo sự kiện | Chỉ sau readiness và user authorization mới train baseline dễ kiểm; so comparator cùng protocol. Không ưu tiên LSTM/Transformer chỉ vì dữ liệu chuỗi hoặc dùng YOLO/rule làm GT |
 | H5 — Vận hành theo failure case có giá trị | Chọn lỗi cụ thể: token expiry, request đang chạy khi đổi context, crash/restart/interrupted worker hoặc restore bản mới; runbook chẩn đoán/rollback theo version | Đặt pass/fail/resource/cleanup trước chạy, chỉ process/kho test của mình. Chỉ thêm soak/production/push khi có nhu cầu, không tăng giờ/chức năng để tăng số liệu |
 | H6 — Hồ sơ đồ án theo chuỗi yêu cầu–bằng chứng–giới hạn | Ma trận yêu cầu→API/module→test/artifact→demo; báo cáo image validation riêng, mock workflow riêng, temporal readiness riêng; script demo lặp được và phần hạn chế trung thực | Người đọc hiểu chính xác đã làm gì/chưa chứng minh gì; không gọi mAP là accuracy hoặc pass rate là field performance. Điều kiện nghiệm thu học thuật do nhóm/giảng viên chốt, không tự khẳng định đã đủ tốt nghiệp |
 
@@ -3384,8 +3384,8 @@ vi được chọn. Các hướng này không bị xóa backlog, chỉ chưa có
 | Giao API cho mobile | Một luồng nghiệp vụ end-to-end được chốt, source/current/history/error semantics rõ | HTTP/contract tests và nhóm client tích hợp theo đúng surface; không gọi API test là UX native |
 | Mở thu kỹ thuật | Điểm/thiết bị/người vận hành/quyền trong phạm vi có thật, raw/source contract đúng | File gốc+metadata+clock/QC report và khả năng backup/restore; thiếu bệnh vẫn báo đúng technical pilot |
 | Mở nghiên cứu bệnh | Người đủ chuyên môn, SOP/lịch độc lập/case definition và protocol/permissions đủ | Nhãn nguồn có evidence/version/availability, số cụm/sự kiện/QC thực và quyết định đủ/chưa đủ có căn cứ |
-| Mở train/đánh giá | Dữ liệu đủ điều kiện,split/holdout đã khóa,baseline/comparator/budget được duyệt và user cho phép train | Run manifest/config/seed/review, metric events/false alerts/lead interval/abstention và giới hạn |
-| Mở production/push | Có nhu cầu/người nhận/consent,security/ops/rollback/RPO-RTO được chọn | Rehearsal theo failure case và phạm vi triển khai riêng; không tự bật từ thành công local |
+| Mở train/đánh giá | Dữ liệu đủ điều kiện, split/holdout đã khóa, baseline/comparator/budget được duyệt và user cho phép train | Run manifest/config/seed/review, metric events/false alerts/lead interval/abstention và giới hạn |
+| Mở production/push | Có nhu cầu/người nhận/consent, security/ops/rollback/RPO-RTO được chọn | Rehearsal theo failure case và phạm vi triển khai riêng; không tự bật từ thành công local |
 
 Chưa cần người dùng cung cấp credential, giấy tờ riêng hoặc cam kết mua thiết
 bị để bắt đầu H1/H2/H6. Khi sẵn có, những thông tin mới hữu ích cho H3/H4 là
@@ -3423,7 +3423,7 @@ mobile là client mục tiêu, V4 giữ, mượn thiết bị khi rảnh, chưa 
 ### 63.10. Phạm vi lần cập nhật báo cáo này
 
 Đã đọc/đối chiếu status1–62, tài liệu current/source/mobile và artifact summary
-liên quan; lập báo cáo toàn dự án, bảng22 task và6 hướng mới. Ghi **toàn bộ
+liên quan; lập báo cáo toàn dự án, bảng22 task và 6 hướng mới. Ghi **toàn bộ
 nội dung mục63 vào chính file status**, không chỉ trỏ sang file khác. Có bản
 đọc riêng tại D:/AEGIS/project_report_20261028/REPORT_VI.md và status_before.md
 để đối chiếu. Kiểm local links và append byte-prefix bằng script/proof của gói.
@@ -3606,7 +3606,7 @@ riêng theo môi trường khi bàn giao thực tế; không gọi đã đạt t
 
 Không stage/commit/push, không sửa index/HEAD/branch/mobile/DB thật, không
 train/đổi V4/threshold/split/nhãn, không gửi thông báo hoặc deploy. Lịch sử
-Task20/63 và evidence trước giữ nguyên; mục64 bổ sung kết quả mới.
+Task 20/63 và evidence trước giữ nguyên; mục64 bổ sung kết quả mới.
 
 
 
@@ -3662,7 +3662,7 @@ APPEND trùng phần status không được tính là task mới hoặc lệnh t
    chọn requirement episode/case, kiểm snapshot hash, resolve base/supplemental
    và current revision của đúng base. Trả ID/base/revision/hash/snapshot,
    available_at, freshness, workflow version và consistency. Base snapshot cũ
-   không bị ghi đè; lỗi integrity trả503, không fallback demo/bản cũ.
+   không bị ghi đè; lỗi integrity trả 503, không fallback demo/bản cũ.
 5. Contract/schema giải thích task_kind, mock source, expired, current≠required,
    version workflow≠revision assessment, pagination, UUID retry và lỗi400/401/
    404/409/429/503. Dùng routes list/detail/events/observations/version hiện có;
@@ -3704,7 +3704,7 @@ phần mềm, không phải accuracy/mAP hoặc field performance.
 | Nội dung | Cách kiểm/lệnh | Kết quả thực tế | Bằng chứng |
 |---|---|---|---|
 | Focused H2 lần đầu | unittest discover backend/checks -p test_mobile_pilot.py |11/11 đạt; sau đó thêm case cửa sổ mới và siết assertion raw403; kết quả cuối ở full suite | focused.log |
-| Backend core+H2 cuối | H1 check_handoff runner từ release H2 |83/83, trong đó12 H2 | run01/clean_copy.log |
+| Backend core+H2 cuối | H1 check_handoff runner từ release H2 |83/83, trong đó 12 H2 | run01/clean_copy.log |
 | Pilot hồi quy | Cùng runner, subprocess riêng |136/136 | cùng log |
 | Temporal/replay/leakage | Cùng runner, không train |65/65 | cùng log |
 | Image contract | Fake detector, không checkpoint |12/12 | cùng log |
@@ -3714,7 +3714,7 @@ phần mềm, không phải accuracy/mAP hoặc field performance.
 | Version/window | Late bucket tạo revision2, episode sang base/window mới, v1 không bị đổi | Qua | Backend suite log |
 | Launcher | Help không chạy server; default config core; pilot lease giữ và thả khi server.run giả lập lỗi | Qua; HTTP test dùng factory, chưa gọi CLI với kho người dùng | test_mobile_pilot và help đã chạy |
 | Package/source | Build/verify128 file, AST parse, canonical hash match | Đạt | boundaries.json, release01/MANIFEST.json |
-| Bảo toàn | H1 release hash/inventory, index/HEAD/branch/staged và tracked ngoài scope/mobile | Không đổi; chỉ3 tracked file H2 thay đổi như danh sách | before.json, boundaries.json |
+| Bảo toàn | H1 release hash/inventory, index/HEAD/branch/staged và tracked ngoài scope/mobile | Không đổi; chỉ 3 tracked file H2 thay đổi như danh sách | before.json, boundaries.json |
 | Secret patterns giới hạn |3 pattern private-key/GitHub/AWS trên selected plaintext |0 hit; không bảo đảm sạch mọi secret/PII/history | boundaries.json |
 | Whitespace | git diff --check | Không lỗi; chỉ cảnh báo LF/CRLF của Git | Chạy trong H2 |
 | Chưa kiểm | Native/UI/camera/LAN, clean dependency install, GPU, Newman, production | Không chạy; ngoài scope | Run summary và phạm vi task |
@@ -3727,7 +3727,7 @@ phần mềm, không phải accuracy/mAP hoặc field performance.
 | Chốt core/pilot entrypoint/subset | Đạt | Serve_mobile default core, pilot flag explicit; contract supported routes |
 | DTO/source/availability/error | Đạt | Capabilities, assessment-view, schema/DTO tables, auth/error semantics |
 | Owner/version/recheck đúng | Đạt bộ kiểm | HTTP và negative tests; current không thay required hoặc v1 |
-| Acceptance tests cho client | Đạt Backend |12 test H2 + toàn bộ300 regression từ copy |
+| Acceptance tests cho client | Đạt Backend |12 test H2 + toàn bộ 300 regression từ copy |
 | Không buộc làm frontend | Đạt scope | Không mobile/static edit; nhóm client có thể tích hợp sau theo contract |
 | Tích hợp native end-to-end | Chưa làm, ngoài scope đã chọn | Cần nhóm mobile thực hiện/kiểm thiết bị, không báo H2 Backend là UI đã xong |
 
@@ -3835,15 +3835,15 @@ có rubric nghiệm thu chính thức của trường. Không tự coi ma trận
 
 Trước H6 có nhiều báo cáo theo ngày nhưng chưa có một bản mapping yêu cầu→module→
 test→evidence→demo→giới hạn. Một số số liệu dễ bị trộn:300 test H2, mAP/F1 ảnh,
-72h target temporal và4h vận hành. Phiên soak đầu thực tế stopped; chỉ phiên
-restart26/10 mới completed4h. H6 giữ cả hai, không gộp số liệu hoặc sửa lịch sử.
+72h target temporal và 4h vận hành. Phiên soak đầu thực tế stopped; chỉ phiên
+restart 26/10 mới completed4h. H6 giữ cả hai, không gộp số liệu hoặc sửa lịch sử.
 
 ### 66.3. Những việc đã thực hiện
 
 1. Tạo ma trận R01–R20 ở docs/THESIS_TRACEABILITY.json và bản đọc THESIS_EVIDENCE.md.
    Mỗi dòng có trạng thái, source/test refs, evidence IDs, demo stages nếu có,
-   điều được kết luận, điều không suy ra và phần còn thiếu. Có12 implemented,
-   6 partial,2 blocked — đây là20 yêu cầu kỹ thuật tái dựng, không thay22 task cũ.
+   điều được kết luận, điều không suy ra và phần còn thiếu. Có 12 implemented,
+   6 partial,2 blocked — đây là 20 yêu cầu kỹ thuật tái dựng, không thay22 task cũ.
 2. Catalog E01–E14 phân biệt local_historical, bundled_historical, source_document
    và bundled_curated. Ghi SHA-256/ngày/phạm vi; không mang DB/ảnh/dataset/log chứa
    thông tin riêng vào source. E12 protocol draft chỉ là tài liệu, không evidence
@@ -3851,7 +3851,7 @@ restart26/10 mới completed4h. H6 giữ cả hai, không gộp số liệu ho�
    trước Task11, không ghi đè contract raw opt-in hiện có.
 3. Curate metadata ảnh/soak/H2 vào docs/evidence/THESIS_HISTORICAL_SUMMARY.json.
    Đối chiếu18 scalar của6 summary model/3 metric,9 cặp mean–SD và F1 V4 từ
-   TP/FP/FN; kiểm hash aggregate đầu vào khớp báo cáo24/10. Chỉ tính từ JSON cũ,
+   TP/FP/FN; kiểm hash aggregate đầu vào khớp báo cáo 24/10. Chỉ tính từ JSON cũ,
    không train/inference/mở tập test. V4 validation mAP50=68,79%, mAP50–95=32,58%,
    micro F1@0,25=66,14%; không gọi là accuracy hoặc field performance. Ba seed là
    source-r1/boundary-r2, không V4 đối chứng ba seed; giữ V4 mặc định.
@@ -3865,7 +3865,7 @@ restart26/10 mới completed4h. H6 giữ cả hai, không gộp số liệu ho�
    test/mẫu độc lập. Kiểm output đã có không bị overwrite, curated metadata sai
    hash bị từ chối và local evidence thiếu không được gọi verified.
 6. Viết checker refs/hash và demo runbook/lời dẫn; link entrypoint ở current docs.
-   Allowlist thêm8 file thành136, gồm6 file H6 mới và2 mobile docs có sẵn nội dung
+   Allowlist thêm8 file thành136, gồm6 file H6 mới và 2 mobile docs có sẵn nội dung
    giữ nguyên để refs trong package tồn tại. H1/H2 release cũ nguyên vẹn. Không
    sửa source ứng dụng/AI/mobile hoặc chạy lại300 regression chỉ để tăng số liệu.
 
@@ -3918,7 +3918,7 @@ Các hash này không là chữ ký, quyền công bố hoặc đảm bảo nộ
 |---|---|---|
 | Yêu cầu→API/module→test/artifact→demo | Đạt phạm vi kỹ thuật | R01–R20,63 refs/E01–E14/D01–D08; dòng ngoài demo chỉ đúng artifact |
 | Image validation riêng | Đạt tài liệu/provenance | Curated metrics + raw JSON refs/hash/arithmetic; không evaluation mới |
-| Mock workflow riêng | Đạt | Demo actual HTTP và36 checkpoint, source mock/synthetic rõ |
+| Mock workflow riêng | Đạt | Demo actual HTTP và 36 checkpoint, source mock/synthetic rõ |
 | Temporal readiness riêng | Đạt | DRAFT/blocked/no trained model/no field metrics, không giả inference |
 | Script demo lặp được | Đạt |2 lần, một lần source copy chặn original; output/cleanup được kiểm |
 | Người đọc hiểu đã làm/chưa chứng minh | Đạt hồ sơ hiện có | Allowed/forbidden/remaining cho mỗi dòng, mốc ngày và source evidence kind |
@@ -3930,12 +3930,12 @@ Matrix là engineering traceability, không phải task-completion score hay ph�
 bổ công lao thành viên. implemented chỉ có nghĩa phạm vi đã ghi có source/evidence;
 partial/blocked không được đổi vì demo qua. Mỗi evidence phân loại nguồn/bundled
 và local-historical để người nhận biết gói source thiếu những gì. Default checker
-không âm thầm “pass” cả14 khi chỉ có3; strict local mode fail nếu thiếu bản gốc.
+không âm thầm “pass” cả 14 khi chỉ có 3; strict local mode fail nếu thiếu bản gốc.
 
 Doc links85 được kiểm trên workspace gốc; package không có toàn bộ link local
 historical là có chủ đích và được báo. E14 metadata curate không thay raw original
 hoặc quyền sử dụng. Hash chỉ kiểm byte, không ký xác thực/chứng minh chuyên gia.
-Secret scan chỉ3 pattern chọn lọc, không đủ kết luận toàn workspace/history sạch.
+Secret scan chỉ 3 pattern chọn lọc, không đủ kết luận toàn workspace/history sạch.
 
 Demo dùng datetime hiện tại, UUID/account mới và temp store riêng nên lặp được
 ở ngày khác mà không sửa fixture cố định. Summary chỉ stage/status/invariant,
@@ -3966,7 +3966,7 @@ HTTP localhost; không chạy trên kho/tài khoản người dùng. Đọc8 sta
 THESIS_DEMO.md và ma trận ở THESIS_EVIDENCE.md, không dùng output làm số đo bệnh.
 
 Trên package không có originals local, chạy checker **không --local-evidence**:
-expected3 checked và11 external not checked; không xóa cờ này để gọi tất cả đã
+expected3 checked và 11 external not checked; không xóa cờ này để gọi tất cả đã
 được verified. Muốn strict14 phải cấp đúng originals/hash theo quyền nguồn.
 Tạo env ngoài pristine source package theo H1 guide; không ghi runtime vào package.
 
@@ -4083,14 +4083,14 @@ Nguồn điều hướng: [current handoff](docs/CURRENT_HANDOFF.md),
 | TASK-15 | Chặn, chưa cho phép train | H4 readiness/protocol/split/holdout và authorization riêng |
 | TASK-16 | Chưa làm, có điều kiện | Chỉ inference temporal sau model/evaluation phù hợp |
 | TASK-17 | Hoàn thành công cụ/rehearsal kho hiện hành | Retention/production recovery/off-device cần scope riêng |
-| TASK-18 | Một phần, nâng cấp có điều kiện | Có4h/failure cases; H5 không tự thêm soak để tăng giờ |
+| TASK-18 | Một phần, nâng cấp có điều kiện | Có 4h/failure cases; H5 không tự thêm soak để tăng giờ |
 | TASK-19 | Hoàn thành docs/contract smoke | H1/H2/H6 bổ sung tài liệu/bàn giao, không native/production |
 | TASK-20 | Hoàn thành audit/ignore/review guide | H1 bổ sung source package; chưa stage/commit/push/AI Git |
 | TASK-21 | Chưa làm, tùy chọn | Notification cần nhu cầu/kênh/người nhận/consent riêng |
 | TASK-22 | Hoãn nâng cấp ảnh | Giữ V4; không tự train/relabel/model switch |
 
 Các task có bản ghi hoàn thành trong scope đã chọn vẫn là
-01/02/03/07/08/11/17/19/20. Không gọi9/22 là phần trăm hoàn thành sản phẩm.
+01/02/03/07/08/11/17/19/20. Không gọi 9/22 là phần trăm hoàn thành sản phẩm.
 H1/H2/H6 là các hướng công việc bổ sung, không cộng chúng thành task23–25 hoặc
 đánh dấu các task thu thật/train/native đã xong.
 
@@ -4107,14 +4107,14 @@ H1/H2/H6 là các hướng công việc bổ sung, không cộng chúng thành t
 
 | Phiên | Kết quả đã ghi | Cách diễn giải |
 |---|---|---|
-| Ảnh validation lịch sử21–24/10 | V4 mAP50=68,79%, mAP50–95=32,58%, F1 micro@0,25=66,14% | Không accuracy, không đánh giá thực địa hoặc lượt inference29/10 |
+| Ảnh validation lịch sử 21–24/10 | V4 mAP50=68,79%, mAP50–95=32,58%, F1 micro@0,25=66,14% | Không accuracy, không đánh giá thực địa hoặc lượt inference 29/10 |
 | Đối chứng3seed | Source-r1/boundary-r2 mean mAP50–95=32,81%±0,10 /33,02%±0,15 | SD mẫu theo seed; không đối chứng3seed với V4/CI thực địa |
-| Soak đầu25/10 | stopped,5949,750giây, chưa đủ14400giây yêu cầu | Giữ thất bại thời lượng, không cộng với phiên sau |
-| Soak restart26/10 | completed,14407,469giây gồm lifecycle,8439HTTP/2799resource sample |4h mock local, không SLA/field metric; khác168h mô phỏng |
-| H1 ngày28/10 |288/288 tests từ source copy sạch,123 file | Existing interpreter, không clean install từ đầu |
-| H2 ngày28/10 |300/300 tests, gồm12 H2;83 Backend+136 pilot+65 temporal+12 image contract+4 handoff | Không cộng288+300 thành588 test độc lập; image contract dùng detector giả |
-| H6 ngày28/10 |20 requirements/63 refs/14 evidence;2 demo×36 checkpoint; package136 file | Checkpoint không là unit test/mẫu bệnh; không inference/train; source package default chỉ kiểm3 bundled và báo11 external chưa kiểm |
-| Bản tổng hợp29/10 này | Chạy lại checker refs/hash:20 requirements,63 refs,14 evidence đạt | Chỉ đối chiếu file/hash, không rerun300 tests, demo, GPU hoặc soak |
+| Soak đầu 25/10 | stopped,5949,750 giây, chưa đủ 14400 giây yêu cầu | Giữ thất bại thời lượng, không cộng với phiên sau |
+| Soak restart 26/10 | completed,14407,469 giây gồm lifecycle,8439HTTP/2799resource sample |4h mock local, không SLA/field metric; khác168h mô phỏng |
+| H1 ngày 28/10 |288/288 tests từ source copy sạch,123 file | Existing interpreter, không clean install từ đầu |
+| H2 ngày 28/10 |300/300 tests, gồm12 H2;83 Backend+136 pilot+65 temporal+12 image contract+4 handoff | Không cộng288+300 thành588 test độc lập; image contract dùng detector giả |
+| H6 ngày 28/10 |20 requirements/63 refs/14 evidence;2 demo×36 checkpoint; package136 file | Checkpoint không là unit test/mẫu bệnh; không inference/train; source package default chỉ kiểm3 bundled và báo11 external chưa kiểm |
+| Bản tổng hợp 29/10 này | Chạy lại checker refs/hash:20 requirements,63 refs,14 evidence đạt | Chỉ đối chiếu file/hash, không rerun300 tests, demo, GPU hoặc soak |
 
 Bằng chứng: [H1](h1_source_handoff_20261028/progress_verification.json),
 [H2](h2_mobile_backend_20261028/progress_verification.json),
@@ -4143,7 +4143,7 @@ phù hợp trước khi kết thúc, cập nhật status và dừng để ngư�
 
 | Mã | Task chức năng/công việc nhỏ | Đầu ra và tiêu chí hoàn thành | Phụ thuộc |
 |---|---|---|---|
-| H2-T01 | Chốt truy vấn danh sách công việc | Chọn filter state/task_kind/device và thứ tự/phân trang theo nhu cầu; contract lỗi và owner tests; không đổi ngầm API cũ | Chọn nhu cầu client trước; hiện route chỉ hỗ trợ page/page_size, query lạ400 |
+| H2-T01 | Chốt truy vấn danh sách công việc | Chọn filter state/task_kind/device và thứ tự/phân trang theo nhu cầu; contract lỗi và owner tests; không đổi ngầm API cũ | Chọn nhu cầu client trước; hiện route chỉ hỗ trợ page/page_size, query lạ 400 |
 | H2-T02 | DTO khả năng thao tác của case | Projection actions/disabled reasons theo state/recheck/version; command vẫn kiểm server authoritative; tests chuyển state/evidence đổi | Sau khi chốt subset hành động; không suy từ state rằng disease/training approved |
 | H2-T03 | Chuẩn hóa luồng refresh/retry/chẩn đoán cho client | Ví dụ DTO/error/request ID, stale/expired/503/429/timeout scenarios và acceptance HTTP; không expose token/body | Có thể chọn độc lập từ contract H2; không cần frontend |
 | H2-T04 | Bàn giao một vertical slice cho nhóm mobile | Fixture/schema/contract và tiêu chí Backend acceptance; checklist client chọn đúng core/pilot/kho và required/current | Nhóm client nhận scope; UI/native/camera/SecureStore do nhóm kiểm riêng, không tự báo đã tích hợp |
@@ -4254,7 +4254,7 @@ HEAD/branch/index/staged; kết quả mới lưu ở project_report_20261029.
 
 Lần này chỉ tạo báo cáo/proof và append status. Không sửa application/AI/mobile,
 không cập nhật allowlist hoặc gói H1/H2/H6 cũ, không cài package/train/inference/
-benchmark/soak/native, không commit/push/deploy. Không gọi20 requirement là22 task
+benchmark/soak/native, không commit/push/deploy. Không gọi20 requirement là 22 task
 hoặc lấy số checkpoint/assertion/sample làm metric bệnh.
 
 ### 67.10. Kết thúc lần cập nhật
@@ -4285,11 +4285,11 @@ Phụ thuộc sử dụng: Python 3.11 có sẵn, mạng PyPI và quyền localh
 
 | Tiêu chí nghiệm thu | Kết quả mới và bằng chứng |
 |---|---|
-| Env mới, không copy venv/site-packages cũ | Đạt; include-system-site-packages=false; trước install chỉ pip24.0/setuptools65.5.0; run04/03_before_install.log và verification.json |
-| Cài đúng requirements CPU, lưu resolver/version | Đạt15/15 pin; pip --isolated install --no-cache-dir từ https://pypi.org/simple; run04/04_install.log,06_versions.log; pip check không lỗi |
-| Kiểm bộ CPU bằng env mới, không đọc source gốc | Đạt300/300,0failure/error/skip;5 subprocess suite; --forbid-source cả hai workspace; origins từ copy; run04/08_cpu_suites.log |
-| Gói source nguyên vẹn trước/sau | Đạt136file; run04/01_verify_original_package.log và09_verify_after.log; manifest SHA b9a2adfc873603065802a210453346b943d839f20aaea605a2a5b5d64774d862 |
-| Cleanup và bảo toàn workspace | Đạt; env/source copy/TEMP do tests tạo nằm trong runtime tạm đã xóa; source/tracked hashes,HEAD/branch/index/staged không đổi; run04/verification.json |
+| Env mới, không copy venv/site-packages cũ | Đạt; include-system-site-packages=false; trước install chỉ pip24.0/setuptools65.5.0; run 04/03_before_install.log và verification.json |
+| Cài đúng requirements CPU, lưu resolver/version | Đạt 15/15 pin; pip --isolated install --no-cache-dir từ https://pypi.org/simple; run 04/04_install.log,06_versions.log; pip check không lỗi |
+| Kiểm bộ CPU bằng env mới, không đọc source gốc | Đạt300/300,0 failure/error/skip;5 subprocess suite; --forbid-source cả hai workspace; origins từ copy; run 04/08_cpu_suites.log |
+| Gói source nguyên vẹn trước/sau | Đạt136file; run 04/01_verify_original_package.log và 09_verify_after.log; manifest SHA b9a2adfc873603065802a210453346b943d839f20aaea605a2a5b5d64774d862 |
+| Cleanup và bảo toàn workspace | Đạt; env/source copy/TEMP do tests tạo nằm trong runtime tạm đã xóa; source/tracked hashes, HEAD/branch/index/staged không đổi; run04/verification.json |
 
 ### B. Thay đổi
 
@@ -4338,7 +4338,7 @@ Lệnh chạy lại không tự append status; finalize.py hiện chỉ chốt r
 
 Fresh install dùng venv hệ thống cô lập với site-packages cũ; pip bootstrap từ
 ensurepip của Python, không upgrade pip/dependency cho tiện. Gói H6 release01
-136file được verify và đối chiếu byte với source hiện hành trước khi copy.
+136 file được verify và đối chiếu byte với source hiện hành trước khi copy.
 Runner canonical giữ các suite tách process; --forbid-source chặn đọc source
 gốc, cho phép dependency của interpreter mới. Manifest kiểm lại sau test.
 Cleanup chỉ xóa runtime đã kiểm parent/name, không xóa source/env đang dùng.
@@ -4382,8 +4382,8 @@ Phụ thuộc sử dụng: Python3.11, mạng PyPI, quyền ghi/rename temp và 
 | Build gói mới và kiểm bên gửi | Đạt136file; run01/sender-package; log01_build,02_verify_sender; canonical source khớp từng byte/hash |
 | Copy nguyên gói sang vị trí nhận mới | Đạt; ngoài D:/AEGIS và D:/AEGIS-AI, path có dấu cách; transferred_inventory_matches=true |
 | Env nhận mới và dependency từ gói nhận | Đạt; không dùng system-site-packages, trước install chỉ pip/setuptools;15/15pin, pip check đạt; log03–08 |
-| Không phụ thuộc source gốc/import origin đúng | Đạt; receiver process chạy từ cwd trống với -I;2guard probe bị từ chối trước khi đọc; canonical child suites -I/--forbid-source; origins app/server/pilot_store/pipeline/bridge thuộc gói nhận; log09 |
-| Bộ CPU và verify sau chạy | Đạt300/300,0failure/error/skip; receiver verify136file trước/sau; sender verify sau đạt; manifest gửi/nhận giống nhau |
+| Không phụ thuộc source gốc/import origin đúng | Đạt; receiver process chạy từ cwd trống với -I;2 guard probe bị từ chối trước khi đọc; canonical child suites -I/--forbid-source; origins app/server/pilot_store/pipeline/bridge thuộc gói nhận; log09 |
+| Bộ CPU và verify sau chạy | Đạt300/300,0 failure/error/skip; receiver verify136file trước/sau; sender verify sau đạt; manifest gửi/nhận giống nhau |
 | Cleanup và bảo toàn source/Git | Đạt; receiver copy/env/test-temp đã xóa; before.json/after.json bằng nhau; source/tracked/HEAD/branch/index/staged giữ nguyên |
 
 Manifest mới SHA-256: b9a2adfc873603065802a210453346b943d839f20aaea605a2a5b5d64774d862.
@@ -4406,7 +4406,7 @@ lặp lỗi sandbox hoặc đổi cấu hình Windows/Python để hoàn thành 
 ### C. Kiểm chứng vừa chạy
 
 Phiên run01: Backend83, pilot136, temporal65, image contract12, handoff4;
-tổng300test,0failure/error/skip. Hai guard probe không tính thành unit test.
+tổng300test,0 failure/error/skip. Hai guard probe không tính thành unit test.
 Đây là phiên nhận mới, không cộng với300test H1-T01/H2 thành nhiều test độc lập.
 Driver bên gửi đọc source để build và snapshot trước/sau là có chủ đích;
 process nhận chỉ dùng gói copy/env/stdlib, không đọc nội dung workspace nguồn.
@@ -4469,7 +4469,7 @@ căn cứ xác nhận.** Không gọi review kỹ thuật là quyền chia sẻ/
 duyệt; không giả định có reviewer độc lập hoặc license của toàn dự án.
 
 Gói duy nhất được review: D:/AEGIS/h1_t02_receiver_20261029/run01/sender-package,
-136file,1.321.780byte source; manifest SHA-256
+136 file,1.321.780byte source; manifest SHA-256
 b9a2adfc873603065802a210453346b943d839f20aaea605a2a5b5d64774d862.
 Đây là định danh byte local, không phải tag/release trên GitHub.
 
@@ -4482,20 +4482,20 @@ kết luận từng mục review, ghi rõ thiếu căn cứ và bảo toàn pack
 
 | Tiêu chí review | Kết quả và bằng chứng |
 |---|---|
-| Allowlist và inventory | Đạt136file đúng allowlist bundled/current; không thừa/thiếu; run02/inventory.json,audit.json |
+| Allowlist và inventory | Đạt136file đúng allowlist bundled/current; không thừa/thiếu; run02/inventory.json, audit.json |
 | Manifest/source/diff | Đạt hash từng file với source; H6:0thay đổi; H2:+8/~1/-0; H1:+13/~5/-0; run02/package_diffs.json |
 | Release notes và giới hạn | Đạt; RELEASE_NOTES_VI.md nêu đúng nhóm file/delta/runtime ngoài gói/H1-T01–T02 lịch sử và giới hạn |
-| Evidence riêng không nhập nhầm | Đạt boundary; không dated raw folder/log/DB/weights/status;2ngoại lệ curate khai báo rõ;3bundled evidence hash đạt,11external chưa kiểm originals |
-| Source license/quyền được rà soát | Đạt việc rà soát; **chưa xác nhận phạm vi quyền chia sẻ**. Không LICENSE/NOTICE trong gói,không Copyright/SPDX header; SOURCE_RIGHTS_REVIEW.md,dependency_metadata.json |
-| Giữ phạm vi và bảo toàn | Đạt; không đổi136source/109tracked/HEAD/branch/index/staged; không thay gói cũ,không stage/push/gửi/deploy |
+| Evidence riêng không nhập nhầm | Đạt boundary; không dated raw folder/log/DB/weights/status;2 ngoại lệ curate khai báo rõ;3 bundled evidence hash đạt,11 external chưa kiểm originals |
+| Source license/quyền được rà soát | Đạt việc rà soát; **chưa xác nhận phạm vi quyền chia sẻ**. Không LICENSE/NOTICE trong gói, không Copyright/SPDX header; SOURCE_RIGHTS_REVIEW.md, dependency_metadata.json |
+| Giữ phạm vi và bảo toàn | Đạt; không đổi136source/109tracked/HEAD/branch/index/staged; không thay gói cũ, không stage/push/gửi/deploy |
 
 ### B. Thay đổi
 
 Chỉ thêm D:/AEGIS/h1_t04_release_review_20261029 gồm audit_release.py,
-dependency_metadata.py,finalize.py, RELEASE_NOTES_VI.md,SOURCE_RIGHTS_REVIEW.md,
+dependency_metadata.py, finalize.py, RELEASE_NOTES_VI.md, SOURCE_RIGHTS_REVIEW.md,
 content_review.json, ACCEPTANCE.json, REVIEW_VI.md, snapshots/audit/diff và proof.
 Append mục70 vào status, không sửa lịch sử hoặc ordinary source/allowlist/gói.
-API contract,dữ liệu,model,default V4,threshold,class/split và mobile giữ nguyên.
+API contract, dữ liệu, model, default V4,threshold, class/split và mobile giữ nguyên.
 
 Không có phát sinh bắt buộc ở application. Harness audit lượt đầu đọc matrix
 UTF-8 bằng cp1252 nên lỗi; giữ snapshot và attempt01_failure.txt, sửa đọc UTF-8
@@ -4504,21 +4504,21 @@ evidence harness, không phải lỗi source hoặc lý do sửa dependency/ứn
 
 ### C. Kiểm chứng vừa chạy và cách kiểm lại
 
-Mới chạy: verifier inventory/hash gói hiện tại và3baseline H1/H2/H6; so allowlist
-và hash136file source; AST91Python;5mẫu private-key/GitHub-token/AWS-key/Bearer
-literal/URL credential có0hit;35dòng auth/password/token đã phân loại ngữ cảnh
+Mới chạy: verifier inventory/hash gói hiện tại và 3 baseline H1/H2/H6; so allowlist
+và hash136file source; AST91Python;5 mẫu private-key/GitHub-token/AWS-key/Bearer
+literal/URL credential có 0 hit;35 dòng auth/password/token đã phân loại ngữ cảnh
 runtime/test/synthetic/placeholder, không nhận diện credential thật trong phần
 đã review. Scan giới hạn gói/plaintext, không chứng nhận mọi secret/PII/history.
 
 Checker thesis từ gói chạy ở chế độ mặc định:20requirements/63source-test refs,
-3bundled(E11/E12/E14) đạt hash;11external(E01–E10/E13) không được kiểm originals.
-Metadata cục bộ16dependency được đọc bằng importlib.metadata, không import ML:
-15có metadata,colorama không có trong env được đọc. Không cài để lấp thiếu.
+3 bundled(E11/E12/E14) đạt hash;11 external(E01–E10/E13) không được kiểm originals.
+Metadata cục bộ 16 dependency được đọc bằng importlib.metadata, không import ML:
+15có metadata, colorama không có trong env được đọc. Không cài để lấp thiếu.
 Metadata license của dependency không là license source AEGIS; không phải full
 runtime SBOM hoặc kết luận đáp ứng mọi điều kiện chia sẻ của third party.
 
-H1-T01 và H1-T02 đã có300test/phiên và fresh CPU/receiver acceptance trên cùng
-máy ngày29/10; đây là bằng chứng lịch sử, **không chạy lại trong H1-T04**.
+H1-T01 và H1-T02 đã có 300 test/phiên và fresh CPU/receiver acceptance trên cùng
+máy ngày 29/10; đây là bằng chứng lịch sử, **không chạy lại trong H1-T04**.
 Không chạy demo/soak/GPU/train/native/benchmark. Gói không đổi từ phiên đã đạt.
 
 Kiểm lại nhẹ, tại D:/AEGIS bằng Python3.11:
@@ -4536,8 +4536,8 @@ evidence; không chạy lại finalize.py để append trùng.
 
 ### D. Review kỹ thuật và finding quyền nguồn
 
-So H1,4file application thay đổi là H2 capabilities/pilot entrypoint/composition
-assessment-view/shared factory; file sửa thứ5là allowlist. So H2 chỉ thêm8file
+So H1,4 file application thay đổi là H2 capabilities/pilot entrypoint/composition
+assessment-view/shared factory; file sửa thứ 5là allowlist. So H2 chỉ thêm8file
 docs/thesis tools/metadata và sửa allowlist; so H6 nguyên136file. Không có thay
 đổi application mới trong task này hoặc tác động contract mới cần migration.
 
@@ -4547,15 +4547,15 @@ metadata lịch sử có hash. Không copy raw originals/DB/log hoặc quyền d
 Trong14evidence tham chiếu, E11mobile verification và E12protocol DRAFT cũng là
 tài liệu bundled được chọn, không có nghĩa originals11mục còn lại đã bàn giao.
 
-Đã ghi82dòng path máy nguồn trong docs;1dòng Python là negative fixture ở
+Đã ghi82dòng path máy nguồn trong docs;1 dòng Python là negative fixture ở
 test_handoff.py. Một số link mobile/UPSTREAM/evidence không có trong gói.
-Newman runner thiếu collection/node_modules trong package,đã ngoài CPU scope;
+Newman runner thiếu collection/node_modules trong package, đã ngoài CPU scope;
 không tự thêm chúng. Guide giữ mốc lịch sử được release notes mới bổ sung,
 không sửa gói pristine hoặc gọi mọi hyperlink là dependency đã cấp.
 
 Không có LICENSE/NOTICE dự án trong gói; mobile/LICENSE nằm ngoài phạm vi và
 không được lấy làm license Backend/AI. Chưa xác nhận chủ thể quyền/phạm vi dùng,
-chia sẻ,attribution cho chính source AEGIS. Không suy nguyên tác từ thiếu header,
+chia sẻ, attribution cho chính source AEGIS. Không suy nguyên tác từ thiếu header,
 không tự kết luận có/không quyền chia sẻ chỉ từ thiếu file license. Chủ thể có
 quyền cần cung cấp căn cứ đúng mục đích nếu chọn chuyển giao thực tế.
 Review hoàn thành đúng mục tiêu, còn **distribution readiness chưa xác định**;
@@ -4565,14 +4565,14 @@ không biến thiếu căn cứ thành license tự gán hoặc clearance đã c
 
 Cải tiến tùy chọn trong phạm vi: gom link historical/external thành appendix
 portable nếu nhóm cần bộ docs độc lập đầy đủ; chưa cần vì source package và
-release notes đã công bố giới hạn,CPU acceptance không phụ thuộc các link đó.
+release notes đã công bố giới hạn, CPU acceptance không phụ thuộc các link đó.
 
 Quyết định bàn giao thực tế cần người có quyền xác nhận chủ sở hữu/phạm vi
 license/attribution; không phải yêu cầu tạo code/framework hoặc mặc định public.
-Không tự liên hệ ai,gửi gói,cấp consent/license,stage/commit/push/PR hoặc deploy.
+Không tự liên hệ ai, gửi gói, cấp consent/license, stage/commit/push/PR hoặc deploy.
 
 Đề xuất task tiếp **H1-T03 — hoàn thiện hướng dẫn cấp model/runtime**, tách khỏi
-review source; chỉ kiểm inference khi file/quyền/env thực sẵn sàng,không đổi V4
+review source; chỉ kiểm inference khi file/quyền/env thực sẵn sàng, không đổi V4
 hoặc tự cấp quyền checkpoint. Đóng H1-T04 ở mức review và dừng chờ người dùng.
 
 
@@ -4592,24 +4592,24 @@ Vấn đề: người nhận cần phân biệt CPU software tests với inferen
 đúng V4/hash/version và có bước dừng/rollback khi runtime không đạt. Phạm vi
 dependency theo vai trò/máy, quyền file/ảnh, preflight missing/wrong hash,
 smoke/rollback và tài liệu portable. Không train/đổi model/threshold/class/split,
-copy/tải weights,thay env đang dùng,đổi API/mobile hoặc deploy.
+copy/tải weights, thay env đang dùng, đổi API/mobile hoặc deploy.
 
 | Tiêu chí | Kết quả và bằng chứng |
 |---|---|
 | Danh mục CPU/GPU theo máy và quyền cấp file | Đạt tài liệu; docs/HANDOFF_MODEL_RUNTIME.md, backend_inventory.json và smoke02/runtime_inventory.json; quyền chuyển giao vẫn chưa xác nhận |
 | V4 path/hash/version/mapping/settings đối chiếu source | Đạt; check_model_provision.py và smoke health đúng V4/640/0.25/0.7/300,classes0/1/2; boundary-r2 giữ candidate |
-| Missing/wrong hash fail trước load | Đạt4CLI case: absent,directory,wrong fixture,actual V4; preflight_checks.json; thêm packaged default missing đạt,không import ML |
-| Smoke có file/env/local authorization,ảnh kỹ thuật tự tạo | Đạt một inference cuối qua2process/2env riêng Backend→AI HTTP,cổng loopback ngẫu nhiên; smoke02/smoke_summary.json |
-| Rollback/stop/cleanup có hướng dẫn và giới hạn | Đạt guide; hai server/process đã dừng,kho/account/upload/config tạm đã dọn,hash checkpoint không đổi; chưa rollback production/model switch |
-| Người nhận có guide/tool,không làm bẩn gói cũ | Đạt gói mới138file verify/AST,guide+preflight trong allowlist; gói136file H1-T02/H1-T04 nguyên byte |
+| Missing/wrong hash fail trước load | Đạt4CLI case: absent, directory, wrong fixture, actual V4; preflight_checks.json; thêm packaged default missing đạt, không import ML |
+| Smoke có file/env/local authorization, ảnh kỹ thuật tự tạo | Đạt một inference cuối qua2process/2env riêng Backend→AI HTTP, cổng loopback ngẫu nhiên; smoke02/smoke_summary.json |
+| Rollback/stop/cleanup có hướng dẫn và giới hạn | Đạt guide; hai server/process đã dừng, kho/account/upload/config tạm đã dọn, hash checkpoint không đổi; chưa rollback production/model switch |
+| Người nhận có guide/tool, không làm bẩn gói cũ | Đạt gói mới138file verify/AST, guide+preflight trong allowlist; gói136file H1-T02/H1-T04 nguyên byte |
 
 ### B. Thay đổi
 
 | File | Lý do |
 |---|---|
-| D:/AEGIS/docs/HANDOFF_MODEL_RUNTIME.md | Guide dependency/quyền/identity/startup/smoke/rollback theo máy,giới hạn đúng bằng chứng |
+| D:/AEGIS/docs/HANDOFF_MODEL_RUNTIME.md | Guide dependency/quyền/identity/startup/smoke/rollback theo máy, giới hạn đúng bằng chứng |
 | D:/AEGIS/tools/check_model_provision.py | CLI stdlib chỉ đọc file/hash V4,exit0verified/2missing-unreadable/3mismatch; không đổi model hoặc load weights |
-| D:/AEGIS/docs/HANDOFF_REPRODUCIBLE.md | Link đầu mục tới guide mới,giữ các mốc lịch sử bên dưới |
+| D:/AEGIS/docs/HANDOFF_REPRODUCIBLE.md | Link đầu mục tới guide mới, giữ các mốc lịch sử bên dưới |
 | D:/AEGIS/tools/handoff_allowlist.json | Thêm đúng2file mới để guide/tool đi cùng gói nhận; không tự thêm evidence/runtime |
 | D:/AEGIS/h1_t03_model_runtime_20261029 | Evidence checks/inventory/smoke/finalize/review/ACCEPTANCE và release01 mới |
 | D:/AEGIS/AEGIS_PROJECT_STATUS.md | Append mục71,giữ prefix lịch sử |
@@ -4617,44 +4617,44 @@ copy/tải weights,thay env đang dùng,đổi API/mobile hoặc deploy.
 Hai thay đổi phát sinh bắt buộc phục vụ nghiệm thu: bổ sung preflight vì API
 standalone tính hash nhưng không pin expected digest trước load; đưa guide/tool
 vào allowlist để không bàn giao tài liệu trỏ đến helper bị thiếu. Không sửa AI
-Detector/API để mở thêm policy/config. Source ứng dụng/AI/mobile,requirements,
+Detector/API để mở thêm policy/config. Source ứng dụng/AI/mobile, requirements,
 database/schema và contract không đổi. Gói cũ đã review không được ghi đè.
 
 ### C. Kiểm chứng vừa chạy và phân biệt lịch sử
 
-Preflight4case đạt trên Python3.11,fixture wrong.pt là text trơ,không model.
+Preflight4case đạt trên Python3.11,fixture wrong.pt là text trơ, không model.
 Actual V4 có hash1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a.
 Packaged tool mặc định trỏ runtime sibling đúng và trả checkpoint_missing vì
-gói không weights,không lén đọc checkpoint workspace. Không test lỗi ACL/unreadable
-bằng thay quyền file thực. CLI chỉ xác minh byte identity,không xác minh quyền file.
+gói không weights, không lén đọc checkpoint workspace. Không test lỗi ACL/unreadable
+bằng thay quyền file thực. CLI chỉ xác minh byte identity, không xác minh quyền file.
 
-Runtime local mới quan sát: Windows/Python3.11.9,RTX3050Laptop4GiB,driver610.62;
+Runtime local mới quan sát: Windows/Python3.11.9,RTX3050Laptop4GiB, driver610.62;
 torch2.11.0+cu128,torchvision0.26.0+cu128,CUDA build12.8,Ultralytics8.4.178,
 Flask3.1.3,requests2.34.2,numpy2.4.6,Pillow12.3.0,Werkzeug3.1.9.
-Env Backend riêng có Flask/requests/Werkzeug,không torch/ultralytics/numpy/Pillow.
+Env Backend riêng có Flask/requests/Werkzeug, không torch/ultralytics/numpy/Pillow.
 Không cài/nâng dependency; inventory không là lock phổ quát cho máy nhận.
 
 Smoke cuối: AI dùng env AI; Backend child dùng backend/.venv; HTTP localhost
-port ngẫu nhiên. Account/password ngẫu nhiên chỉ trong bộ nhớ,kho tạm; ảnh PNG
-trắng32x32 tự tạo,không ảnh bên thứ ba hoặc GT bệnh. AI health đúng identity,
-Backend detect200,hash/version đúng,request ID body/header trùng và Backend→AI
+port ngẫu nhiên. Account/password ngẫu nhiên chỉ trong bộ nhớ, kho tạm; ảnh PNG
+trắng32x32 tự tạo, không ảnh bên thứ ba hoặc GT bệnh. AI health đúng identity,
+Backend detect200,hash/version đúng, request ID body/header trùng và Backend→AI
 được validate. Device cuda:0,real Detector đã nạp; kết quả no_detection chỉ cho
-ảnh kỹ thuật này,không healthy/OOD hoặc hiệu quả thực địa. Một request cuối,
+ảnh kỹ thuật này, không healthy/OOD hoặc hiệu quả thực địa. Một request cuối,
 không latency benchmark hoặc calibration.
 
-Giữ smoke đầu lỗi assertion của harness: Backend đã trả200 nhưng harness so
-với client-supplied ID,khác contract Backend tự sinh ID. Sửa harness đúng source,
-không sửa sản phẩm; log/summary đầu giữ nguyên,chỉ lượt smoke02 chốt đạt. Lượt
-đầu là harness chung process; lượt cuối tách process/env. Cả2temp runtime đã
-kiểm không còn,tất cả server/process do harness sở hữu đã dừng,checkpoint
+Giữ smoke đầu lỗi assertion của harness: Backend đã trả 200 nhưng harness so
+với client-supplied ID, khác contract Backend tự sinh ID. Sửa harness đúng source,
+không sửa sản phẩm; log/summary đầu giữ nguyên, chỉ lượt smoke02 chốt đạt. Lượt
+đầu là harness chung process; lượt cuối tách process/env. Cả 2 temp runtime đã
+kiểm không còn, tất cả server/process do harness sở hữu đã dừng, checkpoint
 trước/sau nguyên hash. Không che lượt thất bại thành pass.
 
-Build/verify release01 mới138file,AST92Python đạt; chưa rerun300CPUtests vì
-source ứng dụng không đổi. 300test H1-T01/T02 là bằng chứng lịch sử,không cộng
-thành kết quả mới. Chưa fresh CPU/GPU inference install,máy khác,model transfer,
-ảnh bệnh thật,Newman/native,train/forecast hoặc production rollout/rollback.
+Build/verify release01 mới138file, AST92Python đạt; chưa rerun300CPUtests vì
+source ứng dụng không đổi. 300 test H1-T01/T02 là bằng chứng lịch sử, không cộng
+thành kết quả mới. Chưa fresh CPU/GPU inference install, máy khác, model transfer,
+ảnh bệnh thật, Newman/native, train/forecast hoặc production rollout/rollback.
 
-Kiểm lại không inference,tại D:/AEGIS bằng Python3.11:
+Kiểm lại không inference, tại D:/AEGIS bằng Python3.11:
 
 ```powershell
 python -B tools\check_model_provision.py
@@ -4662,8 +4662,8 @@ python -B tools\build_handoff.py --verify h1_t03_model_runtime_20261029\release0
 ```
 
 Expected: checkpoint_verified/exit0 nếu V4 local còn đúng hash; gói138file
-verified. Trên gói pristine chưa cấp weights,preflight mặc định phải exit2.
-Hướng dẫn kiểm missing/wrong trong guide,không sửa checkpoint thật để thử.
+verified. Trên gói pristine chưa cấp weights, preflight mặc định phải exit2.
+Hướng dẫn kiểm missing/wrong trong guide, không sửa checkpoint thật để thử.
 Không rerun script smoke với output đã có; khi cần phiên mới phải chọn evidence
 directory mới và cùng guard/temp cleanup. Startup18000/18001 trong guide là
 hướng dẫn chưa chạy đúng các port đó hoặc trên máy nhận. No token/body ảnh/DB
@@ -4671,37 +4671,37 @@ trong summary. Không có dữ liệu người dùng cần rollback; không dọ
 
 ### D. Review kỹ thuật và giới hạn
 
-Preflight streaming SHA-256 bằng stdlib,không dependency ML/network hoặc cờ
+Preflight streaming SHA-256 bằng stdlib, không dependency ML/network hoặc cờ
 đổi expected hash. So health sau load vẫn cần vì file có thể đổi sau preflight;
 source hiện tại kiểm thay đổi hash trong lúc load và class mapping. Không
 coi standalone API tự enforce known V4 digest; guide yêu cầu preflight+health.
 
-AI runtime tự chọn CUDA nếu có,CPU nếu không; chưa thêm device override. Guide
+AI runtime tự chọn CUDA nếu có, CPU nếu không; chưa thêm device override. Guide
 trỏ tài liệu PyTorch install selector và Ultralytics quickstart đã đọc để chọn
 wheel theo máy/cài torch trước; không dùng ví dụ latest/-U để đổi pin dự án.
-Không invent URL wheel/checkpoint hoặc fullGPUlock. Giữ V4 mặc định,HTTP boundary.
+Không invent URL wheel/checkpoint hoặc fullGPUlock. Giữ V4 mặc định, HTTP boundary.
 
 Smoke chỉ xác nhận kỹ thuật local với checkpoint hiện có và ảnh tự tạo. Thiếu
-hồ sơ quyền transfer ở H1-T04 không bị biến thành quyền đã xác nhận,đồng thời
+hồ sơ quyền transfer ở H1-T04 không bị biến thành quyền đã xác nhận, đồng thời
 không chặn phần mềm/kiểm local đã được người dùng yêu cầu. Máy nhận vẫn phải
-có quyền file,dependency và env thực trước inference. Không gọi source package
+có quyền file, dependency và env thực trước inference. Không gọi source package
 có weights/venv hoặc lấy GPU hiện có làm bằng chứng clean install máy mới.
 
 Đạt mục tiêu ban đầu; không phát sinh API/config/service/database hoặc model
 mới. Không kiểm switch production; rollback đã kiểm là teardown phiên tạm và
-giữ nguyên artifact/env cũ,giới hạn được nêu rõ thay vì suy rộng.
+giữ nguyên artifact/env cũ, giới hạn được nêu rõ thay vì suy rộng.
 
 ### E. Đề xuất tách riêng và kết thúc
 
 Cải tiến tùy chọn: full dependency lock/wheel inventory cho một máy nhận cụ thể
 khi có OS/driver/quyền/package index thực; chưa cần làm để đóng guide/preflight.
-Không tự fresh-install GPU,download model hoặc sửa cơ chế device selection.
+Không tự fresh-install GPU, download model hoặc sửa cơ chế device selection.
 
 Việc cấp checkpoint/ảnh/source cho người nhận thật và kiểm máy thứ hai giữ
-điều kiện file/quyền/máy riêng,không được đánh dấu đạt từ smoke cùng máy này.
+điều kiện file/quyền/máy riêng, không được đánh dấu đạt từ smoke cùng máy này.
 Đề xuất task tiếp **H5-T01 — token expiry/revocation và phiên làm việc**, một
 failure case Backend độc lập có thể chọn mà không chờ thiết bị/nhãn bệnh.
-Đóng H1-T03 đúng phạm vi và dừng,không tự triển khai task tiếp hoặc stage/
+Đóng H1-T03 đúng phạm vi và dừng, không tự triển khai task tiếp hoặc stage/
 commit/push/gửi gói/deploy. Các license/quyền/gates nghiên cứu vẫn giữ nguyên.
 
 
@@ -4712,101 +4712,101 @@ Thời điểm ghi: 2026-10-29T22:42:48.685349+07:00 — Asia/Bangkok (UTC+7).
 ### A. Kết quả và phạm vi đã chốt
 
 **Hoàn thành phạm vi Backend của H5-T01.** Đã kiểm ranh giới hết hạn bằng clock
-có kiểm soát,thu hồi session qua logout,private/no-store và owner isolation khi
+có kiểm soát, thu hồi session qua logout, private/no-store và owner isolation khi
 đổi account trên core/pilot mobile API slice. Không xác nhận native UI,
 SecureStore/cache client hoặc request đang chạy qua ranh giới logout/context.
 
 Source đã có chức năng; không phát hiện lỗi auth/session cần sửa sản phẩm.
-Mục tiêu là kiểm failure case cụ thể,bổ sung acceptance và contract bàn giao,
+Mục tiêu là kiểm failure case cụ thể, bổ sung acceptance và contract bàn giao,
 không xây lại login/logout hoặc mở refresh/reset/OAuth/logout-all. Dùng kho/
-account/ảnh software fixture tạm; không đổi TTL,OS clock hoặc DB thật. Kết thúc
-khi hành vi/cleanup được kiểm,review và status đủ bằng chứng,không mở task tiếp.
+account/ảnh software fixture tạm; không đổi TTL, OS clock hoặc DB thật. Kết thúc
+khi hành vi/cleanup được kiểm, review và status đủ bằng chứng, không mở task tiếp.
 
 | Tiêu chí | Kết quả và bằng chứng |
 |---|---|
-| Hết hạn bằng clock có kiểm soát,giữ TTL | Đạt; expires_at−1 trả200,đúng hạn/+1 trả401; TTL86400 không đổi/không sliding; không sửa expires_at DB; test_session_lifecycle.CoreSessionTests |
-| Revocation và các phiên còn lại | Đạt; logout chỉ xóa session gửi,token cũ401 ở client/app instance mới; session khác cùng account/account khác vẫn200; logout token cũ401 |
-| Private response và không trả dữ liệu account cũ | Đạt Backend; core auth no-store,các surface private no-store+Vary Authorization; expired/revoked401,owner khác404,list B không có A; conditional request không304 khi mất quyền |
-| Không tạo business side effect khi bị từ chối | Đạt; expired detect không gọi AI/không analysis mới,plot/observation/event/version không tăng; login lại không đổi required snapshot/workflow |
+| Hết hạn bằng clock có kiểm soát, giữ TTL | Đạt; expires_at−1 trả 200,đúng hạn/+1 trả 401; TTL86400 không đổi/không sliding; không sửa expires_at DB; test_session_lifecycle.CoreSessionTests |
+| Revocation và các phiên còn lại | Đạt; logout chỉ xóa session gửi, token cũ 401 ở client/app instance mới; session khác cùng account/account khác vẫn200; logout token cũ 401 |
+| Private response và không trả dữ liệu account cũ | Đạt Backend; core auth no-store, các surface private no-store+Vary Authorization; expired/revoked401,owner khác404,list B không có A; conditional request không304 khi mất quyền |
+| Không tạo business side effect khi bị từ chối | Đạt; expired detect không gọi AI/không analysis mới, plot/observation/event/version không tăng; login lại không đổi required snapshot/workflow |
 | HTTP và pilot slice | Đạt; một HTTP session/cổng loopback ngẫu nhiên kiểm đọc ảnh→expire→401→B→404→logout→401; pilot list/detail/required-current/versions/events/observations được kiểm |
-| Cleanup đúng tài nguyên phiên | Đạt sau sửa test connection; log29test và before/after one-case,owned_cleanup proof;2folder28/10 không bị đụng |
-| Native client | Chưa kiểm,ngoài phạm vi Backend đã chốt; checklist bàn giao trong SESSION_LIFECYCLE.md,không gọi native/cache UI đã đạt |
+| Cleanup đúng tài nguyên phiên | Đạt sau sửa test connection; log29test và before/after one-case, owned_cleanup proof;2 folder 28/10 không bị đụng |
+| Native client | Chưa kiểm, ngoài phạm vi Backend đã chốt; checklist bàn giao trong SESSION_LIFECYCLE.md, không gọi native/cache UI đã đạt |
 
 ### B. Thay đổi và tác động
 
 | File | Lý do |
 |---|---|
-| D:/AEGIS/backend/checks/test_session_lifecycle.py |9test mới:6core+3pilot,clock auth cô lập,expiry/revocation/cache/owner/no-side-effect/HTTP |
+| D:/AEGIS/backend/checks/test_session_lifecycle.py |9 test mới:6core+3pilot, clock auth cô lập, expiry/revocation/cache/owner/no-side-effect/HTTP |
 | D:/AEGIS/backend/checks/test_mobile_pilot.py |Đóng SQLite connection bằng closing trong đúng test corrupt_required_snapshot; giữ assertion503 |
-| D:/AEGIS/backend/docs/SESSION_LIFECYCLE.md |Contract session,cache,ranh giới Backend/native và cách kiểm lại/cleanup |
+| D:/AEGIS/backend/docs/SESSION_LIFECYCLE.md |Contract session, cache, ranh giới Backend/native và cách kiểm lại/cleanup |
 | D:/AEGIS/backend/docs/API.md |Thêm duy nhất link3dòng của H5-T01; các byte chỉnh sửa sẵn có được bảo toàn |
-| D:/AEGIS/tools/handoff_allowlist.json |Thêm đúng test/doc mới để lần build sau mang acceptance/contract,các entry cũ giữ nguyên |
-| D:/AEGIS/h5_t01_sessions_20261029 |Snapshots,focused/regression logs,one-case cleanup proof,scripts,review/ACCEPTANCE |
+| D:/AEGIS/tools/handoff_allowlist.json |Thêm đúng test/doc mới để lần build sau mang acceptance/contract, các entry cũ giữ nguyên |
+| D:/AEGIS/h5_t01_sessions_20261029 |Snapshots, focused/regression logs, one-case cleanup proof, scripts, review/ACCEPTANCE |
 | D:/AEGIS/AEGIS_PROJECT_STATUS.md |Append mục72,giữ prefix lịch sử |
 
-Source auth/API implementation,TTL,DB/schema,contract response và mobile không
+Source auth/API implementation, TTL, DB/schema, contract response và mobile không
 đổi. Không train/model/GPU. Allowlist hiện140file nhưng **không build gói mới**
-trong task này; gói H1-T03 release01 138file giữ nguyên và đã đối chiếu hash.
+trong task này; gói H1-T03 release01 138 file giữ nguyên và đã đối chiếu hash.
 
 Phát sinh bắt buộc(A): đóng response file trong test mới để tránh ResourceWarning;
 đóng connection test integrity cũ vì nó trực tiếp chặn cleanup bộ kiểm đã chọn.
-Không dùng phát hiện này để refactor storage/DB,thêm framework hoặc sửa test khác.
-Hai thư mục lịch sử28/10 chỉ được nhận diện bằng metadata và giữ nguyên,không
+Không dùng phát hiện này để refactor storage/DB, thêm framework hoặc sửa test khác.
+Hai thư mục lịch sử 28/10 chỉ được nhận diện bằng metadata và giữ nguyên, không
 kết luận chúng là lỗi sản phẩm hoặc tự mở việc dọn dữ liệu ngoài phạm vi.
 
-### C. Kiểm chứng vừa chạy,không cộng sai lượt
+### C. Kiểm chứng vừa chạy, không cộng sai lượt
 
 1. focused_run01:9test chức năng đạt nhưng có ResourceWarning của response file
-   trong test mới; đã sửa dùng context manager,không sửa endpoint.
-2. regression_run01:harness dừng trước test vì nhầm2folder fixture28/10 là
+   trong test mới; đã sửa dùng context manager, không sửa endpoint.
+2. regression_run01:harness dừng trước test vì nhầm2folder fixture 28/10 là
    tài nguyên mới; sửa để chỉ theo dõi TemporaryDirectory do lượt này tạo.
-3. regression_run02:29/29test chức năng đạt,0failure/error/skip,không ResourceWarning:
-   9session mới+4auth+4history+12mobile cũ. Tuy nhiên cleanup collector ghi30temp,
-   còn1folder; exit của harness là lỗi cleanup,không gọi toàn lượt này đạt cleanup.
+3. regression_run02:29/29test chức năng đạt,0 failure/error/skip, không ResourceWarning:
+   9 session mới+4auth+4history+12mobile cũ. Tuy nhiên cleanup collector ghi30temp,
+   còn1folder; exit của harness là lỗi cleanup, không gọi toàn lượt này đạt cleanup.
 4. Xác minh riêng case corrupt_required_snapshot trước sửa:1assertion test đạt
    nhưng temp còn. `with sqlite3.connect` commit/rollback mà không đóng connection.
-   Sau sửa closing,kiểm lại đúng1case:đạt503 mong đợi và temp tự dọn. Không rerun
+   Sau sửa closing, kiểm lại đúng1case:đạt503 mong đợi và temp tự dọn. Không rerun
    toàn29chỉ để tăng bằng chứng sau thay đổi test closure cục bộ.
 5. Đã dọn2folder do các lượt lỗi cleanup của chính phiên tạo. Một path có trong
    proof one-case; path còn lại được đối chiếu event.request_id của DB test với
    log regressionrun02 trước khi xóa. Kiểm resolvedparent/name/containment và
    giữ nguyên metadata hai folder lịch sử. owned_cleanup.json ghi đủ proof.
 
-Không cộng9+29+1+1 thành số test độc lập. Kết luận là29test chức năng đã kiểm và
-1case cleanup sau sửa; các lượt chưa đạt giữ nguyên log. Native/fullCPU300tests,
+Không cộng9+29+1+1 thành số test độc lập. Kết luận là 29 test chức năng đã kiểm và
+1 case cleanup sau sửa; các lượt chưa đạt giữ nguyên log. Native/fullCPU300tests,
 GPU/AI thật/train/soak/benchmark không chạy; model modules không được nạp.
 Fixture image analysis/software rule pilot không là prediction/GT hoặc nhãn bệnh.
 
-Clock chỉ thay reference app.auth.time bằng clock test,rồi restore cleanup,
-không patch time.time toàn process hoặc chờ24h. Quota/business clocks giữ nguyên.
+Clock chỉ thay reference app.auth.time bằng clock test, rồi restore cleanup,
+không patch time.time toàn process hoặc chờ 24h. Quota/business clocks giữ nguyên.
 Core auth cache no-store đủ contract; không ép thêm private/Vary cho đẹp. Pilot
-factory vốn áp private/no-store+Vary cho response toàn app,surface core được
+factory vốn áp private/no-store+Vary cho response toàn app, surface core được
 kiểm theo route đã bàn giao. Không suy đã kiểm mọi404/unmatched/proxy/cache.
 
-Kiểm lại tại D:/AEGIS bằng Backend env,không GPU:
+Kiểm lại tại D:/AEGIS bằng Backend env, không GPU:
 
 ```powershell
 & backend\.venv\Scripts\python.exe -B -m unittest discover -s backend\checks -p test_session_lifecycle.py -v
 ```
 
-Expected:9test đạt,bao gồm realHTTP loopback và cleanup. Hồi quy liên quan tại
+Expected:9test đạt, bao gồm realHTTP loopback và cleanup. Hồi quy liên quan tại
 backend/checks: `..\.venv\Scripts\python.exe -B -m unittest test_auth test_history
 test_mobile_pilot -v`,expected20test đạt. Test dùng account/DB/uploads tạm,
 server finally shutdown và connection test đã đóng; không cần rollback sản phẩm
-hoặc khôi phục TTL. Evidence scripts từ chối overwrite,không chạy finalize lại.
+hoặc khôi phục TTL. Evidence scripts từ chối overwrite, không chạy finalize lại.
 
 ### D. Review kỹ thuật và giới hạn
 
 Backend truy vấn session với expires_at>int(clock),gán user theo digest token;
 request hết hạn/thu hồi dừng ở require_auth trước handler/AI/write. Logout xóa
-đúng digest hiện tại,không tạo semantics logout-all; login mới cấp token/hạn mới
+đúng digest hiện tại, không tạo semantics logout-all; login mới cấp token/hạn mới
 và dọn expired rows. Tests kiểm session row/TTL không bị sửa để ép pass.
 Owner predicates và auth trước private image/conditional response đã được kiểm
-với cùngclient rồi đổiAuthorization,không fallback dữ liệu A sang B.
+với cùngclient rồi đổiAuthorization, không fallback dữ liệu A sang B.
 
 `no-store` không tự xóa DTO/ảnh đã có trong memory UI. HTTP client kỹ thuật không
 là native cache implementation. SESSION_LIFECYCLE.md bàn giao hành vi client cần
-kiểm,không claim SecureStore/UI đã thực hiện hoặc mở việc sửa mobile của nhóm.
+kiểm, không claim SecureStore/UI đã thực hiện hoặc mở việc sửa mobile của nhóm.
 Request đã auth nhưng hoàn tất sau logout/evidence đổi là race H5-T02 riêng,
 không đưa vào tiêu chí đóng H5-T01 hoặc dùng review để tiếp tục hardening.
 
@@ -4819,14 +4819,14 @@ không production security/SLA hoặc hiệu quả dự báo bệnh ngoài thự
 ### E. Đề xuất tách riêng và dừng
 
 Cải tiến tùy chọn trong phạm vi: không cần thêm để đóng task. Không tự thêm
-refresh-token,đổi header/TTL,logout-all hoặc session/device management.
+refresh-token, đổi header/TTL, logout-all hoặc session/device management.
 
 Ngoài phạm vi: nhóm mobile kiểm UI/SecureStore/cache ảnh khi401/đổi account;
 request đang chạy qua ranh giới context/evidence cần task riêng.
 Đề xuất **H5-T02 — request đang chạy khi evidence đổi**,chốt một race cụ thể
 (ví dụ quan sát bị sửa trong lúc check) trước triển khai; không gộp mọi lỗi.
-Đóng H5-T01 phạm vi Backend,cập nhật status và dừng chờ người dùng chọn.
-Không commit/push/deploy,gửi thông báo,đụng dữ liệu thật hoặc chuyển sang mobile.
+Đóng H5-T01 phạm vi Backend, cập nhật status và dừng chờ người dùng chọn.
+Không commit/push/deploy, gửi thông báo, đụng dữ liệu thật hoặc chuyển sang mobile.
 
 
 ## 73. H5-T02 — Quan sát bị sửa trong lúc request check đang chạy
@@ -4838,60 +4838,60 @@ Thời điểm ghi: 2026-10-29T22:55:35.659575+07:00 — Asia/Bangkok (UTC+7).
 **Hoàn thành H5-T02 trong đúng một race đã chọn:** check đọc observation
 revision1,sau khi reader journal đóng nhưng trước insert workflow event,
 request PUT observation khác commit revision2,sau đó check tiếp tục.
-Source hiện có đạt hành vi cần thiết,không sửa implementation sản phẩm.
+Source hiện có đạt hành vi cần thiết, không sửa implementation sản phẩm.
 
 Vấn đề cần kiểm: event không được rewrite/nhận nhầm revision mới đã check;
-snapshot/hash bất biến,check_status/replay/close/recheck phải phản ánh thay đổi.
-Phạm vi hai request HTTP,SQLite/account synthetic tạm,barrier xác định và một
+snapshot/hash bất biến, check_status/replay/close/recheck phải phản ánh thay đổi.
+Phạm vi hai request HTTP, SQLite/account synthetic tạm, barrier xác định và một
 control không edit. Không gộp logout/owner/season/profile/assessment đổi hoặc
-race close/void; không mobile,soak,framework đồng thời hay atomic cross-DB.
-Phụ thuộc chỉ source/Backend env/kho tạm/loopback,không ảnh thực địa/thiết bị/AI.
+race close/void; không mobile, soak, framework đồng thời hay atomic cross-DB.
+Phụ thuộc chỉ source/Backend env/kho tạm/loopback, không ảnh thực địa/thiết bị/AI.
 Điều kiện kết thúc là case/control/hồi quy/cleanup đạt và review/status rõ giới hạn.
 
 | Tiêu chí | Kết quả và bằng chứng |
 |---|---|
-| Ép đúng checkpoint,không timing ngẫu nhiên | Đạt; Event barrier sau reader close,trước insert; workflow mới có2event; PUT201 và GET lại revision2 trước resume; focused_summary.json traces |
+| Ép đúng checkpoint, không timing ngẫu nhiên | Đạt; Event barrier sau reader close, trước insert; workflow mới có 2 event; PUT201 và GET lại revision2 trước resume; focused_summary.json traces |
 | Event giữ snapshot/hash đã đọc | Đạt; event revision1/hash1,bản ghi event nguyên byte sau replay/recheck/close; không ghi nhận revision2 đã check |
-| Response/detail báo cần recheck | Đạt; check201,workflowv3/checked,needs_recheck=true,observation_changed,checked_revision1/current_revision2 |
+| Response/detail báo cần recheck | Đạt; check201,workflowv3/checked, needs_recheck=true, observation_changed, checked_revision1/current_revision2 |
 | Retry cũ không nhận evidence mới | Đạt; replay200 cùng event revision1,needs_recheck vẫn true |
-| Close bị chặn và recheck phục hồi | Đạt; close409 followup_observation_changed,không thêm event; check ý định mới ghi revision2,v4,needs_recheck=false; closev4→201 |
-| Control không thay đổi không báo stale giả | Đạt; cùng barrier,revision1/1,needs_recheck=false,close201 |
-| Giữ assessment/label và cleanup | Đạt; assessment gốc không đổi,disease_confirmed/training_approved=false;10temp của2lượt đã dọn,worker/server đã dừng |
+| Close bị chặn và recheck phục hồi | Đạt; close409 followup_observation_changed, không thêm event; check ý định mới ghi revision2,v4,needs_recheck=false; closev4→201 |
+| Control không thay đổi không báo stale giả | Đạt; cùng barrier, revision 1/1,needs_recheck=false, close201 |
+| Giữ assessment/label và cleanup | Đạt; assessment gốc không đổi, disease_confirmed/training_approved=false;10 temp của2lượt đã dọn, worker/server đã dừng |
 
 ### B. Thay đổi
 
 | File | Lý do |
 |---|---|
-| D:/AEGIS/frontend/test_followup_observation_race.py |2test HTTP thật race/control,hook chỉ trong test,không production hook |
-| D:/AEGIS/backend/docs/FOLLOWUP_OBSERVATION_RACE.md |Timeline/expected201+needs_recheck,replay/close/recheck,cách chạy và giới hạn |
-| D:/AEGIS/backend/docs/MOBILE_FOLLOWUP_API.md |Thêm một đoạn làm rõ race đã kiểm/linkguide,giữ mọi nội dung trước đó |
-| D:/AEGIS/tools/handoff_allowlist.json |Thêm đúng2file test/doc cho lần build sau,không tự nhập evidence/runtime |
-| D:/AEGIS/h5_t02_observation_race_20261029 |Snapshots,runner,log,trace/proof,review/ACCEPTANCE và append verification |
+| D:/AEGIS/frontend/test_followup_observation_race.py |2 test HTTP thật race/control, hook chỉ trong test, không production hook |
+| D:/AEGIS/backend/docs/FOLLOWUP_OBSERVATION_RACE.md |Timeline/expected201+needs_recheck, replay/close/recheck, cách chạy và giới hạn |
+| D:/AEGIS/backend/docs/MOBILE_FOLLOWUP_API.md |Thêm một đoạn làm rõ race đã kiểm/linkguide, giữ mọi nội dung trước đó |
+| D:/AEGIS/tools/handoff_allowlist.json |Thêm đúng2file test/doc cho lần build sau, không tự nhập evidence/runtime |
+| D:/AEGIS/h5_t02_observation_race_20261029 |Snapshots, runner, log, trace/proof, review/ACCEPTANCE và append verification |
 | D:/AEGIS/AEGIS_PROJECT_STATUS.md |Append mục73,giữ nguyên lịch sử |
 
-Không sửa pilot_followup/pilot_journal hoặc Backend implementation,API path/DTO/
-errorcode/version,storage/schema/PRAGMA/timeout/locks/auth/model/mobile. Không
+Không sửa pilot_followup/pilot_journal hoặc Backend implementation, API path/DTO/
+errorcode/version, storage/schema/PRAGMA/timeout/locks/auth/model/mobile. Không
 có phát sinh sửa lỗi sản phẩm bắt buộc(A). Barrier/reader inspection chỉ phục vụ
-tiêu chí xác định interleaving,không thêm cơ chế test/config vào production.
+tiêu chí xác định interleaving, không thêm cơ chế test/config vào production.
 Allowlist142file hiện tại; không build gói mới hoặc sửa gói138file H1-T03 cũ.
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-focused_run01:2/2test đạt,0failure/error/skip,2temp đã dọn. Hai test dùng cùng
-checkpoint nhưng chỉ race có PUT notes correction active/synthetic,same owner/
-season. Đây là evidence revision của phần mềm,không gán nhãn bệnh theo rule.
+focused_run01:2/2test đạt,0 failure/error/skip,2 temp đã dọn. Hai test dùng cùng
+checkpoint nhưng chỉ race có PUT notes correction active/synthetic, same owner/
+season. Đây là evidence revision của phần mềm, không gán nhãn bệnh theo rule.
 
-regression_run01:7/7đạt,0failure/error/skip,8temp đã dọn:4EvidenceRecheckTests,
-follow-up full lifecycle,concurrent workflow actions và mobile correction/recheck.
-Không ResourceWarning,không model modules. Tổng9test khác nhau của phiên;
+regression_run01:7/7 đạt,0 failure/error/skip,8 temp đã dọn:4EvidenceRecheckTests,
+follow-up full lifecycle, concurrent workflow actions và mobile correction/recheck.
+Không ResourceWarning, không model modules. Tổng9test khác nhau của phiên;
 không cộng với29test H5-T01 hoặc300test lịch sử thành metric mới.
 
 Trace race có thứ tự: revision1read→readerclosed→pausedbeforeinsert→revision2
 committed→checkresumed→response. Không dùng sleep hoặc tăngtimeout/PRAGMA để
-vượt race. Worker HTTP có session riêng,trong khi PUT/GET observation dùng
-HTTP session khác,cùng Backend API-only app,khoSQLite thật tạm. Threading.Event
+vượt race. Worker HTTP có session riêng, trong khi PUT/GET observation dùng
+HTTP session khác, cùng Backend API-only app, khoSQLite thật tạm. Threading.Event
 chỉ điều phối test; transactions/route/serialization/errorguard dùng source thật.
-Hook được restore khi context thoát,worker/server shutdown/join trước cleanup.
+Hook được restore khi context thoát, worker/server shutdown/join trước cleanup.
 
 Đã kiểm event payload hash bằng digest và payload_json/hash/time/request_id/
 version/state nguyên byte sau thao tác tiếp theo. Retry không insert check mới;
@@ -4904,23 +4904,23 @@ Kiểm lại tại D:/AEGIS bằng Backend env:
 & backend\.venv\Scripts\python.exe -B -m unittest discover -s frontend -p test_followup_observation_race.py -v
 ```
 
-Expected2test đạt,loopback port ngẫu nhiên,kho/account temporary và cleanup.
+Expected2test đạt, loopback port ngẫu nhiên, kho/account temporary và cleanup.
 Cần quyền localhost/ghi temp; không cần GPU/Pillow/AI hoặc dữ liệu thật.
 Runner evidence từ chối overwrite; khi muốn log mới dùng output mới thay vì
 ghi đè summary cũ. Không cần rollback implementation/DB vì không sửa chúng;
-test tự dừng đúng worker/server và dọn store,không đụng thư mục lịch sử.
+test tự dừng đúng worker/server và dọn store, không đụng thư mục lịch sử.
 
-Chưa chạy fullCPU suite,demo,soak,model inference/train,native hoặc deployment
+Chưa chạy fullCPU suite, demo, soak, model inference/train, native hoặc deployment
 multi-process. Không kiểm race sau projectionread/trướcresponse hoặc close đang
-chạy. Giới hạn này là phạm vi riêng,không biến thành nhiệm vụ tiếp tự triển khai.
+chạy. Giới hạn này là phạm vi riêng, không biến thành nhiệm vụ tiếp tự triển khai.
 
 ### D. Review kỹ thuật và diễn giải đúng contract
 
 Follow-up có BEGIN IMMEDIATE trên DB workflow; snapshot quan sát được chụp
-trong read transaction riêng của journal. Sau reader close,PUT journal có thể
+trong read transaction riêng của journal. Sau reader close, PUT journal có thể
 commit mà không tăng workflow version. Event ghi đúng revision1 từng được đọc;
 projection check_status đọc currentrevision2 rồi đánh dấu observation_changed.
-201 ở đây xác nhận event đã ghi,không xác nhận evidence hiện tại đều đã kiểm.
+201 ở đây xác nhận event đã ghi, không xác nhận evidence hiện tại đều đã kiểm.
 
 Retry cùng UUID/payload trả event ban đầu; một ý định check mới/base version mới
 mới chấp nhận revision2. Close guard chặn stale evidence ở case đã kiểm. Control
@@ -4933,119 +4933,119 @@ chọn và quan sát currentrevision2 trước resume. Thay đổi sau thời đ
 vẫn có thể tạo projection cũ; case khác phải được chọn riêng trước khi kiểm/sửa.
 Không đổi kiến trúc/DB/API hoặc tạo abstraction chỉ vì đã chạm module follow-up.
 
-Đạt đúng mục tiêu ban đầu,không có chênh lệch scope triển khai. Source đã xử lý
-đúng,nên kết quả là acceptance+contract bằng chứng mới,chưa cần sửa sản phẩm.
-Native client chỉ nhận tài liệu contract,không claim UI/retry/cancel đã tích hợp.
+Đạt đúng mục tiêu ban đầu, không có chênh lệch scope triển khai. Source đã xử lý
+đúng, nên kết quả là acceptance+contract bằng chứng mới, chưa cần sửa sản phẩm.
+Native client chỉ nhận tài liệu contract, không claim UI/retry/cancel đã tích hợp.
 
 ### E. Đề xuất tách riêng và dừng
 
 Cải tiến tùy chọn trong phạm vi: không cần bổ sung để đóng case này. Không thêm
-distributed lock,một database mới,version framework hoặc kiểm soak kéo dài.
+distributed lock, một database mới, version framework hoặc kiểm soak kéo dài.
 
 Ngoài phạm vi: các race logout/owner/season/profile/assessment/void hoặc close
-đang chạy cần checkpoint và tiêu chí riêng,không coi đã kiểm từ H5-T02 này.
+đang chạy cần checkpoint và tiêu chí riêng, không coi đã kiểm từ H5-T02 này.
 Đề xuất task tiếp **H2-T03 — refresh/retry/chẩn đoán cho client**,tập trung
 contract lỗi/timeout/429/503 cần cho tích hợp Backend; không phát triển native.
-Đóng H5-T02 đúng race đã chọn,cập nhật status và dừng chờ người dùng chọn.
-Không commit/push/deploy,gửi gói,đụng dữ liệu thật hoặc tự mở race tiếp theo.
+Đóng H5-T02 đúng race đã chọn, cập nhật status và dừng chờ người dùng chọn.
+Không commit/push/deploy, gửi gói, đụng dữ liệu thật hoặc tự mở race tiếp theo.
 
 
-## 74. H6-T04 — Tổng duyệt demo nhẹ và Q&A cho30/10/2026
+## 74. H6-T04 — Tổng duyệt demo nhẹ và Q&A cho 30/10/2026
 
 Thời điểm ghi: 2026-10-29T23:17:55.612242+07:00 — Asia/Bangkok (UTC+7).
 
 ### A. Kết quả và phạm vi đã chốt
 
-**Hoàn thành H6-T04: kịch bản8–10phút,Q&A và rehearsal local mới.** User chọn
-sau khi chốt ưu tiên demo ngàymai30/10,không tiếp tục H2-T03 hoặc tính năng mới.
+**Hoàn thành H6-T04: kịch bản8–10 phút, Q&A và rehearsal local mới.** User chọn
+sau khi chốt ưu tiên demo ngàymai 30/10,không tiếp tục H2-T03 hoặc tính năng mới.
 Phạm vi chức năng đã có:nhận diện ảnh V4,Backend8stage/quyền/workflow/recheck,
-phân biệtảnh/mock/temporal,phương án xem saved results và cleanup.
+phân biệtảnh/mock/temporal, phương án xem saved results và cleanup.
 
-Vấn đề là chọn nội dung có thểshow và lời dẫn đúng bằng chứng,tránh biến buổi
-demo thành vòng feature/debug mới. Không xây frontend/mobile,train,đổi model/
-threshold/class/split,cài dependency,deploy hoặc gửi gói. Điều kiện kết thúc:
-notes/commands/Q&A/link đủ dùng,rehearsal pass,cleanup và giới hạn được ghi rõ.
+Vấn đề là chọn nội dung có thểshow và lời dẫn đúng bằng chứng, tránh biến buổi
+demo thành vòng feature/debug mới. Không xây frontend/mobile, train, đổi model/
+threshold/class/split, cài dependency, deploy hoặc gửi gói. Điều kiện kết thúc:
+notes/commands/Q&A/link đủ dùng, rehearsal pass, cleanup và giới hạn được ghi rõ.
 
 | Tiêu chí | Kết quả và bằng chứng |
 |---|---|
-| Kịch bản nhẹ và phạm vi đóng góp | Đạt START_HERE.md,DEMO_8_10_MIN.md,có phiên5phút,câu mở/kết và bảng8stage;AI/ML–Backend,mobile thuộc nhóm |
-| Rehearsal Backend8stage output mới | Đạt8/8stage,36/36checkpoint;rehearsal01/summary.json và backend_rehearsal01.log;request HTTP thật,dữ liệu mock/synthetic |
-| Ảnh thật chỉ khi file/runtime đủ căn cứ | Đã kiểm local theo yêu cầu demo:2ảnh validation D01/D03 có manifest/hash,V4 thật trêncuda:0,hai process/env riêng;images_rehearsal01/summary.json |
+| Kịch bản nhẹ và phạm vi đóng góp | Đạt START_HERE.md, DEMO_8_10_MIN.md, có phiên5phút, câu mở/kết và bảng8stage;AI/ML–Backend, mobile thuộc nhóm |
+| Rehearsal Backend8stage output mới | Đạt 8/8stage,36/36checkpoint;rehearsal01/summary.json và backend_rehearsal01.log;request HTTP thật, dữ liệu mock/synthetic |
+| Ảnh thật chỉ khi file/runtime đủ căn cứ | Đã kiểm local theo yêu cầu demo:2 ảnh validation D01/D03 có manifest/hash, V4 thật trêncuda:0,hai process/env riêng;images_rehearsal01/summary.json |
 | Q&A về các giới hạn chính | Đạt15câu QA_VI.md gồm no_detection/mock/72h/candidate/sourcecopy/native/failedsoak/GT và live-vs-saved |
-| Phương án demo/lỗi không giả live | Đạt RUN_BACKEND_DEMO.ps1 và SHOW_SAVED_DEMO.ps1 đã chạy;viewer ghi rõ thời điểmISO+07/saved;fallback mởsummary/log,khôngfake output mới |
-| Cleanup/bảo toàn | Đạt Backend/AI/process dừng,kho/config/account/upload tạm dọn;hash weights/ảnh và142source/109tracked/HEAD/branch/index/staged nguyên trạng |
+| Phương án demo/lỗi không giả live | Đạt RUN_BACKEND_DEMO.ps1 và SHOW_SAVED_DEMO.ps1 đã chạy;viewer ghi rõ thời điểmISO+07/saved;fallback mởsummary/log, khôngfake output mới |
+| Cleanup/bảo toàn | Đạt Backend/AI/process dừng, kho/config/account/upload tạm dọn;hash weights/ảnh và 142 source/109tracked/HEAD/branch/index/staged nguyên trạng |
 
 ### B. Thay đổi
 
-Chỉ thêm D:/AEGIS/h6_t04_demo_20261029: START_HERE.md,DEMO_8_10_MIN.md,QA_VI.md,
-RESULTS_VI.md,RUN_BACKEND_DEMO.ps1,SHOW_SAVED_DEMO.ps1,rehearse_images.py,
-snapshot/finalize,logs và2summary rehearsal;REVIEW_VI/ACCEPTANCE/appendproof.
-Append mục74 vào status,không sửa source application/AI/mobile/docs hiện hành,
+Chỉ thêm D:/AEGIS/h6_t04_demo_20261029: START_HERE.md, DEMO_8_10_MIN.md, QA_VI.md,
+RESULTS_VI.md, RUN_BACKEND_DEMO.ps1,SHOW_SAVED_DEMO.ps1,rehearse_images.py,
+snapshot/finalize, logs và 2 summary rehearsal;REVIEW_VI/ACCEPTANCE/appendproof.
+Append mục74 vào status, không sửa source application/AI/mobile/docs hiện hành,
 allowlist hoặc gói source lịch sử. Không contract/schema/model/data changes.
 
 Tận dụng tools/demo_thesis.py nguyên source cho8stage. Wrapper chỉ gọi script,
 chọn output mới và trình bày8stage. Image harness dùng Detector/API hiện có và
-helper Backend của H1-T03 trong workspace local,không thêm entrypoint sản phẩm
+helper Backend của H1-T03 trong workspace local, không thêm entrypoint sản phẩm
 hoặc hứa gói source pristine đã kèm evidence helpers này. Không copy weights/ảnh.
-Không có phát sinh sửa lỗi ứng dụng(A);format viewer giữISO+07 thay autoformat
+Không có phát sinh sửa lỗi ứng dụng(A);format viewer giữ ISO+07 thay autoformat
 timezone host chỉ để hiển thị đúng thời điểm bằng chứng.
 
 ### C. Kiểm chứng mới và lịch sử
 
-Backend rehearsal01:8stage/36checkpoint đạt,không checkpoint/train/native;
-server_stopped vàtemporary_store_cleaned=true.8stage gồm auth,capabilities,
-context/mockrule,follow-uprequired/current,ackretry/conflict,correction/recheck/
-close,owner/logout,temporalofflineblocked. Checkpoint không unit test/mẫu bệnh.
+Backend rehearsal01:8stage/36checkpoint đạt, không checkpoint/train/native;
+server_stopped vàtemporary_store_cleaned=true.8stage gồm auth, capabilities,
+context/mockrule, follow-uprequired/current, ackretry/conflict, correction/recheck/
+close, owner/logout, temporalofflineblocked. Checkpoint không unit test/mẫu bệnh.
 
 Image rehearsal01:V4 actualcheckpointhash/version/mapping/settings được kiểm,
-devicecuda:0;D01detection_found1box,D03detection_found3box. Cả2ảnh là validation
-rice_blast,đã chọn từgallery trước chạy;không gọi lượt này đã kiểm đủ3class.
-D03purposeFN là chẩn đoánmatching lịch sử,không tính lạiFP/FN hoặc metrics từ
-output3box mới. Gửi2ảnh+1exactreplay quaBackend,2analysis tronghistory,ảnh gốc
-tải đúngbytes/privateheaders,logouttoken401. Backend child env riêng,AI env riêng,
-HTTPport ngẫu nhiên. Account/password trongmemory,summary chỉfield đã chọn.
+devicecuda:0;D01detection_found1box, D03detection_found3box. Cả 2 ảnh là validation
+rice_blast, đã chọn từgallery trước chạy;không gọi lượt này đã kiểm đủ 3 class.
+D03purposeFN là chẩn đoánmatching lịch sử, không tính lạiFP/FN hoặc metrics từ
+output3box mới. Gửi2 ảnh+1exactreplay quaBackend,2 analysis tronghistory, ảnh gốc
+tải đúngbytes/privateheaders, logouttoken401. Backend child env riêng, AI env riêng,
+HTTPport ngẫu nhiên. Account/password trongmemory, summary chỉfield đã chọn.
 
 Hai phần dùng2kho riêng:ảnh core vàworkflow pilot synthetic;không chứng minh
-predictionảnh tựtạoalert,không tựliênkết ảnh mới vào case hoặc trộntoken/store.
+predictionảnh tựtạoalert, không tựliênkết ảnh mới vào case hoặc trộntoken/store.
 Cácprocess/server/kho/config tạm đã dọn vàimage/checkpointsource giữ nguyênhash.
-Chạy wrapper vàsavedviewer thành công,viewer ghi rõ chỉ đọcfile. Không tổngduyệt
-UIbrowser/native/camera/SecureStore,không tạooverlayảnh hoặcUI mới trong task.
+Chạy wrapper vàsavedviewer thành công, viewer ghi rõ chỉ đọcfile. Không tổngduyệt
+UIbrowser/native/camera/SecureStore, không tạooverlayảnh hoặcUI mới trong task.
 
-H1freshinstall/sourcecopy,H5-T01session29tests,H5-T02race2+7tests,mAP/F1ảnh vàsoak
-là bằngchứng trước đãghi,không rerun/đổi ngày trong H6-T04. Không cộng36checkpoint,
-2ảnh vàcácunit tests thành một tổngmetric. Chưa trainedtemporal/fieldmetrics,
+H1freshinstall/sourcecopy, H5-T01session29tests, H5-T02race2+7tests, mAP/F1 ảnh vàsoak
+là bằngchứng trước đãghi, không rerun/đổi ngày trong H6-T04. Không cộng36checkpoint,
+2 ảnh vàcácunit tests thành một tổngmetric. Chưa trainedtemporal/fieldmetrics,
 model_transfer_rights không được xácnhận bởi yêu cầu demo local.
 
-Kiểm lại/vận hành,tại D:/AEGIS:
+Kiểm lại/vận hành, tại D:/AEGIS:
 
 ```powershell
 & .\h6_t04_demo_20261029\SHOW_SAVED_DEMO.ps1
 & .\h6_t04_demo_20261029\RUN_BACKEND_DEMO.ps1 -RunName live01
 ```
 
-Viewer khôngnetwork/inference;RUN dùngoutput mới,cầnloopback/temp,expected8PASS
+Viewer khôngnetwork/inference;RUN dùngoutput mới, cầnloopback/temp, expected8PASS
 vàcleanuptrue. live01 chưa được tạo trong rehearsal;chạy tiếp dùnglive02,nội dung
 foldercũ không overwrite. Optional ảnhlive dùng command trong START_HERE với
-images_live01 mới,không cài/tải model. Nếu lỗigiữlog,đọc saved timestamp vànói
-đúng làrehearsal. Không sửa model/env/DB thật đểchữacháy hoặc tựmởLAN/firewall.
-Runners tựshutdown/cleanup;khôngcó account thật,migration hoặc sảnphẩm cầnrollback.
+images_live01 mới, không cài/tải model. Nếu lỗigiữlog, đọc saved timestamp vànói
+đúng làrehearsal. Không sửa model/env/DB thật đểchữacháy hoặc tựmở LAN/firewall.
+Runners tựshutdown/cleanup;khôngcó account thật, migration hoặc sảnphẩm cầnrollback.
 
 ### D. Review kỹ thuật và chất lượng trình bày
 
 Story được chốt:ảnh → workflow → kiểm soát bằngchứng → giới hạn temporal.
-Demo dùng API vàảnh gốc/outputJSON,tập trung đónggóp AI/Backend;không giả UI
+Demo dùng API vàảnh gốc/outputJSON, tập trung đónggóp AI/Backend;không giả UI
 mobileđãtíchhợp. D06rehearsal làcorrection tuần tự;raceH5-T02 được dẫn riêng
-bằngtrace cũ,không nói8stage vừa tái tạo concurrency. Source bệnh/nhãn nguồn
+bằngtrace cũ, không nói8stage vừa tái tạo concurrency. Source bệnh/nhãn nguồn
 giữprovenance;không dùng prediction/rule/mock làmGT hoặc no_detection làmhealthy.
 
-Q&A phânbiệt score với xácsuất,validation với field,mAP vớiaccuracy,3seed
-source-r1/boundary-r2 vớiV4,candidate vớidefault,72hproposal vớileadtime,copy
-cùngmáy với máysecond,soakfailed vớicompleted4h. Không tựfreezeprotocol hoặc
-phêduyệtlicense/consent,khônghứa lịchthu/train khi cònphụthuộc người/dữliệu.
+Q&A phânbiệt score với xácsuất, validation với field, mAP vớiaccuracy,3 seed
+source-r1/boundary-r2 vớiV4,candidate vớidefault,72 hproposal vớileadtime, copy
+cùngmáy với máysecond, soakfailed vớicompleted4h. Không tựfreezeprotocol hoặc
+phêduyệtlicense/consent, khônghứa lịchthu/train khi cònphụthuộc người/dữliệu.
 
 Đạt đúngmục tiêu chuẩn bịdemo nhẹ. Scope không mở thành slide deck/UI/framework
 hoặc tínhnăng mới. Cácfile trìnhbày chỉinternalworkspace;không upload/send/publish.
-Metadata/hashes kiểmbytes/refs,không thay quyền nguồn hoặc reviewer độc lập.
+Metadata/hashes kiểmbytes/refs, không thay quyền nguồn hoặc reviewer độc lập.
 
 ### E. Đề xuất riêng và dừng
 
@@ -5053,9 +5053,9 @@ Cải tiến tùychọn:slide/PDF hoặc demoUI có thể chọn riêng nếu c�
 không cần để đóngH6-T04. Trước buổi nói chỉ mởnotes/viewer và chọn muốn live hay
 saved;không đặt thêm điều kiện bắtbuộc từ test/benchmark/soak mới.
 
-Sau buổi demo,có thể chọn **H2-T03 — refresh/retry/chẩn đoán cho client** theo
+Sau buổi demo, có thể chọn **H2-T03 — refresh/retry/chẩn đoán cho client** theo
 phản hồi tíchhợp. Hiện chưa triển khai task tiếp. Đóng H6-T04,cập nhậtstatus và
-dừng;không mua thiếtbị,liênhệreviewer,train,commit/push,gửi gói hoặc deploy.
+dừng;không mua thiếtbị, liênhệreviewer, train, commit/push, gửi gói hoặc deploy.
 
 
 ## 75. TASK-22/FT25 — V4 fine-tune thêm 25 epoch, đã khởi chạy (2026-10-30T08:48:39.346178+07:00)
@@ -5071,9 +5071,9 @@ PID thực thi 113368, GPU NVIDIA GeForce RTX 3050 Laptop GPU. Trạng thái lú
 Hai checkpoint V4 cũ đã strip optimizer/EMA/epoch; lượt mới từ V4 best.pt,
 không phải resume liên tục epoch51–75. Candidate không tự thay V4/API.
 
-Nghiệm thu: đủ25 epoch; so sánh V4/candidate cùng validation và cấu hình;
+Nghiệm thu: đủ 25 epoch; so sánh V4/candidate cùng validation và cấu hình;
 metric tổng/từng class, source/hash V4 và dữ liệu giữ nguyên; ghi rõ giới hạn.
-Hiện preflight/khởi chạy đạt; đủ25 epoch và kết quả so sánh **chưa đạt/chưa có**.
+Hiện preflight/khởi chạy đạt; đủ 25 epoch và kết quả so sánh **chưa đạt/chưa có**.
 Không bắt buộc metric tăng để kết thúc thí nghiệm.
 
 ### B. Thay đổi và phạm vi
@@ -5092,7 +5092,7 @@ thăm dò, không tuyên bố tối ưu. Optimizer/scheduler mới, không giữ
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Đã kiểm đủ3620train/1034val; không group giao nhau; nhãn qua validator hiện có;
+Đã kiểm đủ 3620 train/1034val; không group giao nhau; nhãn qua validator hiện có;
 ảnh nguồn khớp saved_image_sha256 trong manifest; bản sao ảnh/nhãn khớp hash.
 Không đọc nội dung test. Worker tái kiểm source/snapshot trước train.
 Log xác nhận AdamW0.0001, counts và Starting training for25epochs.
@@ -5100,7 +5100,7 @@ V4 hash vẫn 1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a.
 Chưa có kết quả cuối, không dùng metric lịch sử thay kết quả mới.
 
 Theo dõi status.json; training.log hoặc training/results.csv sau epoch đầu.
-Runner tự train rồi val FP32 cảV4/candidate conf0.001,IoU0.7,max_det300;
+Runner tự train rồi val FP32 cả V4/candidate conf0.001,IoU0.7,max_det300;
 đây là cấu hình AP sweep, không sửa threshold API0.25.
 Sau khi thành công lưu comparison.json/RESULTS_VI.md và status=completed;
 lỗi lưu status=failed/traceback, không tự restart hoặc đổi cấu hình.
@@ -5127,17 +5127,17 @@ chọn phạm vi riêng. Không commit/push/deploy.
 ## 76. TASK-22/FT25 — báo cáo kết thúc fine-tune V4 thêm 25 epoch
 
 Báo cáo lập/kiểm chứng lại: 2026-10-30T11:07:55.254513+07:00. Kết quả train/validation được tạo trước đó
-ngày30/10/2026, không phải lượt train/inference mới trong phiên viết báo cáo.
+ngày 30/10/2026, không phải lượt train/inference mới trong phiên viết báo cáo.
 
 ### A. Kết quả — hoàn thành thí nghiệm, đóng TASK-22/FT25
 
-Đủ25 epoch fine-tune mới từ V4 best.pt. Bắt đầu 2026-10-30T08:47:18.143565+07:00;
+Đủ 25 epoch fine-tune mới từ V4 best.pt. Bắt đầu 2026-10-30T08:47:18.143565+07:00;
 hoàn tất train và so sánh 2026-10-30T10:49:13.576815+07:00. Log training7090.02giây
-(1giờ58phút10giây); toàn lượt gồm khởi tạo/kiểm tra/validation khoảng
-2giờ1phút55giây. GPU RTX3050Laptop,torch2.11.0+cu128,Ultralytics8.4.178.
+(1 giờ 58phút10giây); toàn lượt gồm khởi tạo/kiểm tra/validation khoảng
+2 giờ 1phút55giây. GPU RTX3050Laptop, torch2.11.0+cu128,Ultralytics8.4.178.
 Đây không phải resume liên tục epoch51–75 vì optimizer/scheduler đã khởi tạo lại.
 
-Đánh giá mới V4 và candidate cùng1034ảnh/3161GT validation, FP32, imgsz640,
+Đánh giá mới V4 và candidate cùng1034 ảnh/3161GT validation, FP32, imgsz640,
 batch4,conf0.001,IoU0.7,max_det300. Số đo so sánh:
 
 | Chỉ số | V4 đánh giá lại | FT25 candidate | Delta điểm phần trăm |
@@ -5156,15 +5156,15 @@ tại confidence0.25. Không dùng chúng thay P/R/F1@0.25 của báo cáo lịc
 | Đốm nâu | 72.17 → 72.80 | +0.63 | 33.97 → 34.38 | +0.41 |
 | Khô vằn | 65.84 → 67.69 | +1.84 | 35.04 → 36.89 | +1.85 |
 
-AP50–95 tổng tăng0.75điểm phần trăm; cải thiện mạnh nhất ở khôvằn.
-Đạoônlá AP50 giảm0.92điểm, AP50–95 gần như ngang, hơi giảm0.01điểm.
+AP50–95 tổng tăng0.75 điểm phần trăm; cải thiện mạnh nhất ở khôvằn.
+Đạoônlá AP50 giảm0.92 điểm, AP50–95 gần như ngang, hơi giảm0.01 điểm.
 Không kết luận tốt hơn mọi bệnh hoặc đủ căn cứ thay model mặc định.
 Epoch tốt nhất theo AP50–95 của log train: 25/25;
 chỉ số cùng epoch trong CSV 0.332850. So sánh chính dùng
 checkpoint best.pt và đánh giá FP32 chung, không lấy CSV AMP làm đối chứng FP32.
 
 Đối chiếu nghiệm thu:
-- Đủ25epoch, không dừng sớm: đạt, results.csv epoch1–25 và log hoàn tất.
+- Đủ 25 epoch, không dừng sớm: đạt, results.csv epoch1–25 và log hoàn tất.
 - So sánh cùngval/cấu hình, có tổng/từngclass: đạt, comparison.json.
 - V4 gốc/ảnh/nhãn nguồn và snapshot giữ hash: đạt, kiểm mới FINAL_VERIFICATION.json.
 - Không thay API/model/threshold/class/split/test: không có thao tác thay các phần này;
@@ -5188,8 +5188,8 @@ Không đổi contract/dữ liệu nghiệp vụ. Không có thay đổi phát s
 ### C. Kiểm chứng và cách tự kiểm lại
 
 Kiểm thực sự vừa chạy: runner.verify đọc/hash lại9308file train/val
-(4654ảnh+4654nhãn) tại source và snapshot;5frozen inputs;
-hash cả checkpoint V4/candidate, CSV đủ25epoch và mọi giá trị hữu hạn,
+(4654 ảnh+4654nhãn) tại source và snapshot;5 frozen inputs;
+hash cả checkpoint V4/candidate, CSV đủ 25 epoch và mọi giá trị hữu hạn,
 mapping tênclass trong kết quả, delta tính lại khớp. Không chạy lại inference,
 training, testset, toànbộ Backend suite, benchmark hoặc soak.
 AMP check của lượttrain đã pass theo log; log không có Traceback/Error/Warning
@@ -5206,7 +5206,7 @@ Không cần rollback API vì model phục vụ không đổi. Muốn dọn arti
 ### D. Review kỹ thuật và giới hạn
 
 AdamW0.0001,beta1=0.9,warmup3,warmup_bias_lr0,lrf0.01,
-batch4,imgsz640,seed42,AMP,workers0,augmentation theoV4; patience50>25.
+batch4,imgsz640,seed42,AMP, workers0,augmentation theoV4; patience50>25.
 Thí nghiệm đúng mục tiêu thêm25epoch với candidate độc lập. Hash/data gate,
 không ghi đè, không implicitresume và đánh giá cùngcấuhình đã hoạt động.
 Kết quả validation tăng nhẹ tổng thể nhưng không đồng đều theo bệnh.
@@ -5218,7 +5218,7 @@ Không gọi candidate là V4 default mới; boundary-r2 giữ trạng thái ri�
 
 ### E. Đề xuất tách riêng và dừng
 
-Đề xuất tiếp theo: review FP/FN của đạoônlá ở cùng ngưỡng0.25 giữa V4 vàFT25,
+Đề xuất tiếp theo: review FP/FN của đạoônlá ở cùng ngưỡng0.25 giữa V4 và FT25,
 vì AP50 của class này giảm. Đây là bước chọn riêng để hiểu trade-off trước khi
 cân nhắc candidate, không tự chạy trong báo cáo và không train tiếp.
 Đánh giá nhiều seed hoặc ngoài thựcđịa là hướng riêng với dữ liệu/quyền phù hợp.
@@ -5246,17 +5246,17 @@ Buổi demo xong do người dùng xác nhận; evidence đóng gói là rehears
 Gói mới source142file theo allowlist hiện hành, references/docs và evidence
 chọn lọc H1/H5/H6/FT25, registry R01–R20, lịch sử nguyênbyte tới mục76.
 Không sửa source/allowlist/gói cũ/model/API hoặc mobile. Không đưa dataset,
-weights,DB/uploads,env,credentials,Git hoặc rawlogs vàoZIP; không là backup toànổ.
+weights, DB/uploads, env, credentials, Git hoặc rawlogs vàoZIP; không là backup toànổ.
 Mô tả/cấp riêng trong SOURCE_AND_RUNTIME_VI.md; chưa phê duyệt license/chia sẻ.
 
 ### C. Kiểm chứng vừa chạy
 
 Source manifest142file verify; AST94Python; copiedhash và registry
 E01–E14 khớp 14/14;
-4format secret scan0hit (không là audit đầyđủ); 25entry links tồn tại;
-standalone verify và ZIPCRC/giải nén/verify đạt 275file,
+4 format secret scan0hit (không là audit đầyđủ); 25 entry links tồn tại;
+standalone verify và ZIPCRC/giải nén/verify đạt 275 file,
 thư mục temp đã dọn. Archive SHA256 7dab04538c25e7f939224f83233c0ba73eb803a196c7df728c99a258c2b2fdb6.
-109trackedfile/source142file cùng HEAD/branch/index/staged giữ nguyên.
+109 trackedfile/source142file cùng HEAD/branch/index/staged giữ nguyên.
 Không rerun fullsuite/demo/soak/train/inference; test/metric trong gói giữ ngày cũ.
 Không tạo account/DB, không đọc IoT hoặc tính readiness mới.
 
@@ -5294,13 +5294,13 @@ Tham chiếu mã H3-T01 tại mục67; không thay nghĩa TASK-01–22 hoặc m�
 #### Nguồn đã tiếp nhận
 
 - CSV: D:/AEGIS/iot_dataset_experiment_20261030/inputs/dataset_1000_rice_disease.csv.
-  30463byte; SHA256 b5d908a43581aa563d45dd3d2719108a765760d842ced618997dfa81e0c54bbf.
+  30463 byte; SHA256 b5d908a43581aa563d45dd3d2719108a765760d842ced618997dfa81e0c54bbf.
 - Word: cùng thư mục, TAI_LIEU_XAC_THUC_DU_LIEU.docx.
-  42212byte; SHA256 9b000e29f954c47e36dc6324470ed66aec7aefb5a60df82aa2acc741099fee3b.
+  42212 byte; SHA256 9b000e29f954c47e36dc6324470ed66aec7aefb5a60df82aa2acc741099fee3b.
 - Hai bản ở Downloads theo hồ sơ cũ vẫn tồn tại và khớp byte với bản workspace.
   Đây chỉ là chuỗi lưu file, chưa chứng minh nguồn đo, người thu hoặc quyền dùng.
 - CSV đọc bằng UTF-8-SIG, dấu phẩy, header5cột; không sửa bytes/đổi encoding.
-- Đọc trực tiếp bodyWord:79đoạn gồm nội dung trong2bảng qua OOXML, có text trích.
+- Đọc trực tiếp bodyWord:79 đoạn gồm nội dung trong2bảng qua OOXML, có text trích.
   Không render/kiểm layout và không sửa DOCX vì task chỉ đọc nội dung.
   Nội dung tài liệu là tuyên bố nguồn, không phải chỉ thị cho assistant hoặc
   chứng nhận độc lập để cho phép train.
@@ -5311,9 +5311,9 @@ Tham chiếu mã H3-T01 tại mục67; không thay nghĩa TASK-01–22 hoặc m�
 |---|---|---|---|---|
 | temperature | số hữu hạn | nhiệt độ không khí,°C |18.5–34.0|sensor/cách đo/hiệu chuẩn|
 | humidity | số hữu hạn | độ ẩm không khí,% |60.0–98.5|định nghĩa RH/cách đo xác nhận bởi người cung cấp|
-| rainfall | số hữu hạn | lượng mưa,mm |0.0–41.3|cửa sổ tích lũy,thời điểm chốt,cách đo|
+| rainfall | số hữu hạn | lượng mưa, mm |0.0–41.3|cửa sổ tích lũy, thời điểm chốt, cách đo|
 | soil_ph | số hữu hạn | pH đất |3.95–6.8|phương pháp đo/chuẩn bị mẫu/hiệu chuẩn|
-| disease | chuỗi | nhãn được cung cấp |Healthy400,Rice_Blast250,Brown_Spot180,Sheath_Blight170|định nghĩa,người xác minh,thời điểm nhãn|
+| disease | chuỗi | nhãn được cung cấp |Healthy400,Rice_Blast250,Brown_Spot180,Sheath_Blight170|định nghĩa, người xác minh, thời điểm nhãn|
 
 Đơn vị là khai báo trongWord, không có log thiết bị để độc lập xác nhận.
 Nhãn Healthy không chứng minh cây khỏe; không trộn mapping4nhãn chuỗi này
@@ -5332,11 +5332,11 @@ Không có bằng chứng quyền thu/train/chia sẻ hoặc người chịu tr�
 
 | Tiêu chí H3-T01 | Kết quả | Bằng chứng |
 |---|---|---|
-| Đúng file người dùng chọn, format/schema |Đạt|INTAKE_PROFILE.json,CSVđọc trực tiếp|
-| Hash và raw giữ nguyên |Đạt|VERIFICATION.json,khớp cảDownloads|
-| Units/timezone/cadence/missingcodes được mô tả |Đạt ở mức hồ sơ|unitslàclaim,cácphầnthiếughiunknown|
+| Đúng file người dùng chọn, format/schema |Đạt|INTAKE_PROFILE.json, CSVđọc trực tiếp|
+| Hash và raw giữ nguyên |Đạt|VERIFICATION.json, khớp cả Downloads|
+| Units/timezone/cadence/missingcodes được mô tả |Đạt ở mức hồ sơ|unitslàclaim, cácphầnthiếughiunknown|
 | Model/reference/quyền có trạng thái rõ |Đạt ở mức ghi nhận|không có sensor/provenance/permissions để xác nhận|
-| Đối chiếu source/báo cáo cũ và khoảng thiếu |Đạt|8đối chiếu hash/profilekhớp,rawcontractđãđọc|
+| Đối chiếu source/báo cáo cũ và khoảng thiếu |Đạt|8 đối chiếu hash/profilekhớp, rawcontractđãđọc|
 | Không vượt sang adapter/train |Đạt|không import model hoặc gọiDB/API|
 
 Hoàn thành intake không đồng nghĩa metadata đầy đủ. Phần xác thực nguồn/quyền,
@@ -5349,12 +5349,12 @@ File chính: INTAKE_PROFILE.json, DOCUMENT_PROFILE.json, DOCUMENT_BODY_TEXT.txt,
 VERIFICATION.json, REPORT_VI.md, ACCEPTANCE.json và script kiểm đọc/verify.
 Không sửa API/contract/model/dataset/labels hoặc allowlist/góiZIP cũ.
 
-Mục77 ghi “cóIoT theo người dùng, chưa truy cập/đánh giá”. Hiện đã trực tiếp
+Mục77 ghi “có IoT theo người dùng, chưa truy cập/đánh giá”. Hiện đã trực tiếp
 tiếp nhận bộ xác nhận và tìm thấy các thư mục iot_dataset_experiment,
 iot_robustness_experiment, iot_synthetic_training, iot_simulation_validation
 cùngiot_web_demo mang mốc20261030 trongworkspace (không audit toàn bộ nhánh).
-README/PRETRAIN_DECISION/model_metadata của bộCSV ghi đã có prototypeoffline
-phân loại4nhãn,fit800rowtrain/test200 trước phiên này; đây là bằng chứng lịch sử,
+README/PRETRAIN_DECISION/model_metadata của bộ CSV ghi đã có prototypeoffline
+phân loại4nhãn, fit800rowtrain/test200 trước phiên này; đây là bằng chứng lịch sử,
 không chạy lại/không nạpjoblib và không xác nhận metric bằng inference mới.
 Các thư mục này chưa được mục77/snapshot cũ mô tả; không sửa lịch sử để giả định
 đã được bao phủ. Source hiện có prototype không biến nó thành temporalforecast.
@@ -5367,29 +5367,29 @@ Không dùng nhãn từ model/rule/synthetic làm groundtruth hoặc gánGT cho 
 
 pilot_telemetry.py và ENVIRONMENT_INGEST.md yêu cầu stream có owner/season,
 source/method/instrument/reference và sample có observed_at kèmtimezone,
-UUID/reference. Đại lượng hiện nhận:air_temperature_c,relative_humidity_pct,
+UUID/reference. Đại lượng hiện nhận:air_temperature_c, relative_humidity_pct,
 leaf_wet (có thểnull theocontract). Rainfall vàsoil_ph chưa được schema này nhận;
 disease không là trườngrawsample.
-Chỉ rename2cột không đủ. Không tự bỏ2biến, giảtimestamp, gánleafwet/rainwindow,
+Chỉ rename2cột không đủ. Không tự bỏ 2 biến, giảtimestamp, gánleafwet/rainwindow,
 đổi source hoặc dùng rowindex để nhận diện phépđo thật. Không nạpCSV vàoDB.
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Đọc toàn bộ1000row/5column:0ôtrống,0lỗi parse/nonfinite,0trùng toàn hàng,
-0trùng bộđặctrưng và0bộđặctrưng có nhãn mâu thuẫn. Các phép kiểm chỉ là hồ sơ
+Đọc toàn bộ 1000 row/5column:0 ôtrống,0 lỗi parse/nonfinite,0 trùng toàn hàng,
+0 trùng bộđặctrưng và 0 bộđặctrưng có nhãn mâu thuẫn. Các phép kiểm chỉ là hồ sơ
 cấu trúc tối thiểu H3-T01; chưa QC clock/thiết bị/quarantine/H3-T03.
 HashCSV/Word, rowcount/schema/labelcounts/missing/duplicate/conflict khớp8mục
 đối chiếu báo cáo audit cũ. Đã kiểm hash raw đầu/cuối đọc và references đã đọc;
-source allowlist142file,tracked109file,
+source allowlist142file, tracked109file,
 HEAD/branch/index/staged giữ nguyên. Không chạy lại model/testmetrics/fullsuite.
 
-Tự kiểm bằng BackendPython (chỉ standardlibrary,không ghi artifact):
+Tự kiểm bằng BackendPython (chỉ standardlibrary, không ghi artifact):
 
 ```powershell
 & D:\AEGIS\backend\.venv\Scripts\python.exe -B D:\AEGIS\h3_t01_intake_20261102\verify_intake.py
 ```
 
-Expected verified=true,input_files=2. Đọc report/profile để xem cácunknown.
+Expected verified=true, input_files=2. Đọc report/profile để xem cácunknown.
 inspect_intake.py tạo hồ sơ một lần và từ chối ghi đè; không cần chạy lại.
 Không account/DB/service/tempstore được tạo; không cần cleanup runtime/rollback.
 Giữ nguyên bảnCSV/Word/oldexperiments. Không phát hành/upload hồ sơ hoặc dữliệu.
@@ -5421,7 +5421,7 @@ không thiếu sót cần sửa để đóngH3-T01.
 Không tự bắt đầu H4-T01/H3-T02, train/QCfull hoặc rebuild snapshot trong phiên này.
 
 
-## 79. H4-T01 — nguồn/vai trò/quyền bộCSV1000dòng (2026-11-02T18:45:12.452356+07:00)
+## 79. H4-T01 — nguồn/vai trò/quyền bộ CSV1000dòng (2026-11-02T18:45:12.452356+07:00)
 
 
 Thời điểm: 2026-11-02T18:45:12.452356+07:00. **Hoàn thành một phần; chưa đủ điều kiện đóng H4-T01.**
@@ -5437,7 +5437,7 @@ Nguồn gốc dataset, vai trò được nhận và quyền theo mục đích c�
 | Vai trò được người thật nhận và có bằng chứng |Chưa đạt|Vai trò IoT chỉ mô tả bên chuyển file, không là acceptance/ownership|
 | Quyền thu/nhận/lưu/train/công bố/chia sẻ đúng phạm vi |Chưa đạt|Chưa có license hoặc xác nhận từ bên có thẩm quyền|
 
-Người dùng chỉ nhậnCSV vàWord. Không tự suy là có quyền hoặc nhãn được xác minh.
+Người dùng chỉ nhậnCSV và Word. Không tự suy là có quyền hoặc nhãn được xác minh.
 Phần phụ thuộc bị chặn bởi nguồn/bằng chứng ngoài hồ sơ, không do lỗi phần mềm.
 
 ### Những gì đã biết và mức bằng chứng
@@ -5446,7 +5446,7 @@ U01: “tôi được thành viên phụ trách IoT gửi cho, nguồn ở trên
 U02: “tôi chỉ nhận được một file csv và file doc, tôi sẽ gửi file doc cho bạn”.
 Đây là lời người dùng, chưa là xác nhận trực tiếp từ người cung cấp/nguồn gốc.
 FileWord mới được chỉ định tại Downloads có hash9b000e29f954c47e36dc6324470ed66aec7aefb5a60df82aa2acc741099fee3b, đúng bản H3-T01.
-CSV hashb5d908a43581aa563d45dd3d2719108a765760d842ced618997dfa81e0c54bbf giữ nguyên. Đã đọc lại79đoạn gồm2bảng và các quan hệ ngoài.
+CSV hashb5d908a43581aa563d45dd3d2719108a765760d842ced618997dfa81e0c54bbf giữ nguyên. Đã đọc lại79 đoạn gồm2bảng và các quan hệ ngoài.
 
 Word trình bày các điều kiện môi trường, số mẫu và trích dẫn; phần nội dung
 không xác định URL/datasetID, người tạo/thu/gánnhãn, hồ sơ đo từng dòng hoặc
@@ -5462,21 +5462,21 @@ không gán dataset gầngiống hoặc dùng tài liệu tham khảo làm ngu�
 ### B. Thay đổi
 
 Tạo dossier v1 riêng tại h4_t01_source_20261102, kế thừa nguyên tắc biểu mẫu
-TASK-10 thay vì sửa hồ sơ chậu/khay ngày27/10. Không mang giả định khay/cadence24h
-hoặc reviewer sang bộCSV tĩnh. Files: source_dossier.json,permissions.json,
-people_and_roles.json,user_statements.json,document_review.json,public_lookup.json,
-DOCUMENT_BODY_TEXT.txt,ASK_IOT_TEAMMATE.md,VERIFICATION.json,REPORT_VI.md,ACCEPTANCE.json.
+TASK-10 thay vì sửa hồ sơ chậu/khay ngày 27/10. Không mang giả định khay/cadence24h
+hoặc reviewer sang bộ CSV tĩnh. Files: source_dossier.json, permissions.json,
+people_and_roles.json, user_statements.json, document_review.json, public_lookup.json,
+DOCUMENT_BODY_TEXT.txt, ASK_IOT_TEAMMATE.md, VERIFICATION.json, REPORT_VI.md, ACCEPTANCE.json.
 Không sửa Backend/AI/API/nhãn/model/protocol/dataset hoặc ZIPsnapshot cũ.
 Permissions có session authorization cho việc đọc/đối chiếu, tách khỏi quyền
 của nguồn dữ liệu. Unknown không là kết luận pháp lý cấm dùng; chưa có căn cứ ghi granted.
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Đọc hồ sơ H3-T01 và biểu mẫu nguồn/quyền/vai trò cũ; hash 12input/reference
+Đọc hồ sơ H3-T01 và biểu mẫu nguồn/quyền/vai trò cũ; hash 12 input/reference
 đầu/cuối; đọc trực tiếpWord, so toàn bộ bodytext với H3-T01 và kiểm relationship.
 Lệnh in text đầu lỗi encodingcp1252; chạy lạiUTF8 thành công, không sửa input.
 JSONparse và kiểm không phát sinh permissiongranted/trainingapproval.
-Source142file,tracked109file và HEAD/branch/index/staged
+Source142file, tracked109file và HEAD/branch/index/staged
 giữ nguyên. Không testBackend/GPU/train/inference/DB/API hoặc gửi tin nhắn.
 
 Không xác minh lại tất cả DOI/ngưỡng dịch tễ; REFERENCE_VERIFICATION.md là
@@ -5508,8 +5508,8 @@ không tự chuyển sang H4-T02/H4-T05 hoặc xây adapter. Phần train/SOP/QC
 ### A. Kết quả
 
 Hoàn thành train mới lúc 2026-11-02T18:49:08.996628+07:00 trênCPU, thời gian fit0.209giây.
-RandomForest200trees,maxdepth8,minleaf2,seed42 từ cấu hình đã chọn30/10.
-Train800dòng,đánh giá200dòng theo đúng membership/order cũ; không refit1000dòng.
+RandomForest200trees, maxdepth8,minleaf2,seed42 từ cấu hình đã chọn 30/10.
+Train800dòng, đánh giá 200 dòng theo đúng membership/order cũ; không refit1000dòng.
 Không phải fine-tune25YOLO hoặc trainforecast/H4-T05; tên các task gốc giữ nguyên.
 
 | Chỉ số trên nhãn CSV của tập200dòng đã xem trước | RF mới | Dummy |
@@ -5527,19 +5527,19 @@ bệnh tươnglai hoặc horizon, không suyleadtime72h hoặc hiệu quả dự
 Chỉ folder iot_prototype_rerun_20261102 và appendstatus. Có protocol ghi trướcfit,
 CSV/splitcopy byte-identical, model.joblib, model_metadata, metrics, prediction,
 confusionmatrix và verification. Không sửa runner/requirements/results cũ,
-H4dossier,Backend/API,V4 hoặc split/nhãn. Không modelsearch/thresholdtuning.
-Nghiệmthu modeltồn tại/reloadđúng,metricsvàconfusionmatrix,splitcũ,hashnguồn:
+H4dossier, Backend/API, V4 hoặc split/nhãn. Không modelsearch/thresholdtuning.
+Nghiệmthu modeltồn tại/reloadđúng, metricsvàconfusionmatrix, splitcũ, hashnguồn:
 đềuđạt; không yêu cầu accuracy phải tăng để đónglượttrain.
 
 ### C. Kiểm chứng
 
-ĐãfitRF vàDummy thực tế, predict200dòng, lưu/reload chínhmodelvừatrain để so
-prediction, tínhlạiaccuracy/F1 từCSVprediction; modelkhớpmetadatahash.
-Original experiment42file,source142file,
-tracked109file,HEAD/branch/index/staged,H4dossiervàV4 giữhash.
+ĐãfitRF và Dummy thực tế, predict200dòng, lưu/reload chínhmodelvừatrain để so
+prediction, tínhlạiaccuracy/F1 từ CSVprediction; modelkhớpmetadatahash.
+Original experiment42file, source142file,
+tracked109file, HEAD/branch/index/staged, H4dossiervà V4 giữhash.
 Không cài dependency, không testfullsuite, không gọiGPU/AIservice/DB/API.
 Không account/tempstore; giữ artifact để truyvết. Rollback API không cần vì không đổi.
-Tự xemstatus.json=completed,deployed=false; results/metrics.json và predictions.csv.
+Tự xemstatus.json=completed, deployed=false; results/metrics.json và predictions.csv.
 Không chạy lại script trên outputcũ; nó từ chối overwrite. Chỉ loadjoblib nguồn tin cậy.
 
 ### D. Review và giới hạn
@@ -5575,9 +5575,9 @@ Source hiện tại đã có hành vi cần thiết, không cần sửa logic ng
 | Stale version và payload conflict |409 đúng code; refresh, intent mới; exactreplay200 không sửa event|
 | Timeout sau commit |Eventbarrier sau commit gây clienttimeout; refresh thấy event; replay200 cùngevent, itemversion3 trong khi eventversion2; không nhân event|
 |429/Retry-After |Có headergiây, không ghi event; tiến clock limiter rồi cùngcommand thành201|
-|503 không fallback |Snapshotsha bị hỏng ởDBtạm trảassessment_integrity_error, không item/Retry-After; khôi phục nguồn rồi GET200|
+|503 không fallback |Snapshotsha bị hỏng ở DBtạm trảassessment_integrity_error, không item/Retry-After; khôi phục nguồn rồi GET200|
 | Request ID và diagnostic |Errorbody/header khớp; replayheader mới/eventIDrequest cũ; trace không token/password/body|
-| Cleanup và tương thích |7HTTPtests+3regressions đạt,11tempdir của2lượt thànhcông dọn sạch; source nghiệp vụ/API unchanged|
+| Cleanup và tương thích |7HTTPtests+3regressions đạt,11 tempdir của2lượt thànhcông dọn sạch; source nghiệp vụ/API unchanged|
 
 Đã đạt các tiêu chí trong phạm vi. Không đóng toànH2 hoặc suy ra native đã tíchhợp.
 
@@ -5590,8 +5590,8 @@ Source hiện tại đã có hành vi cần thiết, không cần sửa logic ng
 - backend/docs/MOBILE_FOLLOWUP_API.md và docs/MOBILE_INTEGRATION.md: chỉ thêm
   link tới runbook, đã kiểm nội dung trước task được giữ nguyên.
 - tools/handoff_allowlist.json: thêm đúng2file mới,142→144; chưa buildgói mới,
-  snapshot30/10 và các gói lịch sử giữ nguyên.
-- h2_t03_client_recovery_20261102: baseline,harness,logs,summarytraces,review/proof.
+  snapshot 30/10 và các gói lịch sử giữ nguyên.
+- h2_t03_client_recovery_20261102: baseline, harness, logs, summarytraces, review/proof.
 
 Không đổi route/errorcode/DTO/database schema/TTL/quota hoặc kiếntrúc AIHTTP.
 Không thêm actionsDTO(H2-T02), filters(H2-T01), mobile implementation hoặc train.
@@ -5600,16 +5600,16 @@ thất bại sandbox khi chạy lại; phục vụ tiêu chí kiểm chứng HTT
 
 ### C. Kiểm chứng
 
-Lượtfocused đầu:7errors do sandboxchặn loopback WinError10013; không là7lỗi
-nghiệp vụ. Log/summary giữ nguyên,7tempdir dọn sạch. Không đổi app để né lỗi này.
-Lượtfocusedrun02 với quyền local cần thiết:7/7pass,0failure/error/skip/ResourceWarning.
-Regression3/3pass: corecapability,lateassessment required/current,observationrecheck.
+Lượtfocused đầu:7errors do sandboxchặn loopback WinError10013; không là 7 lỗi
+nghiệp vụ. Log/summary giữ nguyên,7 tempdir dọn sạch. Không đổi app để né lỗi này.
+Lượtfocusedrun02 với quyền local cần thiết:7/7pass,0 failure/error/skip/ResourceWarning.
+Regression 3/3pass: corecapability, lateassessment required/current, observationrecheck.
 Các3regression dùng Flasktestclient, không gọi là HTTP listener tests mới.
-11tempdir của2lượtthànhcông đã dọn,7serverHTTP và sessions dừng/đóng.
-Không cộng cácattempt hoặc lịch sửH1/H5 thành tổngtestđộchínhxác.
+11 tempdir của2lượtthànhcông đã dọn,7serverHTTP và sessions dừng/đóng.
+Không cộng cácattempt hoặc lịch sử H1/H5 thành tổngtestđộchínhxác.
 
-Kiểm mới bổ sung: ASTfiletest,3JSONexample parse,links đúng,144allowlist path
-regular/sorted; sohash142sourcebaseline và109trackedfile. Chỉ3sourceexisting
+Kiểm mới bổ sung: ASTfiletest,3JSONexample parse, links đúng,144 allowlist path
+regular/sorted; sohash142sourcebaseline và 109 trackedfile. Chỉ 3 sourceexisting
 thayđổi đã liệt kê; trongtracked chỉdocs/MOBILE_INTEGRATION.md thayđổi;
 HEAD/branch/index/staged giữ nguyên. V4/AI/dataset/IoT/H4dossier không bị sửa.
 Không fullsuite/demo/soak/GPU/train/realAI/native/proxy/LAN.
@@ -5620,7 +5620,7 @@ Tự kiểm lại từ D:/AEGIS:
 & backend\.venv\Scripts\python.exe -X utf8 -B -m unittest discover -s backend\checks -p test_mobile_recovery.py -v
 ```
 
-Expected7testsOK; cần quyền loopbacklocal. Tests tự tạo/dọn store,tài khoản và
+Expected7testsOK; cần quyền loopbacklocal. Tests tự tạo/dọn store, tài khoản và
 server, không dùng backendinstance/pilot thật. Timeoutbarrier giữresponse sau
 commit, auth/limiter clock được patch ở module riêng, fault DB chỉ trên storetạm.
 Không cần cleanup/rollback dữ liệu thật. Giữ docs/test/allowlist để bàn giao;
@@ -5659,9 +5659,9 @@ Không gửi cho người khác hoặc gán trách nhiệm/native acceptance tha
 | Tiêu chí | Kết quả |
 |---|---|
 | Một slice được xác định rõ |Đạt phía chuẩn bị: list/detail/required-current/ack/check/recheck|
-| Fixture và thứ tự request đối chiếu source |Đạt24requestHTTP và94assertions mỗi phiên|
+| Fixture và thứ tự request đối chiếu source |Đạt24requestHTTP và 94 assertions mỗi phiên|
 | Retry/version/ownership/bằng chứng bất biến |Đạt ở hai phiên source gốc và bản sao|
-| Source copy chạy không đọc source gốc |Đạt guard2positivecontrols và6moduleorigins tronggói|
+| Source copy chạy không đọc source gốc |Đạt guard2positivecontrols và 6 moduleorigins tronggói|
 | Nhóm client nhận scope |Chưa đạt, theo xác nhận người dùng|
 | Native/client tích hợp |Chưa kiểm/chưa có xác nhận|
 
@@ -5674,7 +5674,7 @@ Thêm backend/docs/MOBILE_SLICE_HANDOFF.md và backend/checks/export_mobile_foll
 hai docs entry chỉ thêm link, giữ nội dung có trước; allowlist144→146.
 Exporter tái sử dụng fixture và factory hiện có, không thêm API/SDK/service mới,
 không sửa nghiệp vụ, DTO/schema, model hoặc mobile. Thư mục task chứa source copy,
-fixture/metadata/review/checklist và ZIP. Gói30/10 và lịch sử giữ nguyên.
+fixture/metadata/review/checklist và ZIP. Gói 30/10 và lịch sử giữ nguyên.
 
 Gói source có các module kế thừa ngoài slice để chạy dependency hiện có, không
 mở chúng thành yêu cầu UI. Không đưa dataset/weights/DB/env/credential/rawlog vàoZIP.
@@ -5686,17 +5686,17 @@ HTTP200/201/409/404/401 đúng kỳ vọng, snapshot gốc/event revision cũ b�
 Fixture thực dùng synthetic mock; seed qua test client, business slice qua HTTP.
 Server và kho tạm của cả hai phiên đã dọn. Không load torch/ultralytics/AI.
 
-Packaged run dùng -I,guard chặn đọc backend/frontend/tools/API/temporal source gốc,
-cho phép env sẵn có;2positivecontrol bị chặn;6moduleorigins nằmtronggói.
+Packaged run dùng -I, guard chặn đọc backend/frontend/tools/API/temporal source gốc,
+cho phép env sẵn có;2 positivecontrol bị chặn;6 moduleorigins nằmtronggói.
 Đây là chạycopy cùngmáy/env, không freshinstall hoặc máy nhận thứhai.
-Source manifest146file verify; prefixdocs cũ và109trackedfile được đốichiếu,
+Source manifest146file verify; prefixdocs cũ và 109 trackedfile được đốichiếu,
 chỉdocs/MOBILE_INTEGRATION.md trackedthayđổi;HEAD/branch/index/staged giữnguyên.
 ZIP roundtrip/hash được ghi ở ACCEPTANCE.json bênngoài sauđónggói.
 H2-T03 7HTTP+3regressions chỉ copy bằngchứng cũ, không chạy lại ởtasknày.
 Không fullsuite/demo/soak/train/GPU/IoTQC hoặc mobilebuild.
 
 Tái lập bằng VERIFY_AND_RUN.md; không tài khoản/token nào được giữ để dùnglive.
-Không DB thật bịghi,không rollbackAPI cầnthiết. Giữexports đểbàn giao, khôngxóaartifactcũ.
+Không DB thật bịghi, không rollbackAPI cầnthiết. Giữexports đểbàn giao, khôngxóaartifactcũ.
 
 ### D. Review và giới hạn
 
@@ -5704,8 +5704,8 @@ Không có lỗi nghiệp vụ trực tiếp cần sửa. Fixture chứa payload
 không credential; không dùng fixture fallback trongapp hoặc gánlàmGT.
 Schema chỉrequiredkeys vàassertions, không JSONSchemaengine đầyđủ.
 Required/current cùngID trongfixture; trườnghợpassessmentđổi có regression H2-T03.
-Clientstate,UX,SecureStore/native/offline và nguồnquyền thực còn phải kiểmriêng.
-source-rights reviewH1 cònunresolved; gói chỉnộibộ,chưa phêduyệt chia sẻ.
+Clientstate, UX, SecureStore/native/offline và nguồnquyền thực còn phải kiểmriêng.
+source-rights reviewH1 cònunresolved; gói chỉnộibộ, chưa phêduyệt chia sẻ.
 
 ### E. Phần còn chờ và dừng
 
@@ -5715,9 +5715,9 @@ triểnmobile hoặc chuyển task. H4-T01 vẫnpartial chờ nguồn, không b�
 Không gửi tin nhắn/commit/push/deploy hoặc bắt đầu tính năng tiếp theo.
 
 Gói tại D:/AEGIS/h2_t04_mobile_slice_20261102/AEGIS_MOBILE_FOLLOWUP_20261102.zip; SHA256 c03421c1e09b7390404cbfa8c268a52d6105a161ce7ede0a07579fcf6fc7d910.
-ZIP giải nén/verify đạt 162file liệt kê; temp đã dọn. H2-T04 chưa đóng.
+ZIP giải nén/verify đạt 162 file liệt kê; temp đã dọn. H2-T04 chưa đóng.
 
-Bổ sung H2-T04 lúc 2026-11-02T19:16:17.029004+07:00: gói dùng để đọc/bàn giao là D:\AEGIS\h2_t04_mobile_slice_20261102\AEGIS_MOBILE_FOLLOWUP_20261102_r2.zip; SHA256 7996a605515d5717c09eb8eda7f05111ab07841c4a0d835dd1479835c92861a7. Bản r2 sửa lệnh mẫu PowerShell bị escape khi sinh Markdown, đã kiểm control characters và ZIP roundtrip 163file; source/fixture không đổi. ZIP/proof bản đầu giữ nguyên. H2-T04 vẫn chờ nhóm mobile nhận scope.
+Bổ sung H2-T04 lúc 2026-11-02T19:16:17.029004+07:00: gói dùng để đọc/bàn giao là D:\AEGIS\h2_t04_mobile_slice_20261102\AEGIS_MOBILE_FOLLOWUP_20261102_r2.zip; SHA256 7996a605515d5717c09eb8eda7f05111ab07841c4a0d835dd1479835c92861a7. Bản r2 sửa lệnh mẫu PowerShell bị escape khi sinh Markdown, đã kiểm control characters và ZIP roundtrip 163 file; source/fixture không đổi. ZIP/proof bản đầu giữ nguyên. H2-T04 vẫn chờ nhóm mobile nhận scope.
 
 
 ## 83. H5-T03 — crash trước khi bỏ sentinel restore (2026-11-02T20:10:22.641827+07:00)
@@ -5734,7 +5734,7 @@ test bị kết thúc bằng `os._exit(77)`. Không thêm hook vào source sản
 | Tiêu chí | Kết quả và bằng chứng mới |
 |---|---|
 | Ngắt tiến trình thật đúng checkpoint |Đạt: child exit77 và checkpoint trước sentinel unlink|
-| Kho dở không được mở dù đủ file/marker |Đạt: byte inventory khớp nguồn sau khi tách sentinel; marker hợp lệ; tiến trình probe mới chặn cả5đường|
+| Kho dở không được mở dù đủ file/marker |Đạt: byte inventory khớp nguồn sau khi tách sentinel; marker hợp lệ; tiến trình probe mới chặn cả 5 đường|
 | Không ghi đè khi retry cùng đích |Đạt: CLI exit2, partial inventory/sentinel không đổi|
 | Nguồn và backup không bị sửa |Đạt: inventory nguồn/bundle trước-sau và verify manifest khớp|
 | Khôi phục sang đích mới |Đạt: CLI exit0, sentinel được bỏ, byte và audit bảy DB khớp|
@@ -5762,16 +5762,16 @@ ngoài các file trực tiếp phục vụ nghiệm thu. H2-T04 ZIP r2 giữ has
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Focused2/2 đạt: crash/probe/retry/fresh restore và normal control.
-Regression2/2 đạt: exception copy cũ vẫn chặn đích, cả hai lease chặn backup
+Focused 2/2 đạt: crash/probe/retry/fresh restore và normal control.
+Regression 2/2 đạt: exception copy cũ vẫn chặn đích, cả hai lease chặn backup
 trước khi tạo output. Không failure/error/skip/ResourceWarning; focused7tempdir
 và regression5tempdir đều đã dọn. Trace chỉ giữ trạng thái/hash/count, không giữ
 DB, password/session hash, credential hoặc bytes ảnh. Ảnh technical trong fixture
 và inference được patch từ bộ test cũ, không gọi AI thật hoặc load checkpoint.
 
-Đã kiểm AST test mới, link/runbook/control characters,148path allowlist sorted
+Đã kiểm AST test mới, link/runbook/control characters,148 path allowlist sorted
 và là regular file. So hash146source baseline: chỉ guide vàallowlist thay đổi;
-toàn109trackedfile,HEAD/branch/index/staged giữ nguyên. Không fullsuite/demo/soak,
+toàn109trackedfile, HEAD/branch/index/staged giữ nguyên. Không fullsuite/demo/soak,
 không train, không mở kho pilot thật, không đo RPO/RTO hoặc mất điện.
 Kết quả Task17 cũ chỉ là tham chiếu; các4test trên là lượt mới, không cộng với
 H1/H2/H5 cũ thành thước đo chất lượng model hoặc độ tin cậy production.
@@ -5823,7 +5823,7 @@ Không thay cơ chế recovery, API hoặc vận hành một kho/service thật.
 | Tiêu chí | Kết quả và bằng chứng |
 |---|---|
 | Nhận diện mode/store/source/schema/model |Đạt: runbook và VERSION_CONTEXT.json; ghi rõ expected source metadata khác live service inventory|
-| Đọc request ID/status/error/integrity đúng mốc |Đạt: bảng chẩn đoán;4request-completion pairs đối chiếu từ log lịch sử H2-T03|
+| Đọc request ID/status/error/integrity đúng mốc |Đạt: bảng chẩn đoán;4 request-completion pairs đối chiếu từ log lịch sử H2-T03|
 | Chọn refresh/retry/restart/restore phù hợp |Đạt: quy trình phân nhánh theo lỗi, giữ intent và không chiếm lại reservation mơ hồ|
 | Restart/rollback/backup theo version |Đạt ở mức tài liệu đối chiếu source/CLI; không downgrade DB, không restore đè hoặc bỏ sentinel|
 | RPO/RTO đúng trạng thái |Đạt: chưa chốt/chưa đo production; không đặt số từ test/soak|
@@ -5852,9 +5852,9 @@ phần thêm/thay thế đã nêu; giữ cả các sửa đổi sẵn có trong 
 ### C. Kiểm chứng thực sự vừa chạy
 
 Kiểm6link local, không control character trong Markdown; AST đối chiếu backup
-schema,7DB,expected core migrations1–5,6pilotmetakinds, mobilecontract/pilotmarker
+schema,7DB, expected core migrations1–5,6 pilotmetakinds, mobilecontract/pilotmarker
 và defaultV4 constants từsource. Kiểm11errorcodes có thật trong source hiện tại.
-3CLI help thực sự exit0:pilot_backup.py,serve_mobile.py,check_model_provision.py.
+3CLI help thực sự exit0:pilot_backup.py, serve_mobile.py, check_model_provision.py.
 Đã parse cú pháp2khối PowerShell, không thực thi các lệnh log/verify/restore mẫu.
 
 Đối chiếu4requestID/status/method với completionlog lịch sử H2-T03 cho401/409/429/503.
@@ -5862,7 +5862,7 @@ DIAGNOSTIC_EXAMPLES.json chỉ lưu allowlist field và hash nguồn log, không
 hoặc fullbody. Không gọiHTTP mới hoặc đo live service. Bằng chứngH5-T03 crash77,
 blockedrestart/freshrestore là lịch sử của task trước, không chạy lại ở H5-T04.
 
-149allowlist paths sorted/regular; fingerprint checkout
+149 allowlist paths sorted/regular; fingerprint checkout
 019a310c643332100af8f8a4c6a986afe98b432f9b9d09274533ce563e56b319.
 So148sourcebaseline: chỉ OBSERVABILITY.md vàallowlist thay đổi; trong109trackedfile
 chỉ OBSERVABILITY.md thayđổi; HEAD/branch/index/staged giữ nguyên. CURRENT_RUNBOOK
@@ -5880,7 +5880,7 @@ chỉ gỡ đúng thay đổi task, không revert toànfile đang chứa chỉnh
 Runbook phản ánh đúng source local và phân biệt source fingerprint với version
 của process đang chạy. Không lấy GitHEAD đơn lẻ làm định danh toàn checkout.
 Rollback code cần biết tương thích schema; startup có thể migrate nên không mở
-code cũ lên DB mới để thử. Restore tạođíchmới,không ghép DB từnhiềumốc.
+code cũ lên DB mới để thử. Restore tạođíchmới, không ghép DB từnhiềumốc.
 Restart không tự làm inference running/uncertain thành antoàn để gửi lại.
 
 Version context là observation source/env của máy đang review, không xác nhận
@@ -5909,16 +5909,16 @@ chứng nhận hồ sơ nộp theo rubric. H4-T01 tạm gác, H2-T04 chờ nhóm
 ### B. Thay đổi
 
 Chỉ folder mới handoff_snapshot_20261102 và append status. Tái sử dụng payload
-đã curate từ snapshot30/10 sau kiểm hash, overlay references bằng bản hiện hành,
+đã curate từ snapshot 30/10 sau kiểm hash, overlay references bằng bản hiện hành,
 thêm bằng chứng H2/H3/H4/H5 và IoTprototype. Không chạy builder cũ hoặc sửa gói cũ.
-Source149 so với142 trước: thêm7,sửa5,bỏ0;
+Source149 so với142 trước: thêm7,sửa5,bỏ 0;
 chi tiết SOURCE_DELTA.json. Việc đóng gói không sửa application/source/allowlist.
 
 ### C. Kiểm chứng mới
 
 Source manifest verify149file, AST97Python; mọi copiedfile khớp
-hash input. RegistryE01–E14 khớp14/14 với originals hiện có;5pattern scan0hit
-(không là security audit). GóiZIP/hashes cũ được so lại và giữ nguyên;109trackedfile,
+hash input. RegistryE01–E14 khớp 14/14 với originals hiện có;5 pattern scan0hit
+(không là security audit). GóiZIP/hashes cũ được so lại và giữ nguyên;109 trackedfile,
 HEAD/branch/index/staged không đổi. ZIP roundtrip/tempcleanup được ghi ở ACCEPTANCE
 bên cạnh archive sau bước đóng gói. Không fullsuite/demo/soak/HTTP/train/inference
 hoặc dữliệuIoTQC mới, không account/DB/service; chỉ tempgiải nén để verify rồi dọn.
@@ -5940,9 +5940,9 @@ Không đủ fieldmetrics, quyền phân phối, officialrubric hoặc máy th�
 và bằngchứng. Chưa mở task mới hoặc tạo thêm chức năng/test/package sau nghiệmthu.
 H6-T05 đóng ở phạm vi snapshot này; các task đang chờ không tự đổi thành hoànthành.
 
-Gói mới: D:\AEGIS\handoff_snapshot_20261102\AEGIS_PROGRESS_20261102.zip; SHA256 c5631f4d1c3d393a00819969d89422bd6663c839d6d69847c13788cc3ad60bcf. ZIPverify 344file liệt kê và tempcleanup đạt.
+Gói mới: D:\AEGIS\handoff_snapshot_20261102\AEGIS_PROGRESS_20261102.zip; SHA256 c5631f4d1c3d393a00819969d89422bd6663c839d6d69847c13788cc3ad60bcf. ZIPverify 344 file liệt kê và tempcleanup đạt.
 
-Bổ sung snapshot H6-T05 lúc 2026-11-02T20:32:57.659649+07:00: gói dùng để đọc là D:\AEGIS\handoff_snapshot_20261102\AEGIS_PROGRESS_20261102_r2.zip; SHA256 ce965bea942cbe1abc7f266aad690b1ad666dde35a386523392a325ee4998772. R2 tính lại audit sau khi entry file đã được tạo, không còn hai link entry bị báo thiếu do thứ tự sinh file. Source/evidence không đổi; ZIP/proof build01 giữ nguyên. ZIProundtrip 345file và tempcleanup đạt.
+Bổ sung snapshot H6-T05 lúc 2026-11-02T20:32:57.659649+07:00: gói dùng để đọc là D:\AEGIS\handoff_snapshot_20261102\AEGIS_PROGRESS_20261102_r2.zip; SHA256 ce965bea942cbe1abc7f266aad690b1ad666dde35a386523392a325ee4998772. R2 tính lại audit sau khi entry file đã được tạo, không còn hai link entry bị báo thiếu do thứ tự sinh file. Source/evidence không đổi; ZIP/proof build01 giữ nguyên. ZIProundtrip 345 file và tempcleanup đạt.
 
 
 ## 86. H2-T02 — projection acknowledge/check cho assessment-view (2026-11-02T20:57:39.714336+07:00)
@@ -5953,19 +5953,19 @@ Chốt kết quả 2026-11-02T20:57:39.714336+07:00. **Hoàn thành subset ackno
 ### A. Kết quả và đối chiếu nghiệm thu
 
 GET /api/farm/follow-ups/{id}/assessment-view thêm item.action_capabilities:
-projection_version,base_version,validation_scope,actions acknowledge/check,
-input constraints cho observation,needs_recheck vàrecheck_reasons.
+projection_version, base_version, validation_scope, actions acknowledge/check,
+input constraints cho observation, needs_recheck vàrecheck_reasons.
 Chỉ assessment-view cófield mới, không thay list/detail/command response.
 
 | Tiêu chí | Kết quả và bằng chứng mới |
 |---|---|
-| DTO theo state/version |Đạt open/acknowledged/checked/closed/reopen, base_version khớp followup_version; chỉ2action quảng bá|
-| Disabled reasons/input rõ nghĩa |Đạt workflow_state_not_allowed; advisory bắt buộcobs,check_data không bắtbuộc nhưngobs được gửi vẫn phải hợp lệ|
+| DTO theo state/version |Đạt open/acknowledged/checked/closed/reopen, base_version khớp followup_version; chỉ 2 action quảng bá|
+| Disabled reasons/input rõ nghĩa |Đạt workflow_state_not_allowed; advisory bắt buộcobs, check_data không bắtbuộc nhưngobs được gửi vẫn phải hợp lệ|
 | Evidence/requirement đổi |Đạt observation đổi/void báo recheck; requirementwindow mới cập nhật observed_at_not_before; obs cũ bịtừchối|
 | Command authoritative |Đạt projectionstale409; enabledtrue không bypass obs thiếu/sai/void; replay200 giữeventgốc|
-| Quyền/read/integrity |Đạt401/404 khônglộDTO, corruptsnapshot503 khôngfallback; projectionread không ghi byte store|
-| Tương thích |Đạt sharedtransitiontable giữ nguyên,15regressions pass, schema chỉ additive/optionalfield|
-| Scope/cleanup |Đạt8focused gồm1smokeHTTP; khôngmobile/model/migration;26tempdir dọn sạch|
+| Quyền/read/integrity |Đạt401/404 khônglộ DTO, corruptsnapshot503 khôngfallback; projectionread không ghi byte store|
+| Tương thích |Đạt sharedtransitiontable giữ nguyên,15 regressions pass, schema chỉ additive/optionalfield|
+| Scope/cleanup |Đạt8focused gồm1smokeHTTP; khôngmobile/model/migration;26 tempdir dọn sạch|
 
 Enabled là workflow eligibility và yêu cầu input, **không bảo đảm mọi guard đều
 đạt**. Observation clientchọn chưa validate tạiGET; projection ghi selection_validated=false.
@@ -5980,24 +5980,24 @@ Needs_recheck thông tin từread-time check_status, không xác nhận bệnh/h
   giữ $id/contractversion/required/fields cũ. Không requestfield hoặcDBmigration mới.
 - Mới backend/checks/test_mobile_actions.py và backend/docs/MOBILE_ACTIONS.md.
 - MOBILE_FOLLOWUP_API.md chỉ thêm link3dòng; allowlist149→151.
-- h2_t02_actions_20261102:baseline,harness,logs,summary,compatibilityproof vàreview.
+- h2_t02_actions_20261102:baseline, harness, logs, summary, compatibilityproof vàreview.
 
 Phát sinh nhómA: dùngchung transitiontable là trực tiếp cần để DTO không mô tả
 transitionkhác command. Đã soAST với source149file trước task: mapping khôngđổi.
-Không actionsDTO close/reopen, APIroute mới, role mới,framework/SDK/filter hoặcmobileUI.
+Không actionsDTO close/reopen, APIroute mới, role mới, framework/SDK/filter hoặcmobileUI.
 Commandserver vẫn kiểm payload/version/owner/evidence tại thời điểm thực thi.
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Focused8/8 đạt, gồm1 HTTPloopback thực với Backendpilot;7ca còn lại qua Flasktestclient.
-Regression15/15 đạt:8FollowupTests,4EvidenceRecheckTests và3MobilePilotTests
-(composition/owner,lateversion required/current,integrity503).
-0failure/error/skip/ResourceWarning;9tempdirfocused+17regression đềuđược dọn,
+Focused 8/8 đạt, gồm1 HTTPloopback thực với Backendpilot;7ca còn lại qua Flasktestclient.
+Regression 15/15 đạt:8FollowupTests,4EvidenceRecheckTests và 3MobilePilotTests
+(composition/owner, lateversion required/current, integrity503).
+0 failure/error/skip/ResourceWarning;9 tempdirfocused+17regression đềuđược dọn,
 smokeHTTPserver/session đã dừng. Khôngtorch/ultralytics/AI thật/weights/IoT được dùng.
 
-Kiểm static mới: testsyntax,JSONschema/exampleparse,3linkdoc,151pathregular/sorted;
+Kiểm static mới: testsyntax, JSONschema/exampleparse,3 linkdoc,151 pathregular/sorted;
 gỡ đúng phần schemaadditions cho lại dictschema cũ nguyênvẹn. Không JSONSchemaengine
-đầyđủ; không cài dependency. Chỉ4sourceexisting thayđổi đãnêu;109trackedfile,
+đầyđủ; không cài dependency. Chỉ 4 sourceexisting thayđổi đãnêu;109 trackedfile,
 HEAD/branch/index/staged giữ nguyên (cácfile tínhnăng hiện ở vùngsourceuntracked).
 SnapshotH6r2 vàgóiH2-T04r2 giữ nguyênhash, không tự cậpnhật hoặcbuildgói mới.
 Không fullsuite/demo/soak/train hoặcnativeclient/parser thực tế.
@@ -6013,7 +6013,7 @@ giữ nguyên những sửađổi có trước; không reset toàncheckout. Khô
 Projection được tạo sau các guard ownership/integrity củaassessment-view, cùng
 workflowtransaction đãcó. Checkstatus đọcjournalriêng theo cơ chế hiệncó, không
 atomic xuyênDB. `selection_validated=false` không precheck mộtobservationID chưagửi.
-Stateready vẫn có thể bịquota/session/version/evidence chặn ởPOST; view không
+Stateready vẫn có thể bịquota/session/version/evidence chặn ở POST; view không
 giữchỗ mộtversion hoặc tựchấpnhận ýđịnhmới sau409.
 
 Check ởchecked vẫnenabled khi needs_recheck=false vì commandcũ cho phép; một
@@ -6030,7 +6030,7 @@ Không automaticpromotionmodel/nhãn, không dữliệuthựcđịa hoặc appro
 
 Tiếp tục H2-T04 khi nhómmobile xác nhận nhậnluồng: đốichiếu schema/fixturemới
 và thửconsume projection trênclient. Gói146/149file đãtạo trước task vẫn là bảncũ,
-chưa tự chứaDTOmới. Không tự rebuild,gửi hoặc sửa mobile trongH2-T02.
+chưa tự chứaDTOmới. Không tự rebuild, gửi hoặc sửa mobile trongH2-T02.
 H4-T01 tạm gác theo người dùng; không đổi phạmvi để giải quyết nguồnIoT.
 Đóng H2-T02 subset này; không mở thêm actions/filters hoặc hardening sau nghiệmthu.
 
@@ -6150,7 +6150,7 @@ Kết thúc khi tiêu chí dưới đạt, review và append trạng thái; khô
   helper mà không bỏ validation query. COUNT/order/LIMIT/serializer giữ nguyên
   qua đối chiếu AST; không refactor rộng hoặc thay request.args.
 - backend/checks/test_mobile_filters.py mới:6 test đúng hành vi; test_mobile_pilot.py
-  cập nhật kỳ vọng state=open từ400 sang200 vì contract đã chủ động mở query này.
+  cập nhật kỳ vọng state=open từ 400 sang200 vì contract đã chủ động mở query này.
 - MOBILE_FOLLOWUP_API.md: giá trị, lỗi, ví dụ và semantics pagination; MOBILE_RECOVERY.md
   sửa câu cũ chưa có filter; MOBILE_SLICE_HANDOFF.md ghi filter khác state còn ngoài scope.
 - tools/handoff_allowlist.json thêm test mới151→152; không build package mới.
@@ -6162,13 +6162,13 @@ Source/dossier hiện hành trước task đúng là chưa hỗ trợ state, kh�
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Focused6/6 đạt gồm1 HTTP loopback và5 Flask test-client; regression11/11 đạt gồm
-8FollowupTests,1MobilePilot list/detail/owner và2FarmTests pagination/ownership.
-0failure/error/skip/ResourceWarning;6+12 thư mục tạm đã dọn; HTTP server/session
+Focused 6/6 đạt gồm1 HTTP loopback và 5 Flask test-client; regression 11/11 đạt gồm
+8FollowupTests,1MobilePilot list/detail/owner và 2FarmTests pagination/ownership.
+0 failure/error/skip/ResourceWarning;6+12 thư mục tạm đã dọn; HTTP server/session
 đóng ở finally. Không model/torch/ultralytics; không kho/tài khoản thật.
-Evidence: h2_t01_state_filter_20261103/focused_summary.json,regression_summary.json,
-ACCEPTANCE.json,logs vàsource_delta.patch. Không cộng kết quả lịch sử vào17tests mới.
-Static: syntax source/test,allowlist152,AST helper phần phân trang không đổi,
+Evidence: h2_t01_state_filter_20261103/focused_summary.json, regression_summary.json,
+ACCEPTANCE.json, logs vàsource_delta.patch. Không cộng kết quả lịch sử vào17tests mới.
+Static: syntax source/test, allowlist152,AST helper phần phân trang không đổi,
 git diff --check và hash bảo toàn các ZIP cũ đạt. Chỉ một tracked file farm.py
 thay đổi trong task; các tracked file khác và HEAD/branch/index/staged giữ nguyên.
 
@@ -6176,7 +6176,7 @@ Tự kiểm lại tại D:/AEGIS:
 backend/.venv/Scripts/python.exe -X utf8 -B -m unittest discover -s backend/checks -p test_mobile_filters.py -v
 Expected6 tests OK; cần quyền loopback. Test tự tạo/dọn account/store, không cleanup
 DB dự án. Ví dụ API: ?state=checked&page=2&page_size=1; total là tổng case checked
-trong season của owner, không chỉ trang hiện tại. Không đủ2case thì trang2 rỗng đúng.
+trong season của owner, không chỉ trang hiện tại. Không đủ 2 case thì trang2 rỗng đúng.
 Rollback nếu cần chỉ đảo các hunk source_delta.patch sau review, giữ mọi sửa có trước;
 không reset checkout. Không có dữ liệu thật hoặc migration cần rollback.
 Chưa fullsuite/demo/soak/native/freshinstall, không train hoặc đổi model.
@@ -6186,11 +6186,11 @@ Chưa fullsuite/demo/soak/native/freshinstall, không train hoặc đổi model.
 Giá trị state được validate exact rồi bind SQL; không nội suy input vào SQL.
 Quyền kiểm trước filter để season không thuộc owner vẫn404 kể cả filter sai.
 COUNT và rows trong cùng transaction đọc workflow; check_status đọc journal riêng
-theo cơ chế hiện có. Giữ created_at DESC,id DESC; offset pagination không cố định
+theo cơ chế hiện có. Giữ created_at DESC, id DESC; offset pagination không cố định
 snapshot giữa các request nên case đổi state có thể làm trang thay đổi, client refresh.
 Filter state không lọc needs_recheck: checked có thể vẫn cần kiểm lại, không gọi
 state là bệnh/healthy/approved train. Đáp ứng đúng mục tiêu state, không thêm chức năng.
-Gói H2-T04 ngày02/11 vẫn là snapshot trước filter; không ghi đè hoặc tự phát hành lại.
+Gói H2-T04 ngày 02/11 vẫn là snapshot trước filter; không ghi đè hoặc tự phát hành lại.
 
 ### E. Đề xuất riêng và dừng
 
@@ -6219,21 +6219,21 @@ receipt pending. Native không pass từ Backend evidence.
 
 Chỉ sửa backend/docs/MOBILE_SLICE_HANDOFF.md để hướng dẫn state và phân biệt ngày
 fixture. Không sửa runtime/API/schema/test/model/mobile/dependency. Gói mới riêng;
-gói02/11 giữ nguyên. Filter thêm ở H2-T01, không phải tính năng triển khai trong lượt này.
+gói 02/11 giữ nguyên. Filter thêm ở H2-T01, không phải tính năng triển khai trong lượt này.
 
 ### C. Kiểm chứng
 
 Lượt này: source allowlist/hash/byte, Python syntax, JSON, links entry, PowerShell
 snippets, manifest ZIP CRC/extract/verify/cleanup. Không HTTP/test suite mới hoặc
 inference/train/demo/soak. Source gói đúng workspace hiện tại; chưa chạy gói mới.
-Fixture02/11:35HTTP/191assertions; H2-T01 ngày03/11:6focused+11regression là lịch sử
+Fixture 02/11:35HTTP/191assertions; H2-T01 ngày 03/11:6focused+11regression là lịch sử
 được copy nguyên byte, không đổi ngày hoặc cộng vào số kiểm tra mới.
 Lệnh kiểm lại/expected/cleanup ở START_HERE.md và STATE_FILTER_ACCEPTANCE.md.
 
 ### D. Review
 
 Filter theo workflow state, không theo needs_recheck; checked không xác nhận bệnh.
-Offset không giữ snapshot giữa request. API body/contract version không đổi ởH2-T01,
+Offset không giữ snapshot giữa request. API body/contract version không đổi ở H2-T01,
 nhưng server cũ chưa nhận state: nhóm kiểm source/build trước khi bật filter.
 Không tự fallback bỏ filter. Fixture mock/synthetic không GT hoặc hiệu quả thực địa.
 Native/parser/cache/SecureStore/tích hợp chưa kiểm, nhóm chưa nhận scope theo user.
@@ -6248,15 +6248,15 @@ hoặc yêu cầu mới. Không gửi/liên hệ/commit/push/deploy. Phần chu�
 Tiêu chí source152 khớp workspace, contract state đúng H2-T01, checklist pending,
 fixture giữ đúng ngày gốc, manifest/ZIP/extract/tempcleanup và bảo toàn ZIP cũ đều đạt.
 Lượt mới kiểm 10 links entry,3PowerShell snippets và Python/JSON syntax; ZIPmanifest
-177file (không tính manifest tự thân). Không HTTP hoặc test suite mới.
-Chỉ source MOBILE_SLICE_HANDOFF.md thay đổi,109trackedfile và HEAD/index/staged/branch
+177 file (không tính manifest tự thân). Không HTTP hoặc test suite mới.
+Chỉ source MOBILE_SLICE_HANDOFF.md thay đổi,109 trackedfile và HEAD/index/staged/branch
 giữ nguyên; không update allowlist. Fixture/evidence copy nguyên byte theo manifest.
 Tự kiểm verify_package.py expected manifest_verified=true; source fixture/test có
 lệnh riêng khi người nhận cần. Chỉ xóa output/thư mục tạm do người chạy tạo, không
-DB thật; rollback tài liệu bằng bỏ đoạn cập nhật03/11, giữ lịch sử và gói cũ.
+DB thật; rollback tài liệu bằng bỏ đoạn cập nhật 03/11, giữ lịch sử và gói cũ.
 
 Gói nội bộ: D:\AEGIS\h2_t04_state_handoff_20261103\AEGIS_MOBILE_FOLLOWUP_20261103.zip
-SHA256: 130be0f434506a49553e83eaab30ec1c3445716e37aac6a98b4326ac91657a5a; 526717byte.
+SHA256: 130be0f434506a49553e83eaab30ec1c3445716e37aac6a98b4326ac91657a5a; 526717 byte.
 Không đánh dấu hoàn thành hướng H2. H4-T01 vẫn tạm gác. Dừng chờ nhóm/người dùng.
 
 
@@ -6265,10 +6265,10 @@ Không đánh dấu hoàn thành hướng H2. H4-T01 vẫn tạm gác. Dừng ch
 ### Phạm vi đã chốt
 
 Soạn bản nháp chương báo cáo AI/ML–Backend và bảng đóng góp dựa trên source/tài
-liệu/bằng chứng hiện có đến mục89; bao gồm mục tiêu,kiến trúc,phương pháp,kết quả,
-giới hạn và kế hoạch tiếp. Không sửa ứng dụng,train/inference/test/demo mới,
+liệu/bằng chứng hiện có đến mục89; bao gồm mục tiêu, kiến trúc, phương pháp, kết quả,
+giới hạn và kế hoạch tiếp. Không sửa ứng dụng, train/inference/test/demo mới,
 không Word/slide hoặc tự gán tác giả/phân công cho người khác. Nghiệm thu: mọi
-số liệu có nguồn/ngày,ảnh/mock/RF/temporal tách đúng,refs tồn tại và đóng góp rõ
+số liệu có nguồn/ngày, ảnh/mock/RF/temporal tách đúng, refs tồn tại và đóng góp rõ
 phần xác nhận/chưa xác nhận. Kết thúc bản nháp sau review; toàn nhóm chờ xác nhận.
 
 User mới phát biểu “Tôi sẽ phụ trách làm toàn bộ công việc”. Ghi nhận trách
@@ -6282,22 +6282,22 @@ do chưa có phân công/tác giả toàn nhóm được xác nhận. Không đ�
 
 | Tiêu chí | Kết quả và bằng chứng |
 |---|---|
-| Chương báo cáo đủ nội dung | Đạt docs/MIDTERM_AI_BACKEND.md:10mục,kiến trúc/method/results/limits/kế hoạch và đoạn phát biểu |
-| Đóng góp không suy đoán | Đạt docs/CONTRIBUTIONS_AI_BACKEND_DRAFT.md ghi nguyên lời user,trách nhiệm tiếp theo và tác giả/phối hợp còn thiếu |
-| AI ảnh đúng hiện trạng | Đạt V4default,boundary-r2/FT25candidate;FT25optimizerreset; mAP tổng tăng nhưng blastAP50 giảm |
-| RF khác forecast | Đạt99,5%/macroF1 là khớp nhãnCSV trên200dòng đã đánh giá trước,không deploy/field/leadtime |
-| Bằng chứng có nguồn/ngày | Đạt35tệp hash,37links nội bộ và số liệu đối chiếu JSON; các phiên test giữ ngày gốc |
-| Không vượt phạm vi | Đạt152allowlist source/109tracked và4ZIP cũ giữhash; HEAD/branch/index/staged không đổi |
+| Chương báo cáo đủ nội dung | Đạt docs/MIDTERM_AI_BACKEND.md:10mục, kiến trúc/method/results/limits/kế hoạch và đoạn phát biểu |
+| Đóng góp không suy đoán | Đạt docs/CONTRIBUTIONS_AI_BACKEND_DRAFT.md ghi nguyên lời user, trách nhiệm tiếp theo và tác giả/phối hợp còn thiếu |
+| AI ảnh đúng hiện trạng | Đạt V4default, boundary-r2/FT25candidate;FT25optimizerreset; mAP tổng tăng nhưng blastAP50 giảm |
+| RF khác forecast | Đạt99,5%/macroF1 là khớp nhãnCSV trên200dòng đã đánh giá trước, không deploy/field/leadtime |
+| Bằng chứng có nguồn/ngày | Đạt35tệp hash,37 links nội bộ và số liệu đối chiếu JSON; các phiên test giữ ngày gốc |
+| Không vượt phạm vi | Đạt152allowlist source/109tracked và 4ZIP cũ giữhash; HEAD/branch/index/staged không đổi |
 | Phân công toàn nhóm/rubric | Chưa có xác nhận chi tiết tác giả/chuyển giao mobile; chưa có rubric chính thức trong hồ sơ đã đọc |
 
 ### B. Thay đổi
 
 - Mới docs/MIDTERM_AI_BACKEND.md: bản nháp chương midterm, không ghi đè
-  THESIS_EVIDENCE.md/traceability ngày28/10. Giải thích các cập nhật86–89 riêng.
+  THESIS_EVIDENCE.md/traceability ngày 28/10. Giải thích các cập nhật86–89 riêng.
 - Mới docs/CONTRIBUTIONS_AI_BACKEND_DRAFT.md: ma trận trách nhiệm/phối hợp,
   đoạn đóng góp có thể dùng và phần cần xác nhận trước khi nộp toàn nhóm.
-- Mới h6_t02_midterm_20261103: baseline/status_before,EVIDENCE_REGISTRY,
-  verification,checker vàreview. Không đưa rawCSV/Docx/weights/token vào tài liệu.
+- Mới h6_t02_midterm_20261103: baseline/status_before, EVIDENCE_REGISTRY,
+  verification, checker vàreview. Không đưa rawCSV/Docx/weights/token vào tài liệu.
 - Append mục90 vào status, giữ nguyên toàn bộ lịch sử. Không sửa API/schema,
   runtime/model/mobile/DB/dependency/allowlist hoặc rebuild gói.
 
@@ -6307,31 +6307,31 @@ Không biến việc chờ phân công thành lý do chặn bản nháp kỹ thu
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Đọc trực tiếp source/tài liệu liên quan,hash35file,kiểm37local links,Markdown
+Đọc trực tiếp source/tài liệu liên quan, hash35file, kiểm37local links, Markdown
 fence/control characters. Tính đối chiếu mAP/AP vàdelta từ comparison.json,
 RFaccuracy/macroF1/confusionmatrix199/200 từ metrics.json; kiểm sốtest từ
 acceptance/summary củaH1/H5/H2. Không chạy lại model/validator hoặc17testsH2-T01.
-152source/109tracked,HEAD/branch/index/staged và4ZIP trước vẫn nguyênhash.
+152 source/109tracked, HEAD/branch/index/staged và 4ZIP trước vẫn nguyênhash.
 Không externalweb lookup vì không bổ sung kiến thức/kết quả từ ngoài hồ sơ.
-Không renderWord/PDF/slide,Mermaid chưa render bằng engine; chưa duyệt nội dung
-bởi giảng viên/nhóm,không native hoặc field. Hash không xác nhận nguồn dữ liệu.
+Không renderWord/PDF/slide, Mermaid chưa render bằng engine; chưa duyệt nội dung
+bởi giảng viên/nhóm, không native hoặc field. Hash không xác nhận nguồn dữ liệu.
 
 Tự kiểm lại (read-only): từ D:/AEGIS chạy
 backend/.venv/Scripts/python.exe -X utf8 -B h6_t02_midterm_20261103/check_evidence.py
 Expected evidence_files_verified=35,runtime_experiments_run=0. Registry hash
 status_before.md đếnmục89,không hash status sẽ tiếp tục append. Nếu nguồn thay
-đổi,checker báo file lệch; không tự sửa metric cũ hoặc updatehash để che thay đổi.
-Không account/DB/server/temp runtime được tạo,không cleanup dữ liệu nghiệp vụ.
+đổi, checker báo file lệch; không tự sửa metric cũ hoặc updatehash để che thay đổi.
+Không account/DB/server/temp runtime được tạo, không cleanup dữ liệu nghiệp vụ.
 Rollback nếu cần chỉ tài liệu mới và append90 sau review; không reset source/gói cũ.
 
 ### D. Review kỹ thuật và giới hạn
 
-Kiến trúc giữ AIservice riêng/HTTP,V4default; core/pilot/web tách rõ. Sơ đồ
+Kiến trúc giữ AIservice riêng/HTTP, V4default; core/pilot/web tách rõ. Sơ đồ
 không chứng minh đang chạy; không vẽ RF thànhservice hoặc raw thànhforecast.
 Mức triển khai và mức kiểm chứng phân biệt; không dùng sốtests làm metric bệnh.
-Ảnhhealthy/OOD/field còn thiếu,RFlabelling/sourceunknown,temporal chưa train,
-H2-T04native/client cònpending. Kế hoạch chỉ đề xuất,không tự mở task.
-Đạt mục tiêu bản nháp AI/ML–Backend,không tự kết luận đủ nghiệmthu/tốtnghiệp.
+Ảnhhealthy/OOD/field còn thiếu, RFlabelling/sourceunknown, temporal chưa train,
+H2-T04native/client cònpending. Kế hoạch chỉ đề xuất, không tự mở task.
+Đạt mục tiêu bản nháp AI/ML–Backend, không tự kết luận đủ nghiệmthu/tốtnghiệp.
 Trách nhiệm người dùng tiếp theo đã ghi; tác giả từngmodule/phân công nhóm và
 phạm vi chuyển giao “toàn bộ” chưa được xác định chi tiết nên hồ sơtoànnhóm cònmộtphần.
 
@@ -6340,8 +6340,8 @@ phạm vi chuyển giao “toàn bộ” chưa được xác định chi tiết 
 Đề xuất H6-T01 khi có rubric/đề cương midterm: map từng tiêu chí vào bản nháp
 và bằng chứng. H6-T03 Word/PDF/slide chỉ khi user chọn định dạng/đầu ra riêng;
 không tự làm thêm artifact hoặc rehearsal để mở rộng H6-T02.
-H4-T01 vẫn tạm gác,H2-T04 chờ mobile. Dừng phần biên soạn hiện tại;
-không liên hệ,gửi,cấpconsent,commit/push hoặcdeploy.
+H4-T01 vẫn tạm gác, H2-T04 chờ mobile. Dừng phần biên soạn hiện tại;
+không liên hệ, gửi, cấpconsent, commit/push hoặcdeploy.
 
 
 ## 91. H2-T04 — đối chiếu client, phần tích hợp bị chặn (2026-11-03T16:14:05.336721+07:00)
@@ -6356,41 +6356,41 @@ nghiệm thu; không sửa mobile/API hoặc tạo gói/chạy lại test khi kh
 
 **H2-T04 hoàn thành một phần; bước tích hợp bị chặn do chưa có client follow-up.**
 User xác nhận “Chưa có bản client follow-up”. Backend contract/fixture/checklist
-và gói03/11 vẫn sẵn sàng, không đóng toàn task hoặc toàn H2. Không có người/môi
+và gói 03/11 vẫn sẵn sàng, không đóng toàn task hoặc toàn H2. Không có người/môi
 trường/biên bản client mới; không dùng test Backend thay native acceptance.
 
 | Tiêu chí | Kết quả mới |
 |---|---|
-| Đối chiếu source client | Đã đọc API wrapper,route alerts,AlertsScreen,DemoContext,ConnectedFarmsScreen |
+| Đối chiếu source client | Đã đọc API wrapper, route alerts, AlertsScreen, DemoContext, ConnectedFarmsScreen |
 | Có follow-up để nghiệm thu | Chưa: không có match follow-ups/assessment-view/action_capabilities/needs_recheck trong 42fileTS/TSX dưới mobile/src; user xác nhận không có bản khác |
-| Phân biệt màn demo | Đạt: alerts.tsx dùng useDemo; AlertsScreen là dữ liệu minh họa,đã đọc chỉ setRead local |
-| Backend/gói đã chuẩn bị | Giữ trạng thái đạt theo evidence trước; hash gói03/11 vẫn khớp,không runtime mới |
-| Tích hợp/native | Chưa đạt,bị chặn; không có client thực hiện list/detail/ack/check/recheck |
+| Phân biệt màn demo | Đạt: alerts.tsx dùng useDemo; AlertsScreen là dữ liệu minh họa, đã đọc chỉ setRead local |
+| Backend/gói đã chuẩn bị | Giữ trạng thái đạt theo evidence trước; hash gói 03/11 vẫn khớp, không runtime mới |
+| Tích hợp/native | Chưa đạt, bị chặn; không có client thực hiện list/detail/ack/check/recheck |
 
 ### B. Thay đổi
 
-Chỉ tạo h2_t04_client_gap_20261103/baseline,status_before,VERIFICATION vàreview,
+Chỉ tạo h2_t04_client_gap_20261103/baseline, status_before, VERIFICATION vàreview,
 append mục91. Không sửa source/mobile/contract/DB/dependency hoặc rebuild package.
-152allowlist source/109tracked,HEAD/branch/index/staged giữ nguyên.
+152 allowlist source/109tracked, HEAD/branch/index/staged giữ nguyên.
 Không có thay đổi phát sinh nhómA vào code. Xây client mới là phạm vi riêng cần
-chốt,không tự thêm vào lượt bàn giao Backend để lấp khoảng thiếu.
+chốt, không tự thêm vào lượt bàn giao Backend để lấp khoảng thiếu.
 
 ### C. Kiểm chứng thực sự vừa chạy
 
 Đọc source chọn lọc và scan 42TS/TSX trong mobile/src; scan không match là
-bằng chứng hỗ trợ,không chứng minh ngữ nghĩa/runtime toàn ứng dụng. Ghi hash8file
+bằng chứng hỗ trợ, không chứng minh ngữ nghĩa/runtime toàn ứng dụng. Ghi hash8file
 nguồn/checklist trong VERIFICATION.json; kiểm source/Git/ZIP bảo toàn.
-Không Expo start/lint/typecheck/native/HTTP/test suite mới,không train/inference,
+Không Expo start/lint/typecheck/native/HTTP/test suite mới, không train/inference,
 không deploy/mua thiết bị/liên hệ thành viên. Không tuyên bố mobile build/chạy được.
-Không account/store/temp runtime,không cần cleanup DB. Tự đối chiếu bằng đọc các
+Không account/store/temp runtime, không cần cleanup DB. Tự đối chiếu bằng đọc các
 path trong VERIFICATION.json và source trên; expected alert dùng dữ liệu demo,
-API wrapper chưa có helpers follow-up. Nếu source được cập nhật,kiểm lại đúng
+API wrapper chưa có helpers follow-up. Nếu source được cập nhật, kiểm lại đúng
 revision mới; không dùng scan cũ để mô tả bản mới. Rollback chỉ artifact/append91
-sau review,không reset code hoặc gói có trước.
+sau review, không reset code hoặc gói có trước.
 
 ### D. Review kỹ thuật
 
-Core client hiện có auth/image/history,ConnectedFarmsScreen gọi /farm/plots.
+Core client hiện có auth/image/history, ConnectedFarmsScreen gọi /farm/plots.
 Chưa có luồng chọn mùa vụ→list/filter→detail/required-current/actions→ack/check.
 Màn alerts không phải workflow theo owner/version và dấu đã đọc không phải
 acknowledge Backend. Chưa có bằng chứng chọn observation hoặc xử lý replay/recheck.
@@ -6399,14 +6399,14 @@ Mục tiêu đối chiếu và báo gap đạt; mục tiêu nghiệm thu end-to-
 
 ### E. Lựa chọn nhỏ nhất và dừng
 
-Nếu user muốn tự thực hiện thay nhóm mobile,cần chốt phần triển khai client riêng:
-chọn season,list với state/pagination,detail required-current/actions,ack/check
-hai task_kind,observation sẵn có,replay/409 refresh/recheck/401/404/429/503.
-Không bắt buộc thêm camera,close/reopenUI,observation editor,offline queue,push,
+Nếu user muốn tự thực hiện thay nhóm mobile, cần chốt phần triển khai client riêng:
+chọn season, list với state/pagination, detail required-current/actions, ack/check
+hai task_kind, observation sẵn có, replay/409 refresh/recheck/401/404/429/503.
+Không bắt buộc thêm camera, close/reopenUI, observation editor, offline queue, push,
 forecast hoặc model mới. H2-T04 chỉ tiếp tục nghiệm thu khi có bản client tương ứng.
-Nếu giữ phân công cũ,chờ thành viên mobile triển khai theo checklist hiện có.
-Không tự mở task mobile; dừng phần phụ thuộc,không đóng gói/test lặp để báo tiến độ.
-H4-T01 vẫn tạm gác,H6-T01 tạm bỏ do thiếu đề cương. Không gửi/commit/push/deploy.
+Nếu giữ phân công cũ, chờ thành viên mobile triển khai theo checklist hiện có.
+Không tự mở task mobile; dừng phần phụ thuộc, không đóng gói/test lặp để báo tiến độ.
+H4-T01 vẫn tạm gác, H6-T01 tạm bỏ do thiếu đề cương. Không gửi/commit/push/deploy.
 
 
 ## 92. H2-T04 — người dùng nhận phần mobile, client follow-up tối thiểu (2026-11-03T16:33:20.379119+07:00)
@@ -6415,12 +6415,12 @@ H4-T01 vẫn tạm gác,H6-T01 tạm bỏ do thiếu đề cương. Không gửi
 
 Sau mục91,user xác nhận “tôi nhận phần này luôn”,cho phép triển khai mobile
 follow-up tối thiểu. Đây là thay đổi phạm vi rõ từ chỉ AI/ML–Backend sang phần
-client cụ thể,không tự suy từ lời nhận trách nhiệm chung trước đó. H6-T01 vẫn tạm bỏ.
+client cụ thể, không tự suy từ lời nhận trách nhiệm chung trước đó. H6-T01 vẫn tạm bỏ.
 Luồng: chọn ruộng/mùa vụ → list/filterstate/paging → detail required/current/actions
 → ack/check bằng observation sẵn có → refresh/recheck. Không camera/close-reopenUI,
 observation editor/offlinequeue/push/model mới. Không nâng dependency hoặc đổiAPI.
-Tiêu chí: đúng2taskkind/input,POSTauthoritative,replayUUID/payload,409refresh,
-401/404/429/503,stale-responseguard,typecheck/lint vàHTTP;native ghi riêng nếu chưa có thiết bị.
+Tiêu chí: đúng2taskkind/input, POSTauthoritative, replayUUID/payload,409 refresh,
+401/404/429/503,stale-responseguard, typecheck/lint và HTTP;native ghi riêng nếu chưa có thiết bị.
 
 ### A. Kết quả
 
@@ -6429,62 +6429,62 @@ chờ nghiệm thu giao diện/native.** Điểm chặn “chưa có client” �
 
 | Tiêu chí | Kết quả mới |
 |---|---|
-| Chọn context/list/filter/paging | Có UI; HTTP controller chọnplot/season,list2case,statechecked,paging vàinvalidfilter |
+| Chọn context/list/filter/paging | Có UI; HTTP controller chọnplot/season, list2case, statechecked, paging vàinvalidfilter |
 | Detail/required-current/actions | Có UI vàguard projection; missing/unknown/malformed projection không gửi action |
 | Ack/check2taskkind | HTTP đạt advisory cầnobs vàcheck_data nullobs; reason/input constraints giữ contract |
-| Replay vàrecheck | HTTP cố ý mấtresponse sau commit rồireplay cùngintent,không duplicate;correction→recheck→revisionmới,eventcũr1 |
-| Lỗi vàcontext | Unit đạt409refresh,401clear,404/503khôngfallback,429Retry-After,season/case/accountlate response,doubledclick |
-| Kiểm build/static | typecheck,lints,12logiccases,1HTTPcontroller,1APIregression đạt;Android export1352modules/47assets/Hermes~3,2MB |
-| Native | Chưa chạyemulator/điệnthoại;ADB không có trongPATH/các vịtrí SDK đãkiểm,ANDROID_HOMEtrống;không cài SDK hoặc gọiexportlàAPK |
+| Replay vàrecheck | HTTP cố ý mấtresponse sau commit rồireplay cùngintent, không duplicate;correction→recheck→revisionmới, eventcũr1 |
+| Lỗi vàcontext | Unit đạt409refresh,401 clear,404/503khôngfallback,429Retry-After, season/case/accountlate response, doubledclick |
+| Kiểm build/static | typecheck, lints,12 logiccases,1HTTPcontroller,1APIregression đạt;Android export1352modules/47assets/Hermes~3,2MB |
+| Native | Chưa chạyemulator/điệnthoại;ADB không có trongPATH/các vịtrí SDK đãkiểm, ANDROID_HOMEtrống;không cài SDK hoặc gọiexportlà APK |
 
 ### B. Thay đổi và tác động
 
-- Mới mobile/src/features/followup/client.ts,controller.ts,FollowupScreen.tsx:
-  APItyped,contextgeneration,pendingintent vàUItrêncomponents hiện có.
+- Mới mobile/src/features/followup/client.ts, controller.ts, FollowupScreen.tsx:
+  APItyped, contextgeneration, pendingintent và UItrêncomponents hiện có.
 - mobile/src/app/alerts.tsx:đăngnhập mởfollowup thật theoAPI;chưa cóphiên hiểnthị
-  loginprompt,không fallbackalertdemo khi401. Mànalertdemo source cũ giữ lại,không dùng thaylỗi.
+  loginprompt, không fallbackalertdemo khi401. Mànalertdemo source cũ giữ lại, không dùng thaylỗi.
 - mobile/src/services/api.ts:ApiError thêm optionalrequestId/retryAfter và
-  request thêm optionaltimeoutMessage;hànhvi ảnh cũ giữ nguyên,córegressionHTTP.
+  request thêm optionaltimeoutMessage;hànhvi ảnh cũ giữ nguyên, córegressionHTTP.
 - mobile/src/state/AuthContext.tsx:expireSession theo token hiện tại đểclearphiên
-  khi401;mobile/src/components/Screen.tsx thêm optionalbackDisabled,mặcđịnhfalse.
-- Mới3scriptstest/loader và3responsefixturesynthetic02/11trongmobile/scripts/fixtures;
+  khi401;mobile/src/components/Screen.tsx thêm optionalbackDisabled, mặcđịnhfalse.
+- Mới3scriptstest/loader và 3 responsefixturesynthetic 02/11trongmobile/scripts/fixtures;
   không credential/liveIDs. Không dependency/package-lock thayđổi;UUID dùng
   export đã có trong expo-modules-core củaSDK57,đãđọcdocs/sourcechínhthức.
-- Mới mobile/FOLLOWUP_INTEGRATION.md; cậpnhật2doc MOBILE_SLICE_HANDOFF vàMOBILE_INTEGRATION
+- Mới mobile/FOLLOWUP_INTEGRATION.md; cậpnhật2doc MOBILE_SLICE_HANDOFF và MOBILE_INTEGRATION
   để không tiếp tục gọi client mới là chưa triển khai;giữ rõ các mốc cũ/nativepending.
-- h2_t04_mobile_client_20261103:baseline,originalverified,patch,logs,export,acceptance/review.
+- h2_t04_mobile_client_20261103:baseline, originalverified, patch, logs, export, acceptance/review.
 
-NhómA bắt buộc:metadata lỗi/timeout riêng phục vụ429/diagnostics vàkhông hướngdẫn
-retryfollowup bằng lịch sửảnh;expireSession phục vụ401;navigationguard giữintent
+NhómA bắt buộc:metadata lỗi/timeout riêng phục vụ 429/diagnostics vàkhông hướngdẫn
+retryfollowup bằng lịch sửảnh;expireSession phục vụ 401;navigationguard giữintent
 khi đang chờ. Không refactorauth/SDK rộng hoặc thêm service/DB. Backendruntime,
-APIschema,V4/model/threshold/split không đổi. Allowlist vẫn152,handoffZIPcũ giữhash,
+APIschema, V4/model/threshold/split không đổi. Allowlist vẫn152,handoffZIPcũ giữhash,
 không tự đưa mobile mới vào góiBackend đãphát trước. Git HEAD/branch/index/staged
-giữ nguyên;5trackedfile được sửa cóchủđích,104trackedfilekhác nguyênhash.
+giữ nguyên;5 trackedfile được sửa cóchủđích,104 trackedfilekhác nguyênhash.
 
 ### C. Kiểm chứng thực sự vừa chạy
 
-Lượt cuối12/12Node logic tests đạt. HTTPcontroller TypeScriptthực→pilotloopback
-đạt1scenario bao phủ2taskkind,replay,recheck,filter,owner/session;storetạm sạch,
-server dừng,0ResourceWarning,khôngtorch/ultralytics/AIthật. RegressionAPIclient
-ảnh/auth hiện có đạt1scenario với fakeinference,account/DBtạm theo harness cũ.
+Lượt cuối 12/12Node logic tests đạt. HTTPcontroller TypeScriptthực→pilotloopback
+đạt1scenario bao phủ 2 taskkind, replay, recheck, filter, owner/session;storetạm sạch,
+server dừng,0ResourceWarning, khôngtorch/ultralytics/AIthật. RegressionAPIclient
+ảnh/auth hiện có đạt1scenario với fakeinference, account/DBtạm theo harness cũ.
 Không cộng các lượt chạy thử thành testđộc lập hoặc metricngoàiđồng.
-Typecheck npmruncheck đạt; npmrunlint(Expo)đạt;eslintsrc và3scriptmới đạt.
-Androidexport cuối android_export03 đạt1352modules/47assets,bundlehash ởACCEPTANCE.
-Không runtimefullsuite,train,benchmark,soak,native hoặcfreshinstall.
+Typecheck npmruncheck đạt; npmrunlint(Expo)đạt;eslintsrc và 3 scriptmới đạt.
+Androidexport cuối android_export03 đạt1352modules/47assets, bundlehash ở ACCEPTANCE.
+Không runtimefullsuite, train, benchmark, soak, native hoặcfreshinstall.
 
-Giữ logs các bước chưa đạt:lintđầu có2lỗihooks đãsửa;eslintdot quét cảscript cũ
-api-integration cóBufferundef (ngoài thayđổi),scriptloader mới đãimportBuffer,
+Giữ logs các bước chưa đạt:lintđầu có 2 lỗihooks đãsửa;eslintdot quét cảscript cũ
+api-integration có Bufferundef (ngoài thayđổi),scriptloader mới đãimportBuffer,
 Expo lint vàeslint phần sửa đạt. Lệnh chuẩn bị fixture đầu thiếuencodingUTF8
-bịUnicodeDecodeError,đãsửaencodingexplicit trước unitlượtcuối. Export01/02 giữ
+bị UnicodeDecodeError, đãsửaencodingexplicit trước unitlượtcuối. Export 01/02 giữ
 nguyên;03 làsource cuối sau sửaroute401/cooldown. WarningNO_COLOR/FORCE_COLOR
 củaexport không phải lỗibundle. Không nângdependency để né lỗi.
 
-Tự kiểm: đọc mobile/FOLLOWUP_INTEGRATION.md;npmruncheck,npmrunlint và
+Tự kiểm: đọc mobile/FOLLOWUP_INTEGRATION.md;npmruncheck, npmrunlint và
 node --test scripts/followup.test.mjs tại mobile (expected12pass). HTTP harness
-run_http.py run01/02 đã có vàtừchốioverwrite;muốnrunmới phải chọnđườngdẫn/lượtmới.
-Tự chạy app với pilotorigin/kho đãchọn,tabCảnhbáo→login→plot/season→list→detail.
-Kho mới rỗng/fixtureIDs đãdọn,không fallback dữliệumẫu hoặc tự seed kho thật.
-Không server/DB/accounttạm còn chạy;bundle/log giữlàmartifact,không rollbackDBthật.
+run_http.py run 01/02 đã có vàtừchốioverwrite;muốnrunmới phải chọnđườngdẫn/lượtmới.
+Tự chạy app với pilotorigin/kho đãchọn, tabCảnhbáo→login→plot/season→list→detail.
+Kho mới rỗng/fixtureIDs đãdọn, không fallback dữliệumẫu hoặc tự seed kho thật.
+Không server/DB/accounttạm còn chạy;bundle/log giữlàmartifact, không rollbackDBthật.
 Rollback code nếu cần dùng original/ đãkhớphashbaseline vàexisting_source_delta.patch
 để chỉ đảo đúnghunk;khônggitreset vìsource cósửa từtrước. Giữmọigói/lịchsửcũ.
 
@@ -6492,54 +6492,54 @@ Rollback code nếu cần dùng original/ đãkhớphashbaseline vàexisting_sou
 
 Controller generation bỏ response cũ sau context/account/unmount;đối chiếu
 versiondetail/view khi đọc riêng để không dùngprojectioncũ. POSTvẫnkiểmserver;
-checkởchecked cóthểenabled dùneedsrecheckfalse,không tựgửi. Observationlọcclient
-chỉhỗtrợchọn,khôngbỏsource/owner/season/timeguard. GETintegritylỗi xóaviewthao tác.
-UUID/payloadpending giữnguyên;unknownresponse/5xx giữintent,409clearintent vàđọc
-bảnmới đểuserquyếtđịnh. Pendingkhóa đổicontext/reason/obs,doubleclick/navigation;
-Androidback/gesture chỉmới triểnkhai,chưa kiểm thiếtbị. Pending trongbộnhớ,
-khôngđảm bảo qua forcekill/reload,khôngofflinequeue. Phiên401clearview/tokentheo
+checkởchecked cóthểenabled dùneedsrecheckfalse, không tựgửi. Observationlọcclient
+chỉhỗtrợchọn, khôngbỏsource/owner/season/timeguard. GETintegritylỗi xóaviewthao tác.
+UUID/payloadpending giữnguyên;unknownresponse/5xx giữintent,409 clearintent vàđọc
+bảnmới đểuserquyếtđịnh. Pendingkhóa đổicontext/reason/obs, doubleclick/navigation;
+Androidback/gesture chỉmới triểnkhai, chưa kiểm thiếtbị. Pending trongbộnhớ,
+khôngđảm bảo qua forcekill/reload, khôngofflinequeue. Phiên401clearview/tokentheo
 code nhưngSecureStore/lifecycleđầyđủ chưa kiểmnative. Khôngfallback giảrisk hoặc
-labelhealthy;checked không nhãntrain. Phầntriểnkhai đúngmục tiêu,sựthiếu native
-được giữpending,không mở thêm vònghardening/test sau các tiêu chí phần mềmđạt.
+labelhealthy;checked không nhãntrain. Phầntriểnkhai đúngmục tiêu, sựthiếu native
+được giữpending, không mở thêm vònghardening/test sau các tiêu chí phần mềmđạt.
 
 ### E. Đề xuất riêng và dừng
 
 Tiếp theo chínhH2-T04:nghiệmthu trênemulator/điệnthoại với device/OS/build/origin/
 store/ngườikiểm vàchecklist đãcó;chỉsửalỗi trực tiếp từnghiệmthu. Khôngtạo thêm
 gói/test/soak đểthaybằngchứngnative. Offlinepersist/push/camera/close-reopenUI
-là mởrộngriêng,khôngđiềukiện bắtbuộc thêm cho clienttốithiểu. Không liênhệ,gửi,
+là mởrộngriêng, khôngđiềukiện bắtbuộc thêm cho clienttốithiểu. Không liênhệ, gửi,
 commit/push/deploy/muathiếtbị. H4-T01,H6-T01 tiếp tụctạmgác. Dừngphầncode tạiđây.
 
 
 ## 93. H2-T04 — preflight nghiệm thu native (2026-11-03T16:36:48.490001+07:00)
 
 Phạm vi tiếp tục: kiểm môi trường Android hiện có để nghiệm thu giao diện client
-đã triển khai ởmục92; không càiSDK,mởLAN/firewall hoặc đổi model/chức năng.
+đã triển khai ởmục92; không càiSDK, mở LAN/firewall hoặc đổi model/chức năng.
 
 A. Kết quả: H2-T04 vẫn một phần; native acceptance chờ thông tin môi trường.
-Đã kiểm cả trong và ngoài sandbox: thấy ổC/D,không thấyADB/emulator trongPATH,
+Đã kiểm cả trong và ngoài sandbox: thấy ổ C/D, không thấyADB/emulator trongPATH,
 ANDROID_HOMEtrống. Script run-android-emulator.ps1 kỳ vọngE:/Android_SDK nhưng
-đườngdẫn này và cácvịtríSDK/AVD/local.properties/APK đãkiểm không tồn tại.
-Chưa có dữliệu để kết luận mọi vịtrí trên máy đều không cóSDK hoặc không cóđiệnthoại.
+đườngdẫn này và cácvịtrí SDK/AVD/local.properties/APK đãkiểm không tồn tại.
+Chưa có dữliệu để kết luận mọi vịtrí trên máy đều không có SDK hoặc không cóđiệnthoại.
 Đã hỏi user về thiếtbị/SDK;chưa có trảlời ởthờiđiểm ghi nhận.
 
 B. Chỉ thêm h2_t04_native_preflight_20261103/PREFLIGHT.json và append93.
-14file source/mobile/doc của92 vàcácZIP cũ giữhash. Không sửa code/cấu hình,
-không run buildscript vì thiếu điều kiện,tự cài package/SDK hoặc ghi kho thật.
+14 file source/mobile/doc của92 vàcácZIP cũ giữhash. Không sửa code/cấu hình,
+không run buildscript vì thiếu điều kiện, tự cài package/SDK hoặc ghi kho thật.
 
-C. Mới chạy kiểm đườngdẫn/PATH/drive và đọc launcher/hướngdẫn;0native test,
-0HTTP/testsuite/train/inference mới. Không khởi độngserver/emulator,không có
-account/tempDB cầncleanup. Typecheck/lint/12clienttests/HTTP/export ở92 làlịch sử,
-không gọi vừa chạy lại. Muốn tự kiểm cần adb devices từSDK đúng,định danh
+C. Mới chạy kiểm đườngdẫn/PATH/drive và đọc launcher/hướngdẫn;0 native test,
+0HTTP/testsuite/train/inference mới. Không khởi độngserver/emulator, không có
+account/tempDB cầncleanup. Typecheck/lint/12clienttests/HTTP/export ở 92 làlịch sử,
+không gọi vừa chạy lại. Muốn tự kiểm cần adb devices từ SDK đúng, định danh
 thiếtbị vàorigin/store thử;chưa thể ghi expected UI pass. Rollback chỉ artifact/
-append này nếu cần,không resetcode hoặcgói trước.
+append này nếu cần, không resetcode hoặcgói trước.
 
-D. Giới hạn: bundleHermes đãexport khônglàAPK hoặcchứngminhrender/gesture/SecureStore.
+D. Giới hạn: bundleHermes đãexport khônglà APK hoặcchứngminhrender/gesture/SecureStore.
 Không chạy web/HTTPthaythế đểđóng native acceptance. Java cótrongPATH không
-thaySDK/AVD. Targetedpreflight giúp xácđịnh phụthuộc,chưanghiệmthu luồngtrênthiếtbị.
+thaySDK/AVD. Targetedpreflight giúp xácđịnh phụthuộc, chưanghiệmthu luồngtrênthiếtbị.
 
 E. Bước tiếp nhỏnhất: nhận đườngdẫnSDK cóplatform-tools/adb.exe vàthiếtbị/AVD
-sẵn có,nếu có,rồi tiếp tụcchínhH2-T04. Nếu chưa cómôitrường,cầnchốtphầnthiếtlập
+sẵn có, nếu có, rồi tiếp tụcchínhH2-T04. Nếu chưa cómôitrường, cầnchốtphầnthiếtlập
 riêng trước khi thực hiện;không tựtải/càihàngGB đểlấpkhoảngchờ. H6-T01/H4-T01
 vẫn tạmgác;dừngphầnphụthuộc tạiđây. Không commit/push/deploy/liênhệngườikhác.
 
@@ -6585,16 +6585,16 @@ Hiện chưa có format/logger đủ metadata nên dừng phần triển khai ph
 
 ## B. Đối chiếu source và phần còn thiếu
 
-CSV hiện có5cột temperature,humidity,rainfall,soil_ph,disease. Hồ sơ H3-T01 đã
-ghi thiếu timestamp/timezone,cadence,device/farm/season/cluster IDs và provenance
+CSV hiện có 5 cột temperature, humidity, rainfall, soil_ph, disease. Hồ sơ H3-T01 đã
+ghi thiếu timestamp/timezone, cadence, device/farm/season/cluster IDs và provenance
 thu/gán nhãn. Không có thông tin mới để thay các unknown đó.
 
 telemetry_tool.py đã có import JSON qua loopback; pilot_telemetry.py đã kiểm
-client_sample_id,observed_at,source/owner/stream vàpayload; cùng ID/cùng nội dung
+client_sample_id, observed_at, source/owner/stream vàpayload; cùng ID/cùng nội dung
 replay, cùng ID/khác nội dung conflict, cùng timestamp/stream không ghi đè.
 Đây là phần đã triển khai trước H3-T02, không cần làm lại.
 
-Payload raw hiện có air_temperature_c,relative_humidity_pct,leaf_wet vàmetadata
+Payload raw hiện có air_temperature_c, relative_humidity_pct, leaf_wet vàmetadata
 reported_quality/reference. Rainfall/soil_ph không có mapping schema hiện tại;
 disease không phải raw sensor measurement. Không đổi pH thành độ ẩm đất hoặc
 đưa nhãn bệnh vào sample. Chỉ rename hai cột không đáp ứng ingestion contract.
@@ -6606,7 +6606,7 @@ số đo khi không biết nguồn và semantics để phân biệt replay với
 
 ## C. Kiểm chứng mới và lịch sử
 
-Lượt này đọc lại header/mẫu2dòng và hồ sơ intake,source importer/raw route cùng
+Lượt này đọc lại header/mẫu2dòng và hồ sơ intake, source importer/raw route cùng
 contract; kiểm hash raw CSV/Word giữ đúng H3-T01. Không đọc lại toàn bộ nội dung
 Word hoặc chạy lại audit1000dòng. H3-T01 mới là bằng chứng kiểm missing/duplicate
 trước đây; không ghi thành kết quả mới ở H3-T02.
@@ -6623,7 +6623,7 @@ train prototype trước đây không bổ sung timestamp/semantics cho ingestio
 Không kéo H4-T01 hoặc nhãn chuyên gia thành điều kiện cho software adapter độc
 lập: điểm chặn ở đây là input format/metadata để mapping raw đúng nghĩa.
 
-Không có adapter mới để tự kiểm. Có thể đối chiếu header và hash ởVERIFICATION,
+Không có adapter mới để tự kiểm. Có thể đối chiếu header và hash ở VERIFICATION,
 đọc ENVIRONMENT_INGEST.md/pilot_telemetry.py để kiểm mismatch. Nếu có raw mới,
 tiếp nhận mẫu/metadata liên quan theo H3-T01 rồi tiếp tục chính H3-T02.
 Rollback chỉ hồ sơ mới và append trạng thái nếu cần; không có code/migration/data
@@ -6636,7 +6636,7 @@ Một file xuất thật của logger/thiết bị và mô tả đi kèm có:
 1. Timestamp/timezone của từng số đo hoặc mapping thời gian có căn cứ từ nguồn.
 2. Định danh thiết bị/stream; bối cảnh mùa vụ/owner có thể cấu hình riêng được
    người dùng xác nhận, không nhất thiết nằm trong mỗi dòng CSV.
-3. Tên đại lượng/đơn vị,cách xuất/missing codes và ý nghĩa cadence; nếu dùng mưa
+3. Tên đại lượng/đơn vị, cách xuất/missing codes và ý nghĩa cadence; nếu dùng mưa
    thì cần nghĩa cửa sổ tích lũy. Không đoán từ tên cột hoặc khoảng giá trị.
 4. Cách nhận diện record/retry của format, tham chiếu tài liệu/nguồn logger.
 
@@ -6648,38 +6648,38 @@ Giữ các cải tiến không cần thiết và tính năng độc lập ngoài
 Không tạo endpoint/validator hoặc train mới để thay kết quả adapter đang chặn.
 Không liên hệ/gửi/mua thiết bị/commit/push/deploy. Chờ dữ liệu phù hợp để tiếp tục.
 
-Bằng chứng lượt này: h3_t02_adapter_20261103/VERIFICATION.json; hash CSV/Word khớp H3-T01,source152 vàmobile hiện hành/gói cũ không đổi. H2-T04native,H6-T01,H4-T01 vẫn tạm gác theo người dùng.
+Bằng chứng lượt này: h3_t02_adapter_20261103/VERIFICATION.json; hash CSV/Word khớp H3-T01,source152 vàmobile hiện hành/gói cũ không đổi. H2-T04native, H6-T01,H4-T01 vẫn tạm gác theo người dùng.
 
 
-## 96. Điều chỉnh ưu tiên: người dùng phát triển hệ thống,nhóm phụ trách midterm (03/11/2026)
+## 96. Điều chỉnh ưu tiên: người dùng phát triển hệ thống, nhóm phụ trách midterm (03/11/2026)
 
 User xác định mình xây dựng/pháttriển toàn hệthống AEGIS theo tài liệu;hồ sơ
-midterm giao thànhviênkhác. Giữ scope user cómobile đãnhận ở92,không tiếp tục
-đềxuất báo cáo/slide thay pháttriểnphầnmềm. Đây là địnhhướng,chưa chọn taskcode mới.
+midterm giao thànhviênkhác. Giữ scope user cómobile đãnhận ở 92,không tiếp tục
+đềxuất báo cáo/slide thay pháttriểnphầnmềm. Đây là địnhhướng, chưa chọn taskcode mới.
 Đã đọc MVP/farm/cultivation/mobile/raw/temporal docs vàsourceclient thực tế.
-Khoảng thiếu nổi bật:mobile chưa tạo mùa vụ/observation,chưa xem telemetry/
+Khoảng thiếu nổi bật:mobile chưa tạo mùa vụ/observation, chưa xem telemetry/
 assessment Backend hoặc linkảnh theoassessment;Backend đãcó cácAPI tươngứng.
 H2-T04native vẫn tạmgác;H3-T02blocked/H4-T01tạmgác do metadata/nguồn chưa có.
 Không đổi trạng thái các hướng chỉ vì mởroadmap.
 
-Tạo docs/SYSTEM_DEVELOPMENT_ROADMAP.md với nguồn/thựctrạng và5mã **đềxuất mới**
-H2-T05 tạo/chọn/xemmùavụ,H2-T06 tạoobservation,H2-T07 xemdevice/telemetry/assessment,
-H2-T08 linkảnh,H2-T09 cultivationprofile. Cácmã chưa bắtđầu,không đổinghĩa H2-T01–04
+Tạo docs/SYSTEM_DEVELOPMENT_ROADMAP.md với nguồn/thựctrạng và 5mã **đềxuất mới**
+H2-T05 tạo/chọn/xemmùavụ, H2-T06 tạoobservation, H2-T07 xemdevice/telemetry/assessment,
+H2-T08 linkảnh, H2-T09 cultivationprofile. Cácmã chưa bắtđầu, không đổinghĩa H2-T01–04
 hoặc TASK-01–22,không tự mởrộng taskđãchốt. Đềxuất chọnH2-T05 trước để tài khoản
 mới tự thiếtlậpcontextmùavụ;không cần sensor/GT/rubric để triểnkhai/APItest.
 
-Chỉ roadmap vàappend96;không sửa code/API/model/mobile/dataset,không run test/
-train/HTTP/native. Kiểm local links của roadmap tồn tại,không kiểm runtime mới.
+Chỉ roadmap vàappend96;không sửa code/API/model/mobile/dataset, không run test/
+train/HTTP/native. Kiểm local links của roadmap tồn tại, không kiểm runtime mới.
 Chưa đối chiếu bộđặc tả ngoài những tài liệu đãtruycập;không tuyênbố đạt toànbộ
-đồán hoặcproduction. Dừng,chờ user chọntask trước triểnkhai. Khôngcommit/push/deploy.
+đồán hoặcproduction. Dừng, chờ user chọntask trước triểnkhai. Khôngcommit/push/deploy.
 
 
 ## 97. Bản đồ phát triển bốn nhóm AI/IoT/Backend vàtaskstatus (2026-11-03T17:01:14.213513+07:00)
 
-User yêu cầu bao quát bốn hướng vừa trao đổi thành các hướng tổng quát,từngtask
+User yêu cầu bao quát bốn hướng vừa trao đổi thành các hướng tổng quát, từngtask
 vàstatus;ghi toàn bộ vào hồsơ. Xác nhận mới nhất:Frontend/mobile do thànhviên
-khác phụtrách;user tập trung chức năng,AI,IoT,Backend;midterm do nhómphụtrách.
-G1–G4 lànhóm truycập việc,không đổi nghĩa H1–H6/TASK-01–22.
+khác phụtrách;user tập trung chức năng, AI, IoT, Backend;midterm do nhómphụtrách.
+G1–G4 lànhóm truycập việc, không đổi nghĩa H1–H6/TASK-01–22.
 
 ### Bốn nhóm vàcách dùng
 
@@ -6687,14 +6687,14 @@ G1–G4 lànhóm truycập việc,không đổi nghĩa H1–H6/TASK-01–22.
 
 | Nhóm | Mục tiêu | Nền đã có | Trạng thái chung | Có thể chọn ngay |
 |---|---|---|---|---|
-| **G1 — Chức năng nghiệp vụ vàBackend** | Hoàn thiện hành vi nghiệp vụ theo tài liệu/API,đểFrontend tích hợp | Auth,image/history,farm/cultivation,pilotfollowup/actions/filter,recovery | Nền Backend đã có;gap chức năng tiếp theo phải kiểm chứng,chưa tự thêm endpoint | **H2-T10** |
-| **G2 — IoT,tiếp nhận vàchất lượng dữliệu** | Logger→raw cóprovenance→QC→hourly→thu thử kỹthuật | RawAPI/import/export,replay/conflict,QC/audit kỹthuật cơbản | IntakeCSV xong nhưng không có mẫu logger đủmetadata;adapterblocked | Chưa có task implementation đủ đầu vào;tiếp tụcH3-T01 khi có mẫu mới |
-| **G3 — AI nhận diện ảnh vàchất lượngmodel** | Chọn vàkiểm một vấn đề ảnh có giá trị,cải thiện có bằng chứng | V4default,inferenceHTTP,cácaudit,candidateboundary-r2/FT25 | Hệ ảnh đã tích hợp;chưa có căn cứ promote hoặc fieldaccuracy | **H4-T06** |
-| **G4 — Dữliệu nghiêncứu vàAI dựbáo** | Nguồn/quyền/SOP/readiness→dataset đủ điều kiện→temporal baseline | Draftprotocol,builder/replay/leakage software,RFstaticprototype | Chưa có forecast đãtrain;CSVcộngđồngnguồn/nhãnunknown,H4-T01 tạmgác | Chưa train;chỉ quay lại khi có điều kiện mới |
+| **G1 — Chức năng nghiệp vụ và Backend** | Hoàn thiện hành vi nghiệp vụ theo tài liệu/API, để Frontend tích hợp | Auth, image/history, farm/cultivation, pilotfollowup/actions/filter, recovery | Nền Backend đã có;gap chức năng tiếp theo phải kiểm chứng, chưa tự thêm endpoint | **H2-T10** |
+| **G2 — IoT, tiếp nhận vàchất lượng dữliệu** | Logger→raw cóprovenance→QC→hourly→thu thử kỹthuật | RawAPI/import/export, replay/conflict, QC/audit kỹthuật cơbản | IntakeCSV xong nhưng không có mẫu logger đủmetadata;adapterblocked | Chưa có task implementation đủ đầu vào;tiếp tụcH3-T01 khi có mẫu mới |
+| **G3 — AI nhận diện ảnh vàchất lượngmodel** | Chọn vàkiểm một vấn đề ảnh có giá trị, cải thiện có bằng chứng | V4default, inferenceHTTP, cácaudit, candidateboundary-r2/FT25 | Hệ ảnh đã tích hợp;chưa có căn cứ promote hoặc fieldaccuracy | **H4-T06** |
+| **G4 — Dữliệu nghiêncứu và AI dựbáo** | Nguồn/quyền/SOP/readiness→dataset đủ điều kiện→temporal baseline | Draftprotocol, builder/replay/leakage software, RFstaticprototype | Chưa có forecast đãtrain;CSVcộngđồngnguồn/nhãnunknown, H4-T01 tạmgác | Chưa train;chỉ quay lại khi có điều kiện mới |
 
 G2 xử lý tính đúng kỹthuật của sốđo;G4 xử lý tính hợp lệ của nghiêncứu vànhãn.
-Không cần nhãn bệnh để kiểm adapter kỹthuật,nhưng cũng không coi adapterpass
-là đủ trainforecast. G3 ảnh vàG4 temporal là hai bài toán riêng.
+Không cần nhãn bệnh để kiểm adapter kỹthuật, nhưng cũng không coi adapterpass
+là đủ trainforecast. G3 ảnh và G4 temporal là hai bài toán riêng.
 
 
 
@@ -6702,20 +6702,20 @@ là đủ trainforecast. G3 ảnh vàG4 temporal là hai bài toán riêng.
 
 | Mã | Công việc | Status | Đầu ra / điều kiện kết thúc | Phụ thuộc / giới hạn |
 |---|---|---|---|---|
-| H2-T01 | Filter danh sách follow-up | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Một filter state; lỗi/owner/pagination đã kiểm | Đóng subset state ở88; filter khác chỉ khi có nhu cầu |
-| H2-T02 | DTO khả năng thao tác | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Projection acknowledge/check; POST authoritative | Đóng subset ở86; không tự thêm close/reopen DTO |
-| H2-T03 | Refresh/retry/chẩn đoán | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Contract lỗi và ví dụ retry có bằng chứng HTTP | Đóng ở81; áp dụng khi tích hợp,không làm lại |
-| H2-T04 | Bàn giao vertical slice follow-up | Một phần và tạm gác theo user | Backend+client tối thiểu có,HTTP/export đạt; native chưa nghiệm thu | Native tạm gác theo94; máy giả lập thuộc thành viên |
-| H2-T10 | Đối chiếu khoảng thiếu chức năng Backend theo tài liệu | Đề xuất có thể chọn với hồ sơ hiện có;chưa bắt đầu | Ma trận yêu cầu→API/module→test/evidence→gap;chọn một gap nghiệp vụ để lập task triển khai | Đọc tài liệu/source hiện có;chỉ mở task sửa nếu xác định hành vi thiếu,không mặc định API mới |
+| H2-T01 | Filter danh sách follow-up | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Một filter state; lỗi/owner/pagination đã kiểm | Đóng subset state ở 88; filter khác chỉ khi có nhu cầu |
+| H2-T02 | DTO khả năng thao tác | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Projection acknowledge/check; POST authoritative | Đóng subset ở 86; không tự thêm close/reopen DTO |
+| H2-T03 | Refresh/retry/chẩn đoán | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Contract lỗi và ví dụ retry có bằng chứng HTTP | Đóng ở 81; áp dụng khi tích hợp, không làm lại |
+| H2-T04 | Bàn giao vertical slice follow-up | Một phần và tạm gác theo user | Backend+client tối thiểu có, HTTP/export đạt; native chưa nghiệm thu | Native tạm gác theo94; máy giả lập thuộc thành viên |
+| H2-T10 | Đối chiếu khoảng thiếu chức năng Backend theo tài liệu | Đề xuất có thể chọn với hồ sơ hiện có;chưa bắt đầu | Ma trận yêu cầu→API/module→test/evidence→gap;chọn một gap nghiệp vụ để lập task triển khai | Đọc tài liệu/source hiện có;chỉ mở task sửa nếu xác định hành vi thiếu, không mặc định API mới |
 
 
 ### G2 — taskIoT
 
 | Mã | Công việc | Status | Đầu ra / điều kiện kết thúc | Phụ thuộc / giới hạn |
 |---|---|---|---|---|
-| H3-T01 | Tiếp nhận file/logger mẫu | Đã hoàn thành intake kỹ thuật;metadata còn thiếu | Đã intake CSV/Word1000dòng ở78; giữ unknown về metadata | Mẫu logger mới cần một lượt tiếp nhận riêng trong chính task gốc;không coi CSV là raw cảm biến đã xác minh |
-| H3-T02 | Adapter raw có lineage và retry | Bị chặn bởi đầu vào/điều kiện cụ thể | Parser một format,raw nguyên,batch/row lineage,key ổn định,duplicate/conflict/out-of-order/invalid tests | Thiếu timestamp/device/semantics cho CSV;user xác nhận không có logger mới ở95 |
-| H3-T03 | QC clock/units/late/missing và quarantine | Chờ task/semantics trước;chưa triển khai | QC theo instrument/stream; lý do giữ/loại và audit không sửa raw | Sau mẫu/semantics đúng;raw QC/audit cơ bản đã có,không làm lại;chưa chứng nhận calibration |
+| H3-T01 | Tiếp nhận file/logger mẫu | Đã hoàn thành intake kỹ thuật;metadata còn thiếu | Đã intake CSV/Word1000dòng ở 78; giữ unknown về metadata | Mẫu logger mới cần một lượt tiếp nhận riêng trong chính task gốc;không coi CSV là raw cảm biến đã xác minh |
+| H3-T02 | Adapter raw có lineage và retry | Bị chặn bởi đầu vào/điều kiện cụ thể | Parser một format, raw nguyên, batch/row lineage, key ổn định, duplicate/conflict/out-of-order/invalid tests | Thiếu timestamp/device/semantics cho CSV;user xác nhận không có logger mới ở 95 |
+| H3-T03 | QC clock/units/late/missing và quarantine | Chờ task/semantics trước;chưa triển khai | QC theo instrument/stream; lý do giữ/loại và audit không sửa raw | Sau mẫu/semantics đúng;raw QC/audit cơ bản đã có, không làm lại;chưa chứng nhận calibration |
 | H3-T04 | Hourly aggregation có coverage và revision | Chờ task/semantics trước;chưa triển khai | Đặc tả và kiểm aggregation;giờ thiếu vẫn missing;late correction cóversion | Sau H3-T03 và review semantics;point wetness không thành wet-duration bằng giả định |
 | H3-T05 | Thu thử kỹ thuật import/export/backup | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Một phiên thu có log clock/gián đoạn/QC/lineage và đối chiếu export/restore | Thiết bị/nguồn/quyền/người vận hành và format phù hợp;không cần nhãn bệnh để kiểm ingestion |
 
@@ -6725,9 +6725,9 @@ là đủ trainforecast. G3 ảnh vàG4 temporal là hai bài toán riêng.
 | Mã | Công việc | Status | Đầu ra / điều kiện kết thúc | Phụ thuộc / giới hạn |
 |---|---|---|---|---|
 | H4-T06 | Chốt một vấn đề cải thiện AI ảnh từ bằng chứng hiện có | Đề xuất có thể chọn với hồ sơ hiện có;chưa bắt đầu | Bảng lỗi/giới hạn V4,boundary-r2,FT25;chọn một vấn đề và kế hoạch kiểm chứng có pass/fail | Đọc các audit/metrics có sẵn trước;không inference/train/sửa nhãn mới ở task này |
-| H4-T07 | Tiếp nhận bộ đánh giá ảnh độc lập | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Hồ sơ nguồn/quyền/nhãn,duplicate/overlap,ảnh khỏe/OOD phù hợp mục tiêu và manifest đánh giá | Cần nguồn ảnh và nhãn đủ căn cứ;không dùng prediction/rule làm GT hoặc tự chọn số ảnh đủ |
-| H4-T08 | Thí nghiệm AI ảnh theo vấn đề đã chọn | Chờ task/semantics trước;chưa triển khai | Một thí nghiệm có protocol,seed/config/manifest,so sánh baseline và artifact riêng | Sau H4-T06,có dữ liệu/quyền phù hợp vàuser cho phép train riêng nếu cần;không tự đổi split/class/threshold |
-| H4-T09 | Đánh giá candidate và quyết định sử dụng | Chờ task/semantics trước;chưa triển khai | So sánh cùng protocol,từng lớp/lỗi/giới hạn và quyết định giữ hoặc đề xuất candidate | Sau thí nghiệm;chỉ gọi độc lập nếu H4-T07 phù hợp;không tự promote hoặc dùng test để tune |
+| H4-T07 | Tiếp nhận bộ đánh giá ảnh độc lập | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Hồ sơ nguồn/quyền/nhãn, duplicate/overlap, ảnh khỏe/OOD phù hợp mục tiêu và manifest đánh giá | Cần nguồn ảnh và nhãn đủ căn cứ;không dùng prediction/rule làm GT hoặc tự chọn số ảnh đủ |
+| H4-T08 | Thí nghiệm AI ảnh theo vấn đề đã chọn | Chờ task/semantics trước;chưa triển khai | Một thí nghiệm có protocol, seed/config/manifest, so sánh baseline và artifact riêng | Sau H4-T06,có dữ liệu/quyền phù hợp vàuser cho phép train riêng nếu cần;không tự đổi split/class/threshold |
+| H4-T09 | Đánh giá candidate và quyết định sử dụng | Chờ task/semantics trước;chưa triển khai | So sánh cùng protocol, từng lớp/lỗi/giới hạn và quyết định giữ hoặc đề xuất candidate | Sau thí nghiệm;chỉ gọi độc lập nếu H4-T07 phù hợp;không tự promote hoặc dùng test để tune |
 
 
 ### G4 — taskforecast/nghiêncứu
@@ -6735,10 +6735,10 @@ là đủ trainforecast. G3 ảnh vàG4 temporal là hai bài toán riêng.
 | Mã | Công việc | Status | Đầu ra / điều kiện kết thúc | Phụ thuộc / giới hạn |
 |---|---|---|---|---|
 | H4-T01 | Nguồn/vai trò/quyền bộ dữ liệu | Một phần và tạm gác theo user | Dossier CSV/Word đã có;nguồn/license/cách gán nhãn chưa xác minh | User tạm gác;chỉ tiếp tục khi có thông tin mới;không liên hệ hoặc điền consent thay nguồn |
-| H4-T02 | Endpoint/case definition/SOP và freeze protocol | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Draft được chuyên môn review,decision register/version và quy trình nhãn rõ | Người đủ chuyên môn/nguồn/quyền;hiện DRAFT,không tự freeze72h/24h |
-| H4-T03 | Thiết kế dữ liệu/cluster/split và readiness | Chờ task/semantics trước;chưa triển khai | Readiness có căn cứ,group/time split,purge/holdout,censor vàmetric plan | Sau nguồn/SOP/QC phù hợp;không tách cùng cluster qua split hoặc tự đặt số mẫu đủ |
-| H4-T04 | Thu và kiểm bộ nghiên cứu đủ điều kiện | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Quan sát/nhãn theo lịch,evidence/revision/availability/completeness vàaudit | Nguồn/quyền/reviewer/SOP và H3 phù hợp;không nhãn sinh từ model/mock |
-| H4-T05 | Baseline temporal và đánh giá theo protocol | Bị chặn bởi đầu vào/điều kiện cụ thể | Baseline/comparator,manifest/seed/split vàmetric event/false-alert/leadtime/abstention | Chưa readiness/data đủ điều kiện;chỉ train khi user cho phép riêng,không APIrisk giả |
+| H4-T02 | Endpoint/case definition/SOP và freeze protocol | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Draft được chuyên môn review, decision register/version và quy trình nhãn rõ | Người đủ chuyên môn/nguồn/quyền;hiện DRAFT, không tự freeze72h/24h |
+| H4-T03 | Thiết kế dữ liệu/cluster/split và readiness | Chờ task/semantics trước;chưa triển khai | Readiness có căn cứ, group/time split, purge/holdout, censor vàmetric plan | Sau nguồn/SOP/QC phù hợp;không tách cùng cluster qua split hoặc tự đặt số mẫu đủ |
+| H4-T04 | Thu và kiểm bộ nghiên cứu đủ điều kiện | Chờ nguồn/người/thiết bị thực tế;chưa triển khai | Quan sát/nhãn theo lịch, evidence/revision/availability/completeness vàaudit | Nguồn/quyền/reviewer/SOP và H3 phù hợp;không nhãn sinh từ model/mock |
+| H4-T05 | Baseline temporal và đánh giá theo protocol | Bị chặn bởi đầu vào/điều kiện cụ thể | Baseline/comparator, manifest/seed/split vàmetric event/false-alert/leadtime/abstention | Chưa readiness/data đủ điều kiện;chỉ train khi user cho phép riêng, không APIrisk giả |
 
 
 ### Hỗtrợ/phốihợp
@@ -6753,44 +6753,44 @@ là đủ trainforecast. G3 ảnh vàG4 temporal là hai bài toán riêng.
 | H5-T02 | Request khi evidence đổi | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Giữ evidence cũ;chỉ mở failure mới khi có bug/rủi ro trực tiếp | Đóng một race observation đã chọn;không mọi race |
 | H5-T03 | Gián đoạn restore | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Giữ evidence cũ;chỉ mở failure mới khi có bug/rủi ro trực tiếp | Đóng boundary sentinel đã chọn;không mất điện/hỏng đĩa thật |
 | H5-T04 | Runbook recovery | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Giữ evidence cũ;chỉ mở failure mới khi có bug/rủi ro trực tiếp | Tài liệu local đã có;RPO/RTO/retention production chưa chốt |
-| H6-T05 | Audit gói/snapshot | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Snapshot nội bộ ở85 đã có;không tự là gói nộp cuối | Chỉ cập nhật khi có yêu cầu nhận/nộp thực tế;không rebuild lặp |
+| H6-T05 | Audit gói/snapshot | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Snapshot nội bộ ở 85 đã có;không tự là gói nộp cuối | Chỉ cập nhật khi có yêu cầu nhận/nộp thực tế;không rebuild lặp |
 
 
 | Mã | Công việc | Status | Đầu ra / điều kiện kết thúc | Phụ thuộc / giới hạn |
 |---|---|---|---|---|
-| H2-T05 | Tạo/chọn/xem mùa vụ mobile | Đề xuất Frontend;ngoài ưu tiên user,chưa triển khai | Đề xuất ở96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
-| H2-T06 | Tạo observation mobile | Đề xuất Frontend;ngoài ưu tiên user,chưa triển khai | Đề xuất ở96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
-| H2-T07 | Xem thiết bị/telemetry/assessment mobile | Đề xuất Frontend;ngoài ưu tiên user,chưa triển khai | Đề xuất ở96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
-| H2-T08 | Liên kết ảnh-assessment mobile | Đề xuất Frontend;ngoài ưu tiên user,chưa triển khai | Đề xuất ở96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
-| H2-T09 | Hồ sơ canh tác mobile | Đề xuất Frontend;ngoài ưu tiên user,chưa triển khai | Đề xuất ở96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
-| H6-T01 | Đối chiếu rubric | Tạm gác theo user | Chưa có đề cương;không tự đặt rubric | User tạm gác,nhóm phụ trách hồ sơ |
-| H6-T02 | Đóng góp/chương báo cáo | Hoàn thành một phần | Bản nháp AI/Backend ở90 đã có;phân công/tác giả toàn nhóm chưa chốt | Giữ đúng ngày/trạng thái;không tiếp tục kéo user sang báo cáo |
-| H6-T03 | Bảng/hình/tài liệu nộp | Chưa bắt đầu,thuộc phối hợp hồ sơ | Chưa chọn định dạng hoặc triển khai | Thuộc nhóm làm hồ sơ;không ưu tiên thay việc phát triển |
-| H6-T04 | Demo/Q&A | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Rehearsal lịch sử ở74;không native/field proof | Chỉ mở lượt mới khi nhóm chọn kịch bản/môi trường rõ |
+| H2-T05 | Tạo/chọn/xem mùa vụ mobile | Đề xuất Frontend;ngoài ưu tiên user, chưa triển khai | Đề xuất ở 96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
+| H2-T06 | Tạo observation mobile | Đề xuất Frontend;ngoài ưu tiên user, chưa triển khai | Đề xuất ở 96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
+| H2-T07 | Xem thiết bị/telemetry/assessment mobile | Đề xuất Frontend;ngoài ưu tiên user, chưa triển khai | Đề xuất ở 96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
+| H2-T08 | Liên kết ảnh-assessment mobile | Đề xuất Frontend;ngoài ưu tiên user, chưa triển khai | Đề xuất ở 96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
+| H2-T09 | Hồ sơ canh tác mobile | Đề xuất Frontend;ngoài ưu tiên user, chưa triển khai | Đề xuất ở 96,chưa triển khai task này; API Backend tương ứng đã có | Không phải ưu tiên của người dùng sau xác nhận Frontend do thành viên phụ trách |
+| H6-T01 | Đối chiếu rubric | Tạm gác theo user | Chưa có đề cương;không tự đặt rubric | User tạm gác, nhóm phụ trách hồ sơ |
+| H6-T02 | Đóng góp/chương báo cáo | Hoàn thành một phần | Bản nháp AI/Backend ở 90 đã có;phân công/tác giả toàn nhóm chưa chốt | Giữ đúng ngày/trạng thái;không tiếp tục kéo user sang báo cáo |
+| H6-T03 | Bảng/hình/tài liệu nộp | Chưa bắt đầu, thuộc phối hợp hồ sơ | Chưa chọn định dạng hoặc triển khai | Thuộc nhóm làm hồ sơ;không ưu tiên thay việc phát triển |
+| H6-T04 | Demo/Q&A | Đã hoàn thành phạm vi đã chọn;không toàn hướng | Rehearsal lịch sử ở 74;không native/field proof | Chỉ mở lượt mới khi nhóm chọn kịch bản/môi trường rõ |
 
 
-H2-T05–T09 giữ tên đềxuấtFrontend ở96,chưa chạy,không dùnglại mãchoBackend.
-H2-T10/H4-T06–T09 là5mãđềxuất mới,chưatriểnkhai;không thay tasklịch sử.
-H2-T04client92 giữnguyên,native tạmgác;H3-T02blocked ở95,H4-T01partial/tạmgác,
+H2-T05–T09 giữ tên đềxuấtFrontend ở 96,chưa chạy, không dùnglại mãchoBackend.
+H2-T10/H4-T06–T09 là 5 mãđềxuất mới, chưatriểnkhai;không thay tasklịch sử.
+H2-T04client92 giữnguyên, native tạmgác;H3-T02blocked ở 95,H4-T01partial/tạmgác,
 H6-T01tạmgác;không đổi blocked thànhdone bằngmock hoặc đưa user sangviếtFE.
 H1/H5 hoànthành đúngsubset khôngnghĩatoànhướng hoặcproduction.
 
 ### Kết quả vàkiểmchứng lượt ghi kếhoạch
 
-Đã cậpnhật docs/SYSTEM_DEVELOPMENT_ROADMAP.md,bảncũ96 giữở
+Đã cậpnhật docs/SYSTEM_DEVELOPMENT_ROADMAP.md, bảncũ 96 giữở
 development_directions_20261103/roadmap_before.md;status_before.md giữprefix.
-Registry37mãduynhất kèmstatus/output/dependency/group/owner ởTASK_REGISTRY.json.
-Kiểm17locallinks,152source/109tracked,HEAD/branch/index/staged và4ZIP
-cũ giữhash;không runtime/test/HTTP/train/inference/native,không sửaAPI/model/FE,
-khôngrebuildpackage. Cácstatus kỹthuật làevidence lịch sử,khônggọi vừa chạy lại.
+Registry37mãduynhất kèmstatus/output/dependency/group/owner ở TASK_REGISTRY.json.
+Kiểm17locallinks,152 source/109tracked, HEAD/branch/index/staged và 4ZIP
+cũ giữhash;không runtime/test/HTTP/train/inference/native, không sửaAPI/model/FE,
+khôngrebuildpackage. Cácstatus kỹthuật làevidence lịch sử, khônggọi vừa chạy lại.
 Không đọcmọi tài liệu ngoài hồsơ truycập hoặc tuyênbố đãmaprubric chínhthức.
 
 ### Đềxuất chọn task vàdừng
 
-Ưu tiên H2-T10:đối chiếu nghiệpvụBackend đểchọn mộtgapthực;hoặcH4-T06 nếu
+Ưu tiên H2-T10:đối chiếu nghiệpvụ Backend đểchọn mộtgapthực;hoặcH4-T06 nếu
 user muốn tập trungAIảnh. G2/G4 cầnđúngđầuvào/chuyênmôn;không tựcàiđặtthiếtbị,
-thuGT hoặc train khi thiếu điều kiện. Mộtlượt mộttask,scope→triểnkhai→reviewA–E
-→appendstatus→dừng;phátsinhA/B/C táchrõ. Nếuauditkhôngthấy gap,ghiđúng khôngbịa
+thuGT hoặc train khi thiếu điều kiện. Mộtlượt mộttask, scope→triểnkhai→reviewA–E
+→appendstatus→dừng;phátsinhA/B/C táchrõ. Nếuauditkhôngthấy gap, ghiđúng khôngbịa
 feature. Chưa bắtđầu bấtkỳ taskmới nào;chờuserchọn. Không gửi/liênhệ/push/deploy.
 
 ## 98. H2-T10 khảo sát đợt core và BE-01 sửa JSON farm (03/11/2026, UTC+7)
@@ -6800,7 +6800,7 @@ task đầu tiên đủ căn cứ. Giữ phân công Frontend và mã task lịc
 
 ### A. Kết quả và phạm vi
 
-Đã kiểm kê source đang hoạt động ở hai workspace; đọc toàn bộ17file Backend app/
+Đã kiểm kê source đang hoạt động ở hai workspace; đọc toàn bộ 17 file Backend app/
 entrypoints, AI API app.py, các contract/current docs và source client chọn lọc.
 **Chưa đọc toàn bộ dự án**: pilot/mobile/temporal/AI research và tài liệu dài còn
 batch tiếp theo. Không đánh dấu toàn H2-T10 hoàn tất hoặc tạo API giả cho gap FE.
@@ -6814,18 +6814,18 @@ backend_audit_20261103/source_inventory.json, không đọc .env/DB/uploads/data
 
 Tái hiện JSON lồng2.000tầng khoảng4KB gây RecursionError trong farm.body.
 Sửa helper bắt lỗi decoder thành400invalid_json, cập nhật contract farm và thêm
-5regression test; không migration/endpoint/framework mới hoặc sửa mobile/AI.
+5 regression test; không migration/endpoint/framework mới hoặc sửa mobile/AI.
 Giữ sửa đổi allowed_query có sẵn trong farm.py, đối chiếu bản session-before.
 Review đầy đủ: backend/docs/FARM_JSON_VALIDATION.md.
 
 ### C. Kiểm chứng mới
 
-- Baseline discovery Backend:113test trong143,605s;101pass,1failure+11errors.
-  Cả12test bị lỗi/fail liên quan HTTP loopback bị sandbox chặn WinError10013;
+- Baseline discovery Backend:113test trong143,605s;101 pass,1 failure+11errors.
+  Cả 12 test bị lỗi/fail liên quan HTTP loopback bị sandbox chặn WinError10013;
   không gọi baseline đạt. Không sửa test để vượt lỗi.
-- Regression trước patch:2test với7errors (6subtest core+1pilot), RecursionError.
+- Regression trước patch:2test với7errors (6 subtest core+1pilot), RecursionError.
 - Sau patch:30/30test farm_json/farm/cultivation trong38,156s.
-- Với quyền loopback:23/23test HTTP/pilot trong44,459s; bao gồm toàn bộ12test
+- Với quyền loopback:23/23test HTTP/pilot trong44,459s; bao gồm toàn bộ 12 test
   baseline bị lỗi/fail. Không rerun toàn113test sau patch; hai nhóm kết quả riêng.
 - Test dùng TemporaryDirectory và cleanup, không AI thật/sensor/native/forecast.
   Không chạy migration trên instance/mobile-instance/pilot_data người dùng.
@@ -6852,9 +6852,9 @@ không mặc định mở thêm endpoint hoặc refactor transaction.
 
 ### A. Mục tiêu và kết quả nghiệm thu
 
-**BE-02 đạt phạm vi**. Đã đọc toàn bộ38file Python trực tiếp frontend/ (13pilot
-module,6support/launcher/tool,19test), hai Backend entrypoint và test CJS:
-41source/test có inventory/hash/function/route. Đọc thêm10contract/schema chọn lọc.
+**BE-02 đạt phạm vi**. Đã đọc toàn bộ 38 file Python trực tiếp frontend/ (13 pilot
+module,6 support/launcher/tool,19 test), hai Backend entrypoint và test CJS:
+41 source/test có inventory/hash/function/route. Đọc thêm10contract/schema chọn lọc.
 Không tuyên bố toàn dự án đã đọc; mobile/static/AI/temporal và hồ sơ còn ở S3–S5.
 
 Ma trận đầy đủ ở docs/BE02_PILOT_AUDIT_20261104.md: input/output/validation,
@@ -6870,7 +6870,7 @@ replay_acceptance.py, acceptance.json/log và báo cáo audit; cập nhật ti�
 BACKEND_TASKS/BACKEND_ASSESSMENT. Source41file giữ cùng hash trước/sau test.
 
 Luồng nghiệm thu: assessment -> case/check_data -> late bucket/v2/advisory ->
-required/current/recheck -> observation revision1/2 -> close; replay giữ event
+required/current/recheck -> observation revision 1/2 -> close; replay giữ event
 cũ, foreign/missing-session/stale command không thêm event. Một lỗi giả lập sau
 core commit cho503 và ghi một phần; retry cùng window hoàn tất không nhân đôi.
 
@@ -6879,7 +6879,7 @@ core commit cho503 và ghi một phần; retry cùng window hoàn tất không n
 - Backend env -Xutf8 -B unittest discover frontend/test_*.py: **140/140pass**,
   109,272s, exit0. Có ownership/validation/concurrency/late/fault/restart,
   deterministic HTTP race và child-process restore trên kho tạm.
-- Acceptance riêng: **26bước có trace đạt**, success=true,
+- Acceptance riêng: **26 bước có trace đạt**, success=true,
   temporary_store_cleaned=true. Transport Flask test client trên API-only factory;
   không gọi26bước này là HTTP qua socket. Không start worker thread.
 - Lượt suite có quyền loopback để tránh sandbox socket đã biết; không bỏ test
@@ -6915,8 +6915,8 @@ thêm API/DB/migration, bật sensor/worker hoặc nghiệm thu native thay ngư
 ### A. Kết quả và mục tiêu nghiệm thu
 
 **BE-03 đạt phạm vi bàn giao local/S3**. Đọc44TS/TSX viết tay trong mobile/src,
-app.scss,7script và7root config/entrypoint;1generated styles chỉ giữ hash.
-60file inventory/hashes tại be03_mobile_handoff_20261104/source_inventory.json.
+app.scss,7 script và 7 root config/entrypoint;1 generated styles chỉ giữ hash.
+60 file inventory/hashes tại be03_mobile_handoff_20261104/source_inventory.json.
 Ma trận đủ auth/plot/season/device/telemetry/assessment/detect/link/history/
 follow-up ở docs/BE03_MOBILE_API_HANDOFF_20261104.md, có request/response/error,
 ownership, source/demo, retry/cache và phần native chưa kiểm.
@@ -6938,13 +6938,13 @@ Backend đã có season/device/profile/link/dashboard API nhưng client chưa n�
 
 - tsc --noEmit trực tiếp: exit0, không regenerate styles. npm run lint: exit0,
   telemetry/dotenv tắt, home Expo trong workspace.
-- Node auth-validation + followup unit: **23/23pass** (11auth+12controller).
+- Node auth-validation + followup unit: **23/23pass** (11 auth+12controller).
 - backend/checks/mobile_http.py: **1/1pass**, client api.ts gọi core HTTP trên
-  kho tạm; register/conflict/login/me,plot,multipart/history/detail/owner/logout;
+  kho tạm; register/conflict/login/me, plot, multipart/history/detail/owner/logout;
   inference stub, không model/GPU/native FormData URI.
 - Pilot HTTP harness: **1/1pass**, controller TypeScript thật với2task_kind,
   response-loss/replay/recheck/filter/paging/owner/session. Summary success=true,
-  temporary_store_cleaned=true,server_stopped=true,ResourceWarning0,no_model_loaded=true.
+  temporary_store_cleaned=true, server_stopped=true, ResourceWarning0,no_model_loaded=true.
   Sao chép nguyên harness cũ sang thư mục evidence mới, không overwrite kết quả cũ.
 - Không chạy lại140test pilot BE-02, Android export hoặc inference thật trong
   BE-03. Test Backend không chứng minh layout/SecureStore/camera/gesture native.
@@ -6980,7 +6980,7 @@ API/schema/DB thật, mobile UI, checkpoint/threshold, train hoặc deploy.
 30/30checkpoint từ Node chạy module api.ts và FollowupController thật qua HTTP
 đến Backend trong backend/.venv; Backend gọi AI service chạy bằng AI env riêng.
 V4 checkpoint đúng hash1b755ca0...70940a được nạp, device cuda:0.
-Ảnh fixture sample.jpg (hash1a6f680e...706c1d5) trả1detection rice_blast;
+Ảnh fixture sample.jpg (hash1a6f680e...706c1d5) trả 1 detection rice_blast;
 không dùng một ảnh làm accuracy/ground truth thực địa.
 
 ### B. Thay đổi và luồng
@@ -6992,22 +6992,22 @@ Backend không import torch/ultralytics. Quota farm500 chỉ ở kho rehearsal.
 
 Luồng:2dummyaccounts/login -> plot/season -> detect ảnh thật ->history/detail/
 private image -> foreign404/no-auth401 ->invalid image400 không persist ->
-24mockbuckets/assessment -> link real analysis ->followup/observation synthetic ->
+24 mockbuckets/assessment -> link real analysis ->followup/observation synthetic ->
 ack/check ->correct observation ->close409 ->recheck/close ->exact replay ->logout.
 Assessment snapshot cũ giữ nguyên, workflow không xác nhận bệnh/training.
 
 ### C. Kiểm chứng thực chạy
 
 - Preflight V4 hash và dependency local có sẵn; không cài/tải model.
-- run01 thành công lúc2026-11-04T20:56:30.829111+07:00,30checkpoint đạt;
+- run01 thành công lúc2026-11-04T20:56:30.829111+07:00,30 checkpoint đạt;
   AI processing5512,29ms và roundtrip5594,514ms cho một lần ảnh này, không SLA.
 - Backend exit0, AI server dừng, temp store cleaned=true, forced stop=false.
 - Fallback tools/demo_thesis.py bằng Backend env:36checkpoint đạt,
-  checkpoint_loaded=false,training_performed=false,server/store dọn đạt.
+  checkpoint_loaded=false, training_performed=false, server/store dọn đạt.
 - Source manifest helper/mobile API/controller giữ hash tại kết thúc kiểm.
   Syntax Python/Node đạt; không lặp140test BE-02 hoặc23unit BE-03 không thay đổi.
 
-Evidence: midterm_rehearsal_20261104/run01/summary.json,client_summary.json/log,
+Evidence: midterm_rehearsal_20261104/run01/summary.json, client_summary.json/log,
 backend.log; fallback01/summary.json; root log midterm_rehearsal_20261104_run01.log.
 Không ghi token/password/full response/bytes ảnh/DB vào summary.
 
@@ -7031,13 +7031,13 @@ BE-04/05 giữ các điều kiện đã ghi; nguồn/metadata/rubric còn cần 
 
 ### A. Quyết định và phạm vi người dùng đã xác nhận
 
-- Midterm09/11/2026 bắt buộc mobile; ngày06/11 mới chạy thử và tích hợp trên
+- Midterm 09/11/2026 bắt buộc mobile; ngày 06/11 mới chạy thử và tích hợp trên
   thiết bị. Ưu tiên hoàn thành chức năng cốt lõi trước lượt nghiệm thu đó.
 - Mục tiêu chính là dự báo; nhận diện ảnh hỗ trợ, không thay thế forecast.
 - Chấp nhận mô hình dự báo kỹ thuật huấn luyện trên chuỗi thời gian giả lập.
   Không có thiết bị IoT; chưa có dataset mới và tạm bỏ qua việc tiếp nhận.
 - Không đổi tên bài toán phân loại CSV tĩnh cũ thành dự báo theo thời gian.
-- Các kiểm thử dưới đây là bằng chứng kỹ thuật đã chạy trong phiên05/11;
+- Các kiểm thử dưới đây là bằng chứng kỹ thuật đã chạy trong phiên 05/11;
   cập nhật status chỉ ghi lại, không phát sinh train/test/deploy mới.
 
 ### B. AI nhận diện — mô hình, huấn luyện và trạng thái phục vụ
@@ -7048,16 +7048,16 @@ checkpoint `experiments/yolo/baseline_v4_50epochs/weights/best.pt`, SHA256
 
 - Fine-tune từ trọng số pretrained gốc `yolo11n.pt`, không khởi tạo từ V3 best.
 - Ba lớp: `rice_blast`, `brown_spot`, `sheath_blight`; đầu ra bbox và confidence.
-- Dataset V4:5.174ảnh, gồm3.620train/1.034validation/520test. Chia theo nhóm
+- Dataset V4:5.174 ảnh, gồm3.620train/1.034validation/520test. Chia theo nhóm
   ảnh trùng/gần giống để hạn chế rò rỉ; vẫn có giới hạn audit được lưu riêng.
 - Cấu hình baseline:50epoch, imgsz640, batch4, seed42, GPU device0;
   chọn best checkpoint theo validation. Nguồn:
   script train (`AEGIS-AI/src/train_baseline_v4.py`, workspace AI ngoài repo) và
   args thực chạy (`AEGIS-AI/experiments/yolo/baseline_v4_50epochs/args.yaml`, workspace AI ngoài repo).
-- Test baseline nội bộ20/10 (`AEGIS-AI/experiments/baseline_test_v4_20261020/evaluation_summary.json`, workspace AI ngoài repo):
-  mAP50=72,69%, mAP50–95=33,71%, trên520ảnh. Đây là metric detection,
+- Test baseline nội bộ 20/10 (`AEGIS-AI/experiments/baseline_test_v4_20261020/evaluation_summary.json`, workspace AI ngoài repo):
+  mAP50=72,69%, mAP50–95=33,71%, trên520 ảnh. Đây là metric detection,
   không phải accuracy phân loại ảnh; không dùng một ảnh demo làm metric.
-- FT25 ngày30/10 đã fine-tune thêm25epoch từ V4 best trong thí nghiệm độc lập;
+- FT25 ngày 30/10 đã fine-tune thêm25epoch từ V4 best trong thí nghiệm độc lập;
   optimizer/scheduler khởi tạo lại, không resume liên tục epoch51–75.
   Validation FP32 cùng cấu hình: V4 mAP50–95=32,58%, candidate=33,33%;
   AP50 đạo ôn lá giảm nhẹ. Candidate `deployed=false`, V4 mặc định giữ nguyên.
@@ -7065,8 +7065,8 @@ checkpoint `experiments/yolo/baseline_v4_50epochs/weights/best.pt`, SHA256
 - Các candidate source-r1/boundary-r2, audit nhãn và thử nhiều seed giữ bằng
   chứng ở các mục trước; không tự promote hoặc cộng các run thành một model.
 
-Mốc04/11 đã tổng duyệt Backend/client với V4 thật trên cuda:0,30checkpoint;
-fallback không GPU36checkpoint. Lượt rà soát core05/11 không chạy lại V4/GPU.
+Mốc 04/11 đã tổng duyệt Backend/client với V4 thật trên cuda:0,30 checkpoint;
+fallback không GPU36checkpoint. Lượt rà soát core 05/11 không chạy lại V4/GPU.
 Launcher forecast không tự khởi động dịch vụ nhận diện ảnh.
 
 ### C. FM-01 — dữ liệu dự báo giả lập
@@ -7075,12 +7075,12 @@ Artifact: `D:/AEGIS/fm01_synthetic_forecast_20261105/run02`.
 
 - Generator có seed/config/schema, metadata, nhãn/future worlds tách khỏi
   predictors, manifest/hash và split membership.
-- 200mẫu thuộc100cụm môi trường độc lập, mỗi cụm2plot synthetic.
+- 200 mẫu thuộc100cụm môi trường độc lập, mỗi cụm2plot synthetic.
   Chia60cụm train/20validation/20test, đồng thời tách các giai đoạn thời gian.
-- 170mẫu đủ feature:102train,34validation,34test;30mẫu thiếu được giữ để kiểm
+- 170 mẫu đủ feature:102train,34 validation,34 test;30 mẫu thiếu được giữ để kiểm
   `insufficient_data`, không được lấp điểm0 hoặc trộn vào train như mẫu đủ.
-- Class balance trong các mẫu đủ: train58âm/44dương; validation18âm/16dương;
-  test18âm/16dương.
+- Class balance trong các mẫu đủ: train58 âm/44dương; validation18 âm/16dương;
+  test18 âm/16dương.
 - Mỗi mẫu dùng120giờ lịch sử hourly về nhiệt độ, RH, lá ướt, quality và
   availability, kèm context canh tác/tuổi cây. Tái dùng61feature theo contract.
 - Target: có sự kiện bệnh mô phỏng mới trong `(issued_at, issued_at+72h]`.
@@ -7100,11 +7100,11 @@ artifact `D:/AEGIS/fm02_synthetic_baseline_20261105/run01`.
 
 - Logistic Regression scikit-learn; đặc trưng số qua StandardScaler,
   đặc trưng phân loại qua OneHotEncoder. Preprocessing và model đóng gói chung.
-- Fit chỉ102mẫu train. C=1, max_iter1000, random_state42; ngưỡng0,5 cố định.
-  max_iter không được mô tả là1000epoch deep learning.
+- Fit chỉ 102 mẫu train. C=1, max_iter1000, random_state42; ngưỡng0,5 cố định.
+  max_iter không được mô tả là 1000 epoch deep learning.
 - Đối chứng DummyClassifier(strategy=prior) dùng cùng dữ liệu/phân chia.
 - Nạp lại joblib giữ dự báo giống hệt; thêm dữ liệu72giờ tương lai vào từng
-  mẫu test vẫn giữ nguyên inference tại issued_at (34mẫu đã kiểm).
+  mẫu test vẫn giữ nguyên inference tại issued_at (34 mẫu đã kiểm).
 - Manifest ghi source=synthetic, field_validated=false, horizon72giờ,
   lookback120giờ, thứ tự feature/hash và runtime.
 
@@ -7118,7 +7118,7 @@ artifact `D:/AEGIS/fm02_synthetic_baseline_20261105/run01`.
 Nguồn: [metrics](fm02_synthetic_baseline_20261105/run01/metrics.json),
 [manifest](fm02_synthetic_baseline_20261105/run01/manifest.json).
 Không chỉ báo accuracy rồi bỏ qua validation log loss kém Dummy.
-Score là điểm kỹ thuật chưa hiệu chuẩn, không gọi0,8 là80% chắc chắn có bệnh.
+Score là điểm kỹ thuật chưa hiệu chuẩn, không gọi0,8 là 80% chắc chắn có bệnh.
 YOLO và forecast hiện độc lập; output YOLO chưa là feature của Logistic Regression.
 
 ### E. FM-03 và P0 — Backend, nguồn và lưu trữ forecast
@@ -7141,7 +7141,7 @@ gọi worker qua HTTP; không import YOLO/sklearn vào process Backend.
   ghi cùng transaction. Không ghi đè dự báo cũ khi nguồn tiến thời gian.
 - Cùng input/model/scenario replay cùngid; thay input hợp lệ tạo dự báo mới.
 - Nguồn update kiểm base_revision; xung đột revision, đổi device hoặc lùi
-  đồng hồ bị409. Tài khoản khác404; chưa đăng nhập401.
+  đồng hồ bị 409. Tài khoản khác404; chưa đăng nhập401.
 - Dữ liệu thiếu trả status/reasons và score=null. Worker ngừng503, chậm504;
   lịch sử/tổng quan/nguồn đã lưu vẫn đọc được khi worker không hoạt động.
 - Input future/late được lọc as-of trước khi hash/inference; invalid schema,
@@ -7154,8 +7154,8 @@ gọi worker qua HTTP; không import YOLO/sklearn vào process Backend.
 - Tab Dự báo: đăng nhập → chọn ruộng/mùa → tải nguồn riêng → gọi model →
   hiển thị kết quả và mở lại lịch sử. Nút chính dùng `scenario=source`.
 - Hiển thị revision nguồn, device giả lập, mốc thời gian mô phỏng, số giờ môi
-  trường hợp lệ trong120giờ,6giờ cuối và giá trị T/RH/lá ướt; null không thành0.
-- Kết quả có score chưa hiệu chuẩn, phân lớp theo threshold,72giờ mục tiêu,
+  trường hợp lệ trong120giờ,6 giờ cuối và giá trị T/RH/lá ướt; null không thành0.
+- Kết quả có score chưa hiệu chuẩn, phân lớp theo threshold,72 giờ mục tiêu,
   model version, revision nguồn và giờ lưu thật. Hai fixture ready/insufficient
   nằm trong mục kiểm tra dự phòng, có nhãn độc lập với nguồn mùa vụ.
 - Trang chủ dùng overview Backend; bỏ các số môi trường/cảnh báo/lịch sử mẫu
@@ -7200,26 +7200,26 @@ có Flask/requests. Backend mặc định `http://127.0.0.1:5000/api`.
 Mật khẩu và token không được ghi lại trong file status. Các lệnh tạo dịch vụ
 ở đây là hướng dẫn; không khẳng định server hiện đang chạy.
 
-### H. Hồi quy và artifact kiểm chứng05/11
+### H. Hồi quy và artifact kiểm chứng 05/11
 
 | Bộ kiểm | Kết quả thực chạy | Bằng chứng |
 |---|---|---|
-| Backend |120bài, OK; gồm worker thật và client TypeScript HTTP khi FM04_CHECK_MOBILE=1|[log](docs/evidence/mvp_backend_20261105.log)|
-| Pilot/frontend Python |150bài, OK; telemetry/QC/follow-up/timeline/backup/restore…|[log](docs/evidence/mvp_pilot_20261105.log)|
-| Temporal |129bài, OK bằng Python Backend có Flask|[báo cáo core](docs/MVP_CORE_REVIEW_20261105.md)|
-| Mobile unit |27bài, OK: auth-validation/followup/forecast-client/token-storage|mobile/scripts/*.test.mjs tương ứng|
+| Backend |120 bài, OK; gồm worker thật và client TypeScript HTTP khi FM04_CHECK_MOBILE=1|[log](docs/evidence/mvp_backend_20261105.log)|
+| Pilot/frontend Python |150 bài, OK; telemetry/QC/follow-up/timeline/backup/restore…|[log](docs/evidence/mvp_pilot_20261105.log)|
+| Temporal |129 bài, OK bằng Python Backend có Flask|[báo cáo core](docs/MVP_CORE_REVIEW_20261105.md)|
+| Mobile unit |27 bài, OK: auth-validation/followup/forecast-client/token-storage|mobile/scripts/*.test.mjs tương ứng|
 | Typecheck/lint |npm run check và npm run lint đạt|Lượt sau sửa code cuối đã chạy|
-| Bundle Android |Export đạt,1353module|[metadata](fm05_core_20261105/android02/metadata.json)|
+| Bundle Android |Export đạt,1353 module|[metadata](fm05_core_20261105/android02/metadata.json)|
 
-Lần đầu chạy toàn temporal suite bằng Python model thiếu Flask có5lỗi import;
-đã chạy lại đủ129bài bằng Backend env và đạt. Không cài thêm thư viện để sửa
+Lần đầu chạy toàn temporal suite bằng Python model thiếu Flask có 5 lỗi import;
+đã chạy lại đủ 129 bài bằng Backend env và đạt. Không cài thêm thư viện để sửa
 môi trường model. Bundle không phải APK hoặc bằng chứng demo native.
 Không train lại V4/FM-02 trong lượt hoàn thiện core. Kiểm phần mềm không
 chứng minh độ chính xác dự báo trên môi trường ngoài giả lập.
 
 ### I. Việc còn lại trước midterm và điều kiện hoàn thành
 
-**P0 còn mở: FM-05 — nghiệm thu mobile trên đúng thiết bị ngày06/11.**
+**P0 còn mở: FM-05 — nghiệm thu mobile trên đúng thiết bị ngày 06/11.**
 
 1. Cấu hình API/đường kết nối, đăng nhập đúng tài khoản của kho demo chung.
 2. Trang chủ hiện hai mùa; chọn từng nguồn và đối chiếu score mobile–Backend.
@@ -7303,10 +7303,10 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   và [policy synthetic mẫu](hourly_contract_v1/policy.synthetic.json).
 - Chốt giờ UTC, slot/cadence/tolerance, chọn mẫu deterministic theo từng biến,
   coverage hữu tỷ, numeric mean, closure/grace, as_of, late receipt/exclusion,
-  lineage/hash và cách chiếu sang feature contract hiện hành. Có16ca nghiệm thu
+  lineage/hash và cách chiếu sang feature contract hiện hành. Có 16ca nghiệm thu
   làm đầu vào cho T02/T03.
 - Profile kỹ thuật do lượt T01 chọn: cadence600s, tolerance5s, grace60s và
-  minimum coverage4/5. Đây là lựa chọn synthetic cần đối chiếu khi có nguồn đo
+  minimum coverage 4/5. Đây là lựa chọn synthetic cần đối chiếu khi có nguồn đo
   thật. Đã kiểm JSON/UUID/cadence/coverage, phép tính ví dụ và source references.
 - Raw lá ướt hiện là point state. Adapter v1 giữ thống kê điểm và xuất
   leaf_wet=null cho feature v1; luồng này trả insufficient_data cho model hiện
@@ -7326,7 +7326,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 - Thêm raw fixture sáu slot và output thực chạy trong `hourly_contract_v1/`.
   Một bucket complete_numeric, T25°C/RH65%, wet_point_fraction1 và
   whole_hour_value=null. [Hướng dẫn T02](hourly_contract_v1/README.md).
-- 16test adapter mới và18test raw audit/monitor đạt, tổng34bài. Kiểm CLI thực
+- 16 test adapter mới và 18 test raw audit/monitor đạt, tổng34bài. Kiểm CLI thực
   chạy, replay, output không ghi đè, timezone và cửa sổ tối đa744giờ.
 - T02 hoàn thành phạm vi offline. T03 nghiệm thu với feature preparation và
   T04 lưu/API nguồn hourly còn mở. Chưa nối adapter vào forecast service.
@@ -7335,10 +7335,10 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 
 - Thêm prepare_feature_input vào adapter hourly để chiếu raw đã tổng hợp sang
   envelope feature v1, giữ as_of/availability, null/QC và context revisions.
-- Chạy720điểm synthetic thành120bucket; feature thực tế có coverage
+- Chạy720 điểm synthetic thành120bucket; feature thực tế có coverage
   temp120/rh120/wet0, status insufficient_data và predictors=null. Positive
   control whole-hour hiện có trả ready với61predictor.
-- 42bài adapter/integration/audit/monitor và34bài feature/pipeline đạt, tổng76.
+- 42 bài adapter/integration/audit/monitor và 34 bài feature/pipeline đạt, tổng76.
   Runtime portable và workspace AI đã đối chiếu cùng response qua CLI.
 - Ma trận T01 A–P, evidence/hash và lệnh chạy lại nằm trong
   [báo cáo T03](docs/HOURLY_FEATURE_ACCEPTANCE_T03.md).
@@ -7355,10 +7355,10 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   raw từ DB; không nhận kết quả hourly do client tự khai báo.
 - BEGIN IMMEDIATE cùng base_revision và semantic replay key kiểm cập nhật
   đồng thời, retry và snapshot raw nhất quán. Giới hạn compilation100000mẫu
-  mỗi cửa sổ1–744giờ. Availability live được đóng dấu server trong transaction;
+  mỗi cửa sổ 1–744 giờ. Availability live được đóng dấu server trong transaction;
   không có wall-clock commit timestamp riêng trong SQLite hiện hành.
 - Refactor snapshot raw để API và CLI export dùng chung serialization/hash;
-  stopped-store export giữ phạm vi toàn stream. Hồi quy182bài pilot và120bài
+  stopped-store export giữ phạm vi toàn stream. Hồi quy182bài pilot và 120 bài
   Backend đạt. Bộ T04 cuối10bài đạt, có HTTP thật, hai owner, concurrency,
   nâng cấp kho raw, mở lại kho, backup/verify, rollback/quota và hash corruption.
   Các bộ có test trùng, không cộng số lượt thành tổng test độc lập.
@@ -7381,11 +7381,11 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   provenance source; hai source revision cùng model input có forecast riêng.
   Retry đúng nguồn/issue/context có thể trả record cũ khi worker ngừng; request
   mới lỗi503 không ghi thêm forecast. Lỗi link giữa chừng rollback toàn bộ.
-- Hồi quy192bài pilot và120bài Backend đạt; bộ kiểm cuối32bài đạt, gồm8bài T05
-  và24bài adapter/projection. Các bộ có test trùng. Backend chạy cả client
+- Hồi quy192bài pilot và 120 bài Backend đạt; bộ kiểm cuối32bài đạt, gồm8bài T05
+  và 24 bài adapter/projection. Các bộ có test trùng. Backend chạy cả client
   TypeScript HTTP với FM04_CHECK_MOBILE=1.
-- Positive control gọi Logistic Regression thật và tạo score. Luồng raw720điểm
-  →120giờ →source T04 →worker trả insufficient_data với thiếu120giờ wet,
+- Positive control gọi Logistic Regression thật và tạo score. Luồng raw720 điểm
+  →120 giờ →source T04 →worker trả insufficient_data với thiếu120giờ wet,
   score=null. Không suy thành forecast_ready từ raw point.
 - [Contract T05](backend/docs/STORED_HOURLY_FORECAST_API.md) và
   [summary/evidence](hourly_contract_v1/t05_summary.json) có input, provenance,
@@ -7403,16 +7403,16 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   tuần tự hóa poller, chọn source T04 mới nhất đã available và pin source,
   issued_at, job_version, model pin cho run. Tái dùng hàm nghiệp vụ T05 đã tách
   khỏi HTTP handler, cùng transaction forecast/input/source link.
-- Tối đa3attempt/run, backoff30/60giây. Claim/attempt được lưu trước inference.
+- Tối đa3attempt/run, backoff 30/60giây. Claim/attempt được lưu trước inference.
   Recovery đối soát forecast đã commit, gồm cả attempt cuối; chưa có forecast
   thì retry có giới hạn. Kiểm cron downtime gộp mốc bị lỡ thành một run hiện tại.
 - Job enabled bền vững qua logout; user có thể tắt bằng PUT. Pending/retry của
   version cũ được hủy; lượt running có thể hoàn tất. Mỗi job chỉ một active run.
-- 14test scheduler mới có worker FM-02 thật, CLI, concurrency, crash recovery,
-  source pinning, logout và audit. Hồi quy206bài pilot và120bài Backend đạt.
+- 14 test scheduler mới có worker FM-02 thật, CLI, concurrency, crash recovery,
+  source pinning, logout và audit. Hồi quy206bài pilot và 120 bài Backend đạt.
   Backend bật cả client TypeScript HTTP; launcher nay ghi forecast_worker_port
   trong ready.json để cấu hình scheduler cùng model worker.
-- Bổ sung ca thứ15 cho scheduler: process con os._exit(73) sau forecast commit,
+- Bổ sung ca thứ 15 cho scheduler: process con os._exit(73) sau forecast commit,
   process mới lấy lại OS lease và recovery đúng một forecast khi model port
   không khả dụng. Ca này chạy riêng và đạt, log t06_process_crash.log.
 - [API/runbook T06](backend/docs/FORECAST_SCHEDULER_T06.md),
@@ -7425,21 +7425,21 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 ## 112. T07 đánh giá baseline forecast đã đóng gói — 07/11/2026
 
 - Thêm tools/evaluate_forecast_baseline.py để kiểm hash dataset/split/model,
-  tái audit dữ liệu và đánh giá artifact FM-02 hiện có. 68score validation/test
+  tái audit dữ liệu và đánh giá artifact FM-02 hiện có. 68 score validation/test
   khớp bản cũ với max delta0, metric cũ khớp tolerance1e-12. Scaler/category
   encoder khớp train102row, reload giữ score. Tests chặn fit model/preprocessing.
 - Validation LR có accuracy64,71%, recall31,25% và FN11/16positive. Log loss
   0,72285/Brier0,25372 so Dummy0,69453/0,25067. Test cũ đạt accuracy73,53%,
-  recall75%, log loss0,59211 và Brier0,19414. Các metric thuộc subset ready34/40
+  recall75%, log loss0,59211 và Brier0,19414. Các metric thuộc subset ready 34/40
   mỗi tập và split synthetic đã từng được xem.
-- Calibration5bin cho ECE validation0,2121 và test cũ0,1182. Paired bootstrap
-  2000lần theo18cụm ready mỗi tập cho khoảng delta log loss/Brier đều qua0.
+- Calibration5bin cho ECE validation0,2121 và test cũ 0,1182. Paired bootstrap
+  2000 lần theo18cụm ready mỗi tập cho khoảng delta log loss/Brier đều qua0.
   Thử nghiệm chưa phản ánh biến động train lại hoặc dữ liệu ngoài generator.
 - Stress validation408ca thiếu1/6/24/120giờ theo từng biến đều abstain;
   34ca late receipt abstain trước availability và khôi phục score gốc sau đó;
-  34ca append future giữ score quá khứ. Train có16feature hằng trong61feature.
+  34ca append future giữ score quá khứ. Train có 16 feature hằng trong61feature.
 - Sáu test đánh giá đạt. Evaluation JSON run01/run02 giống từng byte. Có CSV
-  68dòng lỗi, calibration plot đã render/kiểm trực quan và verification/hash.
+  68 dòng lỗi, calibration plot đã render/kiểm trực quan và verification/hash.
 - [Báo cáo T07](docs/FORECAST_BASELINE_EVALUATION_T07.md),
   [kết quả cuối](forecast_evaluation_t07/run02/evaluation.json),
   [biểu đồ](forecast_evaluation_t07/run02/calibration.png). T07 hoàn thành đánh
@@ -7452,7 +7452,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   train/validation/test. Tổng1.200 mẫu,1.020 ready; train510,val255,test255.
   Giữ group/shared-environment guard, temporal purge và label maturity của FM-01.
   Cohort riêng, không pooling seed42; các lần rút mới vẫn cùng generator synthetic.
-- So sánh9ứng viên gồm Dummy, LR C0,01/0,1/1 trên full61feature và weather41feature,
+- So sánh9 ứng viên gồm Dummy, LR C0,01/0,1/1 trên full61feature và weather41feature,
   cùng2model HistGradientBoosting cố định. Preprocessing/model chỉ fit train.
   Chọn full LR C0,01 bằng validation log loss0,532009; ghi selection trước chấm test.
 - Test255ready/135cụm: winner log loss0,530213,Brier0,176310,AUC0,798109,
@@ -7461,7 +7461,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   −0,140312,CI95%[−0,198809;−0,081661]. Chưa phản ánh biến động train nhiều seed.
 - Contract thử nghiệm weather bỏ wetness/categorical hằng, yêu cầu120giờ temp/RH
   và tuổi lúa. Wet-null stress255mẫu validation:4weather model chấm được toàn bộ,
-  score giữ nguyên;4full model abstain. Cả8model abstain khi thiếu temp giờ cuối
+  score giữ nguyên;4 full model abstain. Cả 8 model abstain khi thiếu temp giờ cuối
   hoặc tuổi lúa; nối future giữ feature quá khứ. Chưa tích hợp nhánh này vào raw/API.
 - Run01/run03 selection và test_predictions giống từng byte. Run02 bổ sung
   score stress/provenance;run03 thêm guard từ chối protocol khác hash trước train.
@@ -7475,11 +7475,11 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 
 ## 114. Kiểm tra lại dữ liệu forecast T02–T08 — 08/11/2026
 
-- Audit offline tái sinh toàn bộ1.200mẫu T08:5bảng inputs/metadata/features/labels/
+- Audit offline tái sinh toàn bộ 1.200 mẫu T08:5bảng inputs/metadata/features/labels/
   future_worlds khớp chính xác. Audit split/temporal purge/maturity khớp; bootstrap
   cluster khớp shared-environment registry; sample ID không trùng cohort seed42 cũ.
 - Kiểm63hash nguồn/artifact/dataset theo evidence T03–T08 và pin serving. Nạp lại
-  3model đúng hash, tái lập765score test; scaler mean/variance khớp train510 và
+  3 model đúng hash, tái lập765score test; scaler mean/variance khớp train510 và
   prior Dummy216/510. Tính độc lập metric test bằng công thức, khớp tolerance1e-12.
 - Replay T02 raw→hourly và T03 input→features khớp hoàn toàn. T05 stored input
   tiếp tục cho insufficient_data/score null đúng lý do thiếu120giờ wetness.
@@ -7495,25 +7495,25 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 
 - Theo yêu cầu kiểm chứng rồi tích hợp nếu đạt: freeze protocol trước generation/
   fit/test;5seed20261109–13, mỗi seed300/150/150cụm train/validation/test. Tổng6.000unit,
-  5.100strict-ready được tạo raw720điểm/120giờ, qua adapter thực với jitter,
+  5.100 strict-ready được tạo raw720 điểm/120giờ, qua adapter thực với jitter,
   receipt delay, point noise và hash/QC. Fit510train/seed, giữ purge/group guards.
 - Recipe weather LR C0,01 cố định từ T08, không test-tuning/calibration/imputation.
   5/5seed đạt loss/Brier thấp hơn prior train và AUC≥0,65 ở cả complete và mất1slot/giờ.
   Loss complete0,538175–0,569795,AUC0,772967–0,804983; mean loss0,558377.
   Mất1slot/giờ mean loss0,558452; tăng tối đa từng seed0,000397<gate0,03.
-- 13ca×8mẫu validation×5seed=520/520stress đạt, gồm mấtslot/late/QC/exclusion,
-  outside tolerance,RHnull,outage6h,unknown age,pointwet flip,future,duplicate và
-  late recovery. Hai kịch bản test có1.275score mỗi kịch bản,675cụm bootstrap.
+- 13ca×8 mẫu validation×5 seed=520/520stress đạt, gồm mấtslot/late/QC/exclusion,
+  outside tolerance, RHnull, outage6h, unknown age, pointwet flip, future, duplicate và
+  late recovery. Hai kịch bản test có 1.275 score mỗi kịch bản,675 cụm bootstrap.
   CI95% delta loss complete−Dummy[−0,152312;−0,102764], sparse[−0,152203;−0,102725].
 - Sau acceptance, package seed20261109 đã chỉ định trước thành FM-03 weather,
   manifest pin2961f7e30e93355fa0c498069a06c4dfd44b6f08567241268a06cd24180a2b6f.
-  Contract weather v1 dùng41feature, đủ120giờ temp/RH và tuổi lúa; wetness null
+  Contract weather v1 dùng41feature, đủ 120 giờ temp/RH và tuổi lúa; wetness null
   vẫn forecast_ready. Thiếu numeric/age vẫn abstain; không suy wetness từ điểm/RH.
 - Worker/API nguồn raw đã lưu/scheduler tích hợp FM-03; Backend kiểm lại snapshot,
   readiness/reasons/predictor hash và pin. Cache theo model pin, forecast cũ giữ
   nguyên; pending/running pin cũ failed/model_changed, lịch kế tiếp dùng pin mới.
   Các route ready/insufficient/source/hourly trực tiếp giữ FM-02 và bundle cũ.
-- 22test ML,28test tích hợp,212test pilot và120test Backend đạt. Bộ28 là subset
+- 22 test ML,28 test tích hợp,212 test pilot và 120 test Backend đạt. Bộ 28 là subset
   của212, không cộng trùng. Có kiểm HTTP/process thật với clock fixture synthetic,
   replay offline, pin migration, fail-closed, lịch sử và crash recovery. Không cần
   dependency/schema DB mới, không sửa code giao diện. Serving bundle mới pin riêng.
@@ -7536,8 +7536,8 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 - Forecast overview thêm raw_forecast_readiness theo mùa vụ; giữ source_revision
   legacy tách riêng. Sửa khoảng trống tổng quan chỉ thấy synthetic_hourly_sources
   trong khi nguồn raw đã lưu và FM-03 nằm ở luồng mới. Không sửa code giao diện.
-- 6test mới đạt, round-trip readiness→POST forecast qua worker thật khớp input hash;
-  hồi quy218test pilot và120test Backend đạt. Sáu test mới là subset của218.
+- 6 test mới đạt, round-trip readiness→POST forecast qua worker thật khớp input hash;
+  hồi quy218test pilot và 120 test Backend đạt. Sáu test mới là subset của218.
   Không thay model/feature/pin FM-02/FM-03 hoặc mở guard nhận nguồn thực.
 - Đã lập T11–T18: lịch sử/giải thích score, alert trong ứng dụng, outcome linkage,
   dossier nguồn/thu thử, endpoint/quan sát, dataset readiness, thí nghiệm nguồn thực
@@ -7553,7 +7553,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 ## 117. T11 lịch sử diễn biến và giải thích score — 08/11/2026
 
 - Thêm GET /api/farm/seasons/{id}/forecast-trend theo owner, issue time,
-  model_pin,horizon,from/to và pagination. UTC/microsecond ordering độc lập
+  model_pin, horizon, from/to và pagination. UTC/microsecond ordering độc lập
   created_at. Series tách pin/version/feature contract/horizon/threshold/source/
   input kind/device/policy revision; client nối bằng comparison_edges đã kiểm.
 - Không nối qua insufficient, snapshot thiếu, cùng issue nhiều revision hoặc gap
@@ -7565,16 +7565,16 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   score. Worker và Backend kiểm tolerance1e-12, metadata/input/predictor hash,
   finite values, term uniqueness/order, phép nhân/tổng và score đã lưu.
 - Insufficient trả lý do/score null/terms rỗng không gọi worker. Snapshot thiếu
-  409, artifact/pin không hỗ trợ409, worker unavailable503, corrupt snapshot500,
+  409, artifact/pin không hỗ trợ 409, worker unavailable503, corrupt snapshot500,
   phản hồi giải thích lệch502. GET không ghi lại forecast/context/source/job;
   thay cultivation revision hiện tại không thay giải thích snapshot cũ.
-- 4test ML mới và8test lịch sử/API mới đạt. Hồi quy26ML,226pilot,120Backend đạt;
+- 4 test ML mới và 8 test lịch sử/API mới đạt. Hồi quy26ML,226 pilot,120Backend đạt;
   các test mới là subset của suite, không cộng trùng. Kiểm cả unknown category,
   future invariant, chronology microseconds, cross-page ties, missing→recovery,
   ownership/offline/corruption và worker response giả. Fixture recovery từng đặt
   receipt sau as_of đã được sửa đúng timeline; guard as_of giữ nguyên.
 - Rehearsal qua Backend HTTP và worker HTTP thật đạt, kho/account tạm và worker
-  được dọn; clock nguồn synthetic cố định. Ví dụ41term FM-03 tái dựng score gốc
+  được dọn; clock nguồn synthetic cố định. Ví dụ 41 term FM-03 tái dựng score gốc
   với error0; có forecast/trend/explanation JSON và biểu đồ đã render/kiểm trực quan.
 - [API/handoff T11](backend/docs/FORECAST_HISTORY_T11.md),
   [bằng chứng](forecast_history_t11/run01/verification.json),
@@ -7589,7 +7589,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
 - Thêm policy version aegis-forecast-alert-policy-v1, hash
   e084ddb29d150e726fcce4d40da6a3b7c4d68afd2cd28caca27d2936dcc76766.
   Chỉ forecast nguồn raw đã lưu/pin FM-03 synthetic hiện tại; threshold0,5 trùng
-  inference, cooldown6giờ riêng score_threshold/data_quality, độ mới≤1giờ và
+  inference, cooldown6giờ riêng score_threshold/data_quality, độ mới≤1 giờ và
   target window còn mở. Đây là rule vận hành demo, chưa calibration thực địa.
 - Forecast/input/source link/evaluation/alert/state commit cùng BEGIN IMMEDIATE.
   Ledger unique forecast/policy, watermark issue tăng nghiêm ngặt theo owner/
@@ -7604,13 +7604,13 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   POST acknowledge với base_version và replay idempotent. Owner/auth/query/
   pagination/private headers/active-expired window có guard. Initialization
   thêm5bảng telemetry, không tự backfill hoặc sửa forecast/schema core cũ.
-- 16test T12 đạt; hồi quy242pilot và120Backend đạt,16test là subset242.
+- 16 test T12 đạt; hồi quy242pilot và 120Backend đạt,16 test là subset242.
   Kiểm exact cooldown/freshness, independent kinds, replay, concurrency/ack,
   source/model eligibility, hash corruption, reopen/backup và actual-process
   crash exit73 sau commit→recovery offline không duplicate. Trigger failure sau
   insert alert rollback cả forecast/input/link/alert/state/evaluation.
 - Rehearsal Backend HTTP và model-worker HTTP thật đạt với issue/evaluation UTC
-  hiện tại,120giờ lịch sử synthetic hồi tố. Có đúng2alert quality/threshold,
+  hiện tại,120 giờ lịch sử synthetic hồi tố. Có đúng2alert quality/threshold,
   forecast replay/cooldown/ack replay đúng; temp store/worker/server được dọn.
   Positive control waveform kiểm nhánh phần mềm, không là ground truth bệnh.
 - [API T12](backend/docs/FORECAST_ALERTS_T12.md),
@@ -7631,23 +7631,23 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   link commit. Race writer sửa observation được kiểm: link pin revision đã đọc,
   sau commit nguồn đổi thì reference_status báo drift. Latest/void/changed source
   không tự sửa snapshot cũ; observation không còn current bị loại khỏi tổng hợp.
-- Phase tự tính trước/tại issue, trong(issued,target_end] hoặc sau window;
+- Phase tự tính trước/tại issue, trong(issued, target_end] hoặc sau window;
   observed/recorded/available/review provenance giữ riêng. Baseline nhập muộn được
   ghi retrospective, không nói model biết lúc issue. as_of lọc link creation,
   revision availability và retraction action; forecast chưa có tại cutoff có flag.
-- Status nghiệp vụ gồm following_up,uncertain,unverified_report,
-  review_reported_present,baseline_reported_present,censored; tracking/evidence
+- Status nghiệp vụ gồm following_up, uncertain, unverified_report,
+  review_reported_present, baseline_reported_present, censored; tracking/evidence
   tách riêng. Không ghi bệnh≠negative; một lần absent dù có review tại horizon
   vẫn không chứng minh không bệnh cả window. Khoảng giữa các linked visit được
   giữ biên mở/đóng và cờ vượt issue/target, không gọi là onset đã xác minh.
-- Mọi outcome event_y=null,platform_verified=false,label_approved_for_training=false.
+- Mọi outcome event_y=null, platform_verified=false, label_approved_for_training=false.
   Đóng follow-up/ack alert/prediction ảnh hoặc khai báo external review không
   trở thành nhãn. Evidence scope chỉ các tham chiếu được chọn, không exhaustive.
 - Có retraction version1→2 +reason/action, replay idempotent, history as_of;
   reattach bằng ID mới sau retract, không duplicate active reference/revision.
   Thêm2bảng telemetry, FK/unique/cap500link để giới hạn lưu trữ; không core
   migration, không ghi source stores, không cần model khi liên kết/đọc outcome.
-- 18test mới đạt, hồi quy260pilot và120Backend đạt;18 là subset260.
+- 18 test mới đạt, hồi quy260pilot và 120Backend đạt;18 là subset260.
   Kiểm censored/horizon, retrospective baseline, source/owner/season, Unicode,
   stale/void/review/retraction, corruption, concurrent journal edit/retry,
   quota, readonly/reopen/backup và case closed không sinh outcome bệnh.
@@ -7681,21 +7681,21 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   report bị sửa và reseal nhưng sai diagnostics. Không overwrite; concurrent
   cùng đích một caller thắng. Manifest ghi cuối, gói thiếu sau crash bị từ chối;
   không tuyên bố atomic commit/chữ ký hoặc xác thực nguồn vật lý bằng hash.
-- Generator 3 seed20261108/09/10 ×4case/24giờ đạt: clean đủ144slot; dropout
-  thiếu19/22/19slot; delayed_receipt giữ139slot ở as_of cuối ngày và144 ở snapshot
+- Generator 3 seed20261108/09/10 ×4 case/24giờ đạt: clean đủ 144 slot; dropout
+  thiếu19/22/19slot; delayed_receipt giữ 139 slot ở as_of cuối ngày và 144 ở snapshot
   muộn; clock_qc lệch+30s tạo72off-schedule kèm null/suspect/exclusion đúng clock.
   Cùng seed/scenario tái lập chính xác; không tạo bệnh/outcome y hoặc nhãn train.
-- HTTP Backend thực trong kho tạm: nhập4điểm synthetic, retry4không trùng,
+- HTTP Backend thực trong kho tạm: nhập4 điểm synthetic, retry4không trùng,
   dừng server rồi export read-only/đóng gói/replay. Receipt server thật được ghi
   riêng với observation/log ảo hồi tố; không gọi received−observed là network
   latency. Kho/server tạm được kiểm đã dọn, không xuất token/password vào artifact.
-- 15test T14 mới đạt; **275test pilot hồi quy đạt** (315,468s),15 là subset275.
+- 15 test T14 mới đạt; **275 test pilot hồi quy đạt** (315,468s),15 là subset275.
   Kiểm nguồn/units/linkage, as_of receipt/exclusion/log, empty/unknown clock,
   giữ byte, corruption/reseal, replay và concurrent output. Audit cuối13package
   đạt; model FM02/FM03 manifest và artifact FM03 đối chiếu pin T09 không đổi.
 - Mọi report source=synthetic, physical_collection_performed=false,
   hardware_verified=false, field_validated=false, training_approved=false,
-  disease_labels_approved=false. Bộ24giờ không thay gate120giờ/horizon72giờ.
+  disease_labels_approved=false. Bộ 24 giờ không thay gate120giờ/horizon72giờ.
   Không sửa UI, schema/API dự báo, model/pin/threshold hoặc train thêm.
 - [Contract/CLI](backend/docs/FORECAST_INTAKE_T14.md),
   [tổng duyệt](forecast_intake_t14/run01/verification.json),
@@ -7720,8 +7720,8 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   interval lower-open/upper-closed, known interventions và knowledge hash.
   Thêm revision tương lai đổi bundle hash nhưng giữ knowledge/kết quả quá khứ.
 - Chỉ xuất synthetic_y=1/0 khi window mature và đủ baseline/lịch/attestation.
-  Thiếu ghi bệnh không tạo0; status có prevalent,following_up,uncertain,
-  unverified,ambiguous,censored,intervened,baseline_unavailable_at_issue.
+  Thiếu ghi bệnh không tạo0; status có prevalent, following_up, uncertain,
+  unverified, ambiguous, censored, intervened, baseline_unavailable_at_issue.
   Present tại issue là prevalent; tại horizon có thể positive; interval vắt qua
   issue/end giữ ambiguous. Negative chỉ nghĩa không thấy endpoint theo lịch mô
   phỏng, không khẳng định không nhiễm/không bệnh cả cửa sổ ngoài thực địa.
@@ -7729,28 +7729,28 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   Guard source/protocol/payload hash/timezone/identity/schema/prediction fields;
   chỉ nhận origin simulator_attestation, không nhận external review/YOLO/score.
   Export journal command cũng validate nguồn đầu vào trước khi tạo command.
-- Generator3seed ×15scenario đạt45case;60/96/120giờ tạo135result replay khớp.
-  Cuối cutoff120h:6positive,6negative,3uncertain,9censored,3prevalent,6ambiguous,
-  6intervened,3unverified,3baseline-unavailable. Những số này là test rules,
+- Generator3seed ×15 scenario đạt45case;60/96/120giờ tạo135result replay khớp.
+  Cuối cutoff120h:6positive,6 negative,3 uncertain,9 censored,3 prevalent,6 ambiguous,
+  6 intervened,3 unverified,3 baseline-unavailable. Những số này là test rules,
   không là event recall/accuracy của model. Finding do scenario khai báo, không
   lấy score/weather hoặc latent onset làm ground truth để báo hiệu năng giả.
 - Journal HTTP thực trong kho tạm tạo4visit synthetic/retry4không trùng;
-  sửa một visit thành uncertain revision2, đọc history2/1 giữ nguyên revision1.
+  sửa một visit thành uncertain revision2, đọc history 2/1 giữ nguyên revision1.
   Simulator attestation không chuyển thành user review: command review=null,
   journal/platform/training flags vẫn false; actual receipt riêng clock ảo.
   Có mapping simulator–journal ID để audit; không lấy response HTTP tự tạo y.
   Server/kho tạm kiểm đã dọn, artifact không có token/password.
-- **290test pilot đạt (328,627s)**.15test endpoint mới được kiểm lại sau guard
+- **290 test pilot đạt (328,627s)**.15test endpoint mới được kiểm lại sau guard
   source của journal command cuối cùng, đạt;15 là subset290 theo test cases,
   không cộng trùng. Bao phủ boundary/maturity/receipt/revision/void/intervention,
   source/review/prediction guards, corruption và input immutability.
-- Mọi result event_y=null,label_approved_for_training=false,platform_verified=false,
-  field_validated=false,training_approved=false. Synthetic_y là endpoint offline
+- Mọi result event_y=null, label_approved_for_training=false, platform_verified=false,
+  field_validated=false, training_approved=false. Synthetic_y là endpoint offline
   riêng; chưa duyệt train/dataset/model evaluation. Source forecast/T13 và pin
   FM02/FM03 đối chiếu audit giữ nguyên. Không thêm API/schema DB, không sửa UI.
 - [Contract/CLI](backend/docs/SYNTHETIC_ENDPOINTS_T15.md),
   [protocol JSON](docs/forecast_data/SYNTHETIC_ENDPOINT_PROTOCOL_T15.json),
-  [45case/HTTP](forecast_endpoints_t15/run01/verification.json),
+  [45 case/HTTP](forecast_endpoints_t15/run01/verification.json),
   [audit replay](forecast_endpoints_t15/replay_audit.json),
   [kết quả/hash](forecast_endpoints_t15/summary.json).
   T15 hoàn thành ở phạm vi synthetic. Tiếp theo T16: ghép sensor/context/outcome
@@ -7767,7 +7767,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   snapshot_linked_at (ghép hash sau export, trước/tại data lock). Không giả pin
   của một tệp export hồi tố là đã có tại issue. Context/policy/snapshot clocks
   được kiểm, mọi giá trị vẫn là khai báo mô phỏng, không chứng nhận nguồn vật lý.
-- Raw→hourly120giờ→41predictors FM03 dùng feature cutoff=issue; endpoint T15 dùng
+- Raw→hourly120giờ→41 predictors FM03 dùng feature cutoff=issue; endpoint T15 dùng
   label cutoff riêng từng split. Review/context/receipt/exclusion tới muộn không
   backfill feature tại issue. Giữ feature evidence hash, selected context,
   endpoint knowledge/status/availability và lý do loại ở audit row.
@@ -7775,23 +7775,23 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   batch, raw sample/observation ID tái sử dụng. Component xuyên nhiều split bị
   chặn, không random split row. Kiểm label maturity trước split sau, periods,
   lock và purge khi target_end+embargo>=feature_start ở split sau, cả nhóm khác.
-- Matrices chỉ gồm row_id,predictors,synthetic_y; estimator tương lai chỉ dùng
+- Matrices chỉ gồm row_id, predictors, synthetic_y; estimator tương lai chỉ dùng
   predictors whitelist41, không flatten audit metadata/outcome/seed/IDs vào X.
   Đếm row/class/component/event riêng. Ready yêu cầu3split còn cả hai lớp,
   chỉ là gate kiểm kỹ thuật, không là cỡ mẫu đủ hoặc phê duyệt train.
-- Final run02 đạt18row/3seed/12960raw point, mỗi row120giờ, mỗi split6row class3/3
-  và3component; tổng9component khai báo/9event giả lập. Cặp outcome positive/
+- Final run02 đạt18row/3seed/12960raw point, mỗi row120giờ, mỗi split6row class 3/3
+  và 3 component; tổng9component khai báo/9event giả lập. Cặp outcome positive/
   negative có cùng waveform môi trường để kiểm pipeline, không chứng minh dự báo.
-- 5control đạt: shared_environment gom xuyên3split→0eligible; late receipt giữ
+- 5 control đạt: shared_environment gom xuyên3split→0 eligible; late receipt giữ
   thiếu feature dù nhãn mature; future context/QC không đổi feature evidence;
   immature train labels không có binary train row; support overlap purge6train.
   Audit cuối replay khớp report chính +5control và kết quả CLI, kiểm trực tiếp
   feature/label cutoff, component/time separation và source/pin cũ giữ nguyên.
-- **15test T16 đạt;305test pilot hồi quy cuối đạt (381,845s)**;15 là subset305,
+- **15 test T16 đạt;305 test pilot hồi quy cuối đạt (381,845s)**;15 là subset305,
   không cộng trùng. Lần hồi quy cuối dùng schema đã tách hai clock linkage.
   Run01/pilot_regression.log là kiểm tra preliminary, không dùng thay evidence
   schema cuối; final là run02/pilot_regression_final.log.
-- training_approved=false,training_performed=false,field_validated=false,
+- training_approved=false, training_performed=false, field_validated=false,
   sufficient_for_scientific_claims=false. Test outcomes đã mở để audit,
   blind_holdout_for_model_selection=false. Không đổi model/pin/threshold, không
   thêm API/schema DB hoặc sửa UI; không suy CI/hiệu năng bệnh từ fixture.
@@ -7811,8 +7811,8 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   Plan byte SHA25682553d3243cefded1346cc2b0e8d19cda4e1d87d35a110a848086f33d14581c0
   được pin trước kiểm thử development và không đổi sau kết quả; source/runtime/
   dependency versions đóng vào plan.freeze trước development đầy đủ.
-- Cohort mới3seed2026111701/02/03,576unit-window/288dependency group khai báo,
-  2unit/group. Train240/calibration96/selection96/test144; không dùng lại fixture
+- Cohort mới3seed2026111701/02/03,576 unit-window/288dependency group khai báo,
+  2 unit/group. Train240/calibration96/selection96/test144; không dùng lại fixture
   T16 hay holdout T08/T09. Issue clocks tháng07–08/2026 hoàn toàn mô phỏng.
 - Generator persistent weather +future72h stochastic hazard với hidden group
   frailty/unit susceptibility. Các hệ số nhiệt/RH/hazard là tham số phần mềm,
@@ -7823,14 +7823,14 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   dependency toànrole/seed, kiểm support/maturity. Fit scaler/estimator train,
   fit sigmoid calibration riêng; selection chọn LR/HGB theo log-loss rồi Brier.
   Comparator prior train và frozen FM03; không sweep thêm architecture/config.
-- Selected LR+sigmoid,threshold0,30 chọn từ grid19giá trị trên selection với
+- Selected LR+sigmoid, threshold0,30 chọn từ grid19giá trị trên selection với
   recall>=0,75 gồm abstention. Primaryseed2026111701 cố định.3candidate joblib/
   manifest và lựa chọn/threshold được freeze trước holdout_opened có event/hash
   ledger. Không chuyển sang HGB vì test point estimate HGB tốt hơn.
-- Holdout144opportunity:130decisive (61positive/69negative),14unknown
-  (6uncertain/5unverified/3censored);120đủfeature=83,33%,108decisive scored.
-  Selected recall43/61=70,49% gồm14positive abstention;54false alerts,
-  precision44,33%,13,846false alerts/100unit-days theo quy ước72h/decisive unit.
+- Holdout144opportunity:130decisive (61 positive/69negative),14 unknown
+  (6 uncertain/5unverified/3censored);120 đủfeature=83,33%,108 decisive scored.
+  Selected recall 43/61=70,49% gồm14positive abstention;54 false alerts,
+  precision44,33%,13,846 false alerts/100unit-days theo quy ước72h/decisive unit.
   Không gọi đó là rate triển khai liên tục hoặc negative cho outcome chưa rõ.
 - LR Brier0,25134/log-loss0,69678 so prior0,25985/0,71331; paired bootstrap300
   resample group trong seed cho delta Brier CI95%[-0,03883;+0,02533] và
@@ -7844,7 +7844,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   e200452a1d500312122369f09a932eb3c49c2b06e442a638f81bf1697afc478a.
   Candidate load được phục vụ audit không có nghĩa được promote; không đăng ký
   vào worker/Backend, không đổi active model/pin/threshold hoặc UI/schema DB.
-- **41test ML đạt,15test T17 là subset41**, bao gồm worker FM02/FM03 hiện có.
+- **41 test ML đạt,15 test T17 là subset41**, bao gồm worker FM02/FM03 hiện có.
   Replay audit tái sinh144holdout row, kiểm576row/288component, reopen3artifact,
   raw→feature→candidate example và toànmetric/300bootstrap khớp, score error0.
   Không refit/retune trong audit. Active serving manifest/artifact/source giữ nguyên.
@@ -7855,7 +7855,7 @@ clean clone chạy được trên máy khác hoặc đã được publish/nhóm 
   [audit](forecast_experiment_t17/replay_audit.json),
   [kết quả/hash](forecast_experiment_t17/summary.json).
   T17 hoàn thành về thực nghiệm, candidate_qualified_for_synthetic_shadow=false,
-  deployment_activated=false,field_validated=false. Đề xuất T17.1 tăng nhóm train/
+  deployment_activated=false, field_validated=false. Đề xuất T17.1 tăng nhóm train/
   calibration, comparator FM03 hiệu chuẩn, kế hoạch khóa trước và holdout seed/
   group mới; T18 activation vẫn bị gate chặn. Không làm lại cùng holdout để tune.
 

@@ -12,9 +12,9 @@
 Main có workflow `Team policy`; chưa có develop, Ruleset hay required check.
 Các đoạn bên dưới là nhật ký theo mốc.
 
-**Cập nhật07/11/2026:** đã push nhánh `codex/portable-forecast-demo`
+**Cập nhật 07/11/2026:** đã push nhánh `codex/portable-forecast-demo`
 (commit đầu `aaffdb4`) cho thành viên clone. Xem [hướng dẫn demo toàn dự án](../CLONE_DEMO.md).
-Các dòng bên dưới là nhật ký TASK-19 ngày28/10, không phải trạng thái mới.
+Các dòng bên dưới là nhật ký TASK-19 ngày 28/10, không phải trạng thái mới.
 
 Ghi chú TASK-19,28/10/2026: đây là nhật ký Git theo mốc cũ, không là dashboard
 remote hiện hành. [Chỉ mục local](CURRENT_HANDOFF.md) ghi phần mềm/

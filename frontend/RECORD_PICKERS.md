@@ -15,7 +15,7 @@ nhật ký. Nút dùng quan sát đang mở hiện có vẫn giữ nguyên chứ
    dữ liệu. Bỏ lựa chọn chỉ xóa khỏi form, không xóa bản ghi đã lưu.
 
 Theo dõi chỉ chọn synthetic active từ window yêu cầu trở đi. Lịch chỉ chọn
-active cùng nguồn trong [start,end). Yêu cầu xác minh chọn active + quyền active
+active cùng nguồn trong [start, end). Yêu cầu xác minh chọn active + quyền active
 cùng mùa vụ; revision/hash tự điền, không nhập tay. Ảnh chỉ từ history của tài
 khoản, có nhãn nguồn ảnh chưa xác minh; không lấy no_detection làm xác nhận khỏe.
 

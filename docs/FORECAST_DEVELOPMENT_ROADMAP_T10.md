@@ -1,6 +1,6 @@
 # Phát triển tính năng dự báo bệnh — lộ trình từ T10
 
-Ngày08/11/2026. Nhân chọn phát triển cả chức năng ngay và chuẩn bị dữ liệu thực. Phạm vi Nhân phụ trách là Backend, dữ liệu, ML và vận hành; giao diện bàn giao cho thành viên frontend.
+Ngày 08/11/2026. Nhân chọn phát triển cả chức năng ngay và chuẩn bị dữ liệu thực. Phạm vi Nhân phụ trách là Backend, dữ liệu, ML và vận hành; giao diện bàn giao cho thành viên frontend.
 
 ## Đích phát triển
 
@@ -25,7 +25,7 @@ T10 bắt đầu bằng phần Backend. T11 là ưu tiên chức năng tiếp th
 
 ## Nhánh dữ liệu — phạm vi hiện tại synthetic
 
-**Điều chỉnh ngày08/11/2026 tại T14:** Nhân xác nhận “Hiện nhóm sẽ giả lập toàn bộ
+**Điều chỉnh ngày 08/11/2026 tại T14:** Nhân xác nhận “Hiện nhóm sẽ giả lập toàn bộ
 dữ liệu ảo”. T14 triển khai dossier/thu thử vận hành **synthetic** có seed, lỗi
 missingness/receipt/clock/QC và replay; không yêu cầu có thiết bị để hoàn thành
 phạm vi đã điều chỉnh. T15 trở đi dùng observation/outcome synthetic trong giai
@@ -64,4 +64,4 @@ trước. T18 activation vẫn phụ thuộc qualification và shadow gates.
 - [Template metadata trống](forecast_data/INTAKE_TEMPLATE.json).
 - [API readiness T10](../backend/docs/FORECAST_READINESS_T10.md).
 
-Không mở thêm horizon24/48giờ bằng cách đổi nhãn của score72giờ. Nếu phát triển multi-horizon hoặc thêm bệnh, mỗi target cần định nghĩa outcome, maturity, comparator và đánh giá tương ứng. Nếu dùng dự báo thời tiết bên ngoài, phải giữ bản forecast đã có tại issue time; thời tiết tương lai đã quan sát không được đưa ngược vào predictor.
+Không mở thêm horizon 24/48giờ bằng cách đổi nhãn của score72giờ. Nếu phát triển multi-horizon hoặc thêm bệnh, mỗi target cần định nghĩa outcome, maturity, comparator và đánh giá tương ứng. Nếu dùng dự báo thời tiết bên ngoài, phải giữ bản forecast đã có tại issue time; thời tiết tương lai đã quan sát không được đưa ngược vào predictor.

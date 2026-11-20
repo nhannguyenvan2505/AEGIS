@@ -1,6 +1,6 @@
 # Nguồn raw đã lưu → FM-03 weather forecast
 
-T09 ngày08/11/2026 dùng model `fm03-weather-logistic-v1` cho request nguồn hourly đã lưu và scheduler. Đây là model synthetic, score chưa hiệu chuẩn, `field_validated=false`.
+T09 ngày 08/11/2026 dùng model `fm03-weather-logistic-v1` cho request nguồn hourly đã lưu và scheduler. Đây là model synthetic, score chưa hiệu chuẩn, `field_validated=false`.
 
 ## API
 
@@ -38,7 +38,7 @@ Các request `ready`, `insufficient`, `source` và `hourly` gửi lịch sử tr
 
 ## Bundle và vận hành
 
-`forecast_demo/weather_bundle/` chứa model và manifest riêng. Artifact được chọn cố định từ seed20261109 trước khi đánh giá5seed; không chọn seed có metric tốt nhất. Worker kiểm manifest pin, model hash, feature contract/order, hash mã chuẩn bị feature và phiên bản dependency trước load. Bundle sai/mất trả503 khi input đủ dữ liệu, đồng thời nhánh FM-02 độc lập vẫn có thể phục vụ. Không fallback sang một model khác khi pin FM-03 lỗi.
+`forecast_demo/weather_bundle/` chứa model và manifest riêng. Artifact được chọn cố định từ seed20261109 trước khi đánh giá 5 seed; không chọn seed có metric tốt nhất. Worker kiểm manifest pin, model hash, feature contract/order, hash mã chuẩn bị feature và phiên bản dependency trước load. Bundle sai/mất trả 503 khi input đủ dữ liệu, đồng thời nhánh FM-02 độc lập vẫn có thể phục vụ. Không fallback sang một model khác khi pin FM-03 lỗi.
 
 Launcher `tools/forecast_demo.py` và Backend pilot factory dùng worker đã cập nhật. Tiến trình đã mở trước lúc cập nhật mã cần được khởi động lại bằng launcher hiện có để nhận code/pin mới. Không cần migration schema DB hoặc dependency mới.
 

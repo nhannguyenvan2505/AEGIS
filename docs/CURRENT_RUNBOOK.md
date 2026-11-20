@@ -91,7 +91,7 @@ README/JOURNAL_PILOT trước chọn kho, không trỏ backend/instance. Worker 
 --enable-mock-automation và owner job enabled; raw khay cần
 --enable-controlled-experiments cùng context. Không là cờ train/field forecast.
 Ctrl+C ở launcher của mình, kiểm cleanup; đóng browser không tự dừng server.
-Static example24/10 là lịch sử, thiếu bucket mới trả insufficient_data, không khỏe.
+Static example 24/10 là lịch sử, thiếu bucket mới trả insufficient_data, không khỏe.
 
 ## Temporal và backup
 
@@ -106,7 +106,7 @@ source/schema để ép vào dataset. 72h/24h vẫn đề xuất; field/expert/t
 Temporal README (`AEGIS-AI/temporal_warning/README.md`, workspace AI ngoài repo) có CLI/output mới.
 
 [Backup runbook](../frontend/PILOT_BACKUP_RESTORE.md): dừng mọi writer,
-đủ7DB/uploads/metadata, hai lease/manifest, restore đích mới. Không xóa WAL hoặc
+đủ 7DB/uploads/metadata, hai lease/manifest, restore đích mới. Không xóa WAL hoặc
 sentinel để vượt lỗi. Ban đầu worker/controlled write off, kiểm login/ảnh/chain;
 retention là đề xuất, không TTL hoặc xóa tự động.
 
@@ -114,7 +114,7 @@ retention là đề xuất, không TTL hoặc xóa tự động.
 
 | Triệu chứng | Kiểm trước khi đổi client |
 |---|---|
-| Core trả404 environment-streams/review | Pilot extensions chưa bật ở entry point; không tự đổi source hoặc thêm vào core |
+| Core trả 404 environment-streams/review | Pilot extensions chưa bật ở entry point; không tự đổi source hoặc thêm vào core |
 | Controlled POST403 | Raw opt-in tắt; không đổi khay thành field_observed |
 | Owner khác404 | Kiểm tài khoản/vụ/ảnh đúng quyền, không gửi user_id để vượt Bearer |
 | Backend health200 nhưng detect503/504 | Kiểm AI URL/service, không retry POST mù |

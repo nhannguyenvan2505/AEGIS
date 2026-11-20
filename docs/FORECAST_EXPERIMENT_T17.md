@@ -1,6 +1,6 @@
 # T17 — dự báo synthetic, calibration và holdout mới
 
-Ngày08/11/2026. **Thí nghiệm hoàn tất; candidate chưa qua gate shadow.** FM03
+Ngày 08/11/2026. **Thí nghiệm hoàn tất; candidate chưa qua gate shadow.** FM03
 đang phục vụ giữ nguyên. Candidate/artifact được lưu riêng để audit.
 
 ## Kế hoạch khóa trước
@@ -18,12 +18,12 @@ kết quả. `plan.freeze.json` ghi source/runtime/environment trước lượt 
 | Selection | 96 | 48 | Chọn family và threshold |
 | Test | 144 | 72 | Mở sau artifact/selection freeze |
 
-Tổng576unit-window/288group,2unit/group; seed2026111701/02/03. Đây là budget
+Tổng576unit-window/288group,2 unit/group; seed2026111701/02/03. Đây là budget
 tính toán mô phỏng, không là cỡ mẫu khoa học đã chứng minh. Issue clocks mô
-phỏng01/07,12/07,23/07,03/08/2026; nguồn/snapshot lock20/08.
+phỏng 01/07,12/07,23/07,03/08/2026; nguồn/snapshot lock 20/08.
 
-Raw600s/120giờ được đi qua adapter,41feature FM03, mapping/context và endpoint
-T15 thật. T16 build theo chunk<=40entry, rồi kiểm dependency closure trên toàn
+Raw600s/120giờ được đi qua adapter,41 feature FM03, mapping/context và endpoint
+T15 thật. T16 build theo chunk<=40 entry, rồi kiểm dependency closure trên toàn
 bộ role/seed (cả raw/observation ID tái sử dụng). Group và cửa sổ feature-target
 không giao xuyên role; label cutoff role trước sớm hơn issue role sau.
 
@@ -48,7 +48,7 @@ leaf symptom event interval72giờ; không là thời điểm nhiễm hoặc d�
 
 - Prior: tỷ lệ lớp train; cũng abstain khi feature gate không đủ.
 - LR: StandardScaler fit train, C1,max_iter1000.
-- HGB:120iteration,7leaf,min_samples_leaf12,L2=1; không sweep thêm cấu hình.
+- HGB:120iteration,7 leaf, min_samples_leaf12,L2=1; không sweep thêm cấu hình.
 - Frozen FM03: pin/artifact hiện tại, threshold0,5; là comparator tham chiếu với
   target sinh nhãn cũ khác T17, không phải validation thực địa.
 
@@ -58,7 +58,7 @@ cho phép training **chỉ trong thí nghiệm synthetic này**; flag T16 không
 thành phê duyệt training/triển khai thường trực.
 
 Family chọn bằng pooled selection log-loss, rồi Brier/name nếu hòa. Threshold
-chọn từ19giá trị0,05..0,95, tối thiểu false alerts với recall>=0,75 tính cả
+chọn từ 19 giá trị 0,05..0,95, tối thiểu false alerts với recall>=0,75 tính cả
 abstention. Nếu infeasible phải ghi rõ và dùng max recall theo tie-break đã khóa.
 
 **LR+sigmoid được chọn, threshold0,30**. Primary seed cố định2026111701, không
@@ -69,8 +69,8 @@ sang HGB vì thấy test point estimate HGB tốt hơn sau khi mở.
 
 ## Kết quả holdout
 
-144opportunity,130outcome decisive:61positive/69negative;14chưa rõ gồm6uncertain,
-5unverified,3censored.120unit đủ feature (83,33%). Proper losses dùng108unit vừa
+144 opportunity,130 outcome decisive:61positive/69negative;14 chưa rõ gồm6uncertain,
+5 unverified,3 censored.120unit đủ feature (83,33%). Proper losses dùng108unit vừa
 scored vừa decisive, cùng support cho mọi method.
 
 | Method | Threshold | Brier↓ | Log-loss↓ | ROC-AUC | Recall gồm abstention | False alerts/100unit-days* |
@@ -81,11 +81,11 @@ scored vừa decisive, cùng support cho mọi method.
 | Frozen FM03 | 0,50 | 0,28388 | 0,80453 | 0,65992 | 60,66% | 10,000 |
 
 *Quy ước3ngày/opportunity có outcome decisive, tổng390unit-days. Mỗi unit chỉ có
-một cửa sổ72giờ; đây không là rate triển khai liên tục hoặc thời gian-at-risk
+một cửa sổ 72 giờ; đây không là rate triển khai liên tục hoặc thời gian-at-risk
 đã đo ngoài thực địa. Giữ nguyên threshold comparator sau khi xem test.
 
-Selected có43true alerts/61event,54false alerts, precision decisive44,33%.
-14positive event bị feature abstention;4event scored dưới threshold. Alert có
+Selected có 43 true alerts/61event,54 false alerts, precision decisive44,33%.
+14 positive event bị feature abstention;4 event scored dưới threshold. Alert có
 outcome chưa rõ được đếm riêng, không tự trở thành false/true alert.
 
 ECE10bins: LR0,05181,prior0,11155,FM030,22254. Report có bins và raw-vs-calibrated
@@ -95,8 +95,8 @@ alerts; không gọi đó là ngày nhiễm hoặc lead time chính xác.
 
 ## Gate và bất định
 
-300paired bootstrap resample dependency groups trong từng seed, giữ pairing và
-2unit/group. Không refit model; CI có điều kiện trên3replica đã fit, không bao
+300 paired bootstrap resample dependency groups trong từng seed, giữ pairing và
+2 unit/group. Không refit model; CI có điều kiện trên3replica đã fit, không bao
 phủ mọi cơ chế sinh dữ liệu/bất định training/thực địa.
 
 | Gate định trước | Kết quả | Đạt |
@@ -107,7 +107,7 @@ phủ mọi cơ chế sinh dữ liệu/bất định training/thực địa.
 | Event recall gồm abstention >=65% | 70,49% | Có |
 
 `candidate_qualified_for_synthetic_shadow=false`,deployment_activated=false.
-LR có point estimate tốt hơn prior ở3seed, nhưng chưa đủ bằng chứng theo gate.
+LR có point estimate tốt hơn prior ở 3 seed, nhưng chưa đủ bằng chứng theo gate.
 Không chỉnh threshold/generator hoặc thay family sau khi thấy cùng holdout.
 
 ![T17 comparison](../forecast_experiment_t17/run01/comparison.png)
@@ -122,7 +122,7 @@ offline kiểm manifest/artifact/runtime/feature/endpoint/plan/dependency pins t
 load. Chỉ dùng pickle do thí nghiệm tạo và pin đã biết; hash không làm pickle
 nguồn bất kỳ thành an toàn. [Handoff](../backend/docs/CANDIDATE_FORECAST_T17.md).
 
-41test ML đạt (15test T17 là subset41), gồm worker FM02/FM03 hiện có. Audit tái
+41 test ML đạt (15 test T17 là subset41), gồm worker FM02/FM03 hiện có. Audit tái
 sinh144holdout row, kiểm576row/288component, reopen3candidate, raw→feature→candidate
 example và mọi metric/300bootstrap khớp, score replay error0. Không refit/chọn lại
 model trong audit. Serving bundle và source/protocol cũ giữ nguyên.

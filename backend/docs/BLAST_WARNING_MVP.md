@@ -13,11 +13,11 @@ chưa thay thế cấu hình đang chạy hoặc chứng minh hiệu quả tại
 ## Trạng thái thực hiện
 
 Đã có lõi Python độc lập `app/blast_conditions.py`, test và 8 kịch bản IoT mock.
-Cập nhật tích hợp24/10/2026: đã có route Flask, migration4, ruộng/mùa vụ/thiết bị,
+Cập nhật tích hợp 24/10/2026: đã có route Flask, migration4, ruộng/mùa vụ/thiết bị,
 telemetry mock, assessment/history và liên kết ảnh theo owner. Xem
 [contract thực tế](FARM_WARNING_API.md) và
 [runbook tổng duyệt](../../integrated_warning_20261024/RUNBOOK.md).
-Core trigger thủ công. Câu “chưa scheduler/UI” thuộc mốc24/10; đến28/10 pilot
+Core trigger thủ công. Câu “chưa scheduler/UI” thuộc mốc 24/10; đến 28/10 pilot
 đã có [mock worker opt-in](../../frontend/MOCK_AUTOMATION.md), UI local,
 journal/follow-up/review và backup. Chưa có notification ra ngoài, scheduler
 production hoặc sensor thật được xác nhận. Xem [chỉ mục hiện hành](../../docs/CURRENT_HANDOFF.md).
@@ -35,8 +35,8 @@ cảnh báo sớm đúng bệnh hoặc số ngày cảnh báo trước.
 
 | Nguồn | Thông tin dùng cho thiết kế | Giới hạn áp dụng |
 |---|---|---|
-| [UC IPM, Rice Blast, phần Comments on the Disease](https://ipm.ucanr.edu/agriculture/rice/rice-blast/) — text cập nhật07/2024, đọc24/10/2026 | Môi trường ẩm kéo dài và lá ướt liên quan đến nhiễm; RH trên90%; khoảng tối ưu77–82°F, tương đương25–27,78°C | Hướng dẫn ở California; không phải model đã kiểm chứng ở Việt Nam |
-| [Luis Espino, UC Cooperative Extension, 17/07/2024](https://ucanr.edu/blog/uc-rice-blog/article/weather-conditions-favorable-blast) — đọc24/10/2026 | Theo dõi nhiệt độ/lá ướt theo thời gian; so thời lượng điều kiện có sẵn với thời lượng cần; tác nhân gây bệnh vẫn là điều kiện quan trọng | Không lấy biểu đồ làm công thức số hoặc hứa trước ngày phát bệnh |
+| [UC IPM, Rice Blast, phần Comments on the Disease](https://ipm.ucanr.edu/agriculture/rice/rice-blast/) — text cập nhật07/2024, đọc 24/10/2026 | Môi trường ẩm kéo dài và lá ướt liên quan đến nhiễm; RH trên90%; khoảng tối ưu77–82°F, tương đương25–27,78°C | Hướng dẫn ở California; không phải model đã kiểm chứng ở Việt Nam |
+| [Luis Espino, UC Cooperative Extension, 17/07/2024](https://ucanr.edu/blog/uc-rice-blog/article/weather-conditions-favorable-blast) — đọc 24/10/2026 | Theo dõi nhiệt độ/lá ướt theo thời gian; so thời lượng điều kiện có sẵn với thời lượng cần; tác nhân gây bệnh vẫn là điều kiện quan trọng | Không lấy biểu đồ làm công thức số hoặc hứa trước ngày phát bệnh |
 
 Nguồn xác nhận vai trò các yếu tố, **không cung cấp nguyên vẹn quy tắc phần mềm
 dưới đây**. Ghép các yếu tố bằng AND là thiết kế minh họa của AEGIS; chưa là mô
@@ -45,13 +45,13 @@ hình nhiễm bệnh. Ngoài khoảng tối ưu vẫn có thể có bệnh. Khô
 
 ## Quy tắc minh họa đã đóng phiên bản
 
-Đọc cửa sổ24 giờ hoàn tất. Có ít nhất6 giờ **liên tiếp** mà từng bucket đồng thời:
+Đọc cửa sổ 24 giờ hoàn tất. Có ít nhất6 giờ **liên tiếp** mà từng bucket đồng thời:
 
 - Nhiệt độ trung bình bucket trong25–(82−32)×5/9°C, bao gồm hai biên.
 - RH trung bình bucket **lớn hơn90%**, không bao gồm90%.
 - `leaf_wet=true`: trong fixture nghĩa là lá được giả lập ướt suốt bucket.
 
-Mốc6 giờ, cửa sổ24 giờ và tần suất bucket1 giờ là **giả định kỹ thuật cho demo**,
+Mốc6 giờ, cửa sổ 24 giờ và tần suất bucket1 giờ là **giả định kỹ thuật cho demo**,
 không phải ngưỡng thời gian nhiễm được nguồn trên xác nhận. Nhiệt độ/RH trung bình
 theo giờ không mô tả mọi dao động đồng thời trong giờ; đây cũng là giới hạn của
 mẫu minh họa. Trước dữ liệu thật phải xem lại cách tổng hợp và hiệu chuẩn sensor.
@@ -71,7 +71,7 @@ ngầm, DB hay mạng. `as_of` do caller cấp để replay tái lập được.
 | source | Chính xác `mock`; real sensor chưa được hỗ trợ |
 | as_of | ISO8601 có timezone, đúng mốc giờ; chuẩn hóaUTC |
 | records | Tối đa24 bucket, được phép thiếu để trả insufficient_data |
-| records[].start_at | Bắt đầu khoảng `[start_at,start_at+1h)` đã hoàn tất; ISO8601 có timezone, mốc giờUTC |
+| records[].start_at | Bắt đầu khoảng `[start_at,start_at+1h)` đã hoàn tất; ISO8601 có timezone, mốc giờ UTC |
 | air_temperature_c | Số hữu hạn, biên kỹ thuật−50..60°C; không phải khoảng thuận lợi bệnh |
 | relative_humidity_pct | Số hữu hạn0..100; bool không là số hợp lệ |
 | leaf_wet | Boolean bắt buộc, mock trạng thái cả giờ; không dùng chỉ số sensor chưa hiệu chuẩn trực tiếp |
@@ -99,7 +99,7 @@ Hash input ghi chính xác payload; đổi thứ tự record có thể đổi ha
 
 | Case cố định | Kỳ vọng |
 |---|---|
-| Đủ24 giờ, không match | no_pattern_detected |
+| Đủ 24 giờ, không match | no_pattern_detected |
 | Sáu giờ cuối match liên tiếp | advisory |
 | Chỉ năm giờ | no_pattern_detected |
 | Hai đoạn ba giờ tách biệt | no_pattern_detected |
@@ -115,7 +115,7 @@ PowerShell, chạy tại `D:/AEGIS/backend`:
 & ./.venv/Scripts/python.exe checks/demo_blast_conditions.py --out D:/AEGIS/warning_mvp_20261024/scenarios
 ```
 
-Kỳ vọng10 test đạt và8 scenario đạt. Artifact có cả input/expected/output; không
+Kỳ vọng10 test đạt và 8 scenario đạt. Artifact có cả input/expected/output; không
 đọc/sửa DB, không cần GPU và không gọi AI. Kiểm tra cả biên, thiếu dữ liệu, trùng,
 future/old timestamp, bool thay số, NaN/Inf, và chỉ cho mock. Kết quả chạy thực tế
 nằm trong warning_mvp_20261024/VERIFICATION.md.

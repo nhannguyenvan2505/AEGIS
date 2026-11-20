@@ -1,9 +1,9 @@
 # Quản lý source và bàn giao chọn lọc — TASK-20
 
-**Cập nhật07/11/2026:** người dùng đã yêu cầu chuyển source để thành viên
+**Cập nhật 07/11/2026:** người dùng đã yêu cầu chuyển source để thành viên
 frontend clone và demo. Nhánh `codex/portable-forecast-demo` chứa source demo
 đã curate; các đoạn “không stage/commit/push” dưới đây giữ lại như chính sách
-và trạng thái của TASK-20 ngày28/10, không còn mô tả nhánh mới. Dataset, weights,
+và trạng thái của TASK-20 ngày 28/10, không còn mô tả nhánh mới. Dataset, weights,
 database, logs và thư mục evidence riêng vẫn không được đưa vào Git.
 
 **Bổ sung H1, 28/10/2026:** các nhận định “chưa port/chưa đóng gói” bên dưới là
@@ -19,7 +19,7 @@ local, không phải script stage/commit hoặc chứng nhận clean clone/secre
 
 ## 1. Hiện trạng và nguyên tắc giữ nguyên
 
-D:/AEGIS có Git, checkout feat/3-mobile-integration và109 file tracked ở snapshot
+D:/AEGIS có Git, checkout feat/3-mobile-integration và 109 file tracked ở snapshot
 Task20. Đã có thay đổi chưa commit từ Task19; không reset/checkout/stash để làm
 working tree “sạch”. Không thay index/staged diff/HEAD/branch hoặc add/commit/
 push. D:/AEGIS-AI chưa là Git repo; thêm .gitignore để chuẩn bị boundary tương
