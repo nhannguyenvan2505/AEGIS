@@ -62,7 +62,7 @@ function IoTMetric({ label, value, unit, icon, color, wide }: {
 
 function FieldCard({ field, farmId }: { field: ForecastField; farmId: string }) {
   const { fontScale, width } = useWindowDimensions();
-  const wide = fontScale > 1.2 || width < 350;
+  const wide = fontScale > 1.2 || width < 380;
   const { readings, forecast } = usePlotIot(field.plot.id, field.source);
   const status = forecast?.status ?? fieldStatus(field);
   const color = colors[status.tone];

@@ -9,13 +9,13 @@ export const s = StyleSheet.create({
   },
   "content": {
     "paddingTop": 12,
-    "paddingRight": 24,
+    "paddingRight": 16,
     "paddingBottom": 120,
-    "paddingLeft": 24
+    "paddingLeft": 16
   },
   "brand": {
     "color": "#059669",
-    "fontSize": 24,
+    "fontSize": 21,
     "fontWeight": "800"
   },
   "brandLogo": {
@@ -108,6 +108,7 @@ export const s = StyleSheet.create({
     "color": "#047857"
   },
   "input": {
+    "minHeight": 52,
     "backgroundColor": "#ffffff",
     "borderTopWidth": 1,
     "borderRightWidth": 1,
@@ -121,13 +122,19 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
     "borderBottomLeftRadius": 14,
-    "paddingTop": 14,
-    "paddingRight": 14,
-    "paddingBottom": 14,
-    "paddingLeft": 14,
+    "paddingTop": 8,
+    "paddingRight": 10,
+    "paddingBottom": 8,
+    "paddingLeft": 10,
     "fontSize": 16,
+    "lineHeight": 22,
     "color": "#0f172a",
     "marginBottom": 12
+  },
+  "inputMultiline": {
+    "minHeight": 88,
+    "paddingTop": 12,
+    "paddingBottom": 12
   },
   "badge": {
     "color": "#64748b",
@@ -165,13 +172,13 @@ export const s = StyleSheet.create({
     "marginBottom": 16
   },
   "header": {
-    "paddingTop": 16,
-    "paddingRight": 24,
-    "paddingBottom": 18,
-    "paddingLeft": 24,
+    "paddingTop": 12,
+    "paddingRight": 16,
+    "paddingBottom": 14,
+    "paddingLeft": 16,
     "flexDirection": "row",
     "alignItems": "center",
-    "gap": 14
+    "gap": 12
   },
   "between": {
     "flexDirection": "row",
@@ -564,8 +571,9 @@ export const s = StyleSheet.create({
     "minWidth": 0,
     "color": "#0f172a",
     "fontSize": 16,
-    "paddingTop": 14,
-    "paddingBottom": 14
+    "lineHeight": 22,
+    "paddingTop": 8,
+    "paddingBottom": 8
   },
   "authVisibility": {
     "width": 44,
@@ -776,8 +784,8 @@ export const s = StyleSheet.create({
     "marginBottom": 16
   },
   "authLoginHeroTitle": {
-    "fontSize": 28,
-    "lineHeight": 34
+    "fontSize": 25,
+    "lineHeight": 31
   },
   "authHeroDescription": {
     "fontSize": 16,
@@ -811,9 +819,9 @@ export const s = StyleSheet.create({
     "gap": 0
   },
   "authPageInput": {
-    "paddingTop": 13,
-    "paddingBottom": 13,
-    "lineHeight": 24
+    "paddingTop": 8,
+    "paddingBottom": 8,
+    "lineHeight": 22
   },
   "authPageFieldIcon": {
     "width": 44,
@@ -1055,8 +1063,8 @@ export const s = StyleSheet.create({
     "fontWeight": "700"
   },
   "farmRootTitle": {
-    "fontSize": 28,
-    "lineHeight": 36,
+    "fontSize": 25,
+    "lineHeight": 32,
     "paddingLeft": 4
   },
   "farmOverview": {
@@ -1064,30 +1072,6 @@ export const s = StyleSheet.create({
     "fontSize": 14,
     "lineHeight": 22,
     "marginBottom": 2
-  },
-  "farmBreadcrumbs": {
-    "flexDirection": "row",
-    "alignItems": "center",
-    "gap": 8,
-    "marginBottom": 10
-  },
-  "farmBreadcrumbItem": {
-    "flexDirection": "row",
-    "alignItems": "center",
-    "gap": 8
-  },
-  "farmBreadcrumbLink": {
-    "minHeight": 36,
-    "justifyContent": "center"
-  },
-  "farmBreadcrumbText": {
-    "color": "#657e9e",
-    "fontSize": 13,
-    "lineHeight": 20
-  },
-  "farmBreadcrumbActive": {
-    "color": "#009f96",
-    "fontWeight": "600"
   },
   "farmSearch": {
     "minHeight": 52,
@@ -1116,11 +1100,12 @@ export const s = StyleSheet.create({
     "flexShrink": 1,
     "flexBasis": 0,
     "minWidth": 0,
-    "paddingTop": 13,
-    "paddingBottom": 13,
+    "minHeight": 48,
+    "paddingTop": 0,
+    "paddingBottom": 0,
     "color": "#1c304b",
-    "fontSize": 16,
-    "lineHeight": 24
+    "fontSize": 15,
+    "lineHeight": 22
   },
   "farmSearchClear": {
     "width": 36,
@@ -1129,6 +1114,9 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "farmCard": {
+    "width": "100%",
+    "maxWidth": 560,
+    "alignSelf": "center",
     "backgroundColor": "#ffffff",
     "borderTopLeftRadius": 16,
     "borderTopRightRadius": 16,
@@ -1172,6 +1160,12 @@ export const s = StyleSheet.create({
     "flexDirection": "row",
     "alignItems": "center",
     "gap": 12
+  },
+  "farmCardMain": {
+    "width": "100%"
+  },
+  "farmCardActions": {
+    "marginTop": 10
   },
   "farmGrow": {
     "flexGrow": 1,
@@ -1406,16 +1400,18 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12,
-    "paddingTop": 12,
-    "paddingRight": 14,
-    "paddingBottom": 12,
-    "paddingLeft": 14,
+    "paddingTop": 8,
+    "paddingRight": 10,
+    "paddingBottom": 8,
+    "paddingLeft": 10,
     "color": "#1c2748",
     "fontSize": 16,
-    "lineHeight": 24
+    "lineHeight": 22
   },
   "farmTextArea": {
-    "minHeight": 80
+    "minHeight": 80,
+    "paddingTop": 12,
+    "paddingBottom": 12
   },
   "farmInputInvalid": {
     "borderTopColor": "#b13232",
@@ -1516,8 +1512,13 @@ export const s = StyleSheet.create({
   },
   "farmActions": {
     "flexDirection": "row",
-    "gap": 12,
+    "gap": 10,
     "marginTop": 16
+  },
+  "farmEntityCard": {
+    "width": "100%",
+    "maxWidth": 560,
+    "alignSelf": "center"
   },
   "farmSeasonDates": {
     "color": "#1c304b",
@@ -1771,7 +1772,8 @@ export const s = StyleSheet.create({
   },
   "scanActions": {
     "flexDirection": "row",
-    "gap": 12
+    "alignItems": "stretch",
+    "gap": 10
   },
   "scanActionItem": {
     "flexGrow": 1,
@@ -1780,20 +1782,32 @@ export const s = StyleSheet.create({
     "minWidth": 0
   },
   "scanButton": {
-    "minHeight": 52,
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "width": "100%",
+    "minHeight": 54,
+    "borderTopWidth": 1,
+    "borderRightWidth": 1,
+    "borderBottomWidth": 1,
+    "borderLeftWidth": 1,
+    "borderTopColor": "#009b72",
+    "borderRightColor": "#009b72",
+    "borderBottomColor": "#009b72",
+    "borderLeftColor": "#009b72",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12,
     "backgroundColor": "#009b72",
-    "paddingTop": 13,
-    "paddingRight": 13,
-    "paddingBottom": 13,
-    "paddingLeft": 13,
+    "paddingTop": 12,
+    "paddingRight": 8,
+    "paddingBottom": 12,
+    "paddingLeft": 8,
     "flexDirection": "row",
     "alignItems": "center",
     "justifyContent": "center",
-    "gap": 8
+    "gap": 7
   },
   "scanButtonOutline": {
     "backgroundColor": "#ffffff",
@@ -1807,12 +1821,15 @@ export const s = StyleSheet.create({
     "borderLeftColor": "#009b72"
   },
   "scanButtonText": {
-    "fontSize": 15,
-    "lineHeight": 22,
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "minWidth": 0,
+    "fontSize": 14,
+    "lineHeight": 20,
     "fontWeight": "700",
     "color": "#ffffff",
-    "textAlign": "center",
-    "flexShrink": 1
+    "textAlign": "center"
   },
   "scanOutlineText": {
     "color": "#009b72"
@@ -2129,8 +2146,8 @@ export const s = StyleSheet.create({
   },
   "forecastPageTitle": {
     "color": "#1c304b",
-    "fontSize": 28,
-    "lineHeight": 36,
+    "fontSize": 25,
+    "lineHeight": 32,
     "fontWeight": "800"
   },
   "forecastSubtitle": {
@@ -2822,8 +2839,8 @@ export const s = StyleSheet.create({
   },
   "forecastDetailReadingValue": {
     "color": "#28595b",
-    "fontSize": 29,
-    "lineHeight": 38,
+    "fontSize": 24,
+    "lineHeight": 32,
     "fontWeight": "700"
   },
   "forecastDetailReadingUnit": {
@@ -3427,8 +3444,8 @@ export const s = StyleSheet.create({
   },
   "homeGreeting": {
     "color": "#193234",
-    "fontSize": 24,
-    "lineHeight": 32,
+    "fontSize": 22,
+    "lineHeight": 29,
     "fontWeight": "700",
     "letterSpacing": -0.5
   },
@@ -3694,8 +3711,8 @@ export const s = StyleSheet.create({
   },
   "homeMetricValue": {
     "color": "#193234",
-    "fontSize": 32,
-    "lineHeight": 40,
+    "fontSize": 26,
+    "lineHeight": 34,
     "fontWeight": "700",
     "letterSpacing": -0.5
   },
@@ -4135,13 +4152,13 @@ export const s = StyleSheet.create({
   },
   "profileAvatarInitial": {
     "color": "#009c73",
-    "fontSize": 28,
-    "lineHeight": 38,
+    "fontSize": 25,
+    "lineHeight": 34,
     "fontWeight": "700"
   },
   "profileAvatarInitialLarge": {
-    "fontSize": 34,
-    "lineHeight": 44
+    "fontSize": 29,
+    "lineHeight": 38
   },
   "profileAvatarCamera": {
     "position": "absolute",
@@ -4431,8 +4448,8 @@ export const s = StyleSheet.create({
     "flexShrink": 1,
     "flexBasis": 0,
     "minWidth": 0,
-    "paddingTop": 12,
-    "paddingBottom": 12,
+    "paddingTop": 8,
+    "paddingBottom": 8,
     "color": "#293753",
     "fontSize": 14,
     "lineHeight": 22
@@ -4787,8 +4804,8 @@ export const s = StyleSheet.create({
   },
   "reportAiCount": {
     "color": "#24314d",
-    "fontSize": 30,
-    "lineHeight": 38,
+    "fontSize": 25,
+    "lineHeight": 32,
     "fontWeight": "700"
   },
   "reportSummaryRow": {

@@ -16,6 +16,8 @@ type Workspace = {
   saveFarm: (values: FarmValues, farm?: Farm) => Promise<Farm>;
   deleteFarm: (farm: Farm) => Promise<void>;
   createPlot: (farmId: string, values: PlotValues) => Promise<FarmPlot>;
+  savePlot: (plot: FarmPlot, values: PlotValues) => Promise<FarmPlot>;
+  deletePlot: (plot: FarmPlot) => Promise<void>;
   createSeason: (plotId: string, values: SeasonValues) => Promise<FarmSeason>;
 };
 const Context = createContext<Workspace | null>(null);
@@ -99,9 +101,45 @@ function ScopedWorkspace({ token, children }: { token?: string; children: ReactN
       const item: FarmPlot = token ? (await farmClient.createPlot(token, farmId, values)).item : { ...values, id: uuid.v4(), farm_id: farmId };
       if (active.current) {
         if (!token) setDemoPlots(current => [item, ...current]);
-        setFarms(current => current.map(farm => farm.id === farmId ? { ...farm, plot_count: farm.plot_count + 1, area_ha: farm.area_ha + values.area_ha } : farm));
+        setFarms(current => current.map(farm => farm.id === farmId ? {
+          ...farm, plot_count: farm.plot_count + 1, area_ha: farm.area_ha + (values.area_ha ?? 0),
+          plots_without_area: farm.plots_without_area + (values.area_ha === null ? 1 : 0),
+        } : farm));
       }
       return item;
+    });
+  }
+  function savePlot(plot: FarmPlot, values: PlotValues) {
+    return mutate(async () => {
+      const response = token ? await farmClient.savePlot(token, plot.id, values) : null;
+      const item: FarmPlot = response
+        ? { ...plot, ...response.item, ...values }
+        : { ...plot, ...values };
+      if (active.current) {
+        if (!token) setDemoPlots(current => current.map(old => old.id === plot.id ? item : old));
+        setFarms(current => current.map(farm => farm.id === plot.farm_id ? {
+          ...farm,
+          area_ha: farm.area_ha + (values.area_ha ?? 0) - (plot.area_ha ?? 0),
+          plots_without_area: Math.max(0, farm.plots_without_area + (values.area_ha === null ? 1 : 0) - (plot.area_ha === null ? 1 : 0)),
+        } : farm));
+      }
+      return item;
+    });
+  }
+  function deletePlot(plot: FarmPlot) {
+    return mutate(async () => {
+      if (!token && demoSeasons.some(season => season.plot_id === plot.id))
+        throw new Error('Chỉ có thể xóa ruộng khi chưa có mùa vụ.');
+      if (token) await farmClient.removePlot(token, plot.id);
+      if (active.current) {
+        if (!token) setDemoPlots(current => current.filter(item => item.id !== plot.id));
+        setFarms(current => current.map(farm => farm.id === plot.farm_id ? {
+          ...farm,
+          plot_count: Math.max(0, farm.plot_count - 1),
+          area_ha: Math.max(0, farm.area_ha - (plot.area_ha ?? 0)),
+          plots_without_area: Math.max(0, farm.plots_without_area - (plot.area_ha === null ? 1 : 0)),
+        } : farm));
+      }
     });
   }
   function createSeason(plotId: string, values: SeasonValues) {
@@ -114,7 +152,7 @@ function ScopedWorkspace({ token, children }: { token?: string; children: ReactN
     });
   }
   return <Context.Provider value={{ farms, loaded, loading, error, busy, demo, selectedFarmId, selectFarm,
-    load: refresh, loadPlots, loadSeasons, saveFarm, deleteFarm, createPlot, createSeason }}>{children}</Context.Provider>;
+    load: refresh, loadPlots, loadSeasons, saveFarm, deleteFarm, createPlot, savePlot, deletePlot, createSeason }}>{children}</Context.Provider>;
 }
 
 export function FarmWorkspaceProvider({ children }: { children: ReactNode }) {

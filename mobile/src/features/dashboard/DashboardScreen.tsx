@@ -31,7 +31,7 @@ function DashboardHome() {
     : selectedPlot?.farm_id === farmId ? selectedPlot : undefined;
   const [sheet, setSheet] = useState<'plots' | 'sensors'>();
   const { fontScale, width } = useWindowDimensions();
-  const single = fontScale > 1.6 || width < 330;
+  const single = fontScale > 1.6 || width < 360;
   const { readings, forecast: outlook, refresh: refreshIot } = usePlotIot(plot?.id);
   const date = new Date();
   const day = date.toLocaleDateString('vi-VN', { weekday: 'long' });

@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNavigation } from '../../../components/BottomNavigation';
 import { Icon, type IconName } from '../../../components/Design';
 import { s } from '../../../styles/generated/styles';
-import type { Farm } from '../client';
+import type { Farm, FarmPlot } from '../client';
 
 export const farmColors = { text: '#1c304b', muted: '#657e9e', teal: '#009f96', mint: '#24cdbb', border: '#cbd6e6' };
 export const hectares = (area: number) => new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(area) + ' ha';
@@ -40,19 +40,6 @@ export function FarmPage({ title, root = false, backTo = '/farms', children, ref
   </SafeAreaView>;
 }
 
-export function FarmBreadcrumbs({ stage, farmId }: { stage: 0 | 1 | 2; farmId?: string }) {
-  return <View style={s.farmBreadcrumbs}>
-    {['Nông trại', 'Ruộng', 'Mùa vụ'].map((label, index) => <View key={label} style={s.farmBreadcrumbItem}>
-      {index > 0 && <Icon name="chevron-right" size={16} color={farmColors.muted} />}
-      <Pressable accessibilityRole="link" accessibilityLabel={label + (index === stage ? ', bước hiện tại' : '')}
-        disabled={index >= stage} style={s.farmBreadcrumbLink}
-        onPress={() => index === 0 ? router.navigate('/farms') : farmId && router.navigate(`/farms/${farmId}`)}>
-        <Text style={[s.farmBreadcrumbText, index <= stage && s.farmBreadcrumbActive]}>{label}</Text>
-      </Pressable>
-    </View>)}
-  </View>;
-}
-
 export function FarmButton({ title, onPress, variant = 'mint', icon, disabled = false, testID }: {
   title: string; onPress: () => void; variant?: 'mint' | 'navy' | 'outline' | 'danger' | 'dangerOutline'; icon?: IconName; disabled?: boolean; testID?: string;
 }) {
@@ -73,7 +60,8 @@ export function FarmField({ label, error, ...props }: TextInputProps & { label: 
     <TextInput accessibilityLabel={label.replace(' *', '')} accessibilityHint={error || (label.endsWith('*') ? 'Bắt buộc' : undefined)}
       placeholderTextColor={farmColors.muted} selectionColor={farmColors.teal} underlineColorAndroid="transparent"
       autoCorrect={props.autoCorrect ?? false} autoCapitalize={props.autoCapitalize ?? 'none'}
-      {...props} style={[s.farmInput, props.multiline && s.farmTextArea, !!error && s.farmInputInvalid]} />
+      {...props} textAlignVertical={props.textAlignVertical ?? (props.multiline ? 'top' : 'center')}
+      style={[s.farmInput, props.multiline && s.farmTextArea, !!error && s.farmInputInvalid]} />
     {!!error && <Text accessibilityLiveRegion="polite" style={s.farmFieldError}>{error}</Text>}
   </View>;
 }
@@ -126,6 +114,26 @@ export function DeleteFarmDialog({ farm, busy, error, onCancel, onDelete }: {
           <FarmButton title="Hủy" variant="outline" onPress={onCancel} disabled={busy} testID="farm-delete-cancel" />
           <View style={s.farmButtonGap} />
           <FarmButton title={busy ? 'Đang xóa…' : 'Xóa nông trại'} variant="danger" onPress={onDelete} disabled={busy} testID="farm-delete-confirm" />
+        </View>
+      </ScrollView>
+    </View>
+  </Modal>;
+}
+
+export function DeletePlotDialog({ plot, busy, error, onCancel, onDelete }: {
+  plot?: FarmPlot; busy: boolean; error: string; onCancel: () => void; onDelete: () => void;
+}) {
+  return <Modal visible={!!plot} transparent animationType="fade" statusBarTranslucent onRequestClose={() => { if (!busy) onCancel(); }}>
+    <View style={s.farmModalBackdrop}>
+      <ScrollView contentContainerStyle={s.farmModalScroll}>
+        <View accessibilityViewIsModal style={s.farmModalCard}>
+          <View style={s.farmTrashIcon}><Icon name="trash-2" color="#b13232" size={23} /></View>
+          <Text accessibilityRole="header" style={s.farmModalTitle}>Xóa ruộng {plot?.name}?</Text>
+          <Text style={s.farmModalDescription}>Ruộng này chưa có mùa vụ. Thông tin ruộng sẽ bị xóa và không thể khôi phục.</Text>
+          <FarmError message={error} />
+          <FarmButton title="Hủy" variant="outline" onPress={onCancel} disabled={busy} testID="plot-delete-cancel" />
+          <View style={s.farmButtonGap} />
+          <FarmButton title={busy ? 'Đang xóa…' : 'Xóa ruộng'} variant="danger" onPress={onDelete} disabled={busy} testID="plot-delete-confirm" />
         </View>
       </ScrollView>
     </View>

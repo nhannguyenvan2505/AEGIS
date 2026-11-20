@@ -6,7 +6,7 @@ export type Farm = FarmValues & {
 };
 export type FarmPlot = { id: string; farm_id: string; name: string; location_text: string; area_ha: number | null };
 export type FarmSeason = { id: string; plot_id: string; name: string; start_date: string; end_date: string | null };
-export type PlotValues = { name: string; location_text: string; area_ha: number };
+export type PlotValues = { name: string; location_text: string; area_ha: number | null };
 export type SeasonValues = { name: string; start_date: string; end_date?: string };
 type Page<T> = { items: T[]; pagination: { page: number; has_next: boolean } };
 
@@ -31,6 +31,10 @@ export const farmClient = {
     { method: 'DELETE', body: JSON.stringify({ version: farm.version }) }, token),
   createPlot: (token: string, farmId: string, values: PlotValues) => request<{ item: FarmPlot }>(
     `/farm/farms/${id(farmId)}/plots`, { method: 'POST', body: JSON.stringify(values) }, token),
+  savePlot: (token: string, plotId: string, values: PlotValues) => request<{ item: Partial<FarmPlot> & Pick<FarmPlot, 'id' | 'name' | 'location_text'> }>(
+    `/farm/plots/${id(plotId)}`, { method: 'PUT', body: JSON.stringify(values) }, token),
+  removePlot: (token: string, plotId: string) => request(`/farm/plots/${id(plotId)}`,
+    { method: 'DELETE', body: JSON.stringify({}) }, token),
   createSeason: (token: string, plotId: string, values: SeasonValues) => request<{ item: FarmSeason }>(
     `/farm/plots/${id(plotId)}/seasons`, { method: 'POST', body: JSON.stringify(values) }, token),
 };

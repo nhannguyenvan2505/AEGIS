@@ -80,7 +80,7 @@ function Reading({ label, value, unit, icon, measuredAt, lastRow, right, single 
 
 export function DetailReadings({ readings }: { readings: IotReadings }) {
   const { fontScale, width } = useWindowDimensions();
-  const single = fontScale > 1.65 || width < 330;
+  const single = fontScale > 1.65 || width < 360;
   return <View style={s.forecastDetailReadings}>
     <Reading label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" measuredAt={readings.observedAt} lastRow={false} right={false} single={single} />
     <Reading label="Độ ẩm" value={readings.humidity} unit="%" icon="droplet" measuredAt={readings.observedAt} lastRow={false} right single={single} />

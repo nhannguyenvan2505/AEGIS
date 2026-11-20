@@ -1,8 +1,8 @@
 $green: #059669;
 $muted: #64748b;
 .screen { flex: 1; background-color: #f4f7fb; }
-.content { padding: 24px; padding-top: 12px; padding-bottom: 120px; }
-.brand { color: $green; font-size: 24px; font-weight: 800; }
+.content { padding: 16px; padding-top: 12px; padding-bottom: 120px; }
+.brand { color: $green; font-size: 21px; font-weight: 800; }
 .brandLogo { width: 36px; height: 36px; flex-shrink: 0; }
 .title { color: #0f172a; font-size: 22px; font-weight: 800; }
 .subtitle { color: $muted; font-size: 13px; line-height: 21px; margin-bottom: 16px; }
@@ -16,13 +16,14 @@ $muted: #64748b;
 .buttonText { color: #ffffff; font-size: 14px; font-weight: 700; }
 .secondary { background-color: #ecfdf5; }
 .secondaryText { color: #047857; }
-.input { background-color: #ffffff; border-width: 1px; border-color: #cbd5e1; border-radius: 14px; padding: 14px; font-size: 16px; color: #0f172a; margin-bottom: 12px; }
+.input { min-height: 52px; background-color: #ffffff; border-width: 1px; border-color: #cbd5e1; border-radius: 14px; padding: 10px; padding-top: 8px; padding-bottom: 8px; font-size: 16px; line-height: 22px; color: #0f172a; margin-bottom: 12px; }
+.inputMultiline { min-height: 88px; padding-top: 12px; padding-bottom: 12px; }
 .badge { color: #64748b; font-size: 11px; margin-bottom: 14px; }
 .error { color: #be123c; margin-bottom: 12px; }
 .bar { height: 8px; border-radius: 4px; background-color: #e2e8f0; margin-top: 12px; }
 .fill { height: 8px; border-radius: 4px; background-color: #059669; }
 .image { width: 100%; height: 240px; border-radius: 20px; margin-bottom: 16px; }
-.header { padding: 24px; padding-top: 16px; padding-bottom: 18px; flex-direction: row; align-items: center; gap: 14px; }
+.header { padding: 16px; padding-top: 12px; padding-bottom: 14px; flex-direction: row; align-items: center; gap: 12px; }
 .between { flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; }
 .avatar { width: 44px; height: 44px; border-radius: 22px; background-color: #a6192e; align-items: center; justify-content: center; }
 .avatarText { color: #ffffff; font-size: 18px; font-weight: 800; }
@@ -66,7 +67,7 @@ $muted: #64748b;
 .authInputRow { flex-direction: row; align-items: center; gap: 10px; border-width: 1px; border-color: #cbd5e1; border-radius: 14px; background-color: #ffffff; padding-left: 12px; padding-right: 4px; min-height: 52px; }
 .authInputFocused { border-color: $green; }
 .authInputInvalid { border-color: #be123c; }
-.authInput { flex: 1; min-width: 0px; color: #0f172a; font-size: 16px; padding-top: 14px; padding-bottom: 14px; }
+.authInput { flex: 1; min-width: 0px; color: #0f172a; font-size: 16px; line-height: 22px; padding-top: 8px; padding-bottom: 8px; }
 .authVisibility { width: 44px; min-height: 48px; align-items: center; justify-content: center; }
 .authFieldError { color: #be123c; font-size: 12px; line-height: 18px; margin-top: 6px; }
 .authHint { color: $muted; font-size: 12px; line-height: 18px; margin-top: 6px; }
@@ -99,14 +100,14 @@ $muted: #64748b;
 .authLoginHeroIcon { width: 56px; height: 56px; border-radius: 13px; }
 .authHeroCheck { position: absolute; top: 0px; right: 0px; bottom: 0px; left: 0px; align-items: center; justify-content: center; }
 .authHeroTitle { font-size: 24px; line-height: 30px; font-weight: 700; margin-bottom: 16px; }
-.authLoginHeroTitle { font-size: 28px; line-height: 34px; }
+.authLoginHeroTitle { font-size: 25px; line-height: 31px; }
 .authHeroDescription { font-size: 16px; line-height: 23px; }
 .authPageFormTitle { font-size: 20px; line-height: 26px; font-weight: 700; margin-bottom: 18px; }
 .authLoginForm { min-height: 508px; }
 .authLoginSpacer { min-height: 24px; flex-grow: 1; }
 .authPageFieldLabel { font-size: 14px; line-height: 18px; margin-bottom: 8px; }
 .authPageInputRow { border-radius: 12px; padding-left: 15px; padding-right: 3px; gap: 0px; }
-.authPageInput { padding-top: 13px; padding-bottom: 13px; line-height: 24px; }
+.authPageInput { padding-top: 8px; padding-bottom: 8px; line-height: 22px; }
 .authPageFieldIcon { width: 44px; min-height: 48px; align-items: center; justify-content: center; }
 .authPageHint { font-size: 14px; line-height: 20px; margin-top: 8px; }
 .authForgotPassword { min-height: 48px; align-self: flex-end; justify-content: center; margin-bottom: 12px; }
@@ -142,20 +143,17 @@ $muted: #64748b;
 .farmRootHeader { margin-bottom: 8px; }
 .farmBack { width: 44px; min-height: 44px; align-items: center; justify-content: center; }
 .farmPageTitle { flex: 1; color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; }
-.farmRootTitle { font-size: 28px; line-height: 36px; padding-left: 4px; }
+.farmRootTitle { font-size: 25px; line-height: 32px; padding-left: 4px; }
 .farmOverview { color: #657e9e; font-size: 14px; line-height: 22px; margin-bottom: 2px; }
-.farmBreadcrumbs { flex-direction: row; align-items: center; gap: 8px; margin-bottom: 10px; }
-.farmBreadcrumbItem { flex-direction: row; align-items: center; gap: 8px; }
-.farmBreadcrumbLink { min-height: 36px; justify-content: center; }
-.farmBreadcrumbText { color: #657e9e; font-size: 13px; line-height: 20px; }
-.farmBreadcrumbActive { color: #009f96; font-weight: 600; }
 .farmSearch { min-height: 52px; flex-direction: row; align-items: center; gap: 12px; border-width: 1px; border-color: #cbd6e6; border-radius: 12px; background-color: #ffffff; padding-left: 15px; padding-right: 8px; margin-bottom: 16px; }
-.farmSearchInput { flex: 1; min-width: 0px; padding-top: 13px; padding-bottom: 13px; color: #1c304b; font-size: 16px; line-height: 24px; }
+.farmSearchInput { flex: 1; min-width: 0px; min-height: 48px; padding-top: 0px; padding-bottom: 0px; color: #1c304b; font-size: 15px; line-height: 22px; }
 .farmSearchClear { width: 36px; min-height: 44px; align-items: center; justify-content: center; }
-.farmCard { background-color: #ffffff; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0px 3px 14px rgba(28, 48, 75, 0.05); elevation: 2; }
+.farmCard { width: 100%; max-width: 560px; align-self: center; background-color: #ffffff; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0px 3px 14px rgba(28, 48, 75, 0.05); elevation: 2; }
 .farmListCard { border-width: 1.5px; border-color: #ffffff; padding: 14px; }
 .farmSelectedCard { border-color: #15caba; }
 .farmCardHeading { flex-direction: row; align-items: center; gap: 12px; }
+.farmCardMain { width: 100%; }
+.farmCardActions { margin-top: 10px; }
 .farmGrow { flex: 1; min-width: 0px; }
 .farmCardTitle { color: #1c304b; font-size: 16px; line-height: 22px; font-weight: 700; }
 .farmCardAddress { color: #657e9e; font-size: 13px; line-height: 20px; margin-top: 2px; }
@@ -190,8 +188,8 @@ $muted: #64748b;
 .farmFormCard { padding-bottom: 4px; }
 .farmField { margin-bottom: 12px; }
 .farmFieldLabel { color: #1c2748; font-size: 14px; line-height: 20px; font-weight: 700; margin-bottom: 6px; }
-.farmInput { min-height: 52px; background-color: #f4f6f9; border-width: 1px; border-color: #cbd6e6; border-radius: 12px; padding: 14px; padding-top: 12px; padding-bottom: 12px; color: #1c2748; font-size: 16px; line-height: 24px; }
-.farmTextArea { min-height: 80px; }
+.farmInput { min-height: 52px; background-color: #f4f6f9; border-width: 1px; border-color: #cbd6e6; border-radius: 12px; padding: 10px; padding-top: 8px; padding-bottom: 8px; color: #1c2748; font-size: 16px; line-height: 22px; }
+.farmTextArea { min-height: 80px; padding-top: 12px; padding-bottom: 12px; }
 .farmInputInvalid { border-color: #b13232; }
 .farmFieldError { color: #b13232; font-size: 13px; line-height: 20px; margin-top: 4px; }
 .farmErrorBox { background-color: #fff5f5; border-radius: 12px; padding: 12px; margin-bottom: 16px; }
@@ -204,7 +202,8 @@ $muted: #64748b;
 .farmDetailNotes { color: #657e9e; font-size: 14px; line-height: 22px; margin-top: 12px; }
 .farmSectionTitle { color: #1c304b; font-size: 20px; line-height: 28px; font-weight: 700; margin-top: 4px; margin-bottom: 16px; }
 .farmPlotCard { border-width: 1px; border-color: #ffffff; }
-.farmActions { flex-direction: row; gap: 12px; margin-top: 16px; }
+.farmActions { flex-direction: row; gap: 10px; margin-top: 16px; }
+.farmEntityCard { width: 100%; max-width: 560px; align-self: center; }
 .farmSeasonDates { color: #1c304b; font-size: 14px; line-height: 22px; margin-top: 16px; margin-bottom: 6px; }
 .farmModalBackdrop { flex: 1; background-color: rgba(28, 39, 72, 0.42); }
 .farmModalScroll { flex-grow: 1; padding: 24px; align-items: center; justify-content: center; }
@@ -236,11 +235,11 @@ $muted: #64748b;
 .scanEmptyIcon { width: 62px; height: 62px; border-radius: 22px; align-items: center; justify-content: center; background-color: #e4f6ef; }
 .scanEmptyTitle { color: #1c2745; font-size: 18px; line-height: 26px; font-weight: 700; text-align: center; }
 .scanEmptyDescription { color: #6a7f9f; font-size: 14px; line-height: 22px; text-align: center; max-width: 340px; }
-.scanActions { flex-direction: row; gap: 12px; }
+.scanActions { flex-direction: row; align-items: stretch; gap: 10px; }
 .scanActionItem { flex: 1; min-width: 0px; }
-.scanButton { min-height: 52px; border-radius: 12px; background-color: #009b72; padding: 13px; flex-direction: row; align-items: center; justify-content: center; gap: 8px; }
+.scanButton { flex: 1; width: 100%; min-height: 54px; border-width: 1px; border-color: #009b72; border-radius: 12px; background-color: #009b72; padding: 12px 8px; flex-direction: row; align-items: center; justify-content: center; gap: 7px; }
 .scanButtonOutline { background-color: #ffffff; border-width: 1px; border-color: #009b72; }
-.scanButtonText { font-size: 15px; line-height: 22px; font-weight: 700; color: #ffffff; text-align: center; flex-shrink: 1; }
+.scanButtonText { flex: 1; min-width: 0px; font-size: 14px; line-height: 20px; font-weight: 700; color: #ffffff; text-align: center; flex-shrink: 1; }
 .scanOutlineText { color: #009b72; }
 .scanPressed { opacity: 0.7; }
 .scanDisabled { opacity: 0.5; }
@@ -285,7 +284,7 @@ $muted: #64748b;
 .forecastHeader { flex-direction: row; align-items: center; gap: 16px; margin-bottom: 8px; }
 .forecastGrow { flex: 1; min-width: 0px; }
 .forecastEyebrow { color: #009f96; font-size: 10px; line-height: 16px; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
-.forecastPageTitle { color: #1c304b; font-size: 28px; line-height: 36px; font-weight: 800; }
+.forecastPageTitle { color: #1c304b; font-size: 25px; line-height: 32px; font-weight: 800; }
 .forecastSubtitle { color: #657e9e; font-size: 13px; line-height: 21px; }
 .forecastRefresh { width: 44px; min-height: 44px; align-items: center; justify-content: center; border-radius: 15px; background-color: #ffffff; border-width: 1px; border-color: #dce7eb; }
 .forecastPressed { opacity: 0.6; }
@@ -379,7 +378,7 @@ $muted: #64748b;
 .forecastDetailReadingLeft { border-left-width: 1px; border-left-color: #e0e9e8; }
 .forecastDetailReadingTitle { flex-direction: row; align-items: center; gap: 6px; }
 .forecastDetailReadingLabel { color: #658084; font-size: 12px; line-height: 20px; flex-shrink: 1; }
-.forecastDetailReadingValue { color: #28595b; font-size: 29px; line-height: 38px; font-weight: 700; }
+.forecastDetailReadingValue { color: #28595b; font-size: 24px; line-height: 32px; font-weight: 700; }
 .forecastDetailReadingUnit { color: #6d8788; font-size: 12px; line-height: 19px; font-weight: 500; }
 .forecastDetailReadingMissing { color: #9babb8; }
 .forecastDetailReadingTime { color: #7b9194; font-size: 10px; line-height: 17px; }
@@ -463,7 +462,7 @@ $muted: #64748b;
 .homeBrandIcon { width: 15px; height: 15px; tint-color: #248233; }
 .homeBrand { color: #248233; font-size: 12px; line-height: 18px; letter-spacing: 1.6px; font-weight: 700; }
 .homeDate { color: #597172; font-size: 11px; line-height: 18px; flex-shrink: 1; }
-.homeGreeting { color: #193234; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.5px; }
+.homeGreeting { color: #193234; font-size: 22px; line-height: 29px; font-weight: 700; letter-spacing: -0.5px; }
 .homeNotification { width: 48px; height: 48px; border-radius: 24px; background-color: #f4f7f3; align-items: center; justify-content: center; }
 .homeTagline { color: #597172; font-size: 14px; line-height: 22px; margin-top: 6px; margin-bottom: 24px; }
 .homeFieldCard { border-width: 1px; border-color: #e0e8de; border-radius: 17px; overflow: hidden; background-color: #ffffff; margin-bottom: 24px; }
@@ -495,7 +494,7 @@ $muted: #64748b;
 .homeMetricFull { flex-basis: 100%; }
 .homeMetricHeading { flex-direction: row; align-items: center; gap: 7px; margin-bottom: 8px; }
 .homeMetricLabel { color: #597172; font-size: 12px; line-height: 19px; flex: 1; }
-.homeMetricValue { color: #193234; font-size: 32px; line-height: 40px; font-weight: 700; letter-spacing: -0.5px; }
+.homeMetricValue { color: #193234; font-size: 26px; line-height: 34px; font-weight: 700; letter-spacing: -0.5px; }
 .homeMetricUnit { color: #597172; font-size: 12px; font-weight: 400; letter-spacing: 0px; }
 .homeMetricStatus { color: #248233; font-size: 11px; line-height: 18px; margin-top: 4px; }
 .homeForecastLink { margin-top: 20px; border-width: 1px; border-color: #e1e8de; border-radius: 17px; padding: 14px; flex-direction: row; align-items: center; gap: 12px; }
@@ -550,8 +549,8 @@ $muted: #64748b;
 .profileAvatar { width: 64px; height: 64px; border-radius: 32px; background-color: #cef9e5; align-items: center; justify-content: center; }
 .profileAvatarLarge { width: 82px; height: 82px; border-radius: 41px; }
 .profileAvatarImage { width: 100%; height: 100%; border-radius: 44px; }
-.profileAvatarInitial { color: #009c73; font-size: 28px; line-height: 38px; font-weight: 700; }
-.profileAvatarInitialLarge { font-size: 34px; line-height: 44px; }
+.profileAvatarInitial { color: #009c73; font-size: 25px; line-height: 34px; font-weight: 700; }
+.profileAvatarInitialLarge { font-size: 29px; line-height: 38px; }
 .profileAvatarCamera { position: absolute; right: 0px; bottom: 0px; width: 27px; height: 27px; border-radius: 14px; border-width: 3px; border-color: #ffffff; background-color: #1d2848; align-items: center; justify-content: center; }
 .profileCard { background-color: #ffffff; border-radius: 22px; padding: 20px; box-shadow: 0px 4px 14px rgba(29, 40, 72, 0.04); elevation: 1; }
 .profileCardTitle { color: #1d2848; font-size: 18px; line-height: 26px; font-weight: 700; margin-bottom: 12px; }
@@ -588,7 +587,7 @@ $muted: #64748b;
 .profileInputReadOnly { background-color: #edf1f6; border-color: #dce4ed; }
 .profileReadOnlyText { color: #7a8ba5; }
 .profileInputError { border-color: #d94b4b; background-color: #ffffff; }
-.profileInput { flex: 1; min-width: 0px; padding-top: 12px; padding-bottom: 12px; color: #293753; font-size: 14px; line-height: 22px; }
+.profileInput { flex: 1; min-width: 0px; padding-top: 8px; padding-bottom: 8px; color: #293753; font-size: 14px; line-height: 22px; }
 .profileFieldError { color: #cb4141; font-size: 12px; line-height: 20px; margin-top: 6px; }
 .profileSuccess { align-items: center; gap: 13px; padding-top: 16px; padding-bottom: 20px; }
 .profileSuccessIcon { width: 60px; height: 60px; border-radius: 30px; align-items: center; justify-content: center; background-color: #e5f5f1; margin-bottom: 4px; }
@@ -635,7 +634,7 @@ $muted: #64748b;
 .reportFootnote { color: #7b8dac; font-size: 11px; line-height: 19px; margin-top: 7px; }
 .reportAiStats { flex-direction: row; flex-wrap: wrap; gap: 12px; margin-top: 12px; margin-bottom: 16px; }
 .reportAiStat { flex: 1; min-width: 110px; background-color: #f3f5f9; border-radius: 13px; padding: 15px; gap: 3px; }
-.reportAiCount { color: #24314d; font-size: 30px; line-height: 38px; font-weight: 700; }
+.reportAiCount { color: #24314d; font-size: 25px; line-height: 32px; font-weight: 700; }
 .reportSummaryRow { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 6px; padding-bottom: 6px; }
 .reportSummaryValue { color: #34415e; font-size: 12px; line-height: 20px; font-weight: 600; flex-shrink: 1; }
 .reportLegends { flex-direction: row; flex-wrap: wrap; gap: 16px; margin-top: 13px; }
