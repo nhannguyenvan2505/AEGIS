@@ -33,4 +33,16 @@ See [mobile integration and setup](docs/MOBILE_INTEGRATION.md), [upstream attrib
 IoT readings and forecasts in the midterm flow are synthetic. See the clone guide
 for model/data limits; field validation and device acceptance remain pending.
 
-Team workflow (current): issue → task branch → PR into `main` → independent review; the `Team policy` check validates branch name and PR title. A Gitflow (`develop`) variant is proposed but not yet adopted. See [CONTRIBUTING.md](CONTRIBUTING.md). Do not push directly to shared branches.
+Team workflow (current): issue → task branch → PR into `main` → independent review; the `Team policy` check validates branch name and PR title. A Gitflow (`develop`) variant is proposed in PR #12 but not yet adopted. See [CONTRIBUTING.md](CONTRIBUTING.md). Do not push directly to shared branches.
+
+## Run with a native MySQL instead of Docker
+
+See [backend/docs/NATIVE_MYSQL.md](backend/docs/NATIVE_MYSQL.md) for requirements.
+
+```powershell
+# 1. Set up and start MySQL
+.ackend\.venv\Scripts\python.exe backend/database/setup_native_mysql.py
+
+# 2. Start the backend
+.ackend\.venv\Scripts\python.exe -u -X utf8 -B backend/serve_mobile.py --pilot-dir pilot_data/forecast-midterm
+```

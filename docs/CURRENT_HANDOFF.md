@@ -9,10 +9,10 @@ thuẫn với bảng này thì bảng này đúng. Phạm vi và quyết định
 |---|---|---|
 | Phạm vi | Kết thúc 02/12/2026. Bệnh: Rice Blast, Brown Spot, Sheath Blight. Biến môi trường: nhiệt độ, độ ẩm, leaf wetness. Bắt buộc thêm MQTT/ESP32, deploy cloud, push, xuất PDF/Excel. Bỏ multimodal fusion, OAuth2 | [DECISIONS_20261120](DECISIONS_20261120.md) |
 | Auth | JWT HS256 + session digest để thu hồi; RBAC farmer/admin đọc role từ DB; scrypt. PR #9 (draft) | [JWT_RBAC](../backend/docs/JWT_RBAC.md) |
-| Database | MySQL + MongoDB mặc định. Outbox gửi Mongo bằng dispatcher nền, có trạng thái failed và retry (PR #11, cần migration 5) | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
+| Database | MySQL + MongoDB mặc định. Outbox gửi Mongo bằng dispatcher nền, có trạng thái failed và retry (PR #11, cần migration 6; migration 5 là farm hierarchy) | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
 | AI ảnh | YOLO11 V4 mặc định. Test 520 ảnh: mAP50 72,7%, mAP50-95 33,7%. Ngưỡng Low Confidence 0,50 | [DECISIONS_20261120](DECISIONS_20261120.md) |
 | Forecast | FM03 phục vụ; T17 không qua gate; dữ liệu toàn bộ synthetic | [status mục 124](../AEGIS_PROJECT_STATUS.md) |
-| API | 95 route, bảng sinh tự động từ code | [API_REFERENCE](API_REFERENCE.md) |
+| API | Bảng route sinh tự động từ code (gồm Farm → Plot → Season của mobile) | [API_REFERENCE](API_REFERENCE.md) |
 | CI / PR | `Team policy` trên main; `Backend tests` xanh trên PR #9. PR #8 đã gỡ xung đột với main (20/11). Thứ tự merge: #8 → #9 → #10, #11 | [TEAM_PROGRESS](TEAM_PROGRESS.md) |
 | Hồ sơ môn học | Bộ hồ sơ C1SE.21 đã cập nhật theo quyết định 20/11; thêm SRS, Test Plan, User Guide, Test Report (nháp). Nằm ngoài repo, xem `DANH_MUC.txt` trong thư mục hồ sơ | — |
 | Artifact | Artifact forecast T07–T17 và bằng chứng có ngày không vào Git; chia sẻ qua Release riêng tư | [ARTIFACT_STORAGE](ARTIFACT_STORAGE.md) |

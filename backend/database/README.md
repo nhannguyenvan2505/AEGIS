@@ -1,6 +1,9 @@
 # AEGIS MySQL và MongoDB cho môi trường phát triển
 
-**Trạng thái sau cutover 09/11/2026:** core, mobile và pilot mặc định dùng MySQL + MongoDB; dữ liệu SQLite runtime đã nhập và đối chiếu. Hướng dẫn mới nhất và kết quả phục hồi: [HYBRID_DATABASE_RUNBOOK.md](../../docs/HYBRID_DATABASE_RUNBOOK.md). Migrations hiện tại là 001–004. Các đoạn mô tả bước 2/3 bên dưới giữ bối cảnh triển khai; lựa chọn MySQL hiện không còn là opt-in.
+**Trạng thái 09/11/2026:** core, mobile, pilot và API nông trại hỗ trợ MySQL.
+Migrations hiện tại là 001–005. [Hướng dẫn MySQL native](../docs/NATIVE_MYSQL.md)
+cho phép chạy trực tiếp trên Windows, không cần Docker; MongoDB là tùy chọn qua
+cấu hình delivery. Phần Compose bên dưới giữ cách chạy hybrid của upstream.
 
 Schema đích dựa trên `D:/C1SE.21/C1SE.21_AEGIS_Database_Design.docx`, version 1.0. Core và pilot mặc định dùng MySQL; MongoDB nhận telemetry/HTTP payload và log AI qua outbox. SQLite là backend fixture/legacy tường minh.
 

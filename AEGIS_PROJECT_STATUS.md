@@ -129,7 +129,7 @@ delivery trên đường response và `runtime_lock` toàn cục chưa benchmark
 |---|---|
 | Quyết định D-01…D-08 | Ghi trong [DECISIONS_20261120](docs/DECISIONS_20261120.md): kết thúc 02/12; 3 bệnh theo V4; nhiệt độ/độ ẩm/leaf wetness; MQTT/ESP32, cloud, push, report vẫn bắt buộc; bỏ fusion/OAuth2; scrypt; báo NFR02 theo số thật; ngưỡng 0,50 |
 | Hồ sơ C1SE.21 | Sửa đồng bộ (nhóm 1) và cập nhật nội dung (nhóm 2) cho 6 hồ sơ; tạo SRS, Test Plan, User Guide, Test Report nháp, dàn ý Capstone Report (nhóm 3). Hồ sơ nằm ngoài repo |
-| Repo (nhóm 4) | PR #8 gỡ xung đột với main (giữ bản của nhánh cho 3 tài liệu add/add); [API_REFERENCE](docs/API_REFERENCE.md) sinh từ 95 route; [ARTIFACT_STORAGE](docs/ARTIFACT_STORAGE.md); ignore artifact forecast và cấu hình agent cục bộ; tách nhật ký 1–123 sang [AEGIS_PROJECT_HISTORY](AEGIS_PROJECT_HISTORY.md) |
+| Repo (nhóm 4) | PR #8 gỡ xung đột với main (giữ bản của nhánh cho 3 tài liệu add/add); [API_REFERENCE](docs/API_REFERENCE.md) sinh từ route thật (98); [ARTIFACT_STORAGE](docs/ARTIFACT_STORAGE.md); ignore artifact forecast và cấu hình agent cục bộ; tách nhật ký 1–123 sang [AEGIS_PROJECT_HISTORY](AEGIS_PROJECT_HISTORY.md) |
 
 Rủi ro chính: deadline 02/12 với bốn hạng mục bắt buộc chưa làm (MQTT/ESP32, cloud, push, report), cùng E2E, benchmark và nghiệm thu thiết bị.
 

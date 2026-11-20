@@ -29,7 +29,7 @@ khi mâu thuẫn với tài liệu hiện hành thì theo
 
 ## API và contract cho frontend
 
-Bảng đủ 95 route, sinh từ code: [API_REFERENCE](API_REFERENCE.md) (chạy lại `tools/gen_api_reference.py` khi đổi route). Chi tiết request/response nằm ở các contract dưới đây.
+Bảng đủ route (98 ngày 20/11), sinh từ code: [API_REFERENCE](API_REFERENCE.md) (chạy lại `tools/gen_api_reference.py` khi đổi route). Chi tiết request/response nằm ở các contract dưới đây.
 
 | Khu vực | Tài liệu |
 |---|---|
