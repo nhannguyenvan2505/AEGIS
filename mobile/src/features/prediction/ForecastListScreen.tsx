@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNavigation } from '../../components/BottomNavigation';
+import { AppHeader, HeaderIconButton } from '../../components/AppHeader';
 import { Icon, type IconName } from '../../components/Design';
 import { useAuth } from '../../state/AuthContext';
 import { ApiError } from '../../services/api';
@@ -12,23 +13,16 @@ import { fieldArea, fieldStatus, forecastNumber, loadForecastFarms, type Forecas
 import { IOT_PREVIEW_ENABLED } from './iotPreview';
 import { usePlotIot } from './IotPreviewContext';
 
-const colors = { teal: '#009f96', ink: '#1c304b', muted: '#657e9e', high: '#96520b', low: '#23734d', pending: '#647381' };
+const colors = { teal: '#0b7a54', ink: '#12332b', muted: '#566a63', high: '#8a4b08', low: '#12332b', pending: '#566a63' };
 
 export function ForecastPage({ children, refreshing = false, onRefresh }: {
   children: ReactNode; refreshing?: boolean; onRefresh?: () => void;
 }) {
   return <SafeAreaView style={s.forecastPage}>
+    <AppHeader title="Ruộng của tôi" eyebrow="DỰ BÁO MÙA VỤ" avatar right={onRefresh ? <HeaderIconButton icon="refresh-cw" label="Tải lại danh sách dự báo" onPress={() => { if (!refreshing) onRefresh(); }} /> : undefined} />
     <ScrollView contentContainerStyle={s.forecastScroll} showsVerticalScrollIndicator={false}
       refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.teal} /> : undefined}>
       <View style={s.forecastColumn}>
-        <View style={s.forecastHeader}>
-          <View style={s.forecastGrow}><Text style={s.forecastEyebrow}>DỰ BÁO MÙA VỤ</Text>
-            <Text accessibilityRole="header" style={s.forecastPageTitle}>Ruộng của tôi</Text></View>
-          {onRefresh && <Pressable accessibilityRole="button" accessibilityLabel="Tải lại danh sách dự báo"
-            disabled={refreshing} onPress={onRefresh} style={({ pressed }) => [s.forecastRefresh, pressed && s.forecastPressed]}>
-            {refreshing ? <ActivityIndicator color={colors.teal} size="small" /> : <Icon name="refresh-cw" size={20} color={colors.teal} />}
-          </Pressable>}
-        </View>
         {children}
       </View>
     </ScrollView>
@@ -85,7 +79,7 @@ function FieldCard({ field, farmId }: { field: ForecastField; farmId: string }) 
       <Text style={[s.forecastRiskText, { color }]}>{status.label}</Text>
     </View>
     <View style={s.forecastMetrics}>
-      <IoTMetric label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" color="#c28239" wide={wide} />
+      <IoTMetric label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" color="#d98b1b" wide={wide} />
       <IoTMetric label="Độ ẩm" value={readings.humidity} unit="%" icon="droplet" color="#4b94bb" wide={wide} />
       <IoTMetric label="pH đất" value={readings.soilPh} icon="activity" color="#a17aa8" wide={wide} />
       <IoTMetric label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" color="#6f96ab" wide={wide} />

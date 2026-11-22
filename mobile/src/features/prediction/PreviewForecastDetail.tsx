@@ -7,8 +7,8 @@ import { currentSeason } from './forecastFields';
 import { detailDate } from './forecastDetail';
 import { usePlotIot } from './IotPreviewContext';
 import {
-  DetailButton, DetailCard, DetailMeta, DetailPlotSummary, DetailReadings, DetailReadingsHeader,
-  DetailRiskBadge, DetailSuggestion, ForecastDetailPage, detailColors,
+  DetailCard, DetailHero, DetailMeta, DetailReadings, DetailReadingsHeader,
+  DetailSuggestion, ForecastDetailPage, detailColors,
 } from './components/ForecastDetailUI';
 
 // Local presentation scenario, deliberately separate from saved API forecasts/alerts.
@@ -18,17 +18,9 @@ export function PreviewForecastDetail({ farm, plot, seasons }: { farm: Farm; plo
   const { status } = forecast;
   const high = status.tone === 'high';
   return <ForecastDetailPage onRefresh={refresh}>
-    <DetailCard>
-      <View style={s.forecastDetailSummaryTop}><DetailRiskBadge status={status} />
-        <View style={s.forecastDetailReadState}><View style={s.forecastDetailReadDot} /><Text style={s.forecastDetailReadText}>Đang theo dõi</Text></View>
-      </View>
-      <Text style={s.forecastDetailSummaryTitle}>{forecast.title}</Text>
-      <View style={s.forecastDetailTimeRow}><Icon name="clock" size={16} color={detailColors.muted} />
-        <Text style={s.forecastDetailMuted}>{detailDate(forecast.issuedAt, false, true)}</Text></View>
-      <Text style={s.forecastDetailMuted}>Đánh giá điều kiện môi trường để ưu tiên kiểm tra ruộng, chưa xác nhận lúa đã nhiễm bệnh.</Text>
-    </DetailCard>
+    <DetailHero status={status} farm={farm} plot={plot} season={currentSeason(seasons)} readState="Đang theo dõi" title={forecast.title}
+      time={detailDate(forecast.issuedAt, false, true)} note="Đánh giá điều kiện môi trường để ưu tiên kiểm tra, chưa xác nhận lúa đã nhiễm bệnh." />
 
-    <DetailPlotSummary farm={farm} plot={plot} season={currentSeason(seasons)} />
 
     <DetailCard title="Vì sao có dự báo này?">
       <Text testID="forecast-explanation" style={s.forecastDetailBody}>{forecast.explanation}</Text>
@@ -38,7 +30,7 @@ export function PreviewForecastDetail({ farm, plot, seasons }: { farm: Farm; plo
 
     <DetailReadingsHeader onRefresh={refresh} />
     <DetailReadings readings={readings} />
-    <Text style={s.forecastDetailFootnote}>Lượng mưa tích lũy trong 24 giờ. Nhấn Tải mới để cập nhật số đo và đánh giá của ruộng.</Text>
+    <Text style={s.forecastDetailFootnote}>Đo lúc {detailDate(readings.observedAt, false, true)} · mưa tích lũy 24 giờ.</Text>
 
     <View testID="forecast-outlook" style={[s.forecastDetailOutlook, high ? s.forecastDetailOutlookHigh : s.forecastDetailOutlookLow]}>
       <View style={s.forecastDetailOutlookLabel}><Icon name={high ? 'alert-triangle' : 'activity'} size={16} color={detailColors[status.tone]} />
@@ -56,6 +48,5 @@ export function PreviewForecastDetail({ farm, plot, seasons }: { farm: Farm; plo
       body={high ? 'Kiểm tra lại số đo sau mưa hoặc khi lá còn ướt; theo dõi pH đất riêng để đánh giá điều kiện đất.' : 'Cập nhật số đo khi có mưa, độ ẩm tăng hoặc điều kiện ruộng thay đổi.'} />
     <DetailSuggestion title="Không phun thuốc chỉ dựa vào dự báo" icon="shield"
       body="Nếu thấy triệu chứng, nhờ cán bộ kỹ thuật xác minh trước khi xử lý." />
-    <DetailButton title="Quay lại danh sách ruộng" secondary onPress={() => router.replace('/analysis')} />
   </ForecastDetailPage>;
 }

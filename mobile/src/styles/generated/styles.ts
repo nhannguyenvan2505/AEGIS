@@ -5,7 +5,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#f4f7fb"
+    "backgroundColor": "#f7f3e8"
   },
   "content": {
     "paddingTop": 12,
@@ -14,8 +14,8 @@ export const s = StyleSheet.create({
     "paddingLeft": 16
   },
   "brand": {
-    "color": "#059669",
-    "fontSize": 21,
+    "color": "#0b7a54",
+    "fontSize": 18,
     "fontWeight": "800"
   },
   "brandLogo": {
@@ -24,12 +24,13 @@ export const s = StyleSheet.create({
     "flexShrink": 0
   },
   "title": {
-    "color": "#0f172a",
-    "fontSize": 22,
-    "fontWeight": "800"
+    "color": "#12332b",
+    "fontSize": 19,
+    "fontWeight": "800",
+    "letterSpacing": -0.3
   },
   "subtitle": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21,
     "marginBottom": 16
@@ -47,20 +48,20 @@ export const s = StyleSheet.create({
     "marginBottom": 18
   },
   "heading": {
-    "color": "#0f172a",
-    "fontSize": 16,
+    "color": "#12332b",
+    "fontSize": 15,
     "fontWeight": "700",
     "marginBottom": 12
   },
   "label": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "marginBottom": 6
   },
   "value": {
-    "color": "#0f172a",
-    "fontSize": 23,
+    "color": "#12332b",
+    "fontSize": 20,
     "fontWeight": "800"
   },
   "row": {
@@ -71,7 +72,7 @@ export const s = StyleSheet.create({
   "metric": {
     "flexGrow": 1,
     "flexBasis": "40%",
-    "backgroundColor": "#f4f7fb",
+    "backgroundColor": "#fbf8f0",
     "borderTopLeftRadius": 16,
     "borderTopRightRadius": 16,
     "borderBottomRightRadius": 16,
@@ -83,7 +84,7 @@ export const s = StyleSheet.create({
     "alignItems": "center"
   },
   "button": {
-    "backgroundColor": "#059669",
+    "backgroundColor": "#0b7a54",
     "borderTopLeftRadius": 16,
     "borderTopRightRadius": 16,
     "borderBottomRightRadius": 16,
@@ -102,10 +103,10 @@ export const s = StyleSheet.create({
     "fontWeight": "700"
   },
   "secondary": {
-    "backgroundColor": "#ecfdf5"
+    "backgroundColor": "#eaf6ef"
   },
   "secondaryText": {
-    "color": "#047857"
+    "color": "#0b7a54"
   },
   "input": {
     "minHeight": 52,
@@ -114,10 +115,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#cbd5e1",
-    "borderRightColor": "#cbd5e1",
-    "borderBottomColor": "#cbd5e1",
-    "borderLeftColor": "#cbd5e1",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 14,
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
@@ -128,7 +129,7 @@ export const s = StyleSheet.create({
     "paddingLeft": 10,
     "fontSize": 16,
     "lineHeight": 22,
-    "color": "#0f172a",
+    "color": "#12332b",
     "marginBottom": 12
   },
   "inputMultiline": {
@@ -137,12 +138,12 @@ export const s = StyleSheet.create({
     "paddingBottom": 12
   },
   "badge": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 11,
     "marginBottom": 14
   },
   "error": {
-    "color": "#be123c",
+    "color": "#b42318",
     "marginBottom": 12
   },
   "bar": {
@@ -151,7 +152,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 4,
     "borderBottomRightRadius": 4,
     "borderBottomLeftRadius": 4,
-    "backgroundColor": "#e2e8f0",
+    "backgroundColor": "#e9e3d3",
     "marginTop": 12
   },
   "fill": {
@@ -160,7 +161,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 4,
     "borderBottomRightRadius": 4,
     "borderBottomLeftRadius": 4,
-    "backgroundColor": "#059669"
+    "backgroundColor": "#0b7a54"
   },
   "image": {
     "width": "100%",
@@ -193,13 +194,13 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 22,
     "borderBottomRightRadius": 22,
     "borderBottomLeftRadius": 22,
-    "backgroundColor": "#a6192e",
+    "backgroundColor": "#b42318",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "avatarText": {
     "color": "#ffffff",
-    "fontSize": 18,
+    "fontSize": 16,
     "fontWeight": "800"
   },
   "back": {
@@ -214,7 +215,7 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "pill": {
-    "backgroundColor": "#ecfdf5",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 10,
     "borderTopRightRadius": 10,
     "borderBottomRightRadius": 10,
@@ -225,20 +226,20 @@ export const s = StyleSheet.create({
     "paddingLeft": 10
   },
   "pillText": {
-    "color": "#047857",
+    "color": "#0b7a54",
     "fontSize": 11,
     "fontWeight": "700"
   },
   "alert": {
-    "backgroundColor": "#fff1f2",
+    "backgroundColor": "#fdecea",
     "borderTopWidth": 1,
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#fecdd3",
-    "borderRightColor": "#fecdd3",
-    "borderBottomColor": "#fecdd3",
-    "borderLeftColor": "#fecdd3",
+    "borderTopColor": "#f4c4be",
+    "borderRightColor": "#f4c4be",
+    "borderBottomColor": "#f4c4be",
+    "borderLeftColor": "#f4c4be",
     "paddingTop": 16,
     "paddingRight": 16,
     "paddingBottom": 16,
@@ -252,13 +253,13 @@ export const s = StyleSheet.create({
     "gap": 12
   },
   "alertTitle": {
-    "color": "#9f1239",
+    "color": "#b42318",
     "fontSize": 14,
     "fontWeight": "700",
     "marginBottom": 6
   },
   "alertText": {
-    "color": "#881337",
+    "color": "#b42318",
     "fontSize": 12,
     "lineHeight": 20
   },
@@ -286,12 +287,12 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 16,
     "borderBottomRightRadius": 16,
     "borderBottomLeftRadius": 16,
-    "backgroundColor": "#f4f7fb",
+    "backgroundColor": "#fbf8f0",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "featureText": {
-    "color": "#0f172a",
+    "color": "#12332b",
     "fontSize": 13,
     "fontWeight": "700"
   },
@@ -311,137 +312,10 @@ export const s = StyleSheet.create({
     "gap": 12
   },
   "historyTitle": {
-    "color": "#0f172a",
+    "color": "#12332b",
     "fontSize": 13,
     "fontWeight": "700",
     "marginBottom": 4
-  },
-  "bottomNavContainer": {
-    "position": "absolute",
-    "bottom": 12,
-    "left": 16,
-    "right": 16,
-    "alignItems": "center"
-  },
-  "bottomNavFrame": {
-    "width": "100%",
-    "maxWidth": 480,
-    "height": 88
-  },
-  "bottomNavPanel": {
-    "position": "absolute",
-    "left": 0,
-    "right": 0,
-    "bottom": 0,
-    "height": 72,
-    "borderTopLeftRadius": 36,
-    "borderTopRightRadius": 36,
-    "borderBottomRightRadius": 36,
-    "borderBottomLeftRadius": 36,
-    "backgroundColor": "#ffffff",
-    "shadowOffset": {
-      "width": 0,
-      "height": 6
-    },
-    "shadowRadius": 18,
-    "shadowColor": "rgba(15, 23, 42, 0.14)",
-    "shadowOpacity": 1,
-    "elevation": 8
-  },
-  "bottomNavRow": {
-    "height": 88,
-    "flexDirection": "row",
-    "alignItems": "flex-end",
-    "paddingLeft": 4,
-    "paddingRight": 4,
-    "zIndex": 1,
-    "elevation": 9
-  },
-  "bottomNavTab": {
-    "flexGrow": 1,
-    "flexShrink": 1,
-    "flexBasis": 0,
-    "height": 72,
-    "minWidth": 48,
-    "alignItems": "center",
-    "borderTopLeftRadius": 28,
-    "borderTopRightRadius": 28,
-    "borderBottomRightRadius": 28,
-    "borderBottomLeftRadius": 28
-  },
-  "bottomNavTabPressed": {
-    "backgroundColor": "#edf9f4"
-  },
-  "bottomNavScanTab": {
-    "height": 88
-  },
-  "bottomNavIconSlot": {
-    "position": "absolute",
-    "top": 16,
-    "width": 42,
-    "height": 38,
-    "alignItems": "center",
-    "justifyContent": "center"
-  },
-  "bottomNavSelectedPill": {
-    "position": "absolute",
-    "top": 0,
-    "right": 0,
-    "bottom": 0,
-    "left": 0,
-    "borderTopLeftRadius": 20,
-    "borderTopRightRadius": 20,
-    "borderBottomRightRadius": 20,
-    "borderBottomLeftRadius": 20,
-    "backgroundColor": "#d1fae5"
-  },
-  "bottomNavImage": {
-    "width": 24,
-    "height": 24
-  },
-  "bottomNavScanCircle": {
-    "top": 4,
-    "width": 60,
-    "height": 60,
-    "borderTopLeftRadius": 30,
-    "borderTopRightRadius": 30,
-    "borderBottomRightRadius": 30,
-    "borderBottomLeftRadius": 30,
-    "borderTopWidth": 4,
-    "borderRightWidth": 4,
-    "borderBottomWidth": 4,
-    "borderLeftWidth": 4,
-    "borderTopColor": "#ffffff",
-    "borderRightColor": "#ffffff",
-    "borderBottomColor": "#ffffff",
-    "borderLeftColor": "#ffffff",
-    "backgroundColor": "#00a77b",
-    "shadowOffset": {
-      "width": 0,
-      "height": 4
-    },
-    "shadowRadius": 10,
-    "shadowColor": "rgba(0, 155, 115, 0.25)",
-    "shadowOpacity": 1,
-    "elevation": 10
-  },
-  "bottomNavScanSelected": {
-    "backgroundColor": "#008d68"
-  },
-  "bottomNavScanImage": {
-    "width": 26,
-    "height": 26
-  },
-  "bottomNavLabel": {
-    "position": "absolute",
-    "left": 1,
-    "right": 1,
-    "bottom": 7,
-    "color": "#008b65",
-    "fontSize": 10,
-    "lineHeight": 16,
-    "fontWeight": "700",
-    "textAlign": "center"
   },
   "upload": {
     "borderTopWidth": 2,
@@ -449,10 +323,10 @@ export const s = StyleSheet.create({
     "borderBottomWidth": 2,
     "borderLeftWidth": 2,
     "borderStyle": "dashed",
-    "borderTopColor": "#cbd5e1",
-    "borderRightColor": "#cbd5e1",
-    "borderBottomColor": "#cbd5e1",
-    "borderLeftColor": "#cbd5e1",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "backgroundColor": "#ffffff",
     "borderTopLeftRadius": 24,
     "borderTopRightRadius": 24,
@@ -474,7 +348,7 @@ export const s = StyleSheet.create({
     "alignItems": "flex-end",
     "gap": 9,
     "borderBottomWidth": 1,
-    "borderBottomColor": "#d1fae5",
+    "borderBottomColor": "#d3f1e2",
     "marginTop": 16
   },
   "chartColumn": {
@@ -490,7 +364,7 @@ export const s = StyleSheet.create({
     "width": "100%",
     "borderTopLeftRadius": 5,
     "borderTopRightRadius": 5,
-    "backgroundColor": "#059669"
+    "backgroundColor": "#0b7a54"
   },
   "setting": {
     "flexDirection": "row",
@@ -499,12 +373,12 @@ export const s = StyleSheet.create({
     "paddingTop": 16,
     "paddingBottom": 16,
     "borderBottomWidth": 1,
-    "borderBottomColor": "#f1f5f9",
+    "borderBottomColor": "#f7f3e8",
     "minHeight": 56
   },
   "preview": {
     "height": 240,
-    "backgroundColor": "#102e31",
+    "backgroundColor": "#12332b",
     "borderTopLeftRadius": 24,
     "borderTopRightRadius": 24,
     "borderBottomRightRadius": 24,
@@ -526,8 +400,8 @@ export const s = StyleSheet.create({
     "marginBottom": 16
   },
   "authFieldLabel": {
-    "color": "#0f172a",
-    "fontSize": 13,
+    "color": "#12332b",
+    "fontSize": 12,
     "fontWeight": "600",
     "marginBottom": 8
   },
@@ -539,10 +413,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#cbd5e1",
-    "borderRightColor": "#cbd5e1",
-    "borderBottomColor": "#cbd5e1",
-    "borderLeftColor": "#cbd5e1",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 14,
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
@@ -553,25 +427,25 @@ export const s = StyleSheet.create({
     "minHeight": 52
   },
   "authInputFocused": {
-    "borderTopColor": "#059669",
-    "borderRightColor": "#059669",
-    "borderBottomColor": "#059669",
-    "borderLeftColor": "#059669"
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54"
   },
   "authInputInvalid": {
-    "borderTopColor": "#be123c",
-    "borderRightColor": "#be123c",
-    "borderBottomColor": "#be123c",
-    "borderLeftColor": "#be123c"
+    "borderTopColor": "#b42318",
+    "borderRightColor": "#b42318",
+    "borderBottomColor": "#b42318",
+    "borderLeftColor": "#b42318"
   },
   "authInput": {
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
     "minWidth": 0,
-    "color": "#0f172a",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 13,
+    "lineHeight": 18,
     "paddingTop": 8,
     "paddingBottom": 8
   },
@@ -582,13 +456,13 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "authFieldError": {
-    "color": "#be123c",
+    "color": "#b42318",
     "fontSize": 12,
     "lineHeight": 18,
     "marginTop": 6
   },
   "authHint": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 18,
     "marginTop": 6
@@ -605,10 +479,10 @@ export const s = StyleSheet.create({
     "flexShrink": 1,
     "flexBasis": 0,
     "height": 1,
-    "backgroundColor": "#e2e8f0"
+    "backgroundColor": "#e9e3d3"
   },
   "authDividerText": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 12
   },
   "authGoogleButton": {
@@ -620,10 +494,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#cbd5e1",
-    "borderRightColor": "#cbd5e1",
-    "borderBottomColor": "#cbd5e1",
-    "borderLeftColor": "#cbd5e1",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 16,
     "borderTopRightRadius": 16,
     "borderBottomRightRadius": 16,
@@ -636,13 +510,13 @@ export const s = StyleSheet.create({
     "minHeight": 52
   },
   "authGoogleText": {
-    "color": "#0f172a",
+    "color": "#12332b",
     "fontSize": 14,
     "fontWeight": "600",
     "flexShrink": 1
   },
   "authPressed": {
-    "backgroundColor": "#f4f7fb"
+    "backgroundColor": "#fbf8f0"
   },
   "authLink": {
     "minHeight": 48,
@@ -655,17 +529,17 @@ export const s = StyleSheet.create({
     "marginBottom": 10
   },
   "authLinkText": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21,
     "textAlign": "center"
   },
   "authLinkEmphasis": {
-    "color": "#047857",
+    "color": "#0b7a54",
     "fontWeight": "700"
   },
   "authDemoNote": {
-    "color": "#64748b",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "textAlign": "center",
@@ -713,8 +587,8 @@ export const s = StyleSheet.create({
     "minHeight": 76
   },
   "authPageBrand": {
-    "fontSize": 20,
-    "lineHeight": 26,
+    "fontSize": 17,
+    "lineHeight": 22,
     "fontWeight": "700"
   },
   "authPageHelp": {
@@ -725,22 +599,22 @@ export const s = StyleSheet.create({
   },
   "authPageCard": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 20,
-    "borderTopRightRadius": 20,
-    "borderBottomRightRadius": 20,
-    "borderBottomLeftRadius": 20,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 24,
     "paddingRight": 20,
     "paddingBottom": 24,
     "paddingLeft": 20,
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 6
     },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(15, 23, 42, 0.08)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 3
+    "elevation": 2
   },
   "authHero": {
     "marginBottom": 16,
@@ -778,22 +652,22 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "authHeroTitle": {
-    "fontSize": 24,
-    "lineHeight": 30,
+    "fontSize": 20,
+    "lineHeight": 25,
     "fontWeight": "700",
     "marginBottom": 16
   },
   "authLoginHeroTitle": {
-    "fontSize": 25,
-    "lineHeight": 31
+    "fontSize": 21,
+    "lineHeight": 26
   },
   "authHeroDescription": {
-    "fontSize": 16,
-    "lineHeight": 23
+    "fontSize": 15,
+    "lineHeight": 22
   },
   "authPageFormTitle": {
-    "fontSize": 20,
-    "lineHeight": 26,
+    "fontSize": 17,
+    "lineHeight": 22,
     "fontWeight": "700",
     "marginBottom": 18
   },
@@ -841,16 +715,16 @@ export const s = StyleSheet.create({
     "marginBottom": 12
   },
   "authForgotPasswordText": {
-    "fontSize": 16,
-    "lineHeight": 22,
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "600"
   },
   "authPageSubmit": {
     "minHeight": 56,
-    "borderTopLeftRadius": 13,
-    "borderTopRightRadius": 13,
-    "borderBottomRightRadius": 13,
-    "borderBottomLeftRadius": 13,
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
     "alignItems": "center",
     "justifyContent": "center",
     "paddingTop": 16,
@@ -868,8 +742,8 @@ export const s = StyleSheet.create({
   },
   "authPageSubmitText": {
     "color": "#ffffff",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700",
     "textAlign": "center"
   },
@@ -895,7 +769,7 @@ export const s = StyleSheet.create({
     "textAlign": "center"
   },
   "authPageSwitchEmphasis": {
-    "fontSize": 16,
+    "fontSize": 15,
     "fontWeight": "700"
   },
   "authSecurityNote": {
@@ -919,9 +793,9 @@ export const s = StyleSheet.create({
     "marginTop": 16
   },
   "forgotBackText": {
-    "color": "#009b73",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "color": "#0b7a54",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700"
   },
   "forgotSuccessCard": {
@@ -940,19 +814,19 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 18,
     "borderBottomRightRadius": 18,
     "borderBottomLeftRadius": 18,
-    "backgroundColor": "#cef9e5",
+    "backgroundColor": "#d3f1e2",
     "marginBottom": 16
   },
   "forgotStatusText": {
-    "color": "#009b73",
+    "color": "#0b7a54",
     "fontSize": 14,
     "lineHeight": 20,
     "fontWeight": "700"
   },
   "forgotMessage": {
-    "color": "#1c2748",
-    "fontSize": 16,
-    "lineHeight": 24,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "marginBottom": 16
   },
   "forgotEmail": {
@@ -964,7 +838,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12,
-    "backgroundColor": "#f3f6f9",
+    "backgroundColor": "#f7f3e8",
     "paddingLeft": 14,
     "paddingRight": 14,
     "marginBottom": 16
@@ -973,12 +847,12 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#1c2748",
-    "fontSize": 15,
-    "lineHeight": 22
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 21
   },
   "forgotHint": {
-    "color": "#4e5d78",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 21,
     "marginBottom": 16
@@ -991,14 +865,14 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#009b73",
-    "borderRightColor": "#009b73",
-    "borderBottomColor": "#009b73",
-    "borderLeftColor": "#009b73",
-    "borderTopLeftRadius": 13,
-    "borderTopRightRadius": 13,
-    "borderBottomRightRadius": 13,
-    "borderBottomLeftRadius": 13,
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
     "backgroundColor": "#ffffff",
     "paddingTop": 14,
     "paddingRight": 14,
@@ -1006,9 +880,9 @@ export const s = StyleSheet.create({
     "paddingLeft": 14
   },
   "forgotResendText": {
-    "color": "#009b73",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "color": "#0b7a54",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700"
   },
   "forgotSuccessBack": {
@@ -1018,7 +892,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#edf2f8"
+    "backgroundColor": "#f7f3e8"
   },
   "farmKeyboard": {
     "flexGrow": 1,
@@ -1057,18 +931,18 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#1c304b",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700"
   },
   "farmRootTitle": {
-    "fontSize": 25,
-    "lineHeight": 32,
+    "fontSize": 21,
+    "lineHeight": 27,
     "paddingLeft": 4
   },
   "farmOverview": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22,
     "marginBottom": 2
@@ -1082,10 +956,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#cbd6e6",
-    "borderRightColor": "#cbd6e6",
-    "borderBottomColor": "#cbd6e6",
-    "borderLeftColor": "#cbd6e6",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -1103,7 +977,7 @@ export const s = StyleSheet.create({
     "minHeight": 48,
     "paddingTop": 0,
     "paddingBottom": 0,
-    "color": "#1c304b",
+    "color": "#12332b",
     "fontSize": 15,
     "lineHeight": 22
   },
@@ -1118,10 +992,10 @@ export const s = StyleSheet.create({
     "maxWidth": 560,
     "alignSelf": "center",
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 16,
-    "borderTopRightRadius": 16,
-    "borderBottomRightRadius": 16,
-    "borderBottomLeftRadius": 16,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 16,
     "paddingRight": 16,
     "paddingBottom": 16,
@@ -1129,10 +1003,10 @@ export const s = StyleSheet.create({
     "marginBottom": 16,
     "shadowOffset": {
       "width": 0,
-      "height": 3
+      "height": 6
     },
-    "shadowRadius": 14,
-    "shadowColor": "rgba(28, 48, 75, 0.05)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
     "elevation": 2
   },
@@ -1151,15 +1025,16 @@ export const s = StyleSheet.create({
     "paddingLeft": 14
   },
   "farmSelectedCard": {
-    "borderTopColor": "#15caba",
-    "borderRightColor": "#15caba",
-    "borderBottomColor": "#15caba",
-    "borderLeftColor": "#15caba"
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54"
   },
   "farmCardHeading": {
     "flexDirection": "row",
     "alignItems": "center",
-    "gap": 12
+    "gap": 12,
+    "paddingRight": 40
   },
   "farmCardMain": {
     "width": "100%"
@@ -1174,13 +1049,13 @@ export const s = StyleSheet.create({
     "minWidth": 0
   },
   "farmCardTitle": {
-    "color": "#1c304b",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700"
   },
   "farmCardAddress": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 20,
     "marginTop": 2
@@ -1191,17 +1066,17 @@ export const s = StyleSheet.create({
     "justifyContent": "space-between",
     "gap": 8,
     "marginTop": 12,
-    "marginBottom": 12
+    "marginBottom": 0
   },
   "farmStatsText": {
-    "color": "#1c304b",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 20,
     "fontWeight": "700",
     "flexShrink": 1
   },
   "farmSelectionText": {
-    "color": "#009f96",
+    "color": "#0b7a54",
     "fontSize": 12,
     "lineHeight": 18,
     "fontWeight": "600"
@@ -1212,12 +1087,12 @@ export const s = StyleSheet.create({
     "justifyContent": "space-between",
     "gap": 8,
     "borderTopWidth": 1,
-    "borderTopColor": "#cbd6e6",
+    "borderTopColor": "#d9d2bf",
     "paddingTop": 12,
     "minHeight": 40
   },
   "farmCardLink": {
-    "color": "#009f96",
+    "color": "#0b7a54",
     "fontSize": 14,
     "lineHeight": 21,
     "fontWeight": "600"
@@ -1229,7 +1104,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
     "borderBottomLeftRadius": 14,
-    "backgroundColor": "#e4f4f1",
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -1244,7 +1119,7 @@ export const s = StyleSheet.create({
   "farmHouseImage": {
     "width": 22,
     "height": 22,
-    "tintColor": "#009f96"
+    "tintColor": "#0b7a54"
   },
   "farmLargeHouseImage": {
     "width": 32,
@@ -1256,7 +1131,7 @@ export const s = StyleSheet.create({
     "bottom": 22,
     "width": 18,
     "height": 18,
-    "backgroundColor": "#e4f4f1",
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -1267,15 +1142,15 @@ export const s = StyleSheet.create({
     "paddingBottom": 16
   },
   "farmEmptyTitle": {
-    "color": "#1c304b",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700",
     "textAlign": "center",
     "marginTop": 18
   },
   "farmEmptyDescription": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 21,
     "textAlign": "center",
@@ -1289,11 +1164,11 @@ export const s = StyleSheet.create({
   },
   "farmButton": {
     "minHeight": 56,
-    "borderTopLeftRadius": 12,
-    "borderTopRightRadius": 12,
-    "borderBottomRightRadius": 12,
-    "borderBottomLeftRadius": 12,
-    "backgroundColor": "#24cdbb",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "#0b7a54",
     "flexDirection": "row",
     "alignItems": "center",
     "justifyContent": "center",
@@ -1304,15 +1179,15 @@ export const s = StyleSheet.create({
     "paddingLeft": 16
   },
   "farmButtonText": {
-    "color": "#152c45",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700",
     "textAlign": "center",
     "flexShrink": 1
   },
   "farmButtonNavy": {
-    "backgroundColor": "#1c2748"
+    "backgroundColor": "#12332b"
   },
   "farmButtonOutline": {
     "backgroundColor": "#ffffff",
@@ -1320,13 +1195,13 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#cbd6e6",
-    "borderRightColor": "#cbd6e6",
-    "borderBottomColor": "#cbd6e6",
-    "borderLeftColor": "#cbd6e6"
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf"
   },
   "farmButtonDanger": {
-    "backgroundColor": "#b13232"
+    "backgroundColor": "#b42318"
   },
   "farmButtonDangerOutline": {
     "backgroundColor": "#ffffff",
@@ -1334,16 +1209,16 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#b13232",
-    "borderRightColor": "#b13232",
-    "borderBottomColor": "#b13232",
-    "borderLeftColor": "#b13232"
+    "borderTopColor": "#b42318",
+    "borderRightColor": "#b42318",
+    "borderBottomColor": "#b42318",
+    "borderLeftColor": "#b42318"
   },
   "farmButtonLightText": {
     "color": "#ffffff"
   },
   "farmDangerText": {
-    "color": "#b13232"
+    "color": "#b42318"
   },
   "farmButtonGap": {
     "height": 16
@@ -1355,19 +1230,19 @@ export const s = StyleSheet.create({
     "opacity": 0.72
   },
   "farmFootnote": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 21,
     "marginTop": 16
   },
   "farmDemoNote": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 18,
     "marginTop": 12
   },
   "farmFormHint": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22,
     "marginBottom": 16
@@ -1379,7 +1254,7 @@ export const s = StyleSheet.create({
     "marginBottom": 12
   },
   "farmFieldLabel": {
-    "color": "#1c2748",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 20,
     "fontWeight": "700",
@@ -1387,15 +1262,15 @@ export const s = StyleSheet.create({
   },
   "farmInput": {
     "minHeight": 52,
-    "backgroundColor": "#f4f6f9",
+    "backgroundColor": "#f7f3e8",
     "borderTopWidth": 1,
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#cbd6e6",
-    "borderRightColor": "#cbd6e6",
-    "borderBottomColor": "#cbd6e6",
-    "borderLeftColor": "#cbd6e6",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -1404,7 +1279,7 @@ export const s = StyleSheet.create({
     "paddingRight": 10,
     "paddingBottom": 8,
     "paddingLeft": 10,
-    "color": "#1c2748",
+    "color": "#12332b",
     "fontSize": 16,
     "lineHeight": 22
   },
@@ -1414,19 +1289,19 @@ export const s = StyleSheet.create({
     "paddingBottom": 12
   },
   "farmInputInvalid": {
-    "borderTopColor": "#b13232",
-    "borderRightColor": "#b13232",
-    "borderBottomColor": "#b13232",
-    "borderLeftColor": "#b13232"
+    "borderTopColor": "#b42318",
+    "borderRightColor": "#b42318",
+    "borderBottomColor": "#b42318",
+    "borderLeftColor": "#b42318"
   },
   "farmFieldError": {
-    "color": "#b13232",
+    "color": "#b42318",
     "fontSize": 13,
     "lineHeight": 20,
     "marginTop": 4
   },
   "farmErrorBox": {
-    "backgroundColor": "#fff5f5",
+    "backgroundColor": "#fdecea",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -1454,14 +1329,14 @@ export const s = StyleSheet.create({
     "gap": 12
   },
   "farmMuted": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22
   },
   "farmDetailName": {
-    "color": "#1c304b",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700"
   },
   "farmInfoRow": {
@@ -1475,7 +1350,7 @@ export const s = StyleSheet.create({
     "alignItems": "center",
     "justifyContent": "space-between",
     "gap": 12,
-    "backgroundColor": "#e8f4f4",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -1487,15 +1362,15 @@ export const s = StyleSheet.create({
     "marginTop": 12
   },
   "farmDetailNotes": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22,
     "marginTop": 12
   },
   "farmSectionTitle": {
-    "color": "#1c304b",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700",
     "marginTop": 4,
     "marginBottom": 16
@@ -1521,7 +1396,7 @@ export const s = StyleSheet.create({
     "alignSelf": "center"
   },
   "farmSeasonDates": {
-    "color": "#1c304b",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 22,
     "marginTop": 16,
@@ -1531,7 +1406,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "rgba(28, 39, 72, 0.42)"
+    "backgroundColor": "rgba(14, 60, 42, 0.1)"
   },
   "farmModalScroll": {
     "flexGrow": 1,
@@ -1562,26 +1437,26 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
     "borderBottomLeftRadius": 14,
-    "backgroundColor": "#fceff0",
+    "backgroundColor": "#fdecea",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "farmModalTitle": {
-    "color": "#1c304b",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700",
     "marginTop": 20,
     "marginBottom": 16
   },
   "farmModalDescription": {
-    "color": "#657e9e",
-    "fontSize": 16,
-    "lineHeight": 24,
+    "color": "#566a63",
+    "fontSize": 15,
+    "lineHeight": 22,
     "marginBottom": 16
   },
   "farmModalNote": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 21,
     "marginBottom": 16
@@ -1590,7 +1465,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#eaf0f5"
+    "backgroundColor": "#f7f3e8"
   },
   "scanScroll": {
     "flexGrow": 1,
@@ -1621,9 +1496,9 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#1c2745",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700"
   },
   "scanHistoryButton": {
@@ -1641,17 +1516,17 @@ export const s = StyleSheet.create({
     "backgroundColor": "#ffffff"
   },
   "scanHistoryButtonText": {
-    "color": "#1c2745",
+    "color": "#12332b",
     "fontSize": 13,
     "lineHeight": 20,
     "fontWeight": "600"
   },
   "scanContext": {
     "minHeight": 74,
-    "borderTopLeftRadius": 18,
-    "borderTopRightRadius": 18,
-    "borderBottomRightRadius": 18,
-    "borderBottomLeftRadius": 18,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "backgroundColor": "#ffffff",
     "paddingTop": 16,
     "paddingRight": 16,
@@ -1662,17 +1537,17 @@ export const s = StyleSheet.create({
     "gap": 14,
     "shadowOffset": {
       "width": 0,
-      "height": 3
+      "height": 6
     },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(28, 39, 69, 0.04)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "scanContextIcon": {
     "width": 24,
     "height": 27,
-    "tintColor": "#1c2745"
+    "tintColor": "#12332b"
   },
   "scanContextText": {
     "flexGrow": 1,
@@ -1681,43 +1556,43 @@ export const s = StyleSheet.create({
     "gap": 3
   },
   "scanContextTitle": {
-    "color": "#1c2745",
-    "fontSize": 16,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "600"
   },
   "scanSmall": {
-    "color": "#6a7f9f",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 20
   },
   "scanPreviewCard": {
-    "borderTopLeftRadius": 18,
-    "borderTopRightRadius": 18,
-    "borderBottomRightRadius": 18,
-    "borderBottomLeftRadius": 18,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "overflow": "hidden",
     "backgroundColor": "#ffffff",
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 6
     },
-    "shadowRadius": 14,
-    "shadowColor": "rgba(28, 39, 69, 0.05)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
     "elevation": 2
   },
   "scanPreview": {
     "width": "100%",
     "height": 210,
-    "backgroundColor": "#e2ebe6"
+    "backgroundColor": "#e9e3d3"
   },
   "scanImageCaption": {
     "paddingTop": 12,
     "paddingRight": 12,
     "paddingBottom": 12,
     "paddingLeft": 16,
-    "color": "#6a7f9f",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 20
   },
@@ -1754,19 +1629,19 @@ export const s = StyleSheet.create({
     "borderBottomLeftRadius": 22,
     "alignItems": "center",
     "justifyContent": "center",
-    "backgroundColor": "#e4f6ef"
+    "backgroundColor": "#eaf6ef"
   },
   "scanEmptyTitle": {
-    "color": "#1c2745",
-    "fontSize": 18,
-    "lineHeight": 26,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700",
     "textAlign": "center"
   },
   "scanEmptyDescription": {
-    "color": "#6a7f9f",
-    "fontSize": 14,
-    "lineHeight": 22,
+    "color": "#566a63",
+    "fontSize": 13,
+    "lineHeight": 19,
     "textAlign": "center",
     "maxWidth": 340
   },
@@ -1791,15 +1666,15 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#009b72",
-    "borderRightColor": "#009b72",
-    "borderBottomColor": "#009b72",
-    "borderLeftColor": "#009b72",
-    "borderTopLeftRadius": 12,
-    "borderTopRightRadius": 12,
-    "borderBottomRightRadius": 12,
-    "borderBottomLeftRadius": 12,
-    "backgroundColor": "#009b72",
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "#0b7a54",
     "paddingTop": 12,
     "paddingRight": 8,
     "paddingBottom": 12,
@@ -1815,24 +1690,24 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#009b72",
-    "borderRightColor": "#009b72",
-    "borderBottomColor": "#009b72",
-    "borderLeftColor": "#009b72"
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54"
   },
   "scanButtonText": {
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
     "minWidth": 0,
-    "fontSize": 14,
+    "fontSize": 13,
     "lineHeight": 20,
     "fontWeight": "700",
     "color": "#ffffff",
     "textAlign": "center"
   },
   "scanOutlineText": {
-    "color": "#009b72"
+    "color": "#0b7a54"
   },
   "scanPressed": {
     "opacity": 0.7
@@ -1841,10 +1716,10 @@ export const s = StyleSheet.create({
     "opacity": 0.5
   },
   "scanResult": {
-    "borderTopLeftRadius": 18,
-    "borderTopRightRadius": 18,
-    "borderBottomRightRadius": 18,
-    "borderBottomLeftRadius": 18,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "backgroundColor": "#ffffff",
     "paddingTop": 20,
     "paddingRight": 20,
@@ -1853,12 +1728,12 @@ export const s = StyleSheet.create({
     "gap": 16,
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 6
     },
-    "shadowRadius": 14,
-    "shadowColor": "rgba(28, 39, 69, 0.04)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "scanResultTop": {
     "flexDirection": "row",
@@ -1878,28 +1753,28 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 24,
     "borderBottomRightRadius": 24,
     "borderBottomLeftRadius": 24,
-    "backgroundColor": "#cef9e5",
+    "backgroundColor": "#d3f1e2",
     "alignSelf": "flex-start"
   },
   "scanAiBadgeText": {
-    "color": "#009b72",
+    "color": "#0b7a54",
     "fontSize": 14,
     "lineHeight": 20,
     "fontWeight": "700"
   },
   "scanResultTitle": {
-    "color": "#1c2745",
-    "fontSize": 21,
-    "lineHeight": 29,
+    "color": "#12332b",
+    "fontSize": 16,
+    "lineHeight": 22,
     "fontWeight": "700"
   },
   "scanBody": {
-    "color": "#3c4c65",
-    "fontSize": 14,
-    "lineHeight": 23
+    "color": "#566a63",
+    "fontSize": 13,
+    "lineHeight": 20
   },
   "scanDetection": {
-    "backgroundColor": "#f1f8f5",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -1919,25 +1794,25 @@ export const s = StyleSheet.create({
     "gap": 4
   },
   "scanDetectionName": {
-    "color": "#1c2745",
-    "fontSize": 15,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 21,
     "fontWeight": "600"
   },
   "scanConfidence": {
-    "color": "#009b72",
-    "fontSize": 17,
-    "lineHeight": 24,
+    "color": "#0b7a54",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700"
   },
   "scanWarning": {
-    "backgroundColor": "#fff1da",
+    "backgroundColor": "#fff3dc",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12,
     "borderLeftWidth": 3,
-    "borderLeftColor": "#925311",
+    "borderLeftColor": "#8a4b08",
     "paddingTop": 12,
     "paddingRight": 12,
     "paddingBottom": 12,
@@ -1950,7 +1825,7 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "scanWarningTitle": {
-    "color": "#925311",
+    "color": "#8a4b08",
     "fontSize": 13,
     "lineHeight": 20,
     "fontWeight": "700",
@@ -1959,22 +1834,22 @@ export const s = StyleSheet.create({
     "flexBasis": 0
   },
   "scanWarningText": {
-    "color": "#3c4c65",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22
   },
   "scanFootnote": {
-    "color": "#6a7f9f",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21
   },
   "scanSaved": {
-    "color": "#6a7f9f",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19
   },
   "scanTips": {
-    "backgroundColor": "#f1f8f5",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -1991,18 +1866,18 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#3c6b59",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21
   },
   "scanFormat": {
-    "color": "#6a7f9f",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "textAlign": "center"
   },
   "scanError": {
-    "backgroundColor": "#fff1ec",
+    "backgroundColor": "#fdecea",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -2016,7 +1891,7 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "scanErrorText": {
-    "color": "#a13e2c",
+    "color": "#b42318",
     "fontSize": 14,
     "lineHeight": 22,
     "flexGrow": 1,
@@ -2024,7 +1899,7 @@ export const s = StyleSheet.create({
     "flexBasis": 0
   },
   "scanHistoryIntro": {
-    "color": "#6a7f9f",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 23
   },
@@ -2056,7 +1931,7 @@ export const s = StyleSheet.create({
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12,
     "overflow": "hidden",
-    "backgroundColor": "#e3eee8"
+    "backgroundColor": "#e9e3d3"
   },
   "scanThumbnailImage": {
     "width": "100%",
@@ -2069,13 +1944,13 @@ export const s = StyleSheet.create({
     "gap": 4
   },
   "scanHistoryCardTitle": {
-    "color": "#1c2745",
-    "fontSize": 15,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 21,
     "fontWeight": "600"
   },
   "scanHistoryLink": {
-    "color": "#009b72",
+    "color": "#0b7a54",
     "fontSize": 13,
     "lineHeight": 20,
     "fontWeight": "600"
@@ -2088,7 +1963,7 @@ export const s = StyleSheet.create({
   },
   "scanStoredImageBox": {
     "height": 240,
-    "backgroundColor": "#e2ebe6"
+    "backgroundColor": "#e9e3d3"
   },
   "scanStoredImage": {
     "width": "100%",
@@ -2110,7 +1985,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#edf2f7"
+    "backgroundColor": "#f7f3e8"
   },
   "forecastScroll": {
     "flexGrow": 1,
@@ -2137,7 +2012,7 @@ export const s = StyleSheet.create({
     "minWidth": 0
   },
   "forecastEyebrow": {
-    "color": "#009f96",
+    "color": "#0b7a54",
     "fontSize": 10,
     "lineHeight": 16,
     "fontWeight": "700",
@@ -2145,13 +2020,13 @@ export const s = StyleSheet.create({
     "marginBottom": 5
   },
   "forecastPageTitle": {
-    "color": "#1c304b",
-    "fontSize": 25,
-    "lineHeight": 32,
+    "color": "#12332b",
+    "fontSize": 21,
+    "lineHeight": 27,
     "fontWeight": "800"
   },
   "forecastSubtitle": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21
   },
@@ -2169,10 +2044,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#dce7eb",
-    "borderRightColor": "#dce7eb",
-    "borderBottomColor": "#dce7eb",
-    "borderLeftColor": "#dce7eb"
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3"
   },
   "forecastPressed": {
     "opacity": 0.6
@@ -2181,20 +2056,20 @@ export const s = StyleSheet.create({
     "marginBottom": 24
   },
   "forecastSummary": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 22
   },
   "forecastFarm": {
-    "backgroundColor": "#e2edee",
+    "backgroundColor": "#e9e3d3",
     "borderTopWidth": 1,
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#d2e3e3",
-    "borderRightColor": "#d2e3e3",
-    "borderBottomColor": "#d2e3e3",
-    "borderLeftColor": "#d2e3e3",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 23,
     "borderTopRightRadius": 23,
     "borderBottomRightRadius": 23,
@@ -2221,18 +2096,18 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 13,
     "borderBottomRightRadius": 13,
     "borderBottomLeftRadius": 13,
-    "backgroundColor": "#f6fcfa",
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "forecastFarmName": {
-    "color": "#1c304b",
-    "fontSize": 17,
-    "lineHeight": 24,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 21,
     "fontWeight": "700"
   },
   "forecastFarmMeta": {
-    "color": "#5f7d88",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "marginTop": 2
@@ -2249,7 +2124,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 17
   },
@@ -2259,10 +2134,10 @@ export const s = StyleSheet.create({
   },
   "forecastField": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 14,
     "paddingRight": 14,
     "paddingBottom": 14,
@@ -2277,19 +2152,19 @@ export const s = StyleSheet.create({
     "borderLeftColor": "#ffffff",
     "shadowOffset": {
       "width": 0,
-      "height": 3
+      "height": 6
     },
-    "shadowRadius": 9,
-    "shadowColor": "rgba(28, 48, 75, 0.06)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
     "elevation": 2
   },
   "forecastFieldPressed": {
-    "borderTopColor": "#16cbb8",
-    "borderRightColor": "#16cbb8",
-    "borderBottomColor": "#16cbb8",
-    "borderLeftColor": "#16cbb8",
-    "backgroundColor": "#f8fffd"
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54",
+    "backgroundColor": "#eaf6ef"
   },
   "forecastFieldHeader": {
     "flexDirection": "row",
@@ -2304,23 +2179,23 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 13,
     "borderBottomRightRadius": 13,
     "borderBottomLeftRadius": 13,
-    "backgroundColor": "#e5f5f1",
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "forecastSproutImage": {
     "width": 23,
     "height": 25,
-    "tintColor": "#00a397"
+    "tintColor": "#0b7a54"
   },
   "forecastFieldName": {
-    "color": "#192d42",
-    "fontSize": 16,
-    "lineHeight": 23,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "fontWeight": "700"
   },
   "forecastFieldMeta": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "marginTop": 2
@@ -2347,13 +2222,13 @@ export const s = StyleSheet.create({
     "marginBottom": 13
   },
   "forecastRiskHigh": {
-    "backgroundColor": "#fff1d9"
+    "backgroundColor": "#fff3dc"
   },
   "forecastRiskLow": {
-    "backgroundColor": "#e6f2e9"
+    "backgroundColor": "#eaf6ef"
   },
   "forecastRiskPending": {
-    "backgroundColor": "#edf0f3"
+    "backgroundColor": "#f7f3e8"
   },
   "forecastRiskText": {
     "fontSize": 12,
@@ -2371,7 +2246,7 @@ export const s = StyleSheet.create({
     "flexShrink": 1,
     "flexBasis": 0,
     "minWidth": 0,
-    "backgroundColor": "#f4f7fa",
+    "backgroundColor": "#f7f3e8",
     "borderTopLeftRadius": 10,
     "borderTopRightRadius": 10,
     "borderBottomRightRadius": 10,
@@ -2395,23 +2270,23 @@ export const s = StyleSheet.create({
     "gap": 5
   },
   "forecastMetricLabel": {
-    "color": "#637a93",
+    "color": "#566a63",
     "fontSize": 10,
     "lineHeight": 15
   },
   "forecastMetricValue": {
-    "color": "#223950",
-    "fontSize": 17,
-    "lineHeight": 25,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "fontWeight": "700"
   },
   "forecastMetricUnit": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 10,
     "fontWeight": "500"
   },
   "forecastMissingValue": {
-    "color": "#9baab8"
+    "color": "#7b8e87"
   },
   "forecastFieldFooter": {
     "flexDirection": "row",
@@ -2434,25 +2309,25 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 3,
     "borderBottomRightRadius": 3,
     "borderBottomLeftRadius": 3,
-    "backgroundColor": "#19bda8"
+    "backgroundColor": "#0b7a54"
   },
   "forecastDotMissing": {
-    "backgroundColor": "#a0afba"
+    "backgroundColor": "#7b8e87"
   },
   "forecastTimeText": {
-    "color": "#6b829d",
+    "color": "#566a63",
     "fontSize": 10,
     "lineHeight": 16,
     "flexShrink": 1
   },
   "forecastViewLink": {
-    "color": "#009f96",
+    "color": "#0b7a54",
     "fontSize": 11,
     "lineHeight": 17,
     "fontWeight": "600"
   },
   "forecastFarmEmpty": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21,
     "paddingTop": 12,
@@ -2461,7 +2336,7 @@ export const s = StyleSheet.create({
     "paddingLeft": 12
   },
   "forecastInlineError": {
-    "color": "#a13e2c",
+    "color": "#b42318",
     "fontSize": 12,
     "lineHeight": 19,
     "paddingTop": 10,
@@ -2481,12 +2356,12 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20
   },
   "forecastDataNote": {
-    "color": "#8294a9",
+    "color": "#7b8e87",
     "fontSize": 10,
     "lineHeight": 17,
     "marginTop": 12,
@@ -2519,19 +2394,19 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 20,
     "borderBottomRightRadius": 20,
     "borderBottomLeftRadius": 20,
-    "backgroundColor": "#e5f5f1",
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "forecastEmptyTitle": {
-    "color": "#1c304b",
-    "fontSize": 18,
-    "lineHeight": 26,
+    "color": "#12332b",
+    "fontSize": 16,
+    "lineHeight": 23,
     "fontWeight": "700",
     "textAlign": "center"
   },
   "forecastEmptyText": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22,
     "textAlign": "center"
@@ -2542,11 +2417,11 @@ export const s = StyleSheet.create({
     "paddingRight": 24,
     "paddingBottom": 12,
     "paddingLeft": 24,
-    "borderTopLeftRadius": 13,
-    "borderTopRightRadius": 13,
-    "borderBottomRightRadius": 13,
-    "borderBottomLeftRadius": 13,
-    "backgroundColor": "#009f96",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "#0b7a54",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -2560,11 +2435,11 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#e9eef4"
+    "backgroundColor": "#f7f3e8"
   },
   "forecastDetailScroll": {
     "flexGrow": 1,
-    "paddingTop": 0,
+    "paddingTop": 16,
     "paddingRight": 16,
     "paddingBottom": 140,
     "paddingLeft": 16
@@ -2591,30 +2466,22 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#1d2946",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700"
   },
   "forecastDetailCard": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 18,
-    "borderTopRightRadius": 18,
-    "borderBottomRightRadius": 18,
-    "borderBottomLeftRadius": 18,
-    "paddingTop": 18,
-    "paddingRight": 18,
-    "paddingBottom": 18,
-    "paddingLeft": 18,
-    "gap": 13,
-    "shadowOffset": {
-      "width": 0,
-      "height": 3
-    },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(29, 41, 70, 0.04)",
-    "shadowOpacity": 1,
-    "elevation": 1
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
+    "paddingTop": 16,
+    "paddingRight": 16,
+    "paddingBottom": 16,
+    "paddingLeft": 16,
+    "gap": 10
   },
   "forecastDetailSummaryTop": {
     "flexDirection": "row",
@@ -2655,17 +2522,17 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 3,
     "borderBottomRightRadius": 3,
     "borderBottomLeftRadius": 3,
-    "backgroundColor": "#1fb8ac"
+    "backgroundColor": "#0b7a54"
   },
   "forecastDetailReadText": {
-    "color": "#19a99f",
+    "color": "#0b7a54",
     "fontSize": 11,
-    "lineHeight": 18
+    "lineHeight": 16
   },
   "forecastDetailSummaryTitle": {
-    "color": "#1d2946",
-    "fontSize": 18,
-    "lineHeight": 26,
+    "color": "#12332b",
+    "fontSize": 16,
+    "lineHeight": 23,
     "fontWeight": "700"
   },
   "forecastDetailTimeRow": {
@@ -2674,35 +2541,36 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "forecastDetailBody": {
-    "color": "#34435f",
-    "fontSize": 14,
-    "lineHeight": 23
+    "color": "#12332b",
+    "fontSize": 12,
+    "lineHeight": 19,
+    "opacity": 0.9
   },
   "forecastDetailMuted": {
-    "color": "#7789a7",
-    "fontSize": 12,
-    "lineHeight": 20,
+    "color": "#566a63",
+    "fontSize": 11,
+    "lineHeight": 16,
     "flexShrink": 1
   },
   "forecastDetailHeading": {
-    "color": "#1d2946",
-    "fontSize": 17,
-    "lineHeight": 25,
-    "fontWeight": "700"
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 20,
+    "fontWeight": "800"
   },
   "forecastDetailSectionTitle": {
-    "color": "#1d2946",
-    "fontSize": 19,
-    "lineHeight": 27,
-    "fontWeight": "700",
-    "marginTop": 3
+    "color": "#12332b",
+    "fontSize": 16,
+    "lineHeight": 22,
+    "fontWeight": "800",
+    "marginTop": 6
   },
   "forecastDetailPlot": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 17,
     "paddingRight": 17,
     "paddingBottom": 17,
@@ -2712,27 +2580,27 @@ export const s = StyleSheet.create({
     "gap": 12,
     "shadowOffset": {
       "width": 0,
-      "height": 3
+      "height": 6
     },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(29, 41, 70, 0.04)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "forecastDetailPlant": {
     "width": 24,
     "height": 28,
-    "tintColor": "#11aca1"
+    "tintColor": "#0b7a54"
   },
   "forecastDetailPlotName": {
-    "color": "#25334d",
-    "fontSize": 15,
-    "lineHeight": 23,
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 21,
     "fontWeight": "600",
     "marginBottom": 3
   },
   "forecastDetailSeasonLine": {
-    "color": "#7789a7",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20
   },
@@ -2756,26 +2624,26 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#dbe3ed",
-    "borderRightColor": "#dbe3ed",
-    "borderBottomColor": "#dbe3ed",
-    "borderLeftColor": "#dbe3ed",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "justifyContent": "center"
   },
   "forecastDetailSeasonSelected": {
-    "backgroundColor": "#e0f6ee",
-    "borderTopColor": "#42b69a",
-    "borderRightColor": "#42b69a",
-    "borderBottomColor": "#42b69a",
-    "borderLeftColor": "#42b69a"
+    "backgroundColor": "#eaf6ef",
+    "borderTopColor": "#1aa376",
+    "borderRightColor": "#1aa376",
+    "borderBottomColor": "#1aa376",
+    "borderLeftColor": "#1aa376"
   },
   "forecastDetailSeasonText": {
-    "color": "#657e9e",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20
   },
   "forecastDetailSeasonTextSelected": {
-    "color": "#168067",
+    "color": "#0b7a54",
     "fontWeight": "600"
   },
   "forecastDetailMetadata": {
@@ -2790,9 +2658,9 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "forecastDetailMetaValue": {
-    "color": "#34435f",
-    "fontSize": 12,
-    "lineHeight": 20,
+    "color": "#12332b",
+    "fontSize": 11,
+    "lineHeight": 16,
     "fontWeight": "600",
     "flexShrink": 1,
     "textAlign": "right"
@@ -2801,10 +2669,10 @@ export const s = StyleSheet.create({
     "flexDirection": "row",
     "flexWrap": "wrap",
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "overflow": "hidden"
   },
   "forecastDetailReading": {
@@ -2820,11 +2688,11 @@ export const s = StyleSheet.create({
   },
   "forecastDetailReadingBottom": {
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e0e9e8"
+    "borderBottomColor": "#e9e3d3"
   },
   "forecastDetailReadingLeft": {
     "borderLeftWidth": 1,
-    "borderLeftColor": "#e0e9e8"
+    "borderLeftColor": "#e9e3d3"
   },
   "forecastDetailReadingTitle": {
     "flexDirection": "row",
@@ -2832,33 +2700,33 @@ export const s = StyleSheet.create({
     "gap": 6
   },
   "forecastDetailReadingLabel": {
-    "color": "#658084",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "flexShrink": 1
   },
   "forecastDetailReadingValue": {
-    "color": "#28595b",
-    "fontSize": 24,
-    "lineHeight": 32,
+    "color": "#12332b",
+    "fontSize": 20,
+    "lineHeight": 27,
     "fontWeight": "700"
   },
   "forecastDetailReadingUnit": {
-    "color": "#6d8788",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "fontWeight": "500"
   },
   "forecastDetailReadingMissing": {
-    "color": "#9babb8"
+    "color": "#7b8e87"
   },
   "forecastDetailReadingTime": {
-    "color": "#7b9194",
+    "color": "#566a63",
     "fontSize": 10,
     "lineHeight": 17
   },
   "forecastDetailFootnote": {
-    "color": "#7c8eac",
+    "color": "#7b8e87",
     "fontSize": 12,
     "lineHeight": 20
   },
@@ -2875,16 +2743,16 @@ export const s = StyleSheet.create({
     "gap": 10
   },
   "forecastDetailOutlookHigh": {
-    "backgroundColor": "#fff4e3",
+    "backgroundColor": "#fff3dc",
     "borderLeftColor": "#d98b1b"
   },
   "forecastDetailOutlookLow": {
-    "backgroundColor": "#e8f5ef",
-    "borderLeftColor": "#31a580"
+    "backgroundColor": "#eaf6ef",
+    "borderLeftColor": "#0b7a54"
   },
   "forecastDetailOutlookPending": {
-    "backgroundColor": "#f5f7fa",
-    "borderLeftColor": "#93a5b9"
+    "backgroundColor": "#fbf8f0",
+    "borderLeftColor": "#7b8e87"
   },
   "forecastDetailOutlookLabel": {
     "flexDirection": "row",
@@ -2900,42 +2768,42 @@ export const s = StyleSheet.create({
     "flexBasis": 0
   },
   "forecastDetailOutlookTitle": {
-    "color": "#1d2946",
-    "fontSize": 17,
-    "lineHeight": 25,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "fontWeight": "700"
   },
   "forecastDetailSuggestion": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
-    "paddingTop": 15,
-    "paddingRight": 15,
-    "paddingBottom": 15,
-    "paddingLeft": 15,
+    "borderTopLeftRadius": 18,
+    "borderTopRightRadius": 18,
+    "borderBottomRightRadius": 18,
+    "borderBottomLeftRadius": 18,
+    "paddingTop": 12,
+    "paddingRight": 12,
+    "paddingBottom": 12,
+    "paddingLeft": 12,
     "flexDirection": "row",
     "alignItems": "center",
     "gap": 12
   },
   "forecastDetailSuggestionIcon": {
-    "width": 40,
-    "height": 42,
-    "borderTopLeftRadius": 12,
-    "borderTopRightRadius": 12,
-    "borderBottomRightRadius": 12,
-    "borderBottomLeftRadius": 12,
-    "backgroundColor": "#f1f4f8",
+    "width": 38,
+    "height": 38,
+    "borderTopLeftRadius": 13,
+    "borderTopRightRadius": 13,
+    "borderBottomRightRadius": 13,
+    "borderBottomLeftRadius": 13,
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "forecastDetailSuggestionTitle": {
-    "color": "#24324e",
-    "fontSize": 14,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 13,
+    "lineHeight": 18,
     "fontWeight": "700",
-    "marginBottom": 3
+    "marginBottom": 2
   },
   "forecastDetailButton": {
     "minHeight": 52,
@@ -2943,11 +2811,11 @@ export const s = StyleSheet.create({
     "paddingRight": 13,
     "paddingBottom": 13,
     "paddingLeft": 13,
-    "borderTopLeftRadius": 11,
-    "borderTopRightRadius": 11,
-    "borderBottomRightRadius": 11,
-    "borderBottomLeftRadius": 11,
-    "backgroundColor": "#1d2946",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "#12332b",
     "flexDirection": "row",
     "alignItems": "center",
     "justifyContent": "center",
@@ -2966,14 +2834,14 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#d3deeb",
-    "borderRightColor": "#d3deeb",
-    "borderBottomColor": "#d3deeb",
-    "borderLeftColor": "#d3deeb",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "backgroundColor": "#ffffff"
   },
   "forecastDetailButtonOutlineText": {
-    "color": "#1d2946"
+    "color": "#12332b"
   },
   "forecastDetailDisabled": {
     "opacity": 0.48
@@ -2983,7 +2851,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 13,
     "borderBottomRightRadius": 13,
     "borderBottomLeftRadius": 13,
-    "backgroundColor": "#e4f5ee",
+    "backgroundColor": "#eaf6ef",
     "paddingTop": 14,
     "paddingRight": 14,
     "paddingBottom": 14,
@@ -2996,12 +2864,12 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#23785e",
+    "color": "#0b7a54",
     "fontSize": 13,
     "lineHeight": 21
   },
   "forecastDetailError": {
-    "backgroundColor": "#fff0e9",
+    "backgroundColor": "#fff3dc",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -3015,7 +2883,7 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "forecastDetailErrorText": {
-    "color": "#a15335",
+    "color": "#b42318",
     "fontSize": 13,
     "lineHeight": 21,
     "flexGrow": 1,
@@ -3024,10 +2892,10 @@ export const s = StyleSheet.create({
   },
   "forecastDetailHistory": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 16,
     "paddingRight": 16,
     "paddingBottom": 16,
@@ -3048,10 +2916,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#e0e7ee",
-    "borderRightColor": "#e0e7ee",
-    "borderBottomColor": "#e0e7ee",
-    "borderLeftColor": "#e0e7ee",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -3069,7 +2937,7 @@ export const s = StyleSheet.create({
     "gap": 10
   },
   "forecastDetailHistoryTitle": {
-    "color": "#34435f",
+    "color": "#12332b",
     "fontSize": 13,
     "lineHeight": 21,
     "fontWeight": "600"
@@ -3109,7 +2977,7 @@ export const s = StyleSheet.create({
     "gap": 7
   },
   "forecastDetailRefreshText": {
-    "color": "#15998f",
+    "color": "#0b7a54",
     "fontSize": 13,
     "lineHeight": 21,
     "fontWeight": "600"
@@ -3118,7 +2986,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#e9eef4"
+    "backgroundColor": "#f7f3e8"
   },
   "noticeScroll": {
     "paddingTop": 10,
@@ -3148,9 +3016,9 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#1d2946",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700"
   },
   "noticeFilterIcon": {
@@ -3173,10 +3041,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#d5dedf",
-    "borderRightColor": "#d5dedf",
-    "borderBottomColor": "#d5dedf",
-    "borderLeftColor": "#d5dedf",
+    "borderTopColor": "#d9d2bf",
+    "borderRightColor": "#d9d2bf",
+    "borderBottomColor": "#d9d2bf",
+    "borderLeftColor": "#d9d2bf",
     "borderTopLeftRadius": 24,
     "borderTopRightRadius": 24,
     "borderBottomRightRadius": 24,
@@ -3186,14 +3054,14 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "noticeTabSelected": {
-    "backgroundColor": "#1d2946",
-    "borderTopColor": "#1d2946",
-    "borderRightColor": "#1d2946",
-    "borderBottomColor": "#1d2946",
-    "borderLeftColor": "#1d2946"
+    "backgroundColor": "#12332b",
+    "borderTopColor": "#12332b",
+    "borderRightColor": "#12332b",
+    "borderBottomColor": "#12332b",
+    "borderLeftColor": "#12332b"
   },
   "noticeTabText": {
-    "color": "#6a7e9a",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 18,
     "fontWeight": "600"
@@ -3209,12 +3077,12 @@ export const s = StyleSheet.create({
     "marginTop": 4
   },
   "noticeNewest": {
-    "color": "#788ca7",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 17
   },
   "noticeMarkAll": {
-    "color": "#009f76",
+    "color": "#0b7a54",
     "fontSize": 11,
     "lineHeight": 18,
     "fontWeight": "700"
@@ -3238,12 +3106,12 @@ export const s = StyleSheet.create({
     "backgroundColor": "#ffffff",
     "shadowOffset": {
       "width": 0,
-      "height": 3
+      "height": 6
     },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(29, 41, 70, 0.06)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "noticePressed": {
     "opacity": 0.82
@@ -3259,10 +3127,10 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "noticeIconHigh": {
-    "backgroundColor": "#fff0dc"
+    "backgroundColor": "#fff3dc"
   },
   "noticeIconData": {
-    "backgroundColor": "#d9f6eb"
+    "backgroundColor": "#eaf6ef"
   },
   "noticeContent": {
     "flexGrow": 1,
@@ -3279,7 +3147,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#1d2946",
+    "color": "#12332b",
     "fontSize": 13,
     "lineHeight": 19,
     "fontWeight": "700"
@@ -3292,20 +3160,20 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 4,
     "borderBottomRightRadius": 4,
     "borderBottomLeftRadius": 4,
-    "backgroundColor": "#009f76"
+    "backgroundColor": "#0b7a54"
   },
   "noticeMessage": {
-    "color": "#4e607e",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19
   },
   "noticeMeta": {
-    "color": "#788ca7",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 17
   },
   "noticeFootnote": {
-    "color": "#788ca7",
+    "color": "#566a63",
     "fontSize": 10,
     "lineHeight": 16,
     "marginTop": 1
@@ -3322,13 +3190,13 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12,
-    "backgroundColor": "#fff0e9"
+    "backgroundColor": "#fff3dc"
   },
   "noticeErrorText": {
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "color": "#9d5037",
+    "color": "#b42318",
     "fontSize": 12,
     "lineHeight": 18
   },
@@ -3355,14 +3223,14 @@ export const s = StyleSheet.create({
     "marginTop": 10
   },
   "noticeEmptyTitle": {
-    "color": "#1d2946",
-    "fontSize": 16,
-    "lineHeight": 23,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "fontWeight": "700",
     "textAlign": "center"
   },
   "noticeEmptyText": {
-    "color": "#70839e",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "textAlign": "center"
@@ -3373,11 +3241,11 @@ export const s = StyleSheet.create({
     "paddingRight": 20,
     "paddingBottom": 10,
     "paddingLeft": 20,
-    "borderTopLeftRadius": 12,
-    "borderTopRightRadius": 12,
-    "borderBottomRightRadius": 12,
-    "borderBottomLeftRadius": 12,
-    "backgroundColor": "#1d2946",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "#12332b",
     "alignItems": "center",
     "justifyContent": "center",
     "marginTop": 3
@@ -3392,7 +3260,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#ffffff"
+    "backgroundColor": "#f7f3e8"
   },
   "homeScroll": {
     "paddingTop": 18,
@@ -3427,27 +3295,27 @@ export const s = StyleSheet.create({
   "homeBrandIcon": {
     "width": 15,
     "height": 15,
-    "tintColor": "#248233"
+    "tintColor": "#0b7a54"
   },
   "homeBrand": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontSize": 12,
     "lineHeight": 18,
     "letterSpacing": 1.6,
     "fontWeight": "700"
   },
   "homeDate": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 18,
     "flexShrink": 1
   },
   "homeGreeting": {
-    "color": "#193234",
+    "color": "#12332b",
     "fontSize": 22,
-    "lineHeight": 29,
-    "fontWeight": "700",
-    "letterSpacing": -0.5
+    "lineHeight": 28,
+    "fontWeight": "800",
+    "letterSpacing": -0.6
   },
   "homeNotification": {
     "width": 48,
@@ -3456,37 +3324,45 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 24,
     "borderBottomRightRadius": 24,
     "borderBottomLeftRadius": 24,
-    "backgroundColor": "#f4f7f3",
+    "backgroundColor": "#ffffff",
     "alignItems": "center",
-    "justifyContent": "center"
+    "justifyContent": "center",
+    "shadowOffset": {
+      "width": 0,
+      "height": 4
+    },
+    "shadowRadius": 14,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 2
   },
   "homeTagline": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 22,
     "marginTop": 6,
-    "marginBottom": 24
+    "marginBottom": 20
   },
   "homeFieldCard": {
-    "borderTopWidth": 1,
-    "borderRightWidth": 1,
-    "borderBottomWidth": 1,
-    "borderLeftWidth": 1,
-    "borderTopColor": "#e0e8de",
-    "borderRightColor": "#e0e8de",
-    "borderBottomColor": "#e0e8de",
-    "borderLeftColor": "#e0e8de",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
+    "shadowOffset": {
+      "width": 0,
+      "height": 6
+    },
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 2,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "overflow": "hidden",
     "backgroundColor": "#ffffff",
     "marginBottom": 24
   },
   "homeFieldPhoto": {
-    "height": 112,
-    "backgroundColor": "#dbe8d7"
+    "height": 168,
+    "backgroundColor": "#e9e3d3"
   },
   "homeFieldImage": {
     "width": "100%",
@@ -3496,7 +3372,7 @@ export const s = StyleSheet.create({
     "position": "absolute",
     "top": 12,
     "left": 12,
-    "backgroundColor": "#f0f8e9",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 18,
     "borderTopRightRadius": 18,
     "borderBottomRightRadius": 18,
@@ -3510,7 +3386,7 @@ export const s = StyleSheet.create({
     "gap": 6
   },
   "homeFieldBadgeText": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontSize": 11,
     "lineHeight": 17,
     "fontWeight": "600"
@@ -3525,15 +3401,15 @@ export const s = StyleSheet.create({
     "paddingLeft": 14
   },
   "homeFarmName": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 19,
     "marginBottom": 2
   },
   "homeFieldName": {
-    "color": "#193234",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700",
     "marginBottom": 4
   },
@@ -3543,7 +3419,7 @@ export const s = StyleSheet.create({
     "gap": 6
   },
   "homeLocation": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21,
     "flexShrink": 1
@@ -3555,7 +3431,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 13,
     "borderBottomRightRadius": 13,
     "borderBottomLeftRadius": 13,
-    "backgroundColor": "#f4f7f2",
+    "backgroundColor": "#f7f3e8",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -3564,11 +3440,11 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#f5cfca",
-    "borderRightColor": "#f5cfca",
-    "borderBottomColor": "#f5cfca",
-    "borderLeftColor": "#f5cfca",
-    "backgroundColor": "#fff2f0",
+    "borderTopColor": "#f4c4be",
+    "borderRightColor": "#f4c4be",
+    "borderBottomColor": "#f4c4be",
+    "borderLeftColor": "#f4c4be",
+    "backgroundColor": "#fdecea",
     "borderTopLeftRadius": 17,
     "borderTopRightRadius": 17,
     "borderBottomRightRadius": 17,
@@ -3583,14 +3459,14 @@ export const s = StyleSheet.create({
     "marginBottom": 26
   },
   "homeAlertTitle": {
-    "color": "#bd3030",
+    "color": "#b42318",
     "fontSize": 14,
     "lineHeight": 21,
     "fontWeight": "700",
     "marginBottom": 3
   },
   "homeAlertBody": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 18
   },
@@ -3607,14 +3483,14 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 5,
     "borderBottomRightRadius": 5,
     "borderBottomLeftRadius": 5,
-    "backgroundColor": "#fde4df",
+    "backgroundColor": "#fdecea",
     "paddingTop": 3,
     "paddingRight": 6,
     "paddingBottom": 3,
     "paddingLeft": 6
   },
   "homeAlertTagText": {
-    "color": "#a3423b",
+    "color": "#b42318",
     "fontSize": 9,
     "lineHeight": 14,
     "fontWeight": "600",
@@ -3626,7 +3502,7 @@ export const s = StyleSheet.create({
     "gap": 5
   },
   "homeAlertAction": {
-    "color": "#bd3030",
+    "color": "#b42318",
     "fontSize": 12,
     "lineHeight": 19,
     "fontWeight": "700"
@@ -3640,9 +3516,9 @@ export const s = StyleSheet.create({
     "rowGap": 5
   },
   "homeSectionTitle": {
-    "color": "#193234",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700",
     "flexShrink": 1
   },
@@ -3652,13 +3528,13 @@ export const s = StyleSheet.create({
     "gap": 4
   },
   "homeConnectionText": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontSize": 11,
     "lineHeight": 18,
     "fontWeight": "600"
   },
   "homeUpdated": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21,
     "marginTop": 10,
@@ -3670,27 +3546,22 @@ export const s = StyleSheet.create({
     "gap": 12
   },
   "homeMetric": {
-    "flexBasis": "42%",
+    "width": "47.5%",
     "flexGrow": 1,
     "minWidth": 0,
     "borderTopWidth": 1,
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#e1e8de",
-    "borderRightColor": "#e1e8de",
-    "borderBottomColor": "#e1e8de",
-    "borderLeftColor": "#e1e8de",
-    "backgroundColor": "#f5f8f4",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
-    "paddingTop": 16,
-    "paddingRight": 16,
-    "paddingBottom": 16,
-    "paddingLeft": 16,
-    "minHeight": 124
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
+    "paddingTop": 14,
+    "paddingRight": 14,
+    "paddingBottom": 14,
+    "paddingLeft": 14,
+    "gap": 10
   },
   "homeMetricFull": {
     "flexBasis": "100%"
@@ -3698,83 +3569,84 @@ export const s = StyleSheet.create({
   "homeMetricHeading": {
     "flexDirection": "row",
     "alignItems": "center",
-    "gap": 7,
-    "marginBottom": 8
+    "gap": 8
   },
   "homeMetricLabel": {
-    "color": "#597172",
-    "fontSize": 12,
-    "lineHeight": 19,
     "flexGrow": 1,
     "flexShrink": 1,
-    "flexBasis": 0
+    "flexBasis": 0,
+    "color": "#12332b",
+    "fontSize": 12,
+    "lineHeight": 16,
+    "fontWeight": "700"
   },
   "homeMetricValue": {
-    "color": "#193234",
-    "fontSize": 26,
+    "color": "#12332b",
+    "fontSize": 28,
     "lineHeight": 34,
-    "fontWeight": "700",
-    "letterSpacing": -0.5
+    "fontWeight": "800",
+    "letterSpacing": -0.8
   },
   "homeMetricUnit": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 12,
     "fontWeight": "400",
     "letterSpacing": 0
   },
   "homeMetricStatus": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontSize": 11,
-    "lineHeight": 18,
-    "marginTop": 4
+    "lineHeight": 16,
+    "fontWeight": "700"
   },
   "homeForecastLink": {
     "marginTop": 20,
-    "borderTopWidth": 1,
-    "borderRightWidth": 1,
-    "borderBottomWidth": 1,
-    "borderLeftWidth": 1,
-    "borderTopColor": "#e1e8de",
-    "borderRightColor": "#e1e8de",
-    "borderBottomColor": "#e1e8de",
-    "borderLeftColor": "#e1e8de",
-    "borderTopLeftRadius": 17,
-    "borderTopRightRadius": 17,
-    "borderBottomRightRadius": 17,
-    "borderBottomLeftRadius": 17,
-    "paddingTop": 14,
-    "paddingRight": 14,
-    "paddingBottom": 14,
-    "paddingLeft": 14,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
+    "paddingTop": 16,
+    "paddingRight": 16,
+    "paddingBottom": 16,
+    "paddingLeft": 16,
+    "backgroundColor": "#12332b",
     "flexDirection": "row",
     "alignItems": "center",
-    "gap": 12
+    "gap": 14,
+    "shadowOffset": {
+      "width": 0,
+      "height": 8
+    },
+    "shadowRadius": 22,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 4
   },
   "homeForecastIcon": {
-    "width": 42,
-    "height": 42,
-    "borderTopLeftRadius": 13,
-    "borderTopRightRadius": 13,
-    "borderBottomRightRadius": 13,
-    "borderBottomLeftRadius": 13,
-    "backgroundColor": "#edf5e9",
+    "width": 46,
+    "height": 46,
+    "borderTopLeftRadius": 15,
+    "borderTopRightRadius": 15,
+    "borderBottomRightRadius": 15,
+    "borderBottomLeftRadius": 15,
+    "backgroundColor": "rgba(255, 255, 255, 0.14)",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "homeForecastTitle": {
-    "color": "#193234",
+    "color": "#ffffff",
     "fontSize": 14,
-    "lineHeight": 22,
+    "lineHeight": 21,
     "fontWeight": "700"
   },
   "homeForecastBody": {
-    "color": "#597172",
+    "color": "#bfe3d2",
     "fontSize": 12,
     "lineHeight": 19,
     "marginTop": 2
   },
   "homeFootnote": {
-    "color": "#768778",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 18,
     "textAlign": "center",
@@ -3789,7 +3661,7 @@ export const s = StyleSheet.create({
     "marginTop": 6
   },
   "homeLinkText": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontSize": 13,
     "lineHeight": 21,
     "fontWeight": "600",
@@ -3807,7 +3679,7 @@ export const s = StyleSheet.create({
     "marginBottom": 14
   },
   "homeLoadErrorText": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "flexGrow": 1,
@@ -3832,7 +3704,7 @@ export const s = StyleSheet.create({
     "right": 0,
     "bottom": 0,
     "left": 0,
-    "backgroundColor": "rgba(19, 40, 30, 0.4)"
+    "backgroundColor": "rgba(14, 60, 42, 0.1)"
   },
   "homeSheet": {
     "backgroundColor": "#ffffff",
@@ -3850,7 +3722,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 2,
     "borderBottomRightRadius": 2,
     "borderBottomLeftRadius": 2,
-    "backgroundColor": "#d8e1d5",
+    "backgroundColor": "#d9d2bf",
     "alignSelf": "center",
     "marginTop": 10
   },
@@ -3877,7 +3749,7 @@ export const s = StyleSheet.create({
     "paddingLeft": 20
   },
   "homeSheetDescription": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21
   },
@@ -3891,10 +3763,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#e1e8de",
-    "borderRightColor": "#e1e8de",
-    "borderBottomColor": "#e1e8de",
-    "borderLeftColor": "#e1e8de",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "borderTopLeftRadius": 14,
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
@@ -3909,19 +3781,19 @@ export const s = StyleSheet.create({
     "gap": 7
   },
   "homeFarmChoiceSelected": {
-    "backgroundColor": "#edf6e9",
-    "borderTopColor": "#9cc48d",
-    "borderRightColor": "#9cc48d",
-    "borderBottomColor": "#9cc48d",
-    "borderLeftColor": "#9cc48d"
+    "backgroundColor": "#eaf6ef",
+    "borderTopColor": "#1aa376",
+    "borderRightColor": "#1aa376",
+    "borderBottomColor": "#1aa376",
+    "borderLeftColor": "#1aa376"
   },
   "homeFarmChoiceText": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21
   },
   "homeFarmChoiceTextSelected": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontWeight": "600"
   },
   "homePlotChoice": {
@@ -3934,10 +3806,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#e1e8de",
-    "borderRightColor": "#e1e8de",
-    "borderBottomColor": "#e1e8de",
-    "borderLeftColor": "#e1e8de",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "borderTopLeftRadius": 16,
     "borderTopRightRadius": 16,
     "borderBottomRightRadius": 16,
@@ -3948,22 +3820,22 @@ export const s = StyleSheet.create({
     "marginBottom": 10
   },
   "homePlotChoiceSelected": {
-    "borderTopColor": "#9cc48d",
-    "borderRightColor": "#9cc48d",
-    "borderBottomColor": "#9cc48d",
-    "borderLeftColor": "#9cc48d",
-    "backgroundColor": "#f5f9f2"
+    "borderTopColor": "#1aa376",
+    "borderRightColor": "#1aa376",
+    "borderBottomColor": "#1aa376",
+    "borderLeftColor": "#1aa376",
+    "backgroundColor": "#fbf8f0"
   },
   "homePlotChoiceTitle": {
-    "color": "#193234",
-    "fontSize": 16,
-    "lineHeight": 24,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "fontWeight": "600"
   },
   "homePlotIcon": {
     "width": 25,
     "height": 25,
-    "tintColor": "#248233"
+    "tintColor": "#0b7a54"
   },
   "homeSheetLoading": {
     "paddingTop": 20,
@@ -3989,7 +3861,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
     "borderBottomLeftRadius": 14,
-    "backgroundColor": "#edf6e9",
+    "backgroundColor": "#eaf6ef",
     "flexDirection": "row",
     "alignItems": "center",
     "justifyContent": "center",
@@ -4001,7 +3873,7 @@ export const s = StyleSheet.create({
     "paddingRight": 14,
     "paddingBottom": 14,
     "paddingLeft": 14,
-    "backgroundColor": "#f0f7ec",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 14,
     "borderTopRightRadius": 14,
     "borderBottomRightRadius": 14,
@@ -4012,7 +3884,7 @@ export const s = StyleSheet.create({
     "marginBottom": 20
   },
   "homeSensorNoticeText": {
-    "color": "#597172",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21,
     "flexGrow": 1,
@@ -4023,19 +3895,19 @@ export const s = StyleSheet.create({
     "paddingTop": 14,
     "paddingBottom": 14,
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e7ede4",
+    "borderBottomColor": "#e9e3d3",
     "flexDirection": "row",
     "flexWrap": "wrap",
     "justifyContent": "space-between",
     "gap": 8
   },
   "homeSensorName": {
-    "color": "#193234",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 22
   },
   "homeSensorStatus": {
-    "color": "#248233",
+    "color": "#0b7a54",
     "fontSize": 12,
     "lineHeight": 22
   },
@@ -4043,7 +3915,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#e8eef4"
+    "backgroundColor": "#f7f3e8"
   },
   "profileKeyboard": {
     "flexGrow": 1,
@@ -4075,9 +3947,9 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "profileTitle": {
-    "color": "#1d2848",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700",
     "flexGrow": 1,
     "flexShrink": 1,
@@ -4090,37 +3962,38 @@ export const s = StyleSheet.create({
     "minWidth": 0
   },
   "profileIdentity": {
-    "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 22,
-    "borderTopRightRadius": 22,
-    "borderBottomRightRadius": 22,
-    "borderBottomLeftRadius": 22,
-    "paddingTop": 22,
-    "paddingRight": 22,
-    "paddingBottom": 22,
-    "paddingLeft": 22,
+    "backgroundColor": "#12332b",
+    "borderTopLeftRadius": 26,
+    "borderTopRightRadius": 26,
+    "borderBottomRightRadius": 26,
+    "borderBottomLeftRadius": 26,
+    "paddingTop": 20,
+    "paddingRight": 20,
+    "paddingBottom": 20,
+    "paddingLeft": 20,
     "flexDirection": "row",
     "alignItems": "center",
     "gap": 16,
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 10
     },
-    "shadowRadius": 14,
-    "shadowColor": "rgba(29, 40, 72, 0.04)",
+    "shadowRadius": 26,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 4
   },
   "profileIdentityName": {
-    "color": "#1d2848",
-    "fontSize": 22,
-    "lineHeight": 30,
-    "fontWeight": "700"
+    "color": "#ffffff",
+    "fontSize": 16,
+    "lineHeight": 21,
+    "fontWeight": "800",
+    "letterSpacing": -0.3
   },
   "profileIdentityEmail": {
-    "color": "#4e5f7c",
-    "fontSize": 13,
-    "lineHeight": 21,
+    "color": "#bfe3d2",
+    "fontSize": 12,
+    "lineHeight": 18,
     "marginTop": 4
   },
   "profileAvatar": {
@@ -4130,7 +4003,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 32,
     "borderBottomRightRadius": 32,
     "borderBottomLeftRadius": 32,
-    "backgroundColor": "#cef9e5",
+    "backgroundColor": "#d3f1e2",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -4151,14 +4024,14 @@ export const s = StyleSheet.create({
     "borderBottomLeftRadius": 44
   },
   "profileAvatarInitial": {
-    "color": "#009c73",
-    "fontSize": 25,
-    "lineHeight": 34,
+    "color": "#0b7a54",
+    "fontSize": 21,
+    "lineHeight": 29,
     "fontWeight": "700"
   },
   "profileAvatarInitialLarge": {
-    "fontSize": 29,
-    "lineHeight": 38
+    "fontSize": 25,
+    "lineHeight": 33
   },
   "profileAvatarCamera": {
     "position": "absolute",
@@ -4178,7 +4051,7 @@ export const s = StyleSheet.create({
     "borderRightColor": "#ffffff",
     "borderBottomColor": "#ffffff",
     "borderLeftColor": "#ffffff",
-    "backgroundColor": "#1d2848",
+    "backgroundColor": "#12332b",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -4194,17 +4067,17 @@ export const s = StyleSheet.create({
     "paddingLeft": 20,
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 6
     },
-    "shadowRadius": 14,
-    "shadowColor": "rgba(29, 40, 72, 0.04)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "profileCardTitle": {
-    "color": "#1d2848",
-    "fontSize": 18,
-    "lineHeight": 26,
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 20,
     "fontWeight": "700",
     "marginBottom": 12
   },
@@ -4218,30 +4091,30 @@ export const s = StyleSheet.create({
   },
   "profileSettingBorder": {
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e2e8f0"
+    "borderBottomColor": "#e9e3d3"
   },
   "profileSettingIcon": {
-    "width": 36,
-    "height": 36,
-    "borderTopLeftRadius": 11,
-    "borderTopRightRadius": 11,
-    "borderBottomRightRadius": 11,
-    "borderBottomLeftRadius": 11,
-    "backgroundColor": "#f3f6fa",
+    "width": 40,
+    "height": 40,
+    "borderTopLeftRadius": 13,
+    "borderTopRightRadius": 13,
+    "borderBottomRightRadius": 13,
+    "borderBottomLeftRadius": 13,
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
   "profileSettingTitle": {
-    "color": "#1d2848",
-    "fontSize": 14,
-    "lineHeight": 22,
+    "color": "#12332b",
+    "fontSize": 13,
+    "lineHeight": 19,
     "fontWeight": "600",
     "flexShrink": 1
   },
   "profileSettingSubtitle": {
-    "color": "#7789aa",
-    "fontSize": 12,
-    "lineHeight": 19,
+    "color": "#566a63",
+    "fontSize": 11,
+    "lineHeight": 16,
     "marginTop": 3
   },
   "profilePressed": {
@@ -4253,11 +4126,11 @@ export const s = StyleSheet.create({
     "paddingRight": 13,
     "paddingBottom": 13,
     "paddingLeft": 13,
-    "borderTopLeftRadius": 12,
-    "borderTopRightRadius": 12,
-    "borderBottomRightRadius": 12,
-    "borderBottomLeftRadius": 12,
-    "backgroundColor": "#1d2848",
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "#12332b",
     "flexDirection": "row",
     "alignItems": "center",
     "justifyContent": "center",
@@ -4268,10 +4141,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#d3deed",
-    "borderRightColor": "#d3deed",
-    "borderBottomColor": "#d3deed",
-    "borderLeftColor": "#d3deed",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "backgroundColor": "#ffffff"
   },
   "profileButtonDanger": {
@@ -4279,10 +4152,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#c63434",
-    "borderRightColor": "#c63434",
-    "borderBottomColor": "#c63434",
-    "borderLeftColor": "#c63434",
+    "borderTopColor": "#b42318",
+    "borderRightColor": "#b42318",
+    "borderBottomColor": "#b42318",
+    "borderLeftColor": "#b42318",
     "backgroundColor": "#ffffff"
   },
   "profileButtonText": {
@@ -4296,22 +4169,22 @@ export const s = StyleSheet.create({
     "opacity": 0.5
   },
   "profileMuted": {
-    "color": "#7789aa",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 21
   },
   "profileBody": {
-    "color": "#536381",
+    "color": "#566a63",
     "fontSize": 14,
     "lineHeight": 23
   },
   "profileFootnote": {
-    "color": "#7789aa",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20
   },
   "profileNotice": {
-    "backgroundColor": "#fff1ef",
+    "backgroundColor": "#fdecea",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -4326,7 +4199,7 @@ export const s = StyleSheet.create({
     "marginBottom": 10
   },
   "profileNoticeText": {
-    "color": "#b83d3a",
+    "color": "#b42318",
     "fontSize": 13,
     "lineHeight": 21,
     "flexGrow": 1,
@@ -4339,9 +4212,9 @@ export const s = StyleSheet.create({
     "marginBottom": 20
   },
   "profilePersonalName": {
-    "color": "#1d2848",
-    "fontSize": 21,
-    "lineHeight": 29,
+    "color": "#12332b",
+    "fontSize": 18,
+    "lineHeight": 25,
     "fontWeight": "700",
     "textAlign": "center"
   },
@@ -4357,15 +4230,15 @@ export const s = StyleSheet.create({
     "paddingBottom": 10
   },
   "profileFactLabel": {
-    "color": "#7789aa",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "marginBottom": 4
   },
   "profileFactValue": {
-    "color": "#293753",
-    "fontSize": 15,
-    "lineHeight": 24,
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 22,
     "fontWeight": "500"
   },
   "profileAvatarAction": {
@@ -4375,13 +4248,13 @@ export const s = StyleSheet.create({
     "paddingBottom": 24
   },
   "profileAvatarActionText": {
-    "color": "#18afa3",
+    "color": "#0b7a54",
     "fontSize": 13,
     "lineHeight": 21,
     "fontWeight": "600"
   },
   "profileFormIntro": {
-    "color": "#7789aa",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "marginBottom": 15
@@ -4390,13 +4263,13 @@ export const s = StyleSheet.create({
     "marginBottom": 15
   },
   "profileFieldLabel": {
-    "color": "#536381",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "marginBottom": 7
   },
   "profileRequired": {
-    "color": "#536381"
+    "color": "#566a63"
   },
   "profileInputRow": {
     "minHeight": 49,
@@ -4409,38 +4282,38 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#d4dfed",
-    "borderRightColor": "#d4dfed",
-    "borderBottomColor": "#d4dfed",
-    "borderLeftColor": "#d4dfed",
-    "backgroundColor": "#f4f6fa",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
+    "backgroundColor": "#f7f3e8",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
     "borderBottomLeftRadius": 12
   },
   "profileInputFocused": {
-    "borderTopColor": "#18afa3",
-    "borderRightColor": "#18afa3",
-    "borderBottomColor": "#18afa3",
-    "borderLeftColor": "#18afa3",
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54",
     "backgroundColor": "#ffffff"
   },
   "profileInputReadOnly": {
-    "backgroundColor": "#edf1f6",
-    "borderTopColor": "#dce4ed",
-    "borderRightColor": "#dce4ed",
-    "borderBottomColor": "#dce4ed",
-    "borderLeftColor": "#dce4ed"
+    "backgroundColor": "#f7f3e8",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3"
   },
   "profileReadOnlyText": {
-    "color": "#7a8ba5"
+    "color": "#566a63"
   },
   "profileInputError": {
-    "borderTopColor": "#d94b4b",
-    "borderRightColor": "#d94b4b",
-    "borderBottomColor": "#d94b4b",
-    "borderLeftColor": "#d94b4b",
+    "borderTopColor": "#b42318",
+    "borderRightColor": "#b42318",
+    "borderBottomColor": "#b42318",
+    "borderLeftColor": "#b42318",
     "backgroundColor": "#ffffff"
   },
   "profileInput": {
@@ -4450,12 +4323,12 @@ export const s = StyleSheet.create({
     "minWidth": 0,
     "paddingTop": 8,
     "paddingBottom": 8,
-    "color": "#293753",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 22
   },
   "profileFieldError": {
-    "color": "#cb4141",
+    "color": "#b42318",
     "fontSize": 12,
     "lineHeight": 20,
     "marginTop": 6
@@ -4475,7 +4348,7 @@ export const s = StyleSheet.create({
     "borderBottomLeftRadius": 30,
     "alignItems": "center",
     "justifyContent": "center",
-    "backgroundColor": "#e5f5f1",
+    "backgroundColor": "#eaf6ef",
     "marginBottom": 4
   },
   "profileLoading": {
@@ -4496,7 +4369,7 @@ export const s = StyleSheet.create({
     "right": 0,
     "bottom": 0,
     "left": 0,
-    "backgroundColor": "rgba(29, 40, 72, 0.38)"
+    "backgroundColor": "rgba(14, 60, 42, 0.1)"
   },
   "profileSheet": {
     "width": "100%",
@@ -4514,7 +4387,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 2,
     "borderBottomRightRadius": 2,
     "borderBottomLeftRadius": 2,
-    "backgroundColor": "#ccd7e5",
+    "backgroundColor": "#d9d2bf",
     "alignSelf": "center",
     "marginTop": 11
   },
@@ -4552,7 +4425,7 @@ export const s = StyleSheet.create({
     "borderTopRightRadius": 20,
     "borderBottomRightRadius": 20,
     "borderBottomLeftRadius": 20,
-    "backgroundColor": "#e5f5f1",
+    "backgroundColor": "#eaf6ef",
     "alignItems": "center",
     "justifyContent": "center"
   },
@@ -4571,20 +4444,20 @@ export const s = StyleSheet.create({
     "paddingTop": 16,
     "paddingBottom": 16,
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e2e8f0"
+    "borderBottomColor": "#e9e3d3"
   },
   "profileReportValue": {
-    "color": "#1d2848",
-    "fontSize": 20,
-    "lineHeight": 28,
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 24,
     "fontWeight": "700"
   },
   "reportPlotSelect": {
     "backgroundColor": "#ffffff",
-    "borderTopLeftRadius": 18,
-    "borderTopRightRadius": 18,
-    "borderBottomRightRadius": 18,
-    "borderBottomLeftRadius": 18,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 17,
     "paddingRight": 17,
     "paddingBottom": 17,
@@ -4594,27 +4467,27 @@ export const s = StyleSheet.create({
     "gap": 13,
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 6
     },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(29, 40, 72, 0.05)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "reportPlotName": {
-    "color": "#293753",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 22,
     "fontWeight": "600"
   },
   "reportMuted": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "flexShrink": 1
   },
   "reportPeriodLabel": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20,
     "marginBottom": 8
@@ -4635,7 +4508,7 @@ export const s = StyleSheet.create({
     "gap": 10
   },
   "reportPeriodValue": {
-    "color": "#34415e",
+    "color": "#12332b",
     "fontSize": 12,
     "lineHeight": 20,
     "flexGrow": 1,
@@ -4649,10 +4522,10 @@ export const s = StyleSheet.create({
     "marginTop": -4
   },
   "reportCard": {
-    "borderTopLeftRadius": 19,
-    "borderTopRightRadius": 19,
-    "borderBottomRightRadius": 19,
-    "borderBottomLeftRadius": 19,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
     "paddingTop": 16,
     "paddingRight": 16,
     "paddingBottom": 16,
@@ -4660,12 +4533,12 @@ export const s = StyleSheet.create({
     "backgroundColor": "#ffffff",
     "shadowOffset": {
       "width": 0,
-      "height": 4
+      "height": 6
     },
-    "shadowRadius": 12,
-    "shadowColor": "rgba(29, 40, 72, 0.04)",
+    "shadowRadius": 20,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
     "shadowOpacity": 1,
-    "elevation": 1
+    "elevation": 2
   },
   "reportCardHeading": {
     "flexDirection": "row",
@@ -4675,9 +4548,9 @@ export const s = StyleSheet.create({
     "marginBottom": 10
   },
   "reportCardTitle": {
-    "color": "#25314e",
-    "fontSize": 17,
-    "lineHeight": 25,
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 22,
     "fontWeight": "700",
     "flexShrink": 1
   },
@@ -4691,7 +4564,7 @@ export const s = StyleSheet.create({
     "paddingTop": 16,
     "paddingBottom": 13,
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e2eaf3"
+    "borderBottomColor": "#e9e3d3"
   },
   "reportLegend": {
     "flexDirection": "row",
@@ -4707,7 +4580,7 @@ export const s = StyleSheet.create({
     "borderBottomLeftRadius": 2
   },
   "reportChartLabel": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 10,
     "lineHeight": 17,
     "flexShrink": 1
@@ -4723,7 +4596,7 @@ export const s = StyleSheet.create({
     "justifyContent": "space-between"
   },
   "reportAxisText": {
-    "color": "#8191ae",
+    "color": "#7b8e87",
     "fontSize": 9,
     "lineHeight": 15
   },
@@ -4741,7 +4614,7 @@ export const s = StyleSheet.create({
     "left": 0,
     "right": 0,
     "height": 1,
-    "backgroundColor": "#e3ebf5"
+    "backgroundColor": "#e9e3d3"
   },
   "reportChartSegment": {
     "position": "absolute",
@@ -4768,13 +4641,13 @@ export const s = StyleSheet.create({
     "minHeight": 18
   },
   "reportChartCaption": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 18,
     "marginTop": 9
   },
   "reportFootnote": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 19,
     "marginTop": 7
@@ -4791,7 +4664,7 @@ export const s = StyleSheet.create({
     "flexShrink": 1,
     "flexBasis": 0,
     "minWidth": 110,
-    "backgroundColor": "#f3f5f9",
+    "backgroundColor": "#f7f3e8",
     "borderTopLeftRadius": 13,
     "borderTopRightRadius": 13,
     "borderBottomRightRadius": 13,
@@ -4803,9 +4676,9 @@ export const s = StyleSheet.create({
     "gap": 3
   },
   "reportAiCount": {
-    "color": "#24314d",
-    "fontSize": 25,
-    "lineHeight": 32,
+    "color": "#12332b",
+    "fontSize": 21,
+    "lineHeight": 27,
     "fontWeight": "700"
   },
   "reportSummaryRow": {
@@ -4818,7 +4691,7 @@ export const s = StyleSheet.create({
     "paddingBottom": 6
   },
   "reportSummaryValue": {
-    "color": "#34415e",
+    "color": "#12332b",
     "fontSize": 12,
     "lineHeight": 20,
     "fontWeight": "600",
@@ -4862,9 +4735,9 @@ export const s = StyleSheet.create({
     "gap": 3,
     "paddingTop": 7,
     "borderTopWidth": 1,
-    "borderTopColor": "#e3ebf5",
+    "borderTopColor": "#e9e3d3",
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e3ebf5"
+    "borderBottomColor": "#e9e3d3"
   },
   "reportRiskBar": {
     "width": 18,
@@ -4880,14 +4753,14 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "reportAlertLinkText": {
-    "color": "#169f96",
+    "color": "#0b7a54",
     "fontSize": 12,
     "lineHeight": 21,
     "fontWeight": "600",
     "flexShrink": 1
   },
   "reportAlertDetail": {
-    "backgroundColor": "#f4f7fa",
+    "backgroundColor": "#f7f3e8",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -4903,10 +4776,10 @@ export const s = StyleSheet.create({
     "borderRightWidth": 1,
     "borderBottomWidth": 1,
     "borderLeftWidth": 1,
-    "borderTopColor": "#d4deed",
-    "borderRightColor": "#d4deed",
-    "borderBottomColor": "#d4deed",
-    "borderLeftColor": "#d4deed",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
     "backgroundColor": "#ffffff",
     "borderTopLeftRadius": 9,
     "borderTopRightRadius": 9,
@@ -4919,26 +4792,26 @@ export const s = StyleSheet.create({
     "gap": 10
   },
   "reportPaperBrand": {
-    "color": "#17a69c",
+    "color": "#0b7a54",
     "fontSize": 10,
     "lineHeight": 17,
     "fontWeight": "700",
     "letterSpacing": 2
   },
   "reportPaperTitle": {
-    "color": "#273551",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 23,
     "fontWeight": "700"
   },
   "reportPaperText": {
-    "color": "#4a5b78",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20
   },
   "reportPaperRule": {
     "height": 1,
-    "backgroundColor": "#dfe7f1",
+    "backgroundColor": "#e9e3d3",
     "marginTop": 2,
     "marginBottom": 2
   },
@@ -4950,18 +4823,18 @@ export const s = StyleSheet.create({
     "gap": 8
   },
   "reportPaperMuted": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 12,
     "lineHeight": 20
   },
   "reportPaperValue": {
-    "color": "#34415e",
+    "color": "#12332b",
     "fontSize": 12,
     "lineHeight": 20,
     "fontWeight": "600"
   },
   "reportPaperHeading": {
-    "color": "#34415e",
+    "color": "#12332b",
     "fontSize": 14,
     "lineHeight": 22,
     "fontWeight": "700",
@@ -4971,11 +4844,11 @@ export const s = StyleSheet.create({
     "paddingTop": 8,
     "paddingBottom": 8,
     "borderBottomWidth": 1,
-    "borderBottomColor": "#e1e8f1",
+    "borderBottomColor": "#e9e3d3",
     "gap": 5
   },
   "reportPaperConclusion": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 11,
     "lineHeight": 19,
     "marginTop": 3
@@ -4988,7 +4861,7 @@ export const s = StyleSheet.create({
     "marginTop": 2
   },
   "reportPaperSmall": {
-    "color": "#8b9ab4",
+    "color": "#7b8e87",
     "fontSize": 9,
     "lineHeight": 16
   },
@@ -5004,7 +4877,7 @@ export const s = StyleSheet.create({
     "flexGrow": 1,
     "flexShrink": 1,
     "flexBasis": 0,
-    "backgroundColor": "#e8eef4"
+    "backgroundColor": "#f7f3e8"
   },
   "reportPreviewHeader": {
     "flexDirection": "row",
@@ -5033,7 +4906,7 @@ export const s = StyleSheet.create({
     "minWidth": 140
   },
   "reportLoading": {
-    "backgroundColor": "#e5f1ef",
+    "backgroundColor": "#e9e3d3",
     "borderTopLeftRadius": 17,
     "borderTopRightRadius": 17,
     "borderBottomRightRadius": 17,
@@ -5061,14 +4934,14 @@ export const s = StyleSheet.create({
     "alignItems": "stretch"
   },
   "reportEmptyTitle": {
-    "color": "#293753",
-    "fontSize": 18,
-    "lineHeight": 27,
+    "color": "#12332b",
+    "fontSize": 16,
+    "lineHeight": 24,
     "fontWeight": "700",
     "textAlign": "center"
   },
   "reportEmptyText": {
-    "color": "#7b8dac",
+    "color": "#566a63",
     "fontSize": 13,
     "lineHeight": 22,
     "textAlign": "center"
@@ -5081,7 +4954,7 @@ export const s = StyleSheet.create({
     "paddingBottom": 7
   },
   "reportPeriodChip": {
-    "backgroundColor": "#e8f5f1",
+    "backgroundColor": "#eaf6ef",
     "borderTopLeftRadius": 12,
     "borderTopRightRadius": 12,
     "borderBottomRightRadius": 12,
@@ -5094,9 +4967,858 @@ export const s = StyleSheet.create({
     "justifyContent": "center"
   },
   "reportPeriodChipText": {
-    "color": "#169f96",
+    "color": "#0b7a54",
     "fontSize": 13,
     "lineHeight": 21,
     "fontWeight": "600"
+  },
+  "homeFieldOverlay": {
+    "position": "absolute",
+    "left": 0,
+    "right": 0,
+    "bottom": 0,
+    "paddingTop": 28,
+    "paddingRight": 14,
+    "paddingBottom": 14,
+    "paddingLeft": 14,
+    "backgroundColor": "rgba(10, 40, 30, 0.55)"
+  },
+  "homeOverlayFarm": {
+    "color": "#d6f0e3",
+    "fontSize": 12,
+    "lineHeight": 18,
+    "fontWeight": "600"
+  },
+  "homeOverlayName": {
+    "color": "#ffffff",
+    "fontSize": 19,
+    "lineHeight": 25,
+    "fontWeight": "800",
+    "letterSpacing": -0.3
+  },
+  "homeFieldChange": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 4,
+    "paddingTop": 8,
+    "paddingRight": 12,
+    "paddingBottom": 8,
+    "paddingLeft": 12,
+    "borderTopLeftRadius": 14,
+    "borderTopRightRadius": 14,
+    "borderBottomRightRadius": 14,
+    "borderBottomLeftRadius": 14,
+    "backgroundColor": "#eaf6ef",
+    "minHeight": 36
+  },
+  "homeFieldChangeText": {
+    "color": "#0b7a54",
+    "fontSize": 12,
+    "lineHeight": 18,
+    "fontWeight": "700"
+  },
+  "homeQuick": {
+    "flexDirection": "row",
+    "gap": 10,
+    "marginBottom": 26
+  },
+  "homeQuickItem": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "minHeight": 88,
+    "alignItems": "center",
+    "justifyContent": "center",
+    "gap": 8,
+    "paddingTop": 10,
+    "paddingRight": 4,
+    "paddingBottom": 10,
+    "paddingLeft": 4,
+    "borderTopLeftRadius": 20,
+    "borderTopRightRadius": 20,
+    "borderBottomRightRadius": 20,
+    "borderBottomLeftRadius": 20,
+    "backgroundColor": "#ffffff",
+    "shadowOffset": {
+      "width": 0,
+      "height": 6
+    },
+    "shadowRadius": 18,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 2
+  },
+  "homeQuickIcon": {
+    "width": 42,
+    "height": 42,
+    "borderTopLeftRadius": 14,
+    "borderTopRightRadius": 14,
+    "borderBottomRightRadius": 14,
+    "borderBottomLeftRadius": 14,
+    "backgroundColor": "#eaf6ef",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "homeQuickText": {
+    "color": "#12332b",
+    "fontSize": 12,
+    "lineHeight": 17,
+    "fontWeight": "700",
+    "textAlign": "center"
+  },
+  "homeMetricIcon": {
+    "width": 32,
+    "height": 32,
+    "borderTopLeftRadius": 11,
+    "borderTopRightRadius": 11,
+    "borderBottomRightRadius": 11,
+    "borderBottomLeftRadius": 11,
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "homeMetricPill": {
+    "paddingTop": 3,
+    "paddingRight": 9,
+    "paddingBottom": 3,
+    "paddingLeft": 9,
+    "borderTopLeftRadius": 10,
+    "borderTopRightRadius": 10,
+    "borderBottomRightRadius": 10,
+    "borderBottomLeftRadius": 10,
+    "backgroundColor": "#eaf6ef"
+  },
+  "homeMetricPillIdle": {
+    "backgroundColor": "#e9e3d3"
+  },
+  "homeMetricStatusIdle": {
+    "color": "#566a63"
+  },
+  "profileTitleDark": {
+    "color": "#12332b",
+    "fontSize": 19,
+    "lineHeight": 26,
+    "fontWeight": "800"
+  },
+  "appHeader": {
+    "backgroundColor": "#ffffff",
+    "borderBottomLeftRadius": 24,
+    "borderBottomRightRadius": 24,
+    "paddingTop": 10,
+    "paddingRight": 16,
+    "paddingBottom": 14,
+    "paddingLeft": 16,
+    "shadowOffset": {
+      "width": 0,
+      "height": 6
+    },
+    "shadowRadius": 18,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 4,
+    "zIndex": 5
+  },
+  "appHeaderRow": {
+    "width": "100%",
+    "maxWidth": 600,
+    "alignSelf": "center",
+    "minHeight": 48,
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 10
+  },
+  "appHeaderTitleBox": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "minWidth": 0
+  },
+  "appHeaderEyebrow": {
+    "color": "#0b7a54",
+    "fontSize": 9,
+    "lineHeight": 15,
+    "fontWeight": "800",
+    "letterSpacing": 1.4
+  },
+  "appHeaderTitle": {
+    "color": "#12332b",
+    "fontSize": 18,
+    "lineHeight": 24,
+    "fontWeight": "800",
+    "letterSpacing": -0.3
+  },
+  "appHeaderBack": {
+    "width": 42,
+    "height": 42,
+    "borderTopLeftRadius": 14,
+    "borderTopRightRadius": 14,
+    "borderBottomRightRadius": 14,
+    "borderBottomLeftRadius": 14,
+    "backgroundColor": "#eaf6ef",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "appHeaderIconButton": {
+    "width": 44,
+    "height": 44,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
+    "backgroundColor": "#eaf6ef",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "appHeaderBadge": {
+    "position": "absolute",
+    "top": 11,
+    "right": 12,
+    "width": 9,
+    "height": 9,
+    "borderTopLeftRadius": 5,
+    "borderTopRightRadius": 5,
+    "borderBottomRightRadius": 5,
+    "borderBottomLeftRadius": 5,
+    "backgroundColor": "#b42318",
+    "borderTopWidth": 2,
+    "borderRightWidth": 2,
+    "borderBottomWidth": 2,
+    "borderLeftWidth": 2,
+    "borderTopColor": "#ffffff",
+    "borderRightColor": "#ffffff",
+    "borderBottomColor": "#ffffff",
+    "borderLeftColor": "#ffffff"
+  },
+  "appHeaderAvatar": {
+    "width": 44,
+    "height": 44,
+    "borderTopLeftRadius": 22,
+    "borderTopRightRadius": 22,
+    "borderBottomRightRadius": 22,
+    "borderBottomLeftRadius": 22,
+    "backgroundColor": "#d3f1e2",
+    "borderTopWidth": 2,
+    "borderRightWidth": 2,
+    "borderBottomWidth": 2,
+    "borderLeftWidth": 2,
+    "borderTopColor": "#1aa376",
+    "borderRightColor": "#1aa376",
+    "borderBottomColor": "#1aa376",
+    "borderLeftColor": "#1aa376",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "overflow": "hidden"
+  },
+  "appHeaderAvatarImage": {
+    "width": "100%",
+    "height": "100%"
+  },
+  "appHeaderAvatarText": {
+    "color": "#0b7a54",
+    "fontSize": 17,
+    "lineHeight": 24,
+    "fontWeight": "800"
+  },
+  "appHeaderPressed": {
+    "opacity": 0.7
+  },
+  "bottomNavContainer": {
+    "position": "absolute",
+    "bottom": 10,
+    "left": 14,
+    "right": 14,
+    "alignItems": "center"
+  },
+  "bottomNavFrame": {
+    "width": "100%",
+    "maxWidth": 480,
+    "height": 88
+  },
+  "bottomNavPanel": {
+    "position": "absolute",
+    "left": 0,
+    "right": 0,
+    "bottom": 0,
+    "height": 68,
+    "borderTopLeftRadius": 28,
+    "borderTopRightRadius": 28,
+    "borderBottomRightRadius": 28,
+    "borderBottomLeftRadius": 28,
+    "backgroundColor": "#ffffff",
+    "borderTopWidth": 1,
+    "borderRightWidth": 1,
+    "borderBottomWidth": 1,
+    "borderLeftWidth": 1,
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3",
+    "shadowOffset": {
+      "width": 0,
+      "height": 10
+    },
+    "shadowRadius": 28,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 10
+  },
+  "bottomNavRow": {
+    "height": 88,
+    "flexDirection": "row",
+    "alignItems": "flex-end",
+    "paddingLeft": 4,
+    "paddingRight": 4,
+    "zIndex": 1,
+    "elevation": 11
+  },
+  "bottomNavTab": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "height": 68,
+    "minWidth": 48,
+    "alignItems": "center",
+    "justifyContent": "center",
+    "gap": 3
+  },
+  "bottomNavIconSlot": {
+    "width": 52,
+    "height": 30,
+    "borderTopLeftRadius": 15,
+    "borderTopRightRadius": 15,
+    "borderBottomRightRadius": 15,
+    "borderBottomLeftRadius": 15,
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "bottomNavSelectedPill": {
+    "position": "absolute",
+    "top": 0,
+    "right": 0,
+    "bottom": 0,
+    "left": 0,
+    "borderTopLeftRadius": 15,
+    "borderTopRightRadius": 15,
+    "borderBottomRightRadius": 15,
+    "borderBottomLeftRadius": 15,
+    "backgroundColor": "#d3f1e2"
+  },
+  "bottomNavImage": {
+    "width": 22,
+    "height": 22
+  },
+  "bottomNavScanCircle": {
+    "position": "absolute",
+    "top": -18,
+    "width": 58,
+    "height": 58,
+    "borderTopLeftRadius": 29,
+    "borderTopRightRadius": 29,
+    "borderBottomRightRadius": 29,
+    "borderBottomLeftRadius": 29,
+    "borderTopWidth": 4,
+    "borderRightWidth": 4,
+    "borderBottomWidth": 4,
+    "borderLeftWidth": 4,
+    "borderTopColor": "#ffffff",
+    "borderRightColor": "#ffffff",
+    "borderBottomColor": "#ffffff",
+    "borderLeftColor": "#ffffff",
+    "backgroundColor": "#0b7a54",
+    "shadowOffset": {
+      "width": 0,
+      "height": 8
+    },
+    "shadowRadius": 16,
+    "shadowColor": "rgba(11, 122, 84, 0.3)",
+    "shadowOpacity": 1,
+    "elevation": 12
+  },
+  "bottomNavScanSelected": {
+    "backgroundColor": "#12332b"
+  },
+  "bottomNavScanImage": {
+    "width": 26,
+    "height": 26
+  },
+  "bottomNavLabel": {
+    "color": "#7b8e87",
+    "fontSize": 10,
+    "lineHeight": 14,
+    "fontWeight": "600",
+    "textAlign": "center"
+  },
+  "bottomNavScanLabel": {
+    "position": "absolute",
+    "bottom": 8,
+    "left": 0,
+    "right": 0
+  },
+  "bottomNavLabelSelected": {
+    "color": "#0b7a54",
+    "fontWeight": "800"
+  },
+  "scanFinder": {
+    "minHeight": 250,
+    "borderTopLeftRadius": 26,
+    "borderTopRightRadius": 26,
+    "borderBottomRightRadius": 26,
+    "borderBottomLeftRadius": 26,
+    "backgroundColor": "#ffffff",
+    "borderTopWidth": 2,
+    "borderRightWidth": 2,
+    "borderBottomWidth": 2,
+    "borderLeftWidth": 2,
+    "borderStyle": "dashed",
+    "borderTopColor": "#1aa376",
+    "borderRightColor": "#1aa376",
+    "borderBottomColor": "#1aa376",
+    "borderLeftColor": "#1aa376",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "gap": 10,
+    "paddingTop": 28,
+    "paddingRight": 28,
+    "paddingBottom": 28,
+    "paddingLeft": 28
+  },
+  "scanCorner": {
+    "position": "absolute",
+    "width": 26,
+    "height": 26,
+    "borderTopColor": "#0b7a54",
+    "borderRightColor": "#0b7a54",
+    "borderBottomColor": "#0b7a54",
+    "borderLeftColor": "#0b7a54"
+  },
+  "scanCornerTL": {
+    "top": 12,
+    "left": 12,
+    "borderTopWidth": 4,
+    "borderLeftWidth": 4,
+    "borderTopLeftRadius": 12
+  },
+  "scanCornerTR": {
+    "top": 12,
+    "right": 12,
+    "borderTopWidth": 4,
+    "borderRightWidth": 4,
+    "borderTopRightRadius": 12
+  },
+  "scanCornerBL": {
+    "bottom": 12,
+    "left": 12,
+    "borderBottomWidth": 4,
+    "borderLeftWidth": 4,
+    "borderBottomLeftRadius": 12
+  },
+  "scanCornerBR": {
+    "bottom": 12,
+    "right": 12,
+    "borderBottomWidth": 4,
+    "borderRightWidth": 4,
+    "borderBottomRightRadius": 12
+  },
+  "scanFinderIcon": {
+    "width": 60,
+    "height": 60,
+    "borderTopLeftRadius": 30,
+    "borderTopRightRadius": 30,
+    "borderBottomRightRadius": 30,
+    "borderBottomLeftRadius": 30,
+    "backgroundColor": "#eaf6ef",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "scanFinderTitle": {
+    "color": "#12332b",
+    "fontSize": 15,
+    "lineHeight": 21,
+    "fontWeight": "800",
+    "textAlign": "center"
+  },
+  "scanFinderText": {
+    "color": "#566a63",
+    "fontSize": 13,
+    "lineHeight": 19,
+    "textAlign": "center",
+    "maxWidth": 260
+  },
+  "scanTipsRow": {
+    "flexDirection": "row",
+    "alignItems": "stretch",
+    "backgroundColor": "#ffffff",
+    "borderTopLeftRadius": 20,
+    "borderTopRightRadius": 20,
+    "borderBottomRightRadius": 20,
+    "borderBottomLeftRadius": 20,
+    "paddingTop": 12,
+    "paddingRight": 6,
+    "paddingBottom": 12,
+    "paddingLeft": 6,
+    "shadowOffset": {
+      "width": 0,
+      "height": 4
+    },
+    "shadowRadius": 14,
+    "shadowColor": "rgba(14, 60, 42, 0.1)",
+    "shadowOpacity": 1,
+    "elevation": 1
+  },
+  "scanTipChip": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "minWidth": 0,
+    "alignItems": "center",
+    "gap": 6,
+    "paddingTop": 0,
+    "paddingRight": 4,
+    "paddingBottom": 0,
+    "paddingLeft": 4
+  },
+  "scanTipDivider": {
+    "width": 1,
+    "backgroundColor": "#e9e3d3",
+    "marginTop": 4,
+    "marginBottom": 4
+  },
+  "scanTipIcon": {
+    "width": 34,
+    "height": 34,
+    "borderTopLeftRadius": 17,
+    "borderTopRightRadius": 17,
+    "borderBottomRightRadius": 17,
+    "borderBottomLeftRadius": 17,
+    "backgroundColor": "#eaf6ef",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "scanTipChipText": {
+    "color": "#12332b",
+    "fontSize": 11,
+    "lineHeight": 15,
+    "fontWeight": "700",
+    "textAlign": "center"
+  },
+  "farmEditButton": {
+    "position": "absolute",
+    "top": 12,
+    "right": 12,
+    "width": 36,
+    "height": 36,
+    "borderTopLeftRadius": 12,
+    "borderTopRightRadius": 12,
+    "borderBottomRightRadius": 12,
+    "borderBottomLeftRadius": 12,
+    "backgroundColor": "#eaf6ef",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "homeGauge": {
+    "height": 6,
+    "borderTopLeftRadius": 3,
+    "borderTopRightRadius": 3,
+    "borderBottomRightRadius": 3,
+    "borderBottomLeftRadius": 3,
+    "backgroundColor": "rgba(14, 60, 42, 0.1)",
+    "overflow": "hidden"
+  },
+  "homeGaugeFill": {
+    "height": 6,
+    "borderTopLeftRadius": 3,
+    "borderTopRightRadius": 3,
+    "borderBottomRightRadius": 3,
+    "borderBottomLeftRadius": 3
+  },
+  "homeGaugeScale": {
+    "flexDirection": "row",
+    "justifyContent": "space-between"
+  },
+  "homeGaugeText": {
+    "color": "#566a63",
+    "fontSize": 10,
+    "lineHeight": 14
+  },
+  "forecastHero": {
+    "borderTopLeftRadius": 26,
+    "borderTopRightRadius": 26,
+    "borderBottomRightRadius": 26,
+    "borderBottomLeftRadius": 26,
+    "paddingTop": 16,
+    "paddingRight": 16,
+    "paddingBottom": 16,
+    "paddingLeft": 16,
+    "gap": 12,
+    "borderTopWidth": 1,
+    "borderRightWidth": 1,
+    "borderBottomWidth": 1,
+    "borderLeftWidth": 1
+  },
+  "forecastHeroHigh": {
+    "backgroundColor": "#fff3dc",
+    "borderTopColor": "rgba(240, 160, 46, 0.45)",
+    "borderRightColor": "rgba(240, 160, 46, 0.45)",
+    "borderBottomColor": "rgba(240, 160, 46, 0.45)",
+    "borderLeftColor": "rgba(240, 160, 46, 0.45)"
+  },
+  "forecastHeroLow": {
+    "backgroundColor": "#eaf6ef",
+    "borderTopColor": "rgba(11, 122, 84, 0.35)",
+    "borderRightColor": "rgba(11, 122, 84, 0.35)",
+    "borderBottomColor": "rgba(11, 122, 84, 0.35)",
+    "borderLeftColor": "rgba(11, 122, 84, 0.35)"
+  },
+  "forecastHeroPending": {
+    "backgroundColor": "#ffffff",
+    "borderTopColor": "#e9e3d3",
+    "borderRightColor": "#e9e3d3",
+    "borderBottomColor": "#e9e3d3",
+    "borderLeftColor": "#e9e3d3"
+  },
+  "forecastHeroPlot": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 10,
+    "paddingBottom": 12,
+    "borderBottomWidth": 1,
+    "borderBottomColor": "rgba(14, 60, 42, 0.08)"
+  },
+  "forecastHeroPlotIcon": {
+    "width": 32,
+    "height": 32,
+    "borderTopLeftRadius": 11,
+    "borderTopRightRadius": 11,
+    "borderBottomRightRadius": 11,
+    "borderBottomLeftRadius": 11,
+    "backgroundColor": "rgba(14, 60, 42, 0.08)",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "forecastHeroPlotName": {
+    "color": "#12332b",
+    "fontSize": 14,
+    "lineHeight": 19,
+    "fontWeight": "800"
+  },
+  "forecastHeroMain": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 12
+  },
+  "forecastHeroBadgeIcon": {
+    "width": 56,
+    "height": 56,
+    "borderTopLeftRadius": 28,
+    "borderTopRightRadius": 28,
+    "borderBottomRightRadius": 28,
+    "borderBottomLeftRadius": 28,
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "forecastHeroIconHigh": {
+    "backgroundColor": "#c47a12"
+  },
+  "forecastHeroIconLow": {
+    "backgroundColor": "#0b7a54"
+  },
+  "forecastHeroIconPending": {
+    "backgroundColor": "#4b6080"
+  },
+  "forecastHeroTitle": {
+    "color": "#12332b",
+    "fontSize": 17,
+    "lineHeight": 23,
+    "fontWeight": "800",
+    "letterSpacing": -0.3
+  },
+  "forecastHeroNote": {
+    "color": "#566a63",
+    "fontSize": 12,
+    "lineHeight": 18
+  },
+  "forecastReadingGrid": {
+    "flexDirection": "row",
+    "flexWrap": "wrap",
+    "gap": 10
+  },
+  "forecastReadingTile": {
+    "width": "48%",
+    "flexGrow": 1,
+    "minWidth": 0,
+    "borderTopWidth": 1,
+    "borderRightWidth": 1,
+    "borderBottomWidth": 1,
+    "borderLeftWidth": 1,
+    "borderTopLeftRadius": 20,
+    "borderTopRightRadius": 20,
+    "borderBottomRightRadius": 20,
+    "borderBottomLeftRadius": 20,
+    "paddingTop": 13,
+    "paddingRight": 13,
+    "paddingBottom": 13,
+    "paddingLeft": 13,
+    "gap": 9
+  },
+  "forecastReadingTop": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 7
+  },
+  "forecastReadingIcon": {
+    "width": 28,
+    "height": 28,
+    "borderTopLeftRadius": 10,
+    "borderTopRightRadius": 10,
+    "borderBottomRightRadius": 10,
+    "borderBottomLeftRadius": 10,
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "forecastReadingLabel": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "color": "#566a63",
+    "fontSize": 12,
+    "lineHeight": 16,
+    "fontWeight": "600"
+  },
+  "forecastReadingValue": {
+    "color": "#12332b",
+    "fontSize": 24,
+    "lineHeight": 30,
+    "fontWeight": "800",
+    "letterSpacing": -0.5
+  },
+  "forecastReadingUnit": {
+    "color": "#566a63",
+    "fontSize": 11,
+    "fontWeight": "500",
+    "letterSpacing": 0
+  },
+  "pwHero": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 14,
+    "paddingTop": 18,
+    "paddingRight": 18,
+    "paddingBottom": 18,
+    "paddingLeft": 18,
+    "borderTopLeftRadius": 24,
+    "borderTopRightRadius": 24,
+    "borderBottomRightRadius": 24,
+    "borderBottomLeftRadius": 24,
+    "backgroundColor": "#12332b",
+    "shadowOffset": {
+      "width": 0,
+      "height": 8
+    },
+    "shadowRadius": 22,
+    "shadowColor": "rgba(14, 60, 42, 0.18)",
+    "shadowOpacity": 1,
+    "elevation": 3
+  },
+  "pwHeroIcon": {
+    "width": 50,
+    "height": 50,
+    "borderTopLeftRadius": 16,
+    "borderTopRightRadius": 16,
+    "borderBottomRightRadius": 16,
+    "borderBottomLeftRadius": 16,
+    "backgroundColor": "rgba(255, 255, 255, 0.14)",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "pwHeroTitle": {
+    "color": "#ffffff",
+    "fontSize": 16,
+    "lineHeight": 22,
+    "fontWeight": "800"
+  },
+  "pwHeroText": {
+    "color": "#bfe3d2",
+    "fontSize": 12,
+    "lineHeight": 18,
+    "marginTop": 2
+  },
+  "pwDivider": {
+    "height": 1,
+    "backgroundColor": "#e9e3d3",
+    "marginBottom": 16
+  },
+  "pwMeter": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 10,
+    "marginTop": -4,
+    "marginBottom": 16
+  },
+  "pwBars": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "flexDirection": "row",
+    "gap": 5
+  },
+  "pwBar": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "height": 5,
+    "borderTopLeftRadius": 3,
+    "borderTopRightRadius": 3,
+    "borderBottomRightRadius": 3,
+    "borderBottomLeftRadius": 3,
+    "backgroundColor": "#e9e3d3"
+  },
+  "pwStrengthText": {
+    "minWidth": 72,
+    "textAlign": "right",
+    "fontSize": 11,
+    "lineHeight": 15,
+    "fontWeight": "700"
+  },
+  "pwRules": {
+    "gap": 8,
+    "paddingTop": 12,
+    "paddingRight": 12,
+    "paddingBottom": 12,
+    "paddingLeft": 12,
+    "borderTopLeftRadius": 14,
+    "borderTopRightRadius": 14,
+    "borderBottomRightRadius": 14,
+    "borderBottomLeftRadius": 14,
+    "backgroundColor": "#fbf8f0"
+  },
+  "pwRule": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 8
+  },
+  "pwRuleText": {
+    "color": "#566a63",
+    "fontSize": 12,
+    "lineHeight": 17
+  },
+  "pwRuleTextOk": {
+    "color": "#0b7a54",
+    "fontWeight": "600"
+  },
+  "pwNote": {
+    "flexDirection": "row",
+    "alignItems": "flex-start",
+    "gap": 8,
+    "paddingTop": 0,
+    "paddingRight": 4,
+    "paddingBottom": 0,
+    "paddingLeft": 4
+  },
+  "pwNoteText": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": 0,
+    "color": "#566a63",
+    "fontSize": 11,
+    "lineHeight": 16
   }
 });

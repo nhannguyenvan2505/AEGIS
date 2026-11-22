@@ -3,6 +3,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNavigation } from '../../components/BottomNavigation';
+import { AppHeader, HeaderIconButton } from '../../components/AppHeader';
 import { Icon } from '../../components/Design';
 import { farmClient, type FarmPlot } from '../farms/client';
 import { useAuth } from '../../state/AuthContext';
@@ -43,7 +44,7 @@ function NotificationCard({ notice, plot, busy, onOpen }: {
   return <Pressable accessibilityRole="button" onPress={onOpen} disabled={busy}
     style={({ pressed }) => [s.noticeCard, pressed && s.noticePressed]}>
     <View style={[s.noticeIcon, high ? s.noticeIconHigh : s.noticeIconData]}>
-      <Icon name={high ? 'alert-triangle' : 'radio'} size={18} color={high ? '#a66a1b' : '#16846e'} />
+      <Icon name={high ? 'alert-triangle' : 'radio'} size={18} color={high ? '#8a4b08' : '#0b7a54'} />
     </View>
     <View style={s.noticeContent}>
       <View style={s.noticeTitleRow}><Text style={s.noticeTitle}>{copy.title}</Text>
@@ -125,14 +126,10 @@ function ConnectedNotifications({ token }: { token: string }) {
   }
 
   return <SafeAreaView style={s.noticePage}>
+    <AppHeader title="Thông báo" eyebrow="DỰ BÁO IOT" onBack={() => router.back()} avatar right={<HeaderIconButton icon="sliders" label="Lọc thông báo" onPress={() => setFilter(current => current === 'all' ? 'unread' : 'all')} />} />
     <ScrollView contentContainerStyle={s.noticeScroll} showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={loading && !!data} onRefresh={() => void reload()} tintColor="#009f96" />}>
+      refreshControl={<RefreshControl refreshing={loading && !!data} onRefresh={() => void reload()} tintColor="#0b7a54" />}>
       <View style={s.noticeColumn}>
-        <View style={s.noticeHeader}><Pressable accessibilityRole="button" accessibilityLabel="Quay lại" onPress={() => router.back()} style={s.noticeBack}>
-          <Icon name="arrow-left" color="#1d2946" size={21} /></Pressable><Text accessibilityRole="header" style={s.noticePageTitle}>Thông báo</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Lọc thông báo" onPress={() => setFilter(current => current === 'all' ? 'unread' : 'all')} style={s.noticeFilterIcon}>
-            <Icon name="sliders" color="#657e9e" size={19} /></Pressable>
-        </View>
         <View style={s.noticeTabs}>
           <Pressable accessibilityRole="button" accessibilityState={{ selected: filter === 'all' }} onPress={() => setFilter('all')} style={[s.noticeTab, filter === 'all' && s.noticeTabSelected]}>
             <Text style={[s.noticeTabText, filter === 'all' && s.noticeTabTextSelected]}>Tất cả ({notices.length})</Text></Pressable>
@@ -144,7 +141,7 @@ function ConnectedNotifications({ token }: { token: string }) {
         </View>
         {!!error && <View accessibilityRole="alert" style={s.noticeError}><Text style={s.noticeErrorText}>{error}</Text>
           <Pressable accessibilityRole="button" onPress={() => void reload()}><Text style={s.noticeMarkAll}>Thử lại</Text></Pressable></View>}
-        {loading && !data && <View style={s.noticeLoading}><ActivityIndicator color="#009f96" /><Text style={s.noticeEmptyText}>Đang tải thông báo dự báo IoT…</Text></View>}
+        {loading && !data && <View style={s.noticeLoading}><ActivityIndicator color="#0b7a54" /><Text style={s.noticeEmptyText}>Đang tải thông báo dự báo IoT…</Text></View>}
         {data?.mock && <Text style={s.noticeFootnote}>Báo cáo mẫu minh họa dữ liệu dự báo IoT.</Text>}
         {!loading && data && visible.map(notice => <NotificationCard key={notice.id} notice={notice}
           plot={data.plots.get(notice.plot_id)} busy={busy === notice.id} onOpen={() => void openNotice(notice)} />)}
@@ -153,7 +150,7 @@ function ConnectedNotifications({ token }: { token: string }) {
           <Text style={s.noticeMeta}>Dự báo 72 giờ · {timeLabel(selected.issued_at)} · Dữ liệu IoT</Text>
           <Pressable accessibilityRole="button" onPress={() => setSelected(undefined)} style={s.noticeForecastAction}><Text style={s.noticeForecastActionText}>Đóng báo cáo</Text></Pressable>
         </View>}
-        {!loading && data && !visible.length && <View style={s.noticeEmpty}><Icon name="bell" color="#18a79c" size={23} />
+        {!loading && data && !visible.length && <View style={s.noticeEmpty}><Icon name="bell" color="#0b7a54" size={23} />
           <Text style={s.noticeEmptyTitle}>{filter === 'unread' ? 'Bạn đã đọc hết thông báo' : 'Chưa có thông báo dự báo'}</Text>
           <Text style={s.noticeEmptyText}>Thông báo sẽ xuất hiện khi dự báo IoT của ruộng tạo cảnh báo mới.</Text>
           <Pressable accessibilityRole="button" onPress={() => router.push('/analysis')} style={s.noticeForecastAction}><Text style={s.noticeForecastActionText}>Mở dự báo IoT</Text></Pressable>
@@ -168,9 +165,8 @@ function ConnectedNotifications({ token }: { token: string }) {
 export function ForecastNotificationsScreen() {
   const { session, ready, error } = useAuth();
   if (session) return <ConnectedNotifications key={session.access_token} token={session.access_token} />;
-  return <SafeAreaView style={s.noticePage}><View style={s.noticeColumn}>
-    <View style={s.noticeHeader}><Pressable accessibilityRole="button" onPress={() => router.back()} style={s.noticeBack}><Icon name="arrow-left" color="#1d2946" /></Pressable><Text style={s.noticePageTitle}>Thông báo</Text></View>
-    <View style={s.noticeEmpty}><Icon name="bell" color="#18a79c" size={23} /><Text style={s.noticeEmptyTitle}>Thông báo dự báo IoT</Text>
+  return <SafeAreaView style={s.noticePage}><AppHeader title="Thông báo" eyebrow="DỰ BÁO IOT" onBack={() => router.back()} avatar /><View style={s.noticeColumn}>
+    <View style={s.noticeEmpty}><Icon name="bell" color="#0b7a54" size={23} /><Text style={s.noticeEmptyTitle}>Thông báo dự báo IoT</Text>
       <Text style={s.noticeEmptyText}>{ready ? error || 'Đăng nhập để xem thông báo của các ruộng bạn đang theo dõi.' : 'Đang khôi phục phiên…'}</Text>
       {ready && <Pressable accessibilityRole="button" onPress={() => router.push('/login')} style={s.noticeForecastAction}><Text style={s.noticeForecastActionText}>Đăng nhập</Text></Pressable>}
     </View>
