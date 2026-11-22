@@ -1,13 +1,16 @@
 from app.admin.core import db
+from app.admin.core.filters import like as _user_like, user_clause
 
 
-def list_alerts(alert_type=None, severity=None, status=None):
+def list_alerts(alert_type=None, severity=None, status=None, user=None):
     where, params = [], []
+    if user:
+        where.append(user_clause()); params += [_user_like(user)] * 2
     for value, column in ((alert_type, 'a.alert_type'), (severity, 'a.severity'), (status, 'a.status')):
         if value:
             where.append(f'{column}=%s'); params.append(value)
     select = '''a.alert_id id, a.alert_type, a.severity, a.title, a.message, a.status, a.generated_at, a.resolved_at,
-                p.external_id plot_id, p.field_name plot_name, u.email owner_email'''
+                p.external_id plot_id, p.field_name plot_name, u.email owner_email, u.full_name owner_name'''
     source = 'alerts a JOIN farm_fields p ON p.field_id=a.field_id JOIN users u ON u.user_id=p.user_id'
     return db.paged(select, source, where, params, 'a.alert_id DESC')
 

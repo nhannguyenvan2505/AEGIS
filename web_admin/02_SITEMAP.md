@@ -31,6 +31,6 @@
 4. **Hệ thống:** Sức khỏe, Cấu hình, Nhật ký
 
 ## Quy ước điều hướng
-- Chưa đăng nhập hoặc không phải admin/expert → chuyển về `/login`.
+- Chưa đăng nhập hoặc không phải admin → chuyển về `/login`.
 - Danh sách → bấm một dòng để vào trang chi tiết.
 - Breadcrumb ở đầu mỗi trang chi tiết (ví dụ: Nông trại / Trang trại A / Ruộng 1).

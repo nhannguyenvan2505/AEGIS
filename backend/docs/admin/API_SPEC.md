@@ -1,3 +1,5 @@
+> **Cập nhật:** vai trò `expert` đã bị bỏ theo tài liệu dự án (chỉ có Farmer và Admin). Cột/ký hiệu expert (E) bên dưới là phần cũ, bỏ qua; mọi chức năng web quản trị chỉ dành cho `admin`.
+
 # API admin – đặc tả
 
 ## Trạng thái triển khai
@@ -20,7 +22,7 @@ Quy ước chung
 ## Xác thực
 | Method | Path | Mô tả | Quyền |
 |---|---|---|---|
-| POST | /auth/login | Đăng nhập; từ chối nếu role không phải admin/expert | – |
+| POST | /auth/login | Đăng nhập; từ chối nếu role không phải admin | – |
 | GET | /auth/me | Thông tin + role hiện tại | A,E |
 | POST | /auth/logout | Đăng xuất | A,E |
 | POST | /auth/change-password | Đổi mật khẩu | A,E |

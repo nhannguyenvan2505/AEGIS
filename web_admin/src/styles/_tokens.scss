@@ -1,0 +1,48 @@
+// Hệ thiết kế "Fresh Green" cho web admin: nền sáng, xanh lá làm màu thương hiệu (cùng tông với mobile),
+// bo góc lớn, đổ bóng nhẹ. Mọi màu đi qua biến CSS để sau này thêm chế độ tối chỉ cần đổi ở :root.
+$ink: #10261f;
+$muted: #5b6f67;
+$subtle: #8a9b94;
+
+$bg: #f3f6f4;
+$card: #ffffff;
+$surface: #f8faf9;
+$divider: #edf1ee;
+$border: #e0e7e3;
+
+$primary: #0e8a5f;
+$primaryMid: #1fb583;
+$primaryDark: #0a6f4c;
+$primarySoft: #d3f1e2;
+$primaryTint: #e6f5ee;
+
+$warnInk: #8a4b08;
+$warn: #d98b1b;
+$warnBg: #fff4df;
+$warnBorder: #f1d9a8;
+$danger: #c0392b;
+$dangerBg: #fdecea;
+$dangerBorder: #f4c4be;
+$info: #1d5fa8;
+$infoBg: #e8f1fc;
+$violet: #6b4fc9;
+$violetBg: #efeafc;
+
+$radius: 14px;
+$radiusSm: 10px;
+$sidebarWidth: 248px;
+
+$shadowSm: 0 1px 2px rgba(16, 38, 31, 0.05);
+$shadow: 0 1px 2px rgba(16, 38, 31, 0.04), 0 6px 20px rgba(16, 38, 31, 0.06);
+$shadowLg: 0 20px 60px rgba(10, 33, 27, 0.28);
+
+:root {
+  --ink: #{$ink};
+  --primary: #{$primary};
+  --bg: #{$bg};
+  --card: #{$card};
+  --border: #{$border};
+}
+
+@mixin bp-tablet { @media (max-width: 900px) { @content; } }
+@mixin focus-ring { outline: 3px solid rgba(31, 181, 131, 0.35); outline-offset: 1px; }

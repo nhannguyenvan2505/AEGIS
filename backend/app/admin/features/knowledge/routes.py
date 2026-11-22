@@ -38,7 +38,7 @@ def list_diseases():
 
 
 @bp.post('/diseases')
-@require_role('admin', 'expert')
+@require_role('admin')
 def create_disease():
     values = _disease_values(body())
     new_id = repo.add_disease(values)
@@ -47,7 +47,7 @@ def create_disease():
 
 
 @bp.put('/diseases/<int:disease_id>')
-@require_role('admin', 'expert')
+@require_role('admin')
 def update_disease(disease_id):
     if not repo.disease_exists(disease_id):
         raise ApiError('not_found', 'Không tìm thấy bệnh.', 404)
@@ -75,7 +75,7 @@ def list_recommendations():
 
 
 @bp.post('/recommendations')
-@require_role('admin', 'expert')
+@require_role('admin')
 def create_recommendation():
     values = _rec_values(body())
     new_id = repo.add_recommendation(values)
@@ -84,7 +84,7 @@ def create_recommendation():
 
 
 @bp.put('/recommendations/<int:rec_id>')
-@require_role('admin', 'expert')
+@require_role('admin')
 def update_recommendation(rec_id):
     if not repo.recommendation_exists(rec_id):
         raise ApiError('not_found', 'Không tìm thấy khuyến nghị.', 404)
@@ -95,7 +95,7 @@ def update_recommendation(rec_id):
 
 
 @bp.delete('/recommendations/<int:rec_id>')
-@require_role('admin', 'expert')
+@require_role('admin')
 def delete_recommendation(rec_id):
     if not repo.delete_recommendation(rec_id):
         raise ApiError('not_found', 'Không tìm thấy khuyến nghị.', 404)

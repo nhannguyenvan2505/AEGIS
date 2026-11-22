@@ -55,3 +55,72 @@
 - Kiểm tra API hiện tại: tạo ruộng, `PUT /api/farm/plots/{id}` với tên/diện tích thay đổi (kể cả `area_ha: null`), rồi tải danh sách lại đều trả 200 và có dữ liệu mới.
 - Phát hiện môi trường: `mobile/.env` trỏ tới `127.0.0.1:5000`; Android đang reverse cổng 5000 nhưng hiện không có backend lắng nghe trên máy này. Vì vậy 405 đến từ một backend khác/phiên bản cũ, không phải route hiện tại trong workspace.
 - Hành động cần thiết: khởi động lại backend đang được ứng dụng sử dụng từ mã nguồn mới.
+
+## 2026-11-20 — Thiết kế lại giao diện (Organic Biophilic)
+
+**Công việc đã thực hiện**
+- Phân tích skill đã cài (`ui-ux-pro-max`, `design-system`, `ui-styling`...). Dùng `ui-ux-pro-max --design-system` → phong cách *Organic Biophilic* (xanh lá nông nghiệp, bo góc 16–24, bóng mềm), quy tắc: tương phản ≥ 4.5:1, touch target ≥ 44px, không dùng emoji làm icon.
+- Chuẩn hoá toàn bộ màu: trước đó mỗi nhóm màn hình dùng một bảng màu khác (7 màu nền, ~8 xanh navy, ~8 xanh teal/lục). Nay dùng token SCSS (`$ink`, `$primary`, `$primarySoft`, `$bg`, `$surface`, `$divider`, `$border`, `$muted`, `$warn*`, `$danger*`) ở đầu `app.scss`.
+- Đồng bộ nền trang (`$bg`), card bo 22px + bóng xanh rừng mềm, nút bo 16px, màu chữ phụ đậm hơn để đủ tương phản. Màu series biểu đồ/cảm biến (xanh dương, tím) giữ nguyên.
+- Nút chính của Farm đổi sang nền `$primary` + chữ trắng.
+
+**File đã chỉnh sửa**: `src/styles/app.scss` (+ `generated/styles.ts`), `src/app/_layout.tsx`, `src/app/farms/_layout.tsx`, các component/screen có màu inline (BottomNavigation, Design, Screen, FarmUI, HomeUI, ScanUI, ProfileUI, ForecastDetailUI, ReportCharts, ReportDocumentPreview, ReportsScreen, ProfileScreen, ForecastListScreen, ForecastNotificationsScreen, AlertsScreen, CameraScreen, RecommendationsScreen, AnalysisResult, AuthField). Không đổi logic/API.
+
+**Kết quả kiểm tra**: `npm run styles` OK; `expo lint` 0 lỗi (1 cảnh báo cũ); `node --test`: 58/61 pass (3 test cần backend Flask `backend/checks/mobile_http.py`); chưa xem trên thiết bị/emulator.
+
+**Vấn đề còn tồn tại**: `tsc` báo lỗi có sẵn ở `_layout.tsx` (`translucent` không có trong StatusBarProps); cần xem trực quan trên emulator để tinh chỉnh.
+
+## 2026-11-20 — Cải tiến bố cục Home và Tài khoản
+
+- Home: ảnh ruộng cao hơn, tên nông trại/ruộng chồng lên ảnh, nút "Đổi ruộng"; thêm hàng 4 lối tắt (Khám lúa, Dự báo, Báo cáo, Nhiệm vụ); thẻ số đo có icon chip + nhãn trạng thái, số lớn hơn; thẻ "Dự báo" thành CTA nền tối.
+- Tài khoản: thẻ danh tính nền xanh rừng đậm, icon cài đặt dạng ô màu; sửa màu Switch (bật = xanh).
+- File: `DashboardScreen.tsx`, `HomeUI.tsx`, `ProfileScreen.tsx`, `app.scss`. Không đổi logic/API.
+- Kiểm tra: `npm run styles` OK; lint 0 lỗi; `tsc` chỉ còn lỗi cũ ở `_layout.tsx`. Chưa xem trên emulator.
+
+## 2026-11-21 — Header cố định, avatar tài khoản, thanh điều hướng mới
+
+- Thêm `src/components/AppHeader.tsx` (header cố định ngoài ScrollView: nút quay lại, tiêu đề + eyebrow, nút hành động, avatar → `/profile`).
+- Áp dụng cho Home, Nông trại, Dự báo, Khám lúa/Lịch sử, Thông báo, các trang Tài khoản/Báo cáo (ProfilePage) và `Screen` (Công việc, đổi mật khẩu...). Avatar chỉ hiện ở trang cấp trên (Home, Nông trại gốc, Dự báo, Khám lúa, Thông báo).
+- Thanh điều hướng 5 nút: dạng viên thuốc nổi, nhãn luôn hiện, tab chọn có nền xanh nhạt, nút Quét nổi bật ở giữa.
+- File: AppHeader.tsx, BottomNavigation.tsx, Screen.tsx, FarmUI.tsx, ProfileUI.tsx, ScanUI.tsx, ForecastListScreen.tsx, ForecastNotificationsScreen.tsx, DashboardScreen.tsx, app.scss.
+- Kiểm tra: styles OK, lint 0 lỗi (1 cảnh báo cũ), tsc chỉ còn lỗi cũ `_layout.tsx`. Chưa xem trên emulator.
+
+## 2026-11-21 — Sửa chữ bị cắt, Home về bản trước, thiết kế lại trang Quét
+
+- Kiểm tra trên thiết bị thật (font scale 1.35): tiêu đề/eyebrow header và nhãn thanh điều hướng bị cắt → thêm `adjustsFontSizeToFit`, `maxFontSizeMultiplier`, nút Lịch sử thành icon, rút ngắn eyebrow.
+- Giảm cỡ chữ toàn bộ `app.scss` (≥15px giảm 1–4px, trừ ô nhập và header/nav).
+- Trang chủ: bỏ header cố định, trở về thiết kế trước (header trong nội dung, không avatar).
+- Trang Quét: khung "viewfinder" chạm để chụp, hàng nút Chụp/Tải, 3 chip mẹo, bỏ thẻ trùng lặp.
+- Ghi chú: khi thao tác thử qua adb vô tình chọn một ảnh trong thư viện làm ảnh đại diện ở form Chỉnh sửa hồ sơ (chưa lưu, thoát màn hình là mất).
+
+## 2026-11-21 — Thử nền kem ấm
+- Đổi token nền: `$bg #f7f3e8`, `$surface #fbf8f0`, `$divider #e9e3d3`, `$border #d9d2bf` (+ các màu cùng giá trị trong tsx/_layout). Bản nền sage cũ: `#eef5f0 / #f3f8f4 / #e0eae3 / #cddbd2`.
+- Đính chính: avatar tài khoản trên thiết bị thử đang hiển thị ảnh lá lúa do thao tác adb vô tình chọn và lưu ảnh; cần đổi lại trong Tài khoản > Chỉnh sửa hồ sơ.
+
+## 2026-11-21 — Nút gọn, tìm kiếm, trang Quét
+- Nông trại/Ruộng: nút "Sửa" thành icon bút chì ở góc thẻ; "Thêm nông trại/ruộng/mùa vụ" thành nút "+" trên header (empty state vẫn có nút); bỏ dòng "Xem thông tin…" và đoạn chú thích cuối trang; rút gọn mô tả.
+- Ô tìm kiếm: placeholder "Tìm kiếm".
+- Trang Quét: 3 mẹo (Đủ sáng / Lấy nét / Thấy vết lá) thành một thẻ có icon, không bấm được; rút gọn chữ thẻ AI.
+- Header: nút icon/quay lại dùng nền xanh nhạt để dễ thấy.
+
+## 2026-11-21 — Nền tối, ô chỉ số IoT, chi tiết dự báo
+- Giao diện tối: token mới `$bg #0a1410`, `$card #12231c`, `$ink #e8f3ec` (chữ), `$accent #4fd8a0` (chữ/icon nhấn), `$strong #14664b` (nền nút/thẻ đậm), `$muted/$subtle` sáng hơn; StatusBar chuyển `light`; authTheme chuyển tối; màu literal trong tsx đổi theo. Bản sáng cũ lưu ở scratchpad `app.light.scss`.
+- Home: 4 ô IoT thành lưới 2×2, mỗi ô có màu nhấn riêng (cam/xanh dương/tím/ngọc), icon, số lớn và thanh gauge theo thang.
+- Chi tiết dự báo: header cố định, thẻ hero theo mức nguy cơ (ruộng, mùa vụ, kết luận, thời gian), 4 ô số đo màu như Home, thu gọn gợi ý/chữ; bỏ nút "Quay lại danh sách ruộng" (cả bản API và preview).
+- Kiểm tra: styles OK, lint 0 lỗi, tsc chỉ còn lỗi cũ `_layout.tsx`; đã xem Home, Dự báo, Chi tiết, Nông trại trên thiết bị.
+
+## 2026-11-21 — Đổi nền tối sang xanh navy
+- Nền xanh-đen bị đánh giá xấu → đổi sang navy-slate: `$bg #0e1726`, `$card #16233a`, `$surface #1a2a42`, `$divider #25364f`, `$border #344a66`, chữ `#eaf1f8`, muted `#9fb2cb`, subtle `#7388a3`. Xanh lá giữ làm màu nhấn. Đổi đồng bộ trong scss/ts/tsx/authTheme.
+
+## 2026-11-21 — Quay lại nền kem ấm, chữ xanh đen
+- Token: `$bg #f7f3e8`, `$card #ffffff`, `$surface #fbf8f0`, `$divider #e9e3d3`, `$border #d9d2bf`, chữ `$ink #12332b` (xanh đen), muted `#566a63`, `$accent #0b7a54`, `$strong #12332b`. StatusBar `dark`, authTheme sáng. Giữ nguyên các bố cục mới (ô IoT 2×2, hero dự báo, header cố định...).
+
+## 2026-11-21 — Thiết kế lại trang Đổi mật khẩu
+- Dùng khung `ProfilePage` (header cố định + nút quay lại), thẻ hero xanh đen "Bảo vệ tài khoản", thẻ form 3 trường, thanh đo độ mạnh mật khẩu (chỉ gợi ý hiển thị), checklist quy tắc (12–128 ký tự, khớp xác nhận), nút Lưu và ghi chú backend chưa hỗ trợ lưu.
+- File: `ChangePasswordScreen.tsx`, `app/change-password.tsx`, `app.scss`. Logic validate/submit giữ nguyên.
+
+## 2026-11-21 — Tối ưu độ mượt
+- Ảnh `rice-field-morning` 2,6 MB (1774×887 PNG) → JPG 900×450 ~85 KB (`rice-field-morning.jpg`, giữ PNG gốc); giảm thời gian giải mã khi vào Trang chủ.
+- Stack: `animation: 'fade'` 140 ms + `freezeOnBlur` (màn hình ẩn không render lại) ở `_layout.tsx` và `farms/_layout.tsx`.
+- `useFarmData`: stale-while-revalidate — không bật spinner khi đã có dữ liệu mỗi lần focus lại màn hình.
+- Lưu ý: Expo Go ở chế độ dev chậm hơn bản release nhiều.

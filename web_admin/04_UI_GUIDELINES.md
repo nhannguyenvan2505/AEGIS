@@ -26,5 +26,5 @@ Mức độ cảnh báo: info (xanh dương), warning (vàng), high (cam), criti
 ## Ngôn ngữ
 Tiếng Việt là chính; giữ nguyên mã kỹ thuật (tên bệnh, trạng thái) ở dạng tooltip.
 
-## Công nghệ đề xuất (khi bắt đầu code)
-React + Vite + TypeScript; Tailwind + shadcn/ui; TanStack Table/Query; Recharts; Leaflet. Đặt trong `web_admin/frontend/`, tách khỏi `frontend/` pilot cũ.
+## Công nghệ
+Đã chốt: React 19 + TypeScript + Vite + SCSS, đồng bộ với mobile. Chi tiết ở [06_FRONTEND_ARCHITECTURE.md](06_FRONTEND_ARCHITECTURE.md). Mã nguồn đặt trong `web_admin/` (tách khỏi `frontend/` pilot cũ).

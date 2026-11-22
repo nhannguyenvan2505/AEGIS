@@ -1,7 +1,7 @@
 # 03. Chức năng chi tiết từng trang
 
 ## 1. Đăng nhập `/login`
-- Đăng nhập email + mật khẩu; backend kiểm tra role `admin`/`expert`, người dùng thường bị từ chối.
+- Đăng nhập email + mật khẩu; backend kiểm tra role `admin`, người dùng thường bị từ chối.
 - Hiển thị lỗi `rate_limit_exceeded` kèm thời gian chờ (`Retry-After`).
 - Quên mật khẩu, đổi mật khẩu (backend cần bổ sung; bảng `password_reset_tokens` đã có).
 

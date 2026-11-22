@@ -18,7 +18,6 @@ Nguồn schema: `backend/database/mysql/001_design.sql` và các migration 002�
 | Nhật ký | `audit_logs` | Chưa có API |
 
 ## Thay đổi schema đề xuất (cần cân nhắc, chưa thực hiện)
-- Thêm role `expert` vào `roles`.
 - Bổ sung cột người xác minh và thời điểm xác minh cho `disease_detections` (`verified_by`, `verified_at`, `verification_note`).
 - Seed `diseases` cho 3 bệnh: rice_blast, brown_spot, sheath_blight.
 - Xóa mềm cho `farms`/`iot_devices` nếu chưa có cờ tương đương.

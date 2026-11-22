@@ -1,13 +1,15 @@
 from app.admin.core import db
+from app.admin.core.filters import like as _user_like, user_clause
 
 FARM_SELECT = '''f.external_id id, f.farm_name name, f.address, f.manager, f.latitude, f.longitude,
-                 u.external_id owner_id, u.email owner_email, f.api_created_at created_at,
+                 u.external_id owner_id, u.email owner_email, u.full_name owner_name, f.api_created_at created_at,
                  (SELECT COUNT(*) FROM farm_fields p WHERE p.farm_id=f.farm_id) plot_count,
                  (SELECT COALESCE(SUM(p.area_ha),0) FROM farm_fields p WHERE p.farm_id=f.farm_id) area_ha'''
 FARM_SOURCE = 'farms f JOIN users u ON u.user_id=f.owner_user_id'
 PLOT_SELECT = '''p.external_id id, f.external_id farm_id, f.farm_name, u.external_id owner_id, u.email owner_email,
                  p.field_name name, p.area_ha, p.crop_type, p.soil_type, p.status, p.location_text,
-                 p.latitude, p.longitude, p.api_created_at created_at'''
+                 p.latitude, p.longitude, p.api_created_at created_at,
+                 (SELECT COUNT(*) FROM iot_devices d WHERE d.field_id=p.field_id AND d.sensor_type IS NOT NULL) sensor_count'''
 PLOT_SOURCE = 'farm_fields p JOIN farms f ON f.farm_id=p.farm_id JOIN users u ON u.user_id=p.user_id'
 SEASON_SELECT = '''c.external_id id, p.external_id plot_id, p.field_name plot_name, u.external_id owner_id,
                    c.name, c.crop_type, c.variety, c.start_date, c.expected_end_date, c.actual_end_date,
@@ -19,8 +21,10 @@ def _like(value):
     return '%' + value.replace('%', r'\%').replace('_', r'\_') + '%'
 
 
-def list_farms(owner_id=None, q=None):
+def list_farms(owner_id=None, q=None, user=None):
     where, params = [], []
+    if user:
+        where.append(user_clause()); params += [_user_like(user)] * 2
     if owner_id:
         where.append('u.external_id=%s'); params.append(owner_id)
     if q:
@@ -56,8 +60,14 @@ def season(identifier):
     return db.one(f'SELECT {SEASON_SELECT}, c.notes FROM {SEASON_SOURCE} WHERE c.external_id=%s', (identifier,))
 
 
+def plot_devices(identifier):
+    return db.query('''SELECT d.external_id id, d.device_code, d.device_name, d.sensor_type, d.status, d.last_seen_at
+                       FROM iot_devices d JOIN farm_fields p ON p.field_id=d.field_id
+                       WHERE p.external_id=%s ORDER BY d.device_id''', (identifier,))
+
+
 def season_devices(identifier):
-    return db.query('''SELECT d.external_id id, d.device_code, d.device_name, d.status, d.source, d.last_seen_at
+    return db.query('''SELECT d.external_id id, d.device_code, d.device_name, d.sensor_type, d.status, d.source, d.last_seen_at
                        FROM iot_devices d JOIN crop_cycles c ON c.crop_cycle_id=d.crop_cycle_id
                        WHERE c.external_id=%s''', (identifier,))
 

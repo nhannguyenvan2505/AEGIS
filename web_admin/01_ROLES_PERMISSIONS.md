@@ -1,3 +1,5 @@
+> **Cập nhật:** vai trò `expert` đã bị bỏ theo tài liệu dự án (chỉ có Farmer và Admin). Cột/ký hiệu expert (E) bên dưới là phần cũ, bỏ qua; mọi chức năng web quản trị chỉ dành cho `admin`.
+
 # 01. Vai trò và phân quyền
 
 ## Vai trò

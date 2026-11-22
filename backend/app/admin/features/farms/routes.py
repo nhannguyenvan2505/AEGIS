@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 
+from app.admin.core import sensors
 from app.admin.core.security import ApiError, ok, require_role
 
 from . import repository as repo
@@ -17,7 +18,7 @@ def _found(row, message):
 @bp.get('/farms')
 @require_role()
 def list_farms():
-    items, page, size, total = repo.list_farms(request.args.get('owner_id'), request.args.get('q'))
+    items, page, size, total = repo.list_farms(request.args.get('owner_id'), request.args.get('q'), request.args.get('user'))
     return ok(items=items, page=page, page_size=size, total=total)
 
 
@@ -38,7 +39,10 @@ def list_plots():
 @bp.get('/plots/<identifier>')
 @require_role()
 def get_plot(identifier):
-    return ok(plot=_found(repo.plot(identifier), 'Không tìm thấy ruộng.'), seasons=repo.seasons_of_plot(identifier))
+    plot = _found(repo.plot(identifier), 'Không tìm thấy ruộng.')
+    devices = repo.plot_devices(identifier)
+    return ok(plot=plot, seasons=repo.seasons_of_plot(identifier), devices=devices,
+              sensors=sensors.slots(d['sensor_type'] for d in devices))
 
 
 @bp.get('/seasons/<identifier>')

@@ -17,7 +17,7 @@ def _defaults(app):
     for key, value in dict(
         ADMIN_SESSION_TTL_SECONDS=int(os.environ.get('AEGIS_ADMIN_SESSION_TTL', str(8 * 3600))),
         ADMIN_ALLOWED_ORIGINS=[o.strip() for o in origins.split(',') if o.strip()],
-        ADMIN_ROLES=('admin', 'expert'),
+        ADMIN_ROLES=('admin',),
         LOGIN_MAX_FAILURES=int(os.environ.get('AEGIS_ADMIN_LOGIN_MAX_FAILURES', '5')),
         LOGIN_LOCK_SECONDS=int(os.environ.get('AEGIS_ADMIN_LOGIN_LOCK_SECONDS', '300')),
         FORECAST_URL=os.environ.get('AEGIS_FORECAST_URL', 'http://127.0.0.1:8001'),

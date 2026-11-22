@@ -12,7 +12,7 @@ TRANSITIONS = {'open': ('acknowledged', 'resolved'), 'acknowledged': ('resolved'
 @require_role()
 def list_alerts():
     a = request.args
-    items, page, size, total = repo.list_alerts(a.get('type'), a.get('severity'), a.get('status'))
+    items, page, size, total = repo.list_alerts(a.get('type'), a.get('severity'), a.get('status'), a.get('user') or None)
     return ok(items=items, page=page, page_size=size, total=total)
 
 

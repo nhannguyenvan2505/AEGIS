@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from flask import Blueprint, request
 
+from app.admin.core.sensors import SENSOR_TYPES
 from app.admin.core.security import ApiError, audit, body, ok, pick, require_role
 
 from . import repository as repo
@@ -11,7 +12,7 @@ from . import repository as repo
 bp = Blueprint('admin_devices', __name__, url_prefix='/api/admin/devices')
 STATUSES = ('online', 'offline', 'maintenance', 'inactive')
 SOURCES = ('mock', 'synthetic', 'field', 'bench', 'legacy')
-FILTERS = ('status', 'source', 'owner_id', 'plot_id')
+FILTERS = ('sensor_type', 'status', 'source', 'owner_id', 'plot_id')
 CODE = re.compile(r'[A-Za-z0-9._-]{1,64}')
 
 
@@ -31,7 +32,7 @@ def _device(identifier):
 @require_role()
 def list_devices():
     filters = {k: request.args[k] for k in FILTERS if request.args.get(k)}
-    items, page, size, total = repo.list_page(filters, request.args.get('q'))
+    items, page, size, total = repo.list_page(filters, request.args.get('q'), request.args.get('user'))
     return ok(items=[_simulated(i) for i in items], page=page, page_size=size, total=total)
 
 
@@ -54,16 +55,21 @@ def create_device():
     code, protocol, source = str(data.get('device_code', '')), data.get('protocol', 'HTTP'), data.get('source', 'mock')
     if not CODE.fullmatch(code):
         raise ApiError('invalid_code', 'device_code chỉ gồm chữ, số, . _ - (tối đa 64).', 422)
+    sensor_type = data.get('sensor_type')
+    if sensor_type not in SENSOR_TYPES:
+        raise ApiError('invalid_sensor_type', 'sensor_type phải là: ' + ', '.join(SENSOR_TYPES) + '.', 422)
     if protocol not in ('MQTT', 'HTTP') or source not in SOURCES:
         raise ApiError('invalid_field', 'protocol hoặc source không hợp lệ.', 422)
     if repo.code_exists(season['user_id'], code):
         raise ApiError('code_exists', 'device_code đã tồn tại cho người dùng này.', 409)
+    if repo.sensor_taken(season['field_id'], sensor_type):
+        raise ApiError('sensor_exists', 'Ruộng này đã có thiết bị loại ' + sensor_type + '.', 409)
     external = str(uuid.uuid4())
     repo.create(dict(external_id=external, user_id=season['user_id'], field_id=season['field_id'],
-                     crop_cycle_id=season['crop_cycle_id'], device_code=code, device_name=data.get('device_name'),
+                     crop_cycle_id=season['crop_cycle_id'], device_code=code, device_name=data.get('device_name'), sensor_type=sensor_type,
                      protocol=protocol, firmware_version=data.get('firmware_version'), source=source,
                      created_at=datetime.now(timezone.utc).isoformat(timespec='seconds')))
-    audit('device.create', 'device', external, {'device_code': code, 'source': source})
+    audit('device.create', 'device', external, {'device_code': code, 'sensor_type': sensor_type, 'source': source})
     return ok(id=external), 201
 
 
@@ -71,13 +77,19 @@ def create_device():
 @require_role('admin')
 def update_device(identifier):
     device = _device(identifier)
-    data = pick(body(), ('device_name', 'firmware_version', 'status'))
+    data = pick(body(), ('device_name', 'firmware_version', 'status', 'sensor_type'))
     if not data:
         raise ApiError('invalid_body', 'Không có trường nào để cập nhật.', 400)
     if 'status' in data and data['status'] not in STATUSES:
         raise ApiError('invalid_status', 'status không hợp lệ.', 422)
+    if 'sensor_type' in data:
+        if data['sensor_type'] not in SENSOR_TYPES:
+            raise ApiError('invalid_sensor_type', 'sensor_type không hợp lệ.', 422)
+        if repo.sensor_taken(device['field_id'], data['sensor_type'], device['device_id']):
+            raise ApiError('sensor_exists', 'Ruộng này đã có thiết bị loại ' + data['sensor_type'] + '.', 409)
     repo.update(device['device_id'], data)
-    audit('device.update', 'device', identifier, {'before': {'status': device['status']}, 'after': data})
+    audit('device.update', 'device', identifier,
+          {'before': {'status': device['status'], 'sensor_type': device['sensor_type']}, 'after': data})
     return ok()
 
 

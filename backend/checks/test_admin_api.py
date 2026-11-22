@@ -10,7 +10,7 @@ from app import create_app  # noqa: E402
 PROTECTED = [
     ('GET', '/api/admin/stats/overview'), ('GET', '/api/admin/users'), ('POST', '/api/admin/users'),
     ('GET', '/api/admin/farms'), ('GET', '/api/admin/devices'), ('GET', '/api/admin/detections'),
-    ('POST', '/api/admin/detections/x/verify'), ('GET', '/api/admin/alerts'), ('GET', '/api/admin/thresholds'),
+    ('GET', '/api/admin/alerts'), ('GET', '/api/admin/thresholds'),
     ('GET', '/api/admin/diseases'), ('GET', '/api/admin/models'), ('POST', '/api/admin/models/1/activate'),
     ('GET', '/api/admin/system/health'), ('PUT', '/api/admin/settings/k'), ('GET', '/api/admin/audit-logs'),
     ('GET', '/api/admin/auth/me'),

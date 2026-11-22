@@ -7,7 +7,7 @@
 - Giới hạn tốc độ đăng nhập chặt hơn mobile; khóa tạm sau nhiều lần sai.
 
 ## Phân quyền
-- Decorator mới `@require_role('admin')` / `@require_role('admin','expert')`, trả 403 khi thiếu quyền.
+- Decorator mới `@require_role('admin')`, trả 403 khi thiếu quyền.
 - Người dùng `farmer` không bao giờ truy cập được `/api/admin/*`, kể cả có token hợp lệ.
 - Tài khoản admin đầu tiên tạo bằng script (seed), không qua đăng ký công khai.
 
@@ -20,7 +20,6 @@
 
 ## Dữ liệu nhạy cảm
 - Ảnh người dùng chỉ cung cấp qua endpoint có kiểm tra quyền.
-- Ẩn bớt email/số điện thoại trong danh sách cho vai trò `expert`.
 - Xuất dữ liệu (CSV, tập huấn luyện) phải được ghi audit.
 
 ## Việc cần làm sau

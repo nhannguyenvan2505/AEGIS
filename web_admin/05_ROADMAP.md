@@ -15,7 +15,7 @@ Xem chi tiết endpoint trong [backend/docs/admin/API_SPEC.md](../backend/docs/a
 - GĐ4: `system/health`, `settings`, `audit-logs`.
 
 ## Câu hỏi còn mở
-- Có thêm role `expert` ngay hay để sau?
+- Đã quyết định: không có role `expert`, chỉ `admin`.
 - Web admin dùng chung phiên (`sessions`) với mobile hay tách bảng/token riêng?
 - Có cần đa ngôn ngữ (Việt/Anh) không?
 - Triển khai ở đâu (cùng máy chủ Flask hay tách)?

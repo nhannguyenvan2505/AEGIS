@@ -16,7 +16,6 @@ def overview():
                  'total': _count('SELECT COUNT(*) n FROM iot_devices')},
         detections_today=_count("SELECT COUNT(*) n FROM analysis_runs "
                                 "WHERE created_at>=DATE_FORMAT(UTC_DATE(),'%%Y-%%m-%%d')"),
-        detections_unverified=_count("SELECT COUNT(*) n FROM disease_detections WHERE verification_status='unverified'"),
         alerts_open=_count("SELECT COUNT(*) n FROM alerts WHERE status='open'"),
     )
 

@@ -1,0 +1,174 @@
+@use 'tokens' as *;
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0; background: $bg; color: $ink; font-size: 14.5px; line-height: 1.55;
+  font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: $primary; text-decoration: none; &:hover { text-decoration: underline; } }
+h1, h2, h3 { margin: 0; line-height: 1.25; letter-spacing: -0.01em; }
+h1 { font-size: 24px; font-weight: 800; }
+h2 { font-size: 16px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 700; }
+:focus-visible { @include focus-ring; }
+::selection { background: $primarySoft; }
+.muted { color: $muted; }
+.small { font-size: 12.5px; }
+.mono { font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12.5px; }
+.center-screen { display: grid; place-items: center; min-height: 100%; color: $muted; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.stack { display: grid; gap: 16px; }
+.icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+// ---- Bố cục ----
+.shell { display: grid; grid-template-columns: $sidebarWidth 1fr; min-height: 100%; @include bp-tablet { grid-template-columns: 1fr; } }
+.sidebar {
+  background: linear-gradient(180deg, #0f2f26 0%, #0a211b 100%); color: #cfe3d9; padding: 18px 14px; position: sticky; top: 0; height: 100vh; overflow: auto;
+  display: flex; flex-direction: column;
+  @include bp-tablet { position: static; height: auto; padding: 12px; }
+  .brand { display: flex; gap: 12px; align-items: center; padding: 6px 8px 18px; color: #fff; }
+  .brand-mark {
+    background: linear-gradient(135deg, $primary, #3ddc9a); border-radius: 12px; width: 38px; height: 38px; display: grid; place-items: center;
+    font-weight: 800; font-size: 18px; box-shadow: 0 6px 16px rgba(61, 220, 154, 0.35);
+  }
+  .brand-name { font-weight: 800; font-size: 17px; line-height: 1.1; }
+  .brand-sub { font-size: 11.5px; color: #8fb3a4; letter-spacing: 0.04em; }
+  nav { flex: 1; @include bp-tablet { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; padding-bottom: 4px; > div { display: flex; gap: 4px; } } }
+  .group { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #6f958a; padding: 16px 12px 6px; @include bp-tablet { display: none; } }
+  a.nav-link {
+    display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: $radiusSm; color: #cfe3d9; font-weight: 500; position: relative;
+    transition: background 0.15s, color 0.15s;
+    &:hover { background: rgba(255, 255, 255, 0.07); color: #fff; text-decoration: none; }
+    &.active { background: rgba(61, 220, 154, 0.16); color: #fff; font-weight: 700; }
+    &.active::before { content: ''; position: absolute; left: -14px; top: 8px; bottom: 8px; width: 4px; border-radius: 0 4px 4px 0; background: #3ddc9a; @include bp-tablet { display: none; } }
+    @include bp-tablet { white-space: nowrap; }
+    .icon { opacity: 0.9; }
+  }
+  .side-foot { font-size: 11.5px; color: #6f958a; padding: 14px 12px 4px; border-top: 1px solid rgba(255, 255, 255, 0.07); margin-top: 10px; @include bp-tablet { display: none; } }
+}
+.main { min-width: 0; display: flex; flex-direction: column; }
+.topbar {
+  display: flex; align-items: center; gap: 14px; padding: 12px 28px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px);
+  border-bottom: 1px solid $border; position: sticky; top: 0; z-index: 20;
+  .who { text-align: right; line-height: 1.25; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff;
+    background: linear-gradient(135deg, $primary, $primaryMid);
+  }
+}
+.content { padding: 28px; display: grid; gap: 22px; align-content: start; max-width: 1440px; width: 100%; @include bp-tablet { padding: 16px; } }
+.page-header { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; .sub { color: $muted; margin-top: 4px; } }
+.breadcrumbs { font-size: 12.5px; color: $subtle; margin-bottom: 6px; a { color: $muted; } }
+
+// ---- Thành phần ----
+.card { background: $card; border: 1px solid $border; border-radius: $radius; padding: 20px; box-shadow: $shadow; }
+.card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.grid-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; @include bp-tablet { grid-template-columns: 1fr; } }
+
+.kpi {
+  display: flex; gap: 14px; align-items: center; padding: 18px; transition: transform 0.15s, box-shadow 0.15s;
+  &:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(16, 38, 31, 0.05), 0 12px 28px rgba(16, 38, 31, 0.1); }
+  .kpi-icon { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; flex: none; background: $primaryTint; color: $primary;
+    .icon { width: 24px; height: 24px; }
+    &.amber { background: $warnBg; color: $warn; }
+    &.blue { background: $infoBg; color: $info; }
+    &.red { background: $dangerBg; color: $danger; }
+    &.violet { background: $violetBg; color: $violet; }
+  }
+  .label { color: $muted; font-size: 13px; font-weight: 600; }
+  .value { font-size: 28px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; }
+  .hint { color: $subtle; font-size: 12px; margin-top: 2px; }
+}
+
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer; border-radius: $radiusSm; padding: 9px 16px; border: 1px solid transparent;
+  background: linear-gradient(180deg, $primaryMid -40%, $primary 100%); color: #fff; box-shadow: 0 1px 2px rgba(14, 138, 95, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  display: inline-flex; align-items: center; gap: 8px; transition: filter 0.15s, box-shadow 0.15s, transform 0.05s;
+  &:hover:not(:disabled) { filter: brightness(0.94); text-decoration: none; }
+  &:active:not(:disabled) { transform: translateY(1px); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  &.secondary { background: $card; color: $ink; border-color: $border; box-shadow: $shadowSm; &:hover:not(:disabled) { background: $surface; filter: none; border-color: #cbd6d0; } }
+  &.danger { background: linear-gradient(180deg, #d9534a, $danger); box-shadow: 0 1px 2px rgba(192, 57, 43, 0.3); }
+  &.ghost { background: transparent; border-color: transparent; color: $primary; box-shadow: none; }
+  &.small { padding: 5px 12px; font-size: 13px; }
+}
+
+.field { display: grid; gap: 6px; font-size: 12.5px; font-weight: 700; color: $muted; }
+.field input, .field select, .field textarea, .input {
+  font: inherit; font-weight: 400; color: $ink; padding: 9px 12px; border: 1px solid $border; border-radius: $radiusSm; background: #fff; width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  &:hover:not(:disabled) { border-color: #c5d1cb; }
+  &:focus { outline: none; border-color: $primaryMid; box-shadow: 0 0 0 3px rgba(31, 181, 131, 0.18); }
+  &:disabled { background: $surface; color: $subtle; cursor: not-allowed; }
+}
+.field textarea { min-height: 90px; resize: vertical; }
+.field.check { grid-auto-flow: column; justify-content: start; align-items: center; input { width: auto; } }
+.filters {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 14px; margin-bottom: 14px; background: $surface; border: 1px solid $divider; border-radius: $radiusSm;
+  .field { min-width: 170px; flex: 1 1 170px; max-width: 280px; }
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: $primaryTint; color: $primaryDark; white-space: nowrap;
+  &::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.8; }
+  &.warn { background: $warnBg; color: $warnInk; }
+  &.danger { background: $dangerBg; color: $danger; }
+  &.info { background: $infoBg; color: $info; }
+  &.neutral { background: $divider; color: $muted; }
+}
+
+.table-wrap { overflow-x: auto; border: 1px solid $border; border-radius: $radiusSm; }
+table.table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: $muted; padding: 11px 14px; background: $surface; border-bottom: 1px solid $border; white-space: nowrap; font-weight: 700; }
+  td { padding: 12px 14px; border-bottom: 1px solid $divider; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tr.clickable { cursor: pointer; transition: background 0.12s; &:hover td { background: $primaryTint; } }
+}
+.pagination { display: flex; align-items: center; gap: 10px; justify-content: flex-end; padding-top: 14px; }
+
+.notice { padding: 11px 14px; border-radius: $radiusSm; background: $warnBg; color: $warnInk; border: 1px solid $warnBorder; font-size: 13px; }
+.notice.ok { background: $primaryTint; color: $primaryDark; border-color: #bfe6d2; }
+.error-box { padding: 12px 14px; border-radius: $radiusSm; background: $dangerBg; color: $danger; border: 1px solid $dangerBorder; .rid { color: $muted; font-size: 12px; } }
+.empty { text-align: center; color: $subtle; padding: 36px 8px; font-size: 14px; }
+.skeleton { background: linear-gradient(90deg, $divider 25%, #f6f9f7 50%, $divider 75%); background-size: 200% 100%; animation: shimmer 1.3s infinite; height: 16px; border-radius: 8px; margin: 10px 0; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } .kpi { transition: none; } }
+.kv { display: grid; grid-template-columns: 170px 1fr; gap: 10px 16px; dt { color: $muted; font-weight: 600; } dd { margin: 0; word-break: break-word; } }
+pre.json { background: $surface; border: 1px solid $divider; border-radius: $radiusSm; padding: 12px; overflow: auto; max-height: 260px; margin: 0; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid $border; margin-bottom: 14px; button { font: inherit; font-weight: 600; background: none; border: 0; padding: 9px 16px; cursor: pointer; color: $muted; border-bottom: 2px solid transparent; margin-bottom: -1px; &:hover { color: $ink; } &[data-state='active'] { color: $primary; border-color: $primary; } } }
+
+// ---- Dialog (Radix) ----
+.overlay { position: fixed; inset: 0; background: rgba(10, 33, 27, 0.5); backdrop-filter: blur(3px); z-index: 40; }
+.dialog {
+  position: fixed; z-index: 41; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(540px, calc(100vw - 32px)); max-height: 90vh; overflow: auto;
+  background: $card; border-radius: 18px; padding: 24px; display: grid; gap: 16px; box-shadow: $shadowLg; border: 1px solid $border;
+}
+.dialog-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
+
+.toast-stack { position: fixed; right: 20px; bottom: 20px; display: grid; gap: 10px; z-index: 60; .notice, .error-box { box-shadow: $shadow; min-width: 240px; } }
+
+// ---- Đăng nhập ----
+.login { min-height: 100%; display: grid; grid-template-columns: 1.05fr 1fr; @include bp-tablet { grid-template-columns: 1fr; } }
+.login-aside {
+  background: radial-gradient(1200px 600px at 10% -10%, #1e6b52 0%, transparent 60%), linear-gradient(160deg, #0f2f26, #0a211b); color: #e5f2ec;
+  padding: 56px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; position: relative; overflow: hidden;
+  @include bp-tablet { display: none; }
+  &::after { content: ''; position: absolute; right: -120px; bottom: -120px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(61, 220, 154, 0.25), transparent 70%); }
+  .brand { display: flex; gap: 14px; align-items: center; }
+  .brand-mark { background: linear-gradient(135deg, $primary, #3ddc9a); border-radius: 14px; width: 46px; height: 46px; display: grid; place-items: center; font-weight: 800; font-size: 22px; color: #fff; }
+  h2 { font-size: 34px; line-height: 1.15; font-weight: 800; letter-spacing: -0.02em; color: #fff; max-width: 15ch; }
+  p { color: #a9c7ba; max-width: 42ch; margin: 14px 0 0; font-size: 15px; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; position: relative; z-index: 1; }
+  li { display: flex; gap: 12px; align-items: center; color: #cfe3d9; .dot { width: 32px; height: 32px; border-radius: 10px; background: rgba(61, 220, 154, 0.15); display: grid; place-items: center; color: #3ddc9a; } }
+}
+.login-main { display: grid; place-items: center; padding: 32px 20px; background: $bg; }
+.login-card { width: min(420px, 100%); display: grid; gap: 18px; padding: 32px; border-radius: 20px; }
+.login-card .sub { margin-top: 4px; }
+
+.bbox-wrap { position: relative; display: inline-block; max-width: 100%; img { display: block; max-width: 100%; border-radius: $radiusSm; } .box { position: absolute; border: 2px solid $danger; background: rgba(192, 57, 43, 0.12); border-radius: 3px; } .tag { position: absolute; top: -22px; left: -2px; background: $danger; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap; } }
+.bar { height: 8px; border-radius: 4px; background: $divider; overflow: hidden; i { display: block; height: 100%; background: linear-gradient(90deg, $primary, $primaryMid); border-radius: 4px; } }

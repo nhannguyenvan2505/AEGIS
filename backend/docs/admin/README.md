@@ -28,7 +28,7 @@ Thêm feature mới: tạo thư mục có `routes.py` (định nghĩa `bp`) và 
 - Đã có: xem [API_SPEC.md](API_SPEC.md) (mục "Trạng thái triển khai" ở đầu file).
 - Kiểm thử: `backend/checks/test_admin_api.py` (không cần MySQL; kiểm tra phân quyền mọi route, CORS, 503).
   Các thao tác với CSDL thật **chưa được chạy thử**.
-- SQL bổ sung (role `expert`, dữ liệu 3 bệnh): `backend/database/mysql/admin/001_admin_additions.sql`, chưa áp dụng.
+- SQL bổ sung (dữ liệu 3 bệnh): `backend/database/mysql/admin/001_admin_additions.sql`, chưa áp dụng.
 - Tạo admin đầu tiên: `backend/checks/create_admin.py <email>` (hỏi mật khẩu qua prompt).
 
 | File | Nội dung |

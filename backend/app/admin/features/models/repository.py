@@ -36,6 +36,6 @@ def pair(a, b):
 
 
 def usage(a, b):
-    return db.query('''SELECT model_version_id id, COUNT(*) detections, AVG(confidence) avg_confidence,
-                       SUM(verification_status='rejected') rejected FROM disease_detections
+    return db.query('''SELECT model_version_id id, COUNT(*) detections, AVG(confidence) avg_confidence
+                       FROM disease_detections
                        WHERE model_version_id IN (%s,%s) GROUP BY model_version_id''', (a, b))
