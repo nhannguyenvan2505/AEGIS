@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 import os
+import sys
 import threading
 import time
 import uuid
@@ -15,6 +16,9 @@ from flask import Flask, g, jsonify, request
 from PIL import Image, ImageOps, UnidentifiedImageError
 from PIL.Image import open as pillow_open
 from werkzeug.exceptions import HTTPException
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from diagnosis import DiagnosisPipeline, build_gatekeeper  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,9 +47,9 @@ class Detector:
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         self.lock = threading.Lock()
 
-    def predict(self, pixels):
+    def predict(self, pixels, conf=0.25):
         with self.lock:
-            result = self.model.predict(source=np.ascontiguousarray(pixels[:, :, ::-1]), imgsz=640, conf=0.25, iou=0.7, max_det=300, device=0 if self.device == "cuda:0" else "cpu", quantize=None, verbose=False)[0]
+            result = self.model.predict(source=np.ascontiguousarray(pixels[:, :, ::-1]), imgsz=640, conf=conf, iou=0.7, max_det=300, device=0 if self.device == "cuda:0" else "cpu", quantize=None, verbose=False)[0]
         return [{"class_id": int(class_id), "confidence": float(confidence), "xyxy": coordinates} for coordinates, confidence, class_id in zip(result.boxes.xyxy.cpu().tolist(), result.boxes.conf.cpu().tolist(), result.boxes.cls.cpu().tolist())]
 
 
@@ -70,7 +74,7 @@ def decode_image(payload):
             return np.asarray(oriented).copy()
 
 
-def create_app(detector=None, max_inflight=None):
+def create_app(detector=None, max_inflight=None, gatekeeper=None):
     app = Flask(__name__)
     app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES + 256 * 1024
     capacity = int(os.environ.get('AEGIS_AI_MAX_INFLIGHT','2')) if max_inflight is None else max_inflight
@@ -168,6 +172,36 @@ def create_app(detector=None, max_inflight=None):
         status = "detection_found" if detections else "no_detection"
         message = "Phát hiện vùng nghi bệnh; cần xác minh thực địa." if detections else "Không phát hiện vùng bệnh ở ngưỡng hiện tại; kết quả không xác nhận lá khỏe."
         return jsonify({"request_id": g.request_id, "model_sha256": service.model_sha256, "model_version": getattr(service, "model_version", "aegis-yolo11n-v4-50epochs"), "status": status, "message": message, "image": {"width": width, "height": height, "orientation": "exif_corrected"}, "settings": {"imgsz": 640, "confidence_threshold": 0.25, "nms_iou": 0.7}, "detections": detections, "processing_ms": round((time.perf_counter() - started) * 1000, 2), "decision_support_only": True})
+
+    pipeline = DiagnosisPipeline(service, gatekeeper if gatekeeper is not None else build_gatekeeper())
+
+    @app.get("/v2/health")
+    def health_v2():
+        return jsonify({"status": "ready", "schema_version": "2.0", **pipeline.describe()})
+
+    @app.post("/v2/diagnose")
+    @admit_prediction
+    def diagnose():
+        """Two-stage pipeline. Domain rejections are HTTP 200 with status=rejected_*."""
+        if "image" not in request.files:
+            return error_response("missing_image", "Gửi ảnh bằng multipart/form-data với trường image.", 400)
+        payload = request.files["image"].stream.read(MAX_UPLOAD_BYTES + 1)
+        if len(payload) > MAX_UPLOAD_BYTES:
+            return error_response("upload_too_large", "Ảnh tối đa 8 MiB.", 413)
+        try:
+            pixels = decode_image(payload)
+        except (ValueError, UnidentifiedImageError, OSError, SyntaxError, Image.DecompressionBombError, Image.DecompressionBombWarning):
+            return error_response("invalid_image", "Ảnh không hợp lệ: dùng JPEG/PNG/WebP tĩnh, từ 32 pixel mỗi chiều, tối đa 16 triệu pixel.", 400)
+        started = time.perf_counter()
+        try:
+            result = pipeline.run(pixels)
+        except Exception:
+            logging.getLogger(__name__).exception('Diagnosis failed request_id=%s', g.request_id)
+            return error_response("inference_failed", "Không thể xử lý ảnh lúc này; vui lòng thử lại.", 503)
+        result.update(request_id=g.request_id, model_sha256=service.model_sha256,
+                      model_version=getattr(service, "model_version", "unknown"),
+                      processing_ms=round((time.perf_counter() - started) * 1000, 2))
+        return jsonify(result)
 
     return app
 
