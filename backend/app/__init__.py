@@ -58,12 +58,16 @@ def create_app(config=None):
     init_limits(app)
     app.register_blueprint(api)
     app.register_blueprint(auth)
-    from .admin import admin, register_admin_cli
+    from .rbac_admin import admin, register_admin_cli
     app.register_blueprint(admin)
     register_admin_cli(app)
     app.register_blueprint(farm)
+    from .admin import register_admin
+    register_admin(app)
     from .mobile_contract import enable_mobile_contract
     enable_mobile_contract(app)
+    from .iot_mqtt import enable_iot_mqtt
+    enable_iot_mqtt(app)
 
     @app.after_request
     def deliver_mongo_outbox(response):

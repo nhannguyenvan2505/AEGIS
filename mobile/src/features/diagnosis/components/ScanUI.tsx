@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon, type IconName } from '../../../components/Design';
 import { BottomNavigation } from '../../../components/BottomNavigation';
+import { AppHeader } from '../../../components/AppHeader';
 import { s } from '../../../styles/generated/styles';
 import { scanColors } from '../scanHelpers';
 
@@ -11,17 +12,9 @@ export function ScanPage({ title, children, action, backTo = '/diagnosis' }: {
   title: string; children: ReactNode; action?: ReactNode; backTo?: Href;
 }) {
   return <SafeAreaView style={s.scanScreen}>
+    <AppHeader title={title} eyebrow={backTo === '/' ? 'AI CHẨN ĐOÁN' : undefined} avatar={backTo === '/'} onBack={() => router.canGoBack() ? router.back() : router.replace(backTo)} right={action} />
     <ScrollView contentContainerStyle={s.scanScroll} keyboardShouldPersistTaps="handled">
       <View style={s.scanColumn}>
-        <View style={s.scanHeader}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Quay lại" hitSlop={4}
-            onPress={() => router.canGoBack() ? router.back() : router.replace(backTo)}
-            style={({ pressed }) => [s.scanBack, pressed && s.scanPressed]}>
-            <Icon name="arrow-left" size={22} color={scanColors.text} />
-          </Pressable>
-          <Text accessibilityRole="header" style={s.scanTitle}>{title}</Text>
-          {action}
-        </View>
         {children}
       </View>
     </ScrollView>
@@ -42,13 +35,13 @@ export function ScanButton({ title, icon, onPress, secondary = false, disabled =
 export function ScanHistoryButton({ disabled = false }: { disabled?: boolean }) {
   return <Pressable accessibilityRole="button" accessibilityLabel="Lịch sử quét" accessibilityHint="Xem các ảnh và kết quả đã lưu"
     disabled={disabled} accessibilityState={{ disabled }} onPress={() => router.push('/history')}
-    style={({ pressed }) => [s.scanHistoryButton, disabled && s.scanDisabled, pressed && s.scanPressed]}>
-    <Icon name="clock" size={18} color={scanColors.text} /><Text style={s.scanHistoryButtonText}>Lịch sử</Text>
+    style={({ pressed }) => [s.appHeaderIconButton, disabled && s.scanDisabled, pressed && s.scanPressed]}>
+    <Icon name="clock" size={20} color={scanColors.text} />
   </Pressable>;
 }
 export function ScanNotice({ message }: { message: string }) {
   return <View accessibilityRole="alert" accessibilityLiveRegion="polite" style={s.scanError}>
-    <Icon name="alert-circle" size={19} color="#a13e2c" /><Text style={s.scanErrorText}>{message}</Text>
+    <Icon name="alert-circle" size={19} color="#b42318" /><Text style={s.scanErrorText}>{message}</Text>
   </View>;
 }
 export function ScanEmpty({ title, description, icon = 'image' }: { title: string; description: string; icon?: IconName }) {

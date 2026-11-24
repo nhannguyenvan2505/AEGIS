@@ -20,7 +20,8 @@ export function useFarmData<T>(loader: () => Promise<T>) {
   const sequence = useRef(0);
   const reload = useCallback(() => {
     const current = ++sequence.current;
-    setState(state => ({ ...state, loading: true, error: '' }));
+    // Stale-while-revalidate: keep showing existing data instead of flashing a spinner on every focus.
+    setState(state => ({ ...state, loading: state.data === undefined, error: '' }));
     void loader().then(data => { if (sequence.current === current) setState({ data, loading: false, error: '' }); })
       .catch(error => { if (sequence.current === current) setState({ loading: false, error: error instanceof Error ? error.message : 'Không tải được dữ liệu.' }); });
   }, [loader]);

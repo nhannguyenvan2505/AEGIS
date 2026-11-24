@@ -20,7 +20,8 @@ os.environ.setdefault('AEGIS_STORAGE_BACKEND', 'sqlite')
 PUBLIC = {'/health', '/demo-info', '/api/auth/login', '/api/auth/register'}
 # Contract documents per path prefix (most specific first).
 DOCS = [
-    ('/api/admin', 'backend/docs/JWT_RBAC.md'),
+    ('/api/admin/rbac', 'backend/docs/JWT_RBAC.md'),
+    ('/api/admin', 'backend/docs/admin/API_SPEC.md'),
     ('/api/auth', 'backend/docs/API.md, backend/docs/JWT_RBAC.md'),
     ('/api/disease', 'backend/docs/API.md'),
     ('/api/farm/environment-streams', 'backend/docs/HOURLY_SOURCE_API.md, frontend/ENVIRONMENT_INGEST.md'),

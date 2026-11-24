@@ -75,7 +75,7 @@ export function FollowupScreen({ token }: { token: string }) {
           <Text>{p.needs_recheck ? 'Cần kiểm tra / kiểm tra lại' : 'Đã ghi nhận kiểm tra theo bằng chứng hiện tại'}</Text>
           <Text>Lý do: {p.recheck_reasons.join(', ') || 'Không có'}</Text>
           <Text>Nhận việc: {p.actions.acknowledge.enabled ? 'Có thể thực hiện' : p.actions.acknowledge.disabled_reasons.join(', ')} · Check: {p.actions.check.enabled ? 'Có thể chuẩn bị' : p.actions.check.disabled_reasons.join(', ')}</Text>
-          <TextInput accessibilityLabel="Lý do thao tác" placeholder="Lý do thao tác (bắt buộc, tối đa 500 ký tự)" maxLength={500} editable={!locked} value={m.reason} onChangeText={reason => c.edit(reason)} autoCorrect={false} autoCapitalize="none" style={s.input} />
+          <TextInput accessibilityLabel="Lý do thao tác" placeholder="Nhập lý do thao tác" multiline maxLength={500} editable={!locked} value={m.reason} onChangeText={reason => c.edit(reason)} autoCorrect={false} autoCapitalize="none" textAlignVertical="top" style={[s.input, s.inputMultiline]} />
           <Text>{p.actions.check.observation_required ? 'Bắt buộc chọn quan sát' : 'Quan sát tùy chọn; có thể không chọn'} · từ {p.actions.check.observation_constraints.observed_at_not_before}</Text>
           <Text>Chọn trên client chưa xác thực; Backend kiểm lại owner/mùa vụ/nguồn/trạng thái/thời gian.</Text>
           {!p.actions.check.observation_required && <Button title={m.selected ? 'Không gửi quan sát' : '✓ Không gửi quan sát'} secondary disabled={locked} onPress={() => c.edit(m.reason, '')} />}

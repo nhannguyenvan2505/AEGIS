@@ -3,29 +3,22 @@ import { router, type Href } from 'expo-router';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View, type TextInputProps } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNavigation } from '../../../components/BottomNavigation';
+import { AppHeader, HeaderIconButton } from '../../../components/AppHeader';
 import { Icon, type IconName } from '../../../components/Design';
 import { s } from '../../../styles/generated/styles';
 import { profileInitial, profilePhone, type PersonalProfile } from '../profileModel';
 
-export const profileColors = { ink: '#1d2848', muted: '#7789aa', teal: '#18afa3', green: '#009c73', red: '#c63434' };
+export const profileColors = { ink: '#12332b', muted: '#566a63', teal: '#0b7a54', green: '#0b7a54', red: '#b42318' };
 
 export function ProfilePage({ title, children, backTo, onBack, backDisabled = false, onHelp, form = false }: {
   title: string; children: ReactNode; backTo?: Href; onBack?: () => void; backDisabled?: boolean; onHelp?: () => void; form?: boolean;
 }) {
   return <SafeAreaView style={s.profilePage}>
+    <AppHeader title={title} backTo={backTo} onBack={backTo ? (onBack ?? (() => router.canGoBack() ? router.back() : router.replace(backTo))) : undefined}
+      right={onHelp ? <HeaderIconButton icon="help-circle" label="Trợ giúp tài khoản" onPress={onHelp} /> : undefined} />
     <KeyboardAvoidingView style={s.profileKeyboard} behavior={Platform.OS === 'ios' ? 'padding' : form ? 'height' : undefined}>
       <ScrollView contentContainerStyle={s.profileScroll} keyboardShouldPersistTaps="handled" keyboardDismissMode={form ? 'on-drag' : 'none'} showsVerticalScrollIndicator={false}>
         <View style={s.profileColumn}>
-          <View style={s.profileHeader}>
-            {backTo && <Pressable accessibilityRole="button" accessibilityLabel="Quay lại" disabled={backDisabled} style={s.profileHeaderButton}
-              onPress={onBack ?? (() => router.canGoBack() ? router.back() : router.replace(backTo))}>
-              <Icon name="arrow-left" color={profileColors.muted} size={22} />
-            </Pressable>}
-            <Text accessibilityRole="header" style={s.profileTitle}>{title}</Text>
-            {onHelp && <Pressable accessibilityRole="button" accessibilityLabel="Trợ giúp tài khoản" style={s.profileHeaderButton} onPress={onHelp}>
-              <Icon name="help-circle" color={profileColors.ink} size={22} />
-            </Pressable>}
-          </View>
           {children}
         </View>
       </ScrollView>
@@ -109,7 +102,7 @@ export const ProfileField = forwardRef<TextInput, TextInputProps & { label: stri
     <View style={[s.profileInputRow, focused && s.profileInputFocused, locked && s.profileInputReadOnly, !!error && s.profileInputError]}>
       <Icon name={icon} size={19} color={error ? profileColors.red : profileColors.muted} />
       <TextInput {...props} ref={ref} editable={locked ? false : props.editable} onChangeText={locked ? undefined : props.onChangeText}
-        accessibilityLabel={label} accessibilityHint={locked ? 'Email đăng nhập, không thể chỉnh sửa' : props.accessibilityHint} placeholderTextColor="#8c9bb3" selectionColor={profileColors.teal}
+        accessibilityLabel={label} accessibilityHint={locked ? 'Email đăng nhập, không thể chỉnh sửa' : props.accessibilityHint} placeholderTextColor="#7b8e87" selectionColor={profileColors.teal}
         onFocus={event => { setFocused(true); props.onFocus?.(event); }} onBlur={event => { setFocused(false); props.onBlur?.(event); }} style={[s.profileInput, locked && s.profileReadOnlyText]} />
       {locked && <Icon name="lock" size={16} color={profileColors.muted} />}
       {!!error && <Icon name="alert-circle" size={18} color={profileColors.red} />}

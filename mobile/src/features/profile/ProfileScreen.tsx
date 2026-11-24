@@ -52,14 +52,14 @@ export function ProfileScreen() {
       {sheet === 'notifications' && <>
         <Text style={s.profileMuted}>Chọn loại thông báo bạn muốn theo dõi trong phiên sử dụng này.</Text>
         <View style={s.profileToggleRow}><Text style={s.profileSettingTitle}>Cảnh báo của ruộng</Text>
-          <Switch accessibilityLabel="Cảnh báo của ruộng" value={notifications} onValueChange={setNotifications} trackColor={{ false: '#d6dfeb', true: '#a8ebd5' }} thumbColor="#ffffff" /></View>
+          <Switch accessibilityLabel="Cảnh báo của ruộng" value={notifications} onValueChange={setNotifications} trackColor={{ false: '#d9d2bf', true: '#1aa376' }} thumbColor="#ffffff" /></View>
         <View style={s.profileToggleRow}><Text style={s.profileSettingTitle}>Nhắc nhở chăm sóc</Text>
-          <Switch accessibilityLabel="Nhắc nhở chăm sóc" value={reminders} onValueChange={setReminders} trackColor={{ false: '#d6dfeb', true: '#a8ebd5' }} thumbColor="#ffffff" /></View>
+          <Switch accessibilityLabel="Nhắc nhở chăm sóc" value={reminders} onValueChange={setReminders} trackColor={{ false: '#d9d2bf', true: '#1aa376' }} thumbColor="#ffffff" /></View>
       </>}
       {sheet === 'language' && <View style={s.profileLanguage}><Text style={s.profileSettingTitle}>Tiếng Việt</Text><Icon name="check" color={profileColors.teal} size={22} /></View>}
       {sheet === 'support' && <Text style={s.profileBody}>Nhóm AEGIS · C1SE.21 · Đại học Duy Tân.{ '\n\n' }Khi cần hỗ trợ, hãy ghi lại màn hình gặp vấn đề, thời gian xảy ra và các bước bạn đã thực hiện để nhóm có thể kiểm tra.</Text>}
       {sheet === 'about' && <View style={s.profileAbout}><View style={s.profileAboutIcon}><Icon name="shield" color={profileColors.green} size={32} /></View>
-        <Text style={s.profileIdentityName}>AEGIS</Text><Text style={s.profileBody}>Đồng hành cùng bạn chăm sóc ruộng lúa, theo dõi môi trường và nhận cảnh báo sớm cho mùa vụ.</Text></View>}
+        <Text style={s.profileTitleDark}>AEGIS</Text><Text style={s.profileBody}>Đồng hành cùng bạn chăm sóc ruộng lúa, theo dõi môi trường và nhận cảnh báo sớm cho mùa vụ.</Text></View>}
       <ProfileButton title="Đóng" outline onPress={() => setSheet(undefined)} />
     </ProfileSheet>}
   </ProfilePage>;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, Alert, Image, Linking, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Platform, Pressable, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { File } from 'expo-file-system';
 import { Icon } from '../../components/Design';
@@ -8,7 +8,7 @@ import { useAuth } from '../../state/AuthContext';
 import { ApiError, detect } from '../../services/api';
 import type { Analysis } from '../../types/domain';
 import { AnalysisResult } from './AnalysisResult';
-import { ScanButton, ScanEmpty, ScanHistoryButton, ScanNotice, ScanPage } from './components/ScanUI';
+import { ScanButton, ScanHistoryButton, ScanNotice, ScanPage } from './components/ScanUI';
 import { scanColors, scanDate, validateScanImage } from './scanHelpers';
 import { s } from '../../styles/generated/styles';
 export function DiagnosisScreen() {
@@ -69,13 +69,6 @@ function ScanSession({ token, ready }: { token?: string; ready: boolean }) {
     } finally { locked.current = false; if (active.current) setOperation(undefined); }
   }
   return <ScanPage title="Khám lúa" backTo="/" action={<ScanHistoryButton disabled={operation === 'scan'} />}>
-    <Pressable accessibilityRole="button" accessibilityLabel="Hướng dẫn chụp ảnh lá lúa"
-      style={({ pressed }) => [s.scanContext, pressed && s.scanPressed]}
-      onPress={() => Alert.alert('Chụp ảnh rõ dấu hiệu bệnh', 'Chụp gần vùng lá bất thường, lấy nét rõ và đủ sáng. Có thể chụp thêm mặt dưới lá và toàn bụi lúa. Mỗi lần gửi một ảnh JPEG, PNG hoặc WebP tối đa 8 MiB.')}>
-      <Image source={require('../../../assets/icons/navigation/sprout.png')} style={s.scanContextIcon} resizeMode="contain" />
-      <View style={s.scanContextText}><Text style={s.scanContextTitle}>Khám lúa qua ảnh</Text><Text style={s.scanSmall}>Chụp rõ lá, nhận gợi ý từ AI</Text></View>
-      <Icon name="info" size={19} color={scanColors.muted} />
-    </Pressable>
     <View style={s.scanPreviewCard}>
       {asset ? <>
         <Image source={{ uri: asset.uri }} style={s.scanPreview} resizeMode="contain" accessibilityLabel="Ảnh lá lúa đã chọn để quét" />
@@ -84,11 +77,24 @@ function ScanSession({ token, ready }: { token?: string; ready: boolean }) {
           <Icon name="x" size={18} color={scanColors.text} />
         </Pressable>
         <Text style={s.scanImageCaption}>Ảnh đã chọn · {scanDate(selectedAt)}</Text>
-      </> : <ScanEmpty title="Thêm ảnh lá lúa" description="Chụp ảnh hoặc tải ảnh có dấu hiệu bất thường để bắt đầu kiểm tra." />}
+      </> : <Pressable accessibilityRole="button" accessibilityLabel="Chụp ảnh lá lúa" disabled={busy || !ready} onPress={() => void pick(true)}
+        style={({ pressed }) => [s.scanFinder, pressed && s.scanPressed]}>
+        <View style={[s.scanCorner, s.scanCornerTL]} /><View style={[s.scanCorner, s.scanCornerTR]} />
+        <View style={[s.scanCorner, s.scanCornerBL]} /><View style={[s.scanCorner, s.scanCornerBR]} />
+        <View style={s.scanFinderIcon}><Icon name="camera" size={28} color={scanColors.green} /></View>
+        <Text style={s.scanFinderTitle}>Đặt lá lúa vào khung</Text>
+        <Text style={s.scanFinderText}>Chạm để chụp, hoặc tải ảnh có dấu hiệu bất thường.</Text>
+      </Pressable>}
     </View>
     <View style={s.scanActions}>
       <View style={s.scanActionItem}><ScanButton title="Chụp ảnh" icon="camera" loading={operation === 'camera'} disabled={busy || !ready} onPress={() => void pick(true)} /></View>
       <View style={s.scanActionItem}><ScanButton title="Tải ảnh" icon="upload" secondary loading={operation === 'library'} disabled={busy || !ready} onPress={() => void pick(false)} /></View>
+    </View>
+    <View style={s.scanTipsRow} accessible accessibilityLabel="Mẹo chụp: đủ sáng, lấy nét rõ, thấy vết lá">
+      {([['sun', 'Đủ sáng'], ['crosshair', 'Lấy nét'], ['search', 'Thấy vết lá']] as const).map(([icon, label], index) => <View key={label} style={{ flex: 1, flexDirection: 'row' }}>
+        {index > 0 && <View style={s.scanTipDivider} />}
+        <View style={s.scanTipChip}><View style={s.scanTipIcon}><Icon name={icon} size={17} color={scanColors.green} /></View><Text maxFontSizeMultiplier={1.1} style={s.scanTipChipText}>{label}</Text></View>
+      </View>)}
     </View>
     {!!error && <ScanNotice message={error} />}
     {settingsNeeded && <ScanButton title="Mở cài đặt camera" icon="settings" secondary onPress={() => { void Linking.openSettings().catch(() => setError('Không mở được cài đặt. Hãy cấp quyền camera trong cài đặt thiết bị.')); }} />}
@@ -98,11 +104,9 @@ function ScanSession({ token, ready }: { token?: string; ready: boolean }) {
     {operation === 'scan' ? <View style={s.scanResult}><ActivityIndicator color={scanColors.green} /><Text style={s.scanBody}>Đang kiểm tra ảnh lá lúa… Kết quả sẽ hiện ở đây và được lưu trong lịch sử.</Text></View> :
       result ? <><AnalysisResult result={result} /><ScanButton title="Xem lịch sử quét" icon="clock" secondary onPress={() => router.push('/history')} /></> : <View style={s.scanResult}>
         <View style={s.scanAiBadge}><Icon name="zap" size={17} color={scanColors.green} /><Text style={s.scanAiBadgeText}>Gợi ý từ AI</Text></View>
-        <Text style={s.scanResultTitle}>Quan sát lá, chăm lúa kịp thời</Text>
-        <Text style={s.scanBody}>Chọn một ảnh rõ nét rồi nhấn Quét bằng AI. Kết quả nhận diện sẽ hiển thị bên dưới.</Text>
-        <View style={s.scanTips}><Icon name="sun" size={18} color={scanColors.green} /><Text style={s.scanTipText}>Đủ sáng · Lấy nét rõ · Thấy vùng lá bất thường</Text></View>
-        <Text style={s.scanFootnote}>{token ? 'Các lần quét thành công được lưu vào lịch sử tài khoản.' : 'Bạn có thể chọn ảnh trước. Đăng nhập để quét và lưu lịch sử của mình.'}</Text>
+        <Text style={s.scanBody}>Chọn ảnh rõ nét rồi nhấn Quét bằng AI để xem kết quả.</Text>
+        <Text style={s.scanFootnote}>{token ? 'Kết quả được lưu vào lịch sử.' : 'Đăng nhập để quét và lưu lịch sử.'}</Text>
       </View>}
-    <Text style={s.scanFormat}>JPEG, PNG, WebP · Tối đa 8 MiB / ảnh</Text>
+    <Text style={s.scanFormat}>JPEG, PNG, WebP · tối đa 8 MiB</Text>
   </ScanPage>;
 }

@@ -39,9 +39,9 @@ provision/backup riêng. Không copy key local vào source handoff.
 
 | Method/path | Input | Kết quả |
 |---|---|---|
-| GET /api/admin/roles | Không | `{success:true,items:["farmer","admin"]}` |
-| GET /api/admin/users | `page=1&page_size=20` | `items` gồm id, email, role, status; pagination |
-| PUT /api/admin/users/{uuid}/role | `{role:"admin" hoặc "farmer",reason:"..."}` | user cập nhật và `changed` |
+| GET /api/admin/rbac/roles | Không | `{success:true,items:["farmer","admin"]}` |
+| GET /api/admin/rbac/users | `page=1&page_size=20` | `items` gồm id, email, role, status; pagination |
+| PUT /api/admin/rbac/users/{uuid}/role | `{role:"admin" hoặc "farmer",reason:"..."}` | user cập nhật và `changed` |
 
 Yêu cầu JWT của admin đang active. Chưa xác thực: 401; farmer: 403.
 Danh sách không trả password hash, session/token, thông tin ảnh hoặc farm riêng.
