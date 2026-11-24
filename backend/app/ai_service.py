@@ -51,11 +51,34 @@ def validate_result(data, expected_request_id):
                 detections=detections, status='detection_found' if detections else 'no_detection')
 
 
+REJECTED = {'rejected_poor_quality', 'rejected_non_rice', 'rejected_uncertain_scope'}
+
+
+def validate_rejection(data, expected_request_id):
+    """Domain rejection from /v2/diagnose: not an error, nothing is persisted."""
+    if data.get('request_id') != expected_request_id:
+        raise ValueError('AI request correlation mismatch')
+    if not isinstance(data.get('model_sha256'), str) or not re.fullmatch('[0-9a-f]{64}', data['model_sha256']):
+        raise ValueError('Missing or invalid model artifact digest')
+    if data.get('detections') not in ([], None):
+        raise ValueError('Rejection must not carry detections')
+    message = data.get('message')
+    if not isinstance(message, str) or not message:
+        raise ValueError('Missing rejection message')
+    is_rice = data.get('is_rice')
+    if data['status'] == 'rejected_non_rice' and is_rice is not False:
+        raise ValueError('Inconsistent rejection')
+    return dict(success=True, rejected=True, status=data['status'], is_rice=is_rice, message=message,
+                confidence=data.get('confidence'), quality=data.get('quality'), gatekeeper=data.get('gatekeeper'),
+                request_id=expected_request_id, model_sha256=data['model_sha256'], model_version=data.get('model_version'),
+                decision_support_only=True, detections=[])
+
+
 def predict_image(payload, config, request_id):
     started = time.perf_counter()
     try:
         response = requests.post(
-            config['AI_API_URL'].rstrip('/') + '/predict',
+            config['AI_API_URL'].rstrip('/') + ('/predict' if config.get('AI_API_VERSION') == 'v1' else '/v2/diagnose'),
             files={'image': ('upload', payload, 'application/octet-stream')},
             headers={'X-Request-ID': request_id},
             timeout=(config['AI_CONNECT_TIMEOUT'], config['AI_READ_TIMEOUT']),
@@ -78,7 +101,16 @@ def predict_image(payload, config, request_id):
     if response.status_code != 200:
         raise AIServiceError('ai_inference_failed', 'Dịch vụ AI không thể xử lý ảnh.', 502)
     try:
-        result = validate_result(response.json(), request_id)
+        body = response.json()
+        if isinstance(body, dict) and body.get('status') in REJECTED:
+            result = validate_rejection(body, request_id)
+            result['timings'] = {'ai_roundtrip_ms': round((time.perf_counter() - started) * 1000, 3)}
+            return result
+        result = validate_result(body, request_id)
+        if isinstance(body, dict) and isinstance(body.get('status'), str):
+            result['ai_status'] = body['status']  # disease_detected | uncertain_lesion | healthy
+            result['is_rice'] = body.get('is_rice')
+            result['ai_message'] = body.get('message')
         result['timings']['ai_roundtrip_ms'] = round((time.perf_counter() - started) * 1000, 3)
         return result
     except (ValueError, TypeError, KeyError) as exc:
