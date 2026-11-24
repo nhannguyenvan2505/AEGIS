@@ -10,6 +10,11 @@ from .core import db
 from .core.security import ApiError
 
 PREFIX = '/api/admin'
+RBAC_PREFIX = PREFIX + '/rbac'  # JWT/RBAC API (app/rbac_admin.py) has its own auth and storage
+
+
+def managed(path):
+    return path.startswith(PREFIX) and not (path == RBAC_PREFIX or path.startswith(RBAC_PREFIX + '/'))
 
 
 def _defaults(app):
@@ -32,14 +37,14 @@ def register_admin(app):
 
     @app.before_request
     def admin_guard():
-        if request.path.startswith(PREFIX) and request.path != PREFIX + '/ping' and request.method != 'OPTIONS':
+        if managed(request.path) and request.path != PREFIX + '/ping' and request.method != 'OPTIONS':
             if app.config.get('STORAGE_BACKEND') != 'mysql':
                 return jsonify(success=False, error={'code': 'admin_unavailable',
                                                      'message': 'API admin cần STORAGE_BACKEND=mysql.'}), 503
 
     @app.after_request
     def admin_response(response):
-        if not request.path.startswith(PREFIX):
+        if not managed(request.path):
             return response
         response = db.finish_request(response)  # commit nếu < 400, rollback nếu lỗi
         response.headers['Cache-Control'] = 'no-store'

@@ -51,7 +51,7 @@ class JWTAndRBACTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 0, result.output)
 
     def change(self, target, role, actor=None, client=None):
-        return (client or self.client).put('/api/admin/users/'+target['user']['id']+'/role',
+        return (client or self.client).put('/api/admin/rbac/users/'+target['user']['id']+'/role',
             headers=self.headers(actor or self.owner), json=dict(role=role, reason='Acceptance change'))
 
     def test_signed_claims_restart_and_revocation(self):
@@ -95,10 +95,10 @@ class JWTAndRBACTests(unittest.TestCase):
                 self.assertEqual(self.client.get('/api/auth/me', headers={'Authorization':'Bearer '+token}).status_code, 401)
 
     def test_admin_guard_safe_listing_and_pagination(self):
-        self.assertEqual(self.client.get('/api/admin/users').status_code, 401)
-        self.assertEqual(self.client.get('/api/admin/users', headers=self.headers(self.owner)).status_code, 403)
+        self.assertEqual(self.client.get('/api/admin/rbac/users').status_code, 401)
+        self.assertEqual(self.client.get('/api/admin/rbac/users', headers=self.headers(self.owner)).status_code, 403)
         self.bootstrap()
-        response = self.client.get('/api/admin/users?page_size=1', headers=self.headers(self.owner))
+        response = self.client.get('/api/admin/rbac/users?page_size=1', headers=self.headers(self.owner))
         self.assertEqual(response.status_code, 200, response.json)
         self.assertEqual(response.json['pagination']['total'], 2)
         self.assertTrue(response.json['pagination']['has_next'])
@@ -106,7 +106,7 @@ class JWTAndRBACTests(unittest.TestCase):
         self.assertIn('no-store', response.headers['Cache-Control'])
         self.assertIn('Authorization', response.headers['Vary'])
         for query in ['page=0', 'page=1&page=2', 'page_size=101', 'page=-1', 'q=unknown']:
-            self.assertEqual(self.client.get('/api/admin/users?'+query, headers=self.headers(self.owner)).status_code, 400)
+            self.assertEqual(self.client.get('/api/admin/rbac/users?'+query, headers=self.headers(self.owner)).status_code, 400)
 
     def test_last_admin_audit_and_immediate_demotion(self):
         self.bootstrap()
@@ -118,7 +118,7 @@ class JWTAndRBACTests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/auth/me', headers=self.headers(self.other)).json['user']['role'], 'admin')
         self.assertFalse(self.change(self.other, 'admin').json['changed'])
         self.assertEqual(self.change(self.owner, 'farmer', self.other).status_code, 200)
-        self.assertEqual(self.client.get('/api/admin/users', headers=self.headers(self.owner)).status_code, 403)
+        self.assertEqual(self.client.get('/api/admin/rbac/users', headers=self.headers(self.owner)).status_code, 403)
         self.assertEqual(self.change(self.other, 'farmer', self.other).status_code, 409)
         with connect(self.config) as db:
             rows = db.execute('SELECT * FROM role_audit ORDER BY id').fetchall()
@@ -152,11 +152,11 @@ class JWTAndRBACTests(unittest.TestCase):
 
     def test_role_change_validation_and_missing_target(self):
         self.bootstrap()
-        url = '/api/admin/users/'+self.other['user']['id']+'/role'
+        url = '/api/admin/rbac/users/'+self.other['user']['id']+'/role'
         for body in [None, {}, {'role':'root','reason':'No'}, {'role':[],'reason':'No'},
                      {'role':'admin','reason':''}, {'role':'admin','reason':'x','status':'active'}]:
             self.assertEqual(self.client.put(url, headers=self.headers(self.owner), json=body).status_code, 400)
-        response = self.client.put('/api/admin/users/00000000-0000-0000-0000-000000000000/role',
+        response = self.client.put('/api/admin/rbac/users/00000000-0000-0000-0000-000000000000/role',
             headers=self.headers(self.owner), json={'role':'farmer','reason':'Missing'})
         self.assertEqual(response.status_code, 404)
 

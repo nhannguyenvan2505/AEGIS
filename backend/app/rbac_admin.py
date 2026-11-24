@@ -8,7 +8,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 from .auth import error, require_roles
 from .repositories import repository
 
-admin = Blueprint('admin', __name__, url_prefix='/api/admin')
+admin = Blueprint('rbac_admin', __name__, url_prefix='/api/admin/rbac')
 ROLES = ('farmer', 'admin')
 
 

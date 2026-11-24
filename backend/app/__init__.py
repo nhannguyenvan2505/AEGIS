@@ -58,7 +58,7 @@ def create_app(config=None):
     init_limits(app)
     app.register_blueprint(api)
     app.register_blueprint(auth)
-    from .admin import admin, register_admin_cli
+    from .rbac_admin import admin, register_admin_cli
     app.register_blueprint(admin)
     register_admin_cli(app)
     app.register_blueprint(farm)

@@ -56,7 +56,9 @@ class AdminApiTest(unittest.TestCase):
         public = {'/api/admin/ping', '/api/admin/auth/login'}
         seen = 0
         for rule in self.app.url_map.iter_rules():
-            if not rule.rule.startswith('/api/admin') or rule.rule in public:
+            # /api/admin/rbac is the JWT/RBAC API; test_jwt_rbac covers its 401/403 paths.
+            if (not rule.rule.startswith('/api/admin') or rule.rule in public
+                    or rule.rule.startswith('/api/admin/rbac/')):
                 continue
             path = rule.rule
             for arg, conv in rule._converters.items():
