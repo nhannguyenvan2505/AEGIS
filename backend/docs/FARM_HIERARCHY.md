@@ -16,15 +16,19 @@ Runtime MySQL hỗ trợ đầy đủ các endpoint này qua migration
 | `DELETE /api/farm/farms/{id}` | Gửi JSON `{"version":1}`; chỉ xóa nông trại chưa có ruộng |
 | `GET /api/farm/farms/{id}/plots` | Ruộng thuộc nông trại, cùng phân trang như danh sách cũ |
 | `POST /api/farm/farms/{id}/plots` | Tạo ruộng với `name`, tùy chọn `location_text`, `area_ha` |
+| `GET /api/farm/plots/{id}` | Chi tiết ruộng, gồm nông trại và diện tích |
+| `PUT /api/farm/plots/{id}` | Sửa `name`, `area_ha`; tùy chọn `location_text` |
+| `DELETE /api/farm/plots/{id}` | Xóa ruộng chưa có mùa vụ; gửi JSON rỗng |
 
 Tên/người phụ trách tối đa 120 ký tự, địa chỉ 500, ghi chú 1.000. Ghi chú hỗ trợ
 xuống dòng. Diện tích là số hữu hạn lớn hơn 0 và không quá 1.000.000 ha; ruộng cũ
 chưa có diện tích trả `null`, không được diễn giải thành 0 ha.
 
-Sửa/xóa dùng `version` để chặn ghi đè bản đã thay đổi (`409 farm_version_conflict`).
-Xóa nông trại có ruộng trả `409 farm_not_empty`. Kiểm tra và ghi nằm trong cùng
-transaction; MySQL dùng khóa runtime InnoDB hiện có, SQLite fixture dùng
-`BEGIN IMMEDIATE`. Khóa ngoại ghép kiểm tra cả tài khoản và quan hệ.
+Sửa/xóa nông trại dùng `version` để chặn ghi đè bản đã thay đổi (`409 farm_version_conflict`).
+Xóa nông trại có ruộng trả `409 farm_not_empty`; xóa ruộng có mùa vụ trả
+`409 plot_not_empty`. Kiểm tra và ghi nằm trong cùng transaction; MySQL dùng khóa
+runtime InnoDB hiện có, SQLite fixture dùng `BEGIN IMMEDIATE`. Khóa ngoại ghép
+kiểm tra cả tài khoản và quan hệ.
 
 MySQL dùng bảng `farms`/`farm_fields`/`crop_cycles` hiện có, không tạo bộ bảng
 nông trại song song. Migration 005 thêm UUID API, người phụ trách, version và

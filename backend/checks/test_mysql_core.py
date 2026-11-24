@@ -328,28 +328,28 @@ class MySQLCoreTests(unittest.TestCase):
         claims = jwt.decode(token, self.app.config['JWT_SECRET'], algorithms=['HS256'],
                             issuer='aegis-backend', audience='aegis-api')
         self.assertEqual(claims['sub'], self.identifiers[0])
-        self.assertEqual(self.client.get('/api/admin/users',headers=self.headers[0]).status_code,403)
+        self.assertEqual(self.client.get('/api/admin/rbac/users',headers=self.headers[0]).status_code,403)
         result = self.app.test_cli_runner().invoke(args=[
             'bootstrap-admin',self.identifiers[0],'--reason','MySQL integration acceptance'])
         self.assertEqual(result.exit_code,0,result.output)
         try:
-            response=self.client.get('/api/admin/users?page_size=1',headers=self.headers[0])
+            response=self.client.get('/api/admin/rbac/users?page_size=1',headers=self.headers[0])
             self.assertEqual(response.status_code,200,response.json)
             self.assertEqual(set(response.json['items'][0]),{'id','email','role','status'})
             def change(owner,target,role):
-                return self.client.put('/api/admin/users/'+self.identifiers[target]+'/role',
+                return self.client.put('/api/admin/rbac/users/'+self.identifiers[target]+'/role',
                     headers=self.headers[owner],json=dict(role=role,reason='MySQL acceptance'))
             self.assertEqual(change(0,0,'farmer').status_code,409)
             self.assertEqual(change(0,1,'admin').status_code,200)
             def demote(index):
-                return self.app.test_client().put('/api/admin/users/'+self.identifiers[index]+'/role',
+                return self.app.test_client().put('/api/admin/rbac/users/'+self.identifiers[index]+'/role',
                     headers=self.headers[index],json=dict(role='farmer',reason='Concurrent demotion')).status_code
             with ThreadPoolExecutor(max_workers=2) as pool:
                 statuses=list(pool.map(demote,[0,1]))
             self.assertEqual(sorted(statuses),[200,409])
             demoted=statuses.index(200)
             survivor=1-demoted
-            self.assertEqual(self.client.get('/api/admin/users',headers=self.headers[demoted]).status_code,403)
+            self.assertEqual(self.client.get('/api/admin/rbac/users',headers=self.headers[demoted]).status_code,403)
             self.assertEqual(change(survivor,survivor,'farmer').status_code,409)
             with repository(self.config) as repo:
                 count=repo.one("SELECT COUNT(*) n FROM audit_logs WHERE action='user_role_changed' AND entity_id IN (%s,%s)",tuple(self.identifiers))['n']

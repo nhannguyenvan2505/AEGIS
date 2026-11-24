@@ -12,7 +12,7 @@ import { currentSeason, fieldReadings, fieldStatus, forecastNumber } from './for
 import { IOT_PREVIEW_ENABLED } from './iotPreview';
 import { PreviewForecastDetail } from './PreviewForecastDetail';
 import { acknowledgeForecastAlert, detailDate, forecastExplanation, forecastReason, loadForecastDetail, type ForecastAlert } from './forecastDetail';
-import { DetailButton, DetailCard, DetailMeta, DetailNotice, DetailPlotSummary, DetailReadings, DetailReadingsHeader, DetailRiskBadge, DetailSuggestion, ForecastDetailPage, detailColors } from './components/ForecastDetailUI';
+import { DetailButton, DetailCard, DetailHero, DetailMeta, DetailNotice, DetailReadings, DetailReadingsHeader, DetailSuggestion, ForecastDetailPage, detailColors } from './components/ForecastDetailUI';
 import { s } from '../../styles/generated/styles';
 
 function ForecastHistoryList({ token, seasonId, initial }: { token: string; seasonId: string; initial?: Page<Forecast> }) {
@@ -102,20 +102,13 @@ function ApiForecastDetailContent({ token, farm, plot, seasons }: ForecastDetail
     {resource.loading && !data && <View style={s.forecastLoading}><ActivityIndicator color={detailColors.teal} /><Text style={s.forecastDetailMuted}>Đang tải dự báo của ruộng…</Text></View>}
     {!!resource.error && <><DetailNotice message={resource.error} /><DetailButton title="Thử lại" secondary onPress={resource.reload} /></>}
     {data && field && status && <>
-      <DetailCard>
-        <View style={s.forecastDetailSummaryTop}><DetailRiskBadge status={status} />
-          <View style={s.forecastDetailReadState}><View style={s.forecastDetailReadDot} />
-            <Text style={s.forecastDetailReadText}>{alert ? alert.state === 'unread' ? 'Chưa đọc' : 'Đã đọc' : 'Đang theo dõi'}</Text></View>
-        </View>
-        <Text style={s.forecastDetailSummaryTitle}>{status.tone === 'high' ? 'Ưu tiên · Nguy cơ đạo ôn cao' :
-          status.tone === 'low' ? 'Nguy cơ đạo ôn thấp' : field.error ? 'Chưa tải đủ dữ liệu' :
-            forecast?.status === 'insufficient_data' ? 'Chưa đủ dữ liệu dự báo' : field.source ? 'Chờ kết quả dự báo' : 'Chờ dữ liệu của ruộng'}</Text>
-        <View style={s.forecastDetailTimeRow}><Icon name="clock" size={16} color={detailColors.muted} />
-          <Text style={s.forecastDetailMuted}>{forecast ? detailDate(forecast.issued_at) : 'Chưa phát hành dự báo'}</Text></View>
-        <Text style={s.forecastDetailMuted}>{forecast ? 'Dự báo AI giúp ưu tiên kiểm tra, chưa xác nhận lúa đã nhiễm bệnh.' : 'Theo dõi số đo môi trường để chuẩn bị dự báo riêng cho mùa vụ của bạn.'}</Text>
-      </DetailCard>
+      <DetailHero status={status} farm={farm} plot={plot} season={season} profile={data.profile}
+        readState={alert ? alert.state === 'unread' ? 'Chưa đọc' : 'Đã đọc' : 'Đang theo dõi'}
+        title={status.tone === 'high' ? 'Nguy cơ đạo ôn cao' : status.tone === 'low' ? 'Nguy cơ đạo ôn thấp' : field.error ? 'Chưa tải đủ dữ liệu' :
+          forecast?.status === 'insufficient_data' ? 'Chưa đủ dữ liệu dự báo' : field.source ? 'Chờ kết quả dự báo' : 'Chờ dữ liệu của ruộng'}
+        time={forecast ? detailDate(forecast.issued_at) : 'Chưa phát hành dự báo'}
+        note={forecast ? 'Giúp ưu tiên kiểm tra, chưa xác nhận lúa đã nhiễm bệnh.' : 'Cần số đo môi trường để lập dự báo cho mùa vụ.'} />
 
-      <DetailPlotSummary farm={farm} plot={plot} season={season} profile={data.profile} />
 
       <DetailCard title="Vì sao có dự báo này?">
         <Text style={s.forecastDetailBody}>{forecastExplanation(field)}</Text>
@@ -126,7 +119,7 @@ function ApiForecastDetailContent({ token, farm, plot, seasons }: ForecastDetail
 
       <DetailReadingsHeader onRefresh={resource.reload} busy={resource.loading || !!busy} />
       <DetailReadings readings={readings} />
-      <Text style={s.forecastDetailFootnote}>Nhiệt độ, độ ẩm, pH đất và lượng mưa của ruộng. Dấu — là chưa có số đo.</Text>
+      <Text style={s.forecastDetailFootnote}>Đo lúc {detailDate(readings.observedAt)} · dấu — là chưa có số đo.</Text>
 
       <View style={[s.forecastDetailOutlook, status.tone === 'high' ? s.forecastDetailOutlookHigh : status.tone === 'low' ? s.forecastDetailOutlookLow : s.forecastDetailOutlookPending]}>
         <View style={s.forecastDetailOutlookLabel}><Icon name={status.tone === 'high' ? 'alert-triangle' : 'activity'} size={16} color={detailColors[status.tone]} />
@@ -147,13 +140,11 @@ function ApiForecastDetailContent({ token, farm, plot, seasons }: ForecastDetail
       {!!error && <DetailNotice message={error} />}
       {alert?.state === 'unread' && <>
         <DetailButton title="Đánh dấu đã đọc" icon="check" testID="forecast-mark-read" disabled={resource.loading || !!busy} busy={busy === 'read'} onPress={() => void act('read')} />
-        <Text style={s.forecastDetailFootnote}>Đánh dấu đã đọc chỉ cập nhật thông báo, giữ nguyên kết quả và mức nguy cơ của ruộng.</Text>
       </>}
       {alert?.state === 'acknowledged' && <View style={s.forecastDetailReadReceipt} accessibilityLiveRegion="polite"><Icon name="check-circle" size={20} color={detailColors.teal} />
         <Text style={s.forecastDetailReadReceiptText}>Đã đọc cảnh báo · Mức nguy cơ được giữ nguyên.</Text></View>}
       <DetailButton title={busy === 'forecast' ? 'Đang cập nhật dự báo…' : !season ? 'Chưa có mùa vụ' : !field.source ? 'Chờ dữ liệu mùa vụ' : 'Cập nhật dự báo'}
         icon="activity" testID="forecast-update" disabled={!season || !field.source || !!field.error || resource.loading || !!busy} busy={busy === 'forecast'} onPress={() => void act('forecast')} />
-      <DetailButton title="Quay lại danh sách ruộng" secondary disabled={!!busy} onPress={() => router.replace('/analysis')} />
 
       {season && <View style={s.forecastDetailHistory}>
         <Pressable accessibilityRole="button" accessibilityLabel="Lịch sử dự báo" accessibilityState={{ expanded: historyOpen }}
@@ -163,7 +154,6 @@ function ApiForecastDetailContent({ token, farm, plot, seasons }: ForecastDetail
         </Pressable>
         {historyOpen && <ForecastHistoryList key={`${token}:${season.id}:${forecast?.id ?? 'none'}`} token={token} seasonId={season.id} initial={data.history} />}
       </View>}
-      <Text style={s.forecastDetailFootnote}>Dự báo hỗ trợ theo dõi mùa vụ và ưu tiên kiểm tra ruộng.</Text>
     </>}
   </ForecastDetailPage>;
 }

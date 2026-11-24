@@ -224,11 +224,9 @@ def holding_detail(identifier):
 
 
 def create_plot(db, data, farm_id=None):
-    size = data.get('area_ha')
-    if size is not None and (type(size) not in (int, float) or not 0 < size <= 1000000 or not math.isfinite(size)):
-        raise FarmError('invalid_area', 'Diện tích phải lớn hơn 0 và không vượt quá 1.000.000 ha.')
-    item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], name=text(data['name']),
-                location_text=text(data.get('location_text', ''), 500, True), created_at=now().isoformat())
+    fields = plot_fields(data)
+    item = dict(id=str(uuid.uuid4()), user_id=g.user['id'], name=fields['name'],
+                location_text=fields['location_text'], created_at=now().isoformat())
     if farm_id is None:
         candidate = data.get('farm_id')
         if candidate is not None:
@@ -239,7 +237,14 @@ def create_plot(db, data, farm_id=None):
             farm_id = owned(db, 'farms', candidate)['id']
         else:
             farm_id = None
-    return db.add_plot(item, farm_id=farm_id, area_ha=size)
+    return db.add_plot(item, farm_id=farm_id, area_ha=fields['area_ha'])
+
+
+def plot_fields(data):
+    size = data.get('area_ha')
+    if size is not None and (type(size) not in (int, float) or not 0 < size <= 1000000 or not math.isfinite(size)):
+        raise FarmError('invalid_area', 'Diện tích phải lớn hơn 0 và không vượt quá 1.000.000 ha.')
+    return dict(name=text(data['name']), location_text=text(data.get('location_text', ''), 500, True), area_ha=size)
 
 
 @farm.route('/farms/<uuid:identifier>/plots', methods=['GET', 'POST'])
@@ -266,15 +271,28 @@ def plots():
     with connect(current_app.config) as db:
         db.begin(True)
         item = create_plot(db, data)
-    # Keep the legacy create/detail response contract unchanged.
-    return jsonify(success=True, item={key: item[key] for key in ('id', 'user_id', 'name', 'location_text', 'created_at')}), 201
+    # Same shape as GET /plots/<id> (plot_summary), so create and detail stay consistent.
+    return jsonify(success=True, item=item), 201
 
 
-@farm.get('/plots/<uuid:identifier>')
+@farm.route('/plots/<uuid:identifier>', methods=['GET', 'PUT', 'DELETE'])
 @require_auth
 def plot_detail(identifier):
+    data = body({'name', 'area_ha'}, {'location_text'}) if request.method == 'PUT' else (
+        body(set()) if request.method == 'DELETE' else None)
     with connect(current_app.config) as db:
-        return jsonify(success=True, item=dict(owned(db, 'plots', identifier)))
+        db.begin(data is not None)
+        if request.method == 'GET':
+            return jsonify(success=True, item=db.plot_summary(owned(db, 'plots', identifier)))
+        if request.method == 'PUT':
+            fields = plot_fields(data)
+            owned(db, 'plots', identifier)
+            db.update_plot(dict(**fields, id=str(identifier), user_id=g.user['id']))
+            return jsonify(success=True, item=db.plot_summary(owned(db, 'plots', identifier)))
+        owned(db, 'plots', identifier)
+        if not db.delete_plot(str(identifier), g.user['id']):
+            raise FarmError('plot_not_empty', 'Chỉ có thể xóa ruộng khi chưa có mùa vụ.', 409)
+        return jsonify(success=True, deleted_id=str(identifier))
 
 
 @farm.route('/plots/<uuid:identifier>/seasons', methods=['GET', 'POST'])

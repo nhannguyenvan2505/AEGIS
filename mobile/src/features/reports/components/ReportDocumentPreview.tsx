@@ -37,7 +37,7 @@ export function ReportFullPreview({ report, onClose }: { report: ReportData; onC
   return <Modal visible animationType="slide" onRequestClose={onClose}>
     <SafeAreaView style={s.reportPreviewPage}>
       <View style={s.reportPreviewHeader}><Pressable accessibilityRole="button" accessibilityLabel="Đóng xem trước báo cáo" onPress={onClose} style={s.profileHeaderButton}>
-        <Icon name="arrow-left" size={23} color="#7385a4" /></Pressable><Text style={s.profileTitle}>Xem trước báo cáo</Text><Text style={s.reportMuted}>2 trang</Text></View>
+        <Icon name="arrow-left" size={23} color="#566a63" /></Pressable><Text style={s.profileTitle}>Xem trước báo cáo</Text><Text style={s.reportMuted}>2 trang</Text></View>
       <ScrollView contentContainerStyle={s.reportPreviewScroll}><View style={s.profileColumn}><ReportPaper report={report} /><ReportPaper report={report} page={2} /></View></ScrollView>
     </SafeAreaView>
   </Modal>;

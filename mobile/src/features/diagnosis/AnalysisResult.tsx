@@ -17,7 +17,7 @@ export function AnalysisResult({ result }: { result: Analysis }) {
       <Text style={s.scanConfidence}>{(group.confidence * 100).toFixed(1)}%</Text>
     </View>)}
     <View style={s.scanWarning}>
-      <View style={s.scanWarningHeading}><Icon name="alert-triangle" size={17} color="#925311" /><Text style={s.scanWarningTitle}>Không phải chẩn đoán xác nhận</Text></View>
+      <View style={s.scanWarningHeading}><Icon name="alert-triangle" size={17} color="#8a4b08" /><Text style={s.scanWarningTitle}>Không phải chẩn đoán xác nhận</Text></View>
       <Text style={s.scanWarningText}>Nhờ cán bộ kỹ thuật kiểm tra trước khi quyết định dùng thuốc.</Text>
     </View>
     <Text style={s.scanFootnote}>Để rõ hơn: chụp thêm mặt dưới lá và toàn bụi lúa, đủ sáng, không bị mờ.</Text>
