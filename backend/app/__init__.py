@@ -66,6 +66,8 @@ def create_app(config=None):
     register_admin(app)
     from .mobile_contract import enable_mobile_contract
     enable_mobile_contract(app)
+    from .iot_mqtt import enable_iot_mqtt
+    enable_iot_mqtt(app)
 
     @app.after_request
     def deliver_mongo_outbox(response):

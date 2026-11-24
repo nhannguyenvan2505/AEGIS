@@ -13,7 +13,7 @@ import {
 
 // Local presentation scenario, deliberately separate from saved API forecasts/alerts.
 export function PreviewForecastDetail({ farm, plot, seasons }: { farm: Farm; plot: FarmPlot; seasons: FarmSeason[] }) {
-  const { readings, forecast, refresh } = usePlotIot(plot.id);
+  const { readings, forecast, refresh, liveIot } = usePlotIot(plot.id);
   if (!forecast) return null;
   const { status } = forecast;
   const high = status.tone === 'high';
@@ -24,7 +24,7 @@ export function PreviewForecastDetail({ farm, plot, seasons }: { farm: Farm; plo
 
     <DetailCard title="Vì sao có dự báo này?">
       <Text testID="forecast-explanation" style={s.forecastDetailBody}>{forecast.explanation}</Text>
-      <View style={s.forecastDetailMetadata}><DetailMeta label="Nguồn dữ liệu" value="Số đo IoT của ruộng" />
+      <View style={s.forecastDetailMetadata}><DetailMeta label="Nguồn dữ liệu" value={liveIot ? `ESP32 MQTT (${liveIot.deviceUid})` : 'Số đo IoT của ruộng'} />
         <DetailMeta label="Đo lúc" value={detailDate(readings.observedAt, false, true)} /></View>
     </DetailCard>
 
