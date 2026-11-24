@@ -1,6 +1,6 @@
 # Quy trình cộng tác AEGIS
 
-Quy tắc chung cho mọi thành viên. Tài liệu `git-flow.md` là tài liệu tham khảo;
+Quy tắc chung cho mọi thành viên. Tài liệu [docs/git-flow.md](docs/git-flow.md) là tài liệu tham khảo;
 hướng dẫn này chuẩn hóa cho AEGIS và thay thế GitHub Flow trước đây.
 
 ## Nhánh và Pull Request
@@ -86,16 +86,10 @@ Nếu lộ bí mật phải thu hồi/thay thế trước. Không di chuyển AI
 
 ## Trạng thái triển khai
 
-Cập nhật 19/11/2026: workflow `Team policy` đã vào main (#7, 17/11), chạy ở chế độ
-`github-flow` (task → main). Bảng Gitflow phía trên là đích chuyển đổi, chưa áp
-dụng: chưa tạo develop, chưa đổi default branch, chưa bật bảo vệ GitHub.
-Workflow `Backend tests` đang chờ trong PR #9. Hướng dẫn cũ ghi nhận
-API bảo vệ main bị từ chối HTTP 403 ngày 25/10/2026; chưa xác minh lại gói hiện tại.
+Từ 24/11/2026 repository dùng Gitflow: `develop` là nhánh mặc định, biến Actions
+`TEAM_FLOW=gitflow`. Workflow `Team policy` kiểm tra metadata PR, không thay build/test,
+không xác minh điểm tách nhánh hoặc approval. Kho private gói free bị GitHub từ chối
+Rulesets (HTTP 403), nên quy tắc review/chặn push là quy ước, chưa được cưỡng chế phía server.
 
-Xem [kích hoạt GitHub](docs/GITHUB_TEAM_SETUP.md). Workflow Team policy kiểm tra
-metadata PR, không thay build/test, không xác minh điểm tách nhánh hoặc approval.
-Chỉ Rulesets/branch protection đã bật mới cưỡng chế quy tắc phía server.
-
-Bổ sung triển khai Actions: [chế độ kiểm tra PR](docs/TEAM_POLICY_ACTIONS.md) mặc định
-giữ luồng task → main hiện có. Quy trình Gitflow trong tài liệu này là đích chuyển đổi;
-chỉ bật `TEAM_FLOW=gitflow` sau khi nhóm áp dụng và develop đã có workflow.
+Xem [thiết lập GitHub](docs/github-setup.md), [quy trình Git](docs/git-flow.md) và
+[chế độ kiểm tra PR](docs/TEAM_POLICY_ACTIONS.md).
