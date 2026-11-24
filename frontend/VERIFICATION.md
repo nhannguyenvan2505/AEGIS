@@ -12,15 +12,15 @@ tra ở lượt tổng duyệt ngay trước; không báo commit/diff. Thêm th�
 | Cú pháp JS bản cuối | `node --check static/app.js`, exit0 |
 | Wrapper unit/integration local | 4/4 đạt; evidence/server_tests.log |
 | Browser thực | CUA/IAB: register/login, context create/select, mock upload/assessment, V4, link/history, logout/user2 |
-| V4 thật | 3 inference thành công: ảnh mẫu và2 ảnh kỹ thuật; health CUDA0, SHA1b755ca0…70940a |
+| V4 thật | 3 inference thành công: ảnh mẫu và 2 ảnh kỹ thuật; health CUDA0, SHA1b755ca0…70940a |
 | Replay | Cùng file/key không thêm analysis, lịch sử vẫn1 mục trước khi gửi fixture kỹ thuật |
 | Snapshot | Link/replay ảnh không đổi nội dung assessment; advisory và insufficient_data hiển thị riêng |
 | EXIF | JPEG orientation6 raw100×60 → canvas60×100, không bị báo lệch contract |
 | Không detection | PNG trắng kỹ thuật → no_detection, UI ghi chưa kết luận khỏe |
-| Lỗi |8MiB+1 bị chặn ở UI, detect disabled; text lỗi trả400 invalid_image có request ID |
-| Phiên riêng tư | Logout xóa workspace/canvas/file/history/password; user2 có0ruộng/0analysis |
+| Lỗi |8MiB+1 bị chặn ở UI, detect disabled; text lỗi trả 400 invalid_image có request ID |
+| Phiên riêng tư | Logout xóa workspace/canvas/file/history/password; user2 có 0 ruộng/0analysis |
 | Responsive |1440px:3cột, scrollWidth1425;390px:1cột, scrollWidth375; đã reset override viewport |
-| Integrity |16file baseline runtime/runner/collection/checkpoint từ mốc tổng duyệt trước khớp hash |
+| Integrity |16 file baseline runtime/runner/collection/checkpoint từ mốc tổng duyệt trước khớp hash |
 | Cleanup |backend_stopped/ai_stopped/temporary_storage_cleaned=true, error=null |
 
 Test wrapper kiểm static/CSP/no-store, auth các API không bị UI bypass, static
@@ -31,14 +31,14 @@ mock kết quả ảnh hoặc chèn state để giả hoàn thành luồng.
 `evidence/verification.json` ghi các quan sát browser đã thực hiện, giới hạn và
 integrity/log scan; không gọi chúng là test E2E tự động. `database_evidence.json`
 được đọc từ DB tạm theo mode=ro, đóng connection trước dọn. Cuối phiên:2user,
-1plot,1season,1device,24bucket,2assessment,1link,3analysis,2detection; không có
+1 plot,1 season,1 device,24 bucket,2 assessment,1 link,3 analysis,2 detection; không có
 vi phạm foreign key. Không xuất password/session/token. Log scan chỉ kiểm mẫu
 Bearer/password/access_token/dataURL đã khai báo, không là bảo đảm tìm mọi secret.
 
 ## Vấn đề phát hiện và xử lý
 
 1. Biểu mẫu ban đầu dùng FormData sau khi disable các trường lúc busy, khiến
-   browser bỏ các trường và Backend trả400 invalid_fields. Đã sửa đọc rõ những
+   browser bỏ các trường và Backend trả 400 invalid_fields. Đã sửa đọc rõ những
    field có name của form; reload và chạy lại tạo ruộng/vụ/thiết bị thành công.
    Không nới validation Backend để test qua.
 2. Giữ bối cảnh đang chọn trong dropdown khi đổi trang danh sách; tránh hiển

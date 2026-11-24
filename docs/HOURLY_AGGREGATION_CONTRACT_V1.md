@@ -46,7 +46,7 @@ Policy có chính xác các trường trong [mẫu JSON](../hourly_contract_v1/p
 | numeric_method | slot_arithmetic_mean |
 | wetness_method | point_diagnostics_only |
 
-Cadence null hoặc khác policy gây `policy_cadence_mismatch`. anchor sau start, cadence không chia hết giờ, policy tới sau as_of hoặc snapshot sai hash đều làm input bị từ chối. Profile mẫu dùng cadence600s, tolerance5s, grace60s, minimum coverage4/5. Đây là profile tổng hợp synthetic do lượt T01 lựa chọn, có thể thay bằng revision mới.
+Cadence null hoặc khác policy gây `policy_cadence_mismatch`. anchor sau start, cadence không chia hết giờ, policy tới sau as_of hoặc snapshot sai hash đều làm input bị từ chối. Profile mẫu dùng cadence600s, tolerance5s, grace60s, minimum coverage 4/5. Đây là profile tổng hợp synthetic do lượt T01 lựa chọn, có thể thay bằng revision mới.
 
 Policy được khai báo là đã available qua timestamp giống các snapshot nghiên cứu hiện có. Metadata này cần được Backend đóng dấu và lưu bất biến ở T04 để có chứng cứ vận hành.
 
@@ -105,17 +105,17 @@ quality valid cùng một biến null được pipeline hiện tại hỗ trợ,
 
 ## 8. Ví dụ nghiệm thu
 
-Các ví dụ dùng profile600s, tolerance5s, grace60s, coverage4/5; sáu slot mỗi giờ. Tất cả mẫu ở UTC và receipt <=as_of nếu không nêu khác. T/RH cùng giá trị theo slot trong ví dụ.
+Các ví dụ dùng profile600s, tolerance5s, grace60s, coverage 4/5; sáu slot mỗi giờ. Tất cả mẫu ở UTC và receipt <=as_of nếu không nêu khác. T/RH cùng giá trị theo slot trong ví dụ.
 
 | Ca | Input | Kết quả bắt buộc |
 |---|---|---|
-| A | Sáu slot, T=[20,22,24,26,28,30], RH=[60,62,64,66,68,70], as_of=01:01:05 cho giờ00 | T=25, RH=65, coverage=1, complete_numeric; whole_hour wet=null |
+| A | Sáu slot, T=[20,22,24,26,28,30], RH=[60,62,64,66,68,70], as_of=01:01:05 cho giờ 00 | T=25, RH=65, coverage=1, complete_numeric; whole_hour wet=null |
 | B | Năm slot đầu của A | T=24, RH=64, coverage=5/6, đạt ngưỡng |
 | C | Bốn slot đầu của A | Hai value=null, coverage=4/6, insufficient |
 | D | Sáu T hợp lệ, hai RH null | T=25, RH=null, partial_numeric; coverage T=1, RH=4/6 |
 | E | A nhưng as_of=01:01:04 | pending, numeric values=null |
 | F | Slot00:10 có mẫu00:10:04 T=100 ngoài bounds và mẫu00:10:02 T=22 | Snapshot sai technical bounds bị từ chối trước aggregation |
-| G | Slot00:10 có mẫu00:10:04 T=29 và00:10:02 T=22 | Chọn22; valid_slots chỉ tăng1 |
+| G | Slot00:10 có mẫu00:10:04 T=29 và 00:10:02 T=22 | Chọn22; valid_slots chỉ tăng1 |
 | H | Mẫu00:10:00 bị suspect; mẫu00:10:04 nominal T=23 | Chọn23 cho slot |
 | I | Một mẫu của A received=01:02:00 | as_of01:01:05 dùng5slot; as_of01:02:00 dùng6slot; receipt gốc được giữ |
 | J | Một mẫu của A exclusion=01:03:00 | as_of01:02:00 còn dùng mẫu; as_of01:03:00 bỏ mẫu và đổi lineage/hash |
@@ -124,7 +124,7 @@ Các ví dụ dùng profile600s, tolerance5s, grace60s, coverage4/5; sáu slot m
 | M | Sáu leaf_wet=true | wet_point_fraction=1; whole_hour_value=null; feature v1 insufficient |
 | N | Cadence null,3601, hoặc policy600 khác metadata300 | Từ chối policy; không tự chọn cadence |
 | O | Giờ không có mẫu | expected_slots=6, valid_slots=0, coverage=0, values=null |
-| P | observed00:59:58 gần slot01:00 | Thuộc giờ01; giờ00 không nhận mẫu này |
+| P | observed00:59:58 gần slot01:00 | Thuộc giờ 01; giờ 00 không nhận mẫu này |
 
 T02 cần mở rộng ví dụ thành fixture có UUID, hash, timestamp đầy đủ, thêm equality tolerance, policy unknown, stream unknown, nửa khoảng giữa slot, biên ngày, timezone offset và max window. T03 chạy acceptance cùng feature preparation thực tế. T01 kiểm tài liệu và policy mẫu, chưa chạy các ca adapter khi implementation chưa được tạo.
 

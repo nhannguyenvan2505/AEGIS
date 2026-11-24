@@ -15,7 +15,7 @@ mọi tính năng trong roadmap nghiên cứu đã hoàn thành.
 | Trang chủ | Thay dữ liệu/cảnh báo mẫu bằng tổng quan từ Backend, có empty/loading/error/pagination | Tải lại thủ công |
 | Ruộng/mùa vụ | Tạo/xem ruộng; thêm tạo/xem/phân trang mùa vụ trên mobile | Mùa mới cần nguồn hourly; seed chuẩn bị hai mùa demo |
 | Phiên/kết nối | Giữ HTTP status khi response lỗi không phải JSON, thông báo lỗi mạng; reset view theo token, bỏ response cũ khi đổi ngữ cảnh; kiểm token hiện tại trước expire, xếp thứ tự ghi/xóa token | SecureStore và đổi tài khoản cần nghiệm thu native |
-| Vận hành | Launcher chung, seed lặp được, bảo toàn nguồn đã tiến/lịch sử; thêm tool tiến thời gian dry/wet/missing và gọi model/lưu dự báo | Localhost; kết nối thiết bị ngày06/11 cần cấu hình API |
+| Vận hành | Launcher chung, seed lặp được, bảo toàn nguồn đã tiến/lịch sử; thêm tool tiến thời gian dry/wet/missing và gọi model/lưu dự báo | Localhost; kết nối thiết bị ngày 06/11 cần cấu hình API |
 | IoT/pilot cũ | Hồi quy raw/QC, follow-up, timeline, backup/restore và workflow có sẵn đạt | Raw point chưa tự biến thành hourly forecast; chưa có thiết bị thật |
 | Ảnh lá | Hồi quy Backend/auth/history/idempotency/AI contract đạt | Không chạy lại V4/GPU trong lượt này; launcher forecast không tự khởi động AI ảnh |
 | Ngoài core midterm | Camera stream, Google login, đổi mật khẩu, push và đề xuất chuyên môn còn chưa triển khai đầy đủ | Giữ giới hạn hiển thị rõ; không gọi chúng là đã hoàn thành |
@@ -36,14 +36,14 @@ FM04_CHECK_MOBILE=1 để chạy client TypeScript qua HTTP. Kiểm owner/401/40
 nguồn revision3, insufficient_data, overview, replay, worker ngừng503 và lịch
 sử vẫn đọc được. Acceptance launcher tạo hai nguồn khác score, tiến thiếu
 1 giờ rồi phục hồi 120 giờ khô, seed lại và restart giữ đúng các bản ghi đã
-tiến: tổng4 source revision và4 forecast, một tài khoản, dịch vụ đều dừng.
+tiến: tổng4 source revision và 4 forecast, một tài khoản, dịch vụ đều dừng.
 
 Chạy temporal suite bằng Python model thiếu Flask gây5 lỗi import ở các
-test snapshot tích hợp. Đã chạy lại đủ129 bài bằng Python Backend và đạt;
+test snapshot tích hợp. Đã chạy lại đủ 129 bài bằng Python Backend và đạt;
 không cài thêm package hoặc đổi môi trường model để che lỗi môi trường.
 Native storage được thay bằng mock ở unit test; chưa chứng minh trên thiết bị.
 
-## Lượt nghiệm thu ngày06/11
+## Lượt nghiệm thu ngày 06/11
 
 Theo [runbook](FORECAST_MVP_MIDTERM_20261105.md), chạy launcher, cấu hình mobile
 trỏ đúng Backend, đăng nhập đúng tài khoản/kho. Kiểm trên thiết bị trình bày:

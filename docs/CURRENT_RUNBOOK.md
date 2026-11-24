@@ -24,7 +24,7 @@ entrypoint pilot API-only cho mobile, không mount UI/nạp YOLO/start worker.
 [Contract và guard kho](../backend/docs/MOBILE_FOLLOWUP_API.md). Các câu “không
 tự có pilot” bên dưới áp dụng core mặc định **khi không truyền --pilot-dir**.
 
-28/10/2026, UTC+7. [Chỉ mục](D:/AEGIS/docs/CURRENT_HANDOFF.md). Path dưới đúng
+28/10/2026, UTC+7. [Chỉ mục](CURRENT_HANDOFF.md). Path dưới đúng
 workspace hiện tại, không giả clone mới có pilot/AI/venv/checkpoint. TASK-19
 không cài package, bật kho thật, train hoặc nạp model để kiểm tài liệu.
 
@@ -55,7 +55,7 @@ trong phiên này. Đọc review Task19 cho kết quả mới, không mượn s�
 
 ## Core/mobile và AI thật
 
-[MOBILE_INTEGRATION](D:/AEGIS/docs/MOBILE_INTEGRATION.md) hướng dẫn client của
+[MOBILE_INTEGRATION](MOBILE_INTEGRATION.md) hướng dẫn client của
 nhóm. backend/serve_mobile.py dùng backend/mobile-instance riêng; backend/run.py
 dùng instance mặc định. Không tự có pilot extensions/controlled raw/worker.
 
@@ -76,8 +76,8 @@ TASK-19**:
 ```
 
 Lệnh nạp checkpoint thật, cần AI workspace/dependency/weights đã cấp. Giữ V4,
-Backend→AI qua HTTP, không import YOLO vào Backend. [Image API](D:/AEGIS/backend/docs/API.md)
-và [AI README](D:/AEGIS-AI/api/README.md) giữ hash/mapping/timing. Backend health
+Backend→AI qua HTTP, không import YOLO vào Backend. [Image API](../backend/docs/API.md)
+và AI README (`AEGIS-AI/api/README.md`, workspace AI ngoài repo) giữ hash/mapping/timing. Backend health
 không chứng minh AI/V4 đã nạp. Không tự thay checkpoint/threshold theo test.
 
 Pilot launcher chuẩn cũng nạp V4 thật:
@@ -91,7 +91,7 @@ README/JOURNAL_PILOT trước chọn kho, không trỏ backend/instance. Worker 
 --enable-mock-automation và owner job enabled; raw khay cần
 --enable-controlled-experiments cùng context. Không là cờ train/field forecast.
 Ctrl+C ở launcher của mình, kiểm cleanup; đóng browser không tự dừng server.
-Static example24/10 là lịch sử, thiếu bucket mới trả insufficient_data, không khỏe.
+Static example 24/10 là lịch sử, thiếu bucket mới trả insufficient_data, không khỏe.
 
 ## Temporal và backup
 
@@ -103,10 +103,10 @@ Set-Location D:\AEGIS-AI\temporal_warning
 Builder không train. Snapshot research v4 dùng research_bridge.py; converter
 legacy chỉ v1/v2. Raw export-v2 controlled khác research snapshot-v4; không đổi
 source/schema để ép vào dataset. 72h/24h vẫn đề xuất; field/expert/train chưa duyệt.
-[Temporal README](D:/AEGIS-AI/temporal_warning/README.md) có CLI/output mới.
+Temporal README (`AEGIS-AI/temporal_warning/README.md`, workspace AI ngoài repo) có CLI/output mới.
 
-[Backup runbook](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md): dừng mọi writer,
-đủ7DB/uploads/metadata, hai lease/manifest, restore đích mới. Không xóa WAL hoặc
+[Backup runbook](../frontend/PILOT_BACKUP_RESTORE.md): dừng mọi writer,
+đủ 7DB/uploads/metadata, hai lease/manifest, restore đích mới. Không xóa WAL hoặc
 sentinel để vượt lỗi. Ban đầu worker/controlled write off, kiểm login/ảnh/chain;
 retention là đề xuất, không TTL hoặc xóa tự động.
 
@@ -114,7 +114,7 @@ retention là đề xuất, không TTL hoặc xóa tự động.
 
 | Triệu chứng | Kiểm trước khi đổi client |
 |---|---|
-| Core trả404 environment-streams/review | Pilot extensions chưa bật ở entry point; không tự đổi source hoặc thêm vào core |
+| Core trả 404 environment-streams/review | Pilot extensions chưa bật ở entry point; không tự đổi source hoặc thêm vào core |
 | Controlled POST403 | Raw opt-in tắt; không đổi khay thành field_observed |
 | Owner khác404 | Kiểm tài khoản/vụ/ảnh đúng quyền, không gửi user_id để vượt Bearer |
 | Backend health200 nhưng detect503/504 | Kiểm AI URL/service, không retry POST mù |

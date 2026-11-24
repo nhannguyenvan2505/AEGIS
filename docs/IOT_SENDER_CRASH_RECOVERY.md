@@ -37,8 +37,8 @@ không phải49unit test độc lập.
 
 | Process | Điểm kiểm | Exit | Queue còn | Backend còn |
 |---|---|---|---|---|
-| Sender1 | Nhận ACK201 tạo mới, dừng trước local dequeue |77 |2phép đo nguyên gốc |1phép đo |
-| Sender2 | Gửi lại phép đo đầu, nhận ACK200 replay, dừng cùng điểm |77 |2phép đo nguyên gốc |Vẫn1phép đo |
+| Sender1 | Nhận ACK201 tạo mới, dừng trước local dequeue |77 |2 phép đo nguyên gốc |1 phép đo |
+| Sender2 | Gửi lại phép đo đầu, nhận ACK200 replay, dừng cùng điểm |77 |2 phép đo nguyên gốc |Vẫn1phép đo |
 | Sender3 | Khởi động mới, nhận replay cho đầu và persisted cho cuối |0 |0 |Đúng2phép đo |
 | Sender4 | Khởi động trên queue rỗng |0 |0, không gửi gì |Vẫn2phép đo |
 
@@ -87,7 +87,7 @@ Get-Content iot_sender_crash_20261104\manual01\summary.json
 
 Kỳ vọng script cha exit0, success=true, checks_passed=49,
 sender_runs[*].exit_code=[77,77,0,0],persisted_unique_samples=2,
-backend_stopped=true,forced_stop=false,temporary_store_cleaned=true.
+backend_stopped=true, forced_stop=false, temporary_store_cleaned=true.
 Exit77 của hai child là chủ đích, **không** phải exit code thành công của
 runner cha. So marker HTTP status201/200 và cùng payload hash; raw có đúng
 hai reading. Source UUID fixture ổn định, stream/owner/PID và received_at do

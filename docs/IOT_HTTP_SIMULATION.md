@@ -1,7 +1,7 @@
 # IOT-06 — mô phỏng HTTP, buffer và retry
 
 **Cập nhật sau IOT-06:** [IOT-07 đã kiểm sender process crash sau ACK trước
-dequeue](IOT_SENDER_CRASH_RECOVERY.md),49checkpoint đạt. Các giới hạn và câu
+dequeue](IOT_SENDER_CRASH_RECOVERY.md),49 checkpoint đạt. Các giới hạn và câu
 “chưa kiểm crash sender” bên dưới mô tả riêng lượt IOT-06, không phủ nhận
 bằng chứng bổ sung của IOT-07.
 
@@ -65,7 +65,7 @@ scheduler retry lâu dài. Sau retry_exhausted, caller phải chủ động mở
 
 Hàng lỗi đứng đầu làm dừng queue để tránh âm thầm bỏ dữ liệu. Task chưa có
 quarantine/skip/requeue UI. Capacity giới hạn số hàng; mỗi payload giới hạn
-60000byte. Không hứa hard quota file SQLite theo byte hoặc chống đầy đĩa.
+60000 byte. Không hứa hard quota file SQLite theo byte hoặc chống đầy đĩa.
 Outbox dùng SQLite synchronous=FULL; chưa có kiểm mất điện/hỏng đĩa/đa writer.
 
 Client chỉ chấp nhận origin HTTP IPv4 `127.0.0.1:port`, không proxy environment,
@@ -76,8 +76,8 @@ tạo stream synthetic trước khi gửi. Không dùng nó làm gateway thu th�
 
 ## Fault injection và kết quả thực chạy
 
-**run02 thành công:37/37checkpoint**,6raw duy nhất thuộc2stream/2vùng. Đây là
-37checkpoint của một bài acceptance, không phải37test độc lập.
+**run02 thành công:37/37checkpoint**,6 raw duy nhất thuộc2stream/2vùng. Đây là
+37 checkpoint của một bài acceptance, không phải37test độc lập.
 
 1. Mỗi node có hai hàng chờ. Thêm hàng thứ ba khi đầy bị từ chối và giữ hai
    hàng cũ. Hàng bị từ chối được generator giữ để enqueue lại khi buffer rỗng.
@@ -97,7 +97,7 @@ tạo stream synthetic trước khi gửi. Không dùng nó làm gateway thu th�
 7. Hai Backend process đều exit0, forced_stop=false; temp store cleaned=true.
    Snapshot source=synthetic, training_approved=false. Không gọi inference.
 
-9/9unit test đạt,0,210giây, exit0. Có session stub cho503/429/redirect/bad ACK
+9/9unit test đạt,0,210 giây, exit0. Có session stub cho503/429/redirect/bad ACK
 và backoff; **không gọi các ca stub này là lỗi503/429 thật trên mạng**. Log tại
 `iot_http_20261104/run02/sender_tests.log`. Test lần đầu có lỗi dọn fixture
 SQLite do connection chưa đóng trong chính test; đã sửa fixture bằng closing,
@@ -120,11 +120,11 @@ Set-Location D:\AEGIS
 Get-Content iot_http_20261104\manual01\summary.json
 ```
 
-Kỳ vọng exit0, success=true,checks_passed=37,persisted_unique_samples=6,
-temporary_store_cleaned=true,backend_stopped=true,forced_stop=false.
+Kỳ vọng exit0, success=true, checks_passed=37,persisted_unique_samples=6,
+temporary_store_cleaned=true, backend_stopped=true, forced_stop=false.
 Trong sender_results tìm lần lượt retry_exhausted/connection_unconfirmed,
 drained/replayed, drained/persisted và operator_required với409/400/401.
-`node0.raw.synthetic.json` và `node1.raw.synthetic.json` có3readings mỗi file.
+`node0.raw.synthetic.json` và `node1.raw.synthetic.json` có 3 readings mỗi file.
 
 Output trùng trả exit2. Lỗi khác trả exit1 và summary success=false, có
 failure_type hoặc failed_check đã lọc. Không dump token/full response vào log.

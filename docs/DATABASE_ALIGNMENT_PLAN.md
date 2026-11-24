@@ -6,6 +6,8 @@ Nguồn thiết kế: `D:/C1SE.21/C1SE.21_AEGIS_Database_Design.docx`, version 1
 
 ## 1. Hiện trạng và phạm vi
 
+> Đoạn dưới mô tả source trước cutover (09/11). Hiện hành: runtime mặc định MySQL + MongoDB; SQLite chỉ còn cho fixture test, migration và hàng đợi tại sender.
+
 Backend mặc định dùng SQLite qua `backend/app/storage.py`, `migrations.py`, `farm_schema.py`, `cultivation.py`. Factory `backend/app/__init__.py` gọi khởi tạo storage khi startup. Pilot có các kho SQLite riêng và chức năng forecast, journal, follow-up, research, automation ngoài schema lõi.
 
 Thiết kế đích gồm 18 bảng MySQL và 3 collection MongoDB. Chuyển đổi cần cả schema, truy vấn, xác thực, dữ liệu và vận hành. Việc tạo bảng mới chưa đồng nghĩa backend đã sử dụng bảng đó.
@@ -40,7 +42,7 @@ Thiết kế đích gồm 18 bảng MySQL và 3 collection MongoDB. Chuyển đ�
 
 - Giữ định danh API dạng chuỗi hiện tại qua bảng mapping legacy/external ID; ID số MySQL dùng nội bộ. Không ép UUID thành số hoặc thay đồng loạt ID mobile.
 - Bổ sung schema extension cho sessions, rate limits, inference idempotency, revisions, journal và workflow. Tài liệu chưa mô tả các phần này nhưng runtime hiện tại phụ thuộc vào chúng.
-- Tài liệu nêu bcrypt/JWT/OAuth2, code hiện dùng scrypt và opaque bearer session. Giữ khả năng xác minh hash cũ trong giai đoạn chuyển tiếp; chỉ rehash khi có mật khẩu hợp lệ lúc đăng nhập. OAuth2 cần provider/client configuration và là hạng mục riêng.
+- Tài liệu nêu bcrypt/JWT/OAuth2. Từ 15/11/2026 code dùng JWT (kèm session để thu hồi) và RBAC; mật khẩu vẫn hash scrypt, OAuth2 chưa có. Giữ khả năng xác minh hash cũ trong giai đoạn chuyển tiếp; chỉ rehash khi có mật khẩu hợp lệ lúc đăng nhập. OAuth2 cần provider/client configuration và là hạng mục riêng.
 - Không tự chuyển mock/synthetic thành dữ liệu thiết bị thật. Giữ source, provenance và các cờ validation trong mọi bản ghi chuyển đổi.
 - Catalog bệnh phải khớp checkpoint đang provision: README hiện nêu blast, brown spot, sheath blight; tài liệu có ví dụ Rice Hispa. Không thay class model chỉ để khớp ví dụ trong tài liệu.
 - MySQL và MongoDB không có transaction chung. Cần outbox/retry có idempotency cho inference log và summary, cùng trạng thái pending/failed quan sát được.
@@ -55,7 +57,7 @@ Thiết kế đích gồm 18 bảng MySQL và 3 collection MongoDB. Chuyển đ�
 | 3 | Storage repositories cho auth, farm, ảnh và detections | Hoàn thành; MySQL mặc định, UUID API giữ nguyên, core/pilot không mở SQLite |
 | 4 | Mongo ingest và AI logs, MySQL forecast/alerts | Hoàn thành cho tính năng hiện có: outbox idempotent, raw HTTP bytes, telemetry và AI logs; forecast/alerts/workflow chạy trên namespace MySQL; không giả score thành xác suất bệnh |
 | 5 | Export/import SQLite và manifest mapping | Hoàn thành dữ liệu runtime tìm thấy: source DB không đổi hash; core hợp nhất UUID, journal giữ từng namespace; ảnh SHA-256 khớp; quota/meta cũ được archive |
-| 6 | RBAC/reset password/catalog/settings/notifications | Schema đi cùng API và quyền truy cập; trạng thái chức năng được ghi rõ |
+| 6 | RBAC/reset password/catalog/settings/notifications | Một phần: JWT + RBAC farmer/admin, admin API và audit đã có (15/11, PR #9). Reset password, catalog, settings, notifications chưa làm |
 | 7 | Cutover runtime và runbook backup/restore | Hoàn thành; mặc định hybrid, backup/restore kiểm chứng 166 bảng MySQL và ba collection MongoDB, ảnh khớp hash |
 
 ## 5. Nguồn mã đã đối chiếu

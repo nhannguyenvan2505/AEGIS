@@ -1,6 +1,6 @@
 # Lịch dự báo và worker T06
 
-**Cập nhật T09 ngày08/11/2026:** run mới pin FM-03 weather cho nguồn đã lưu. Run pin cũ kết thúc `model_changed`; job enabled tiếp tục ở lịch kế tiếp với pin mới. [Chi tiết contract/provenance và tương thích lịch sử](RAW_WEATHER_FORECAST_T09.md). Các kết quả T06 bên dưới giữ mốc lịch sử FM-02.
+**Cập nhật T09 ngày 08/11/2026:** run mới pin FM-03 weather cho nguồn đã lưu. Run pin cũ kết thúc `model_changed`; job enabled tiếp tục ở lịch kế tiếp với pin mới. [Chi tiết contract/provenance và tương thích lịch sử](RAW_WEATHER_FORECAST_T09.md). Các kết quả T06 bên dưới giữ mốc lịch sử FM-02.
 
 T06 lưu lịch theo owner/stream và thực thi forecast T05 bằng worker riêng. Một run chọn nguồn hourly mới nhất đã available tại thời điểm tick, giữ cố định source ID, issued_at, job_version và model pin qua các lần retry. Kết quả insufficient_data được lưu như một lần xử lý thành công, với forecast_id để đọc lý do thiếu dữ liệu.
 
@@ -26,9 +26,9 @@ POST tạo lịch nhận đúng các trường sau.
 }
 ```
 
-Mỗi owner/stream có một job. interval_seconds là integer60–86400; enabled là boolean. UUID retry cùng nội dung tạo ban đầu trả200 cùng job hiện hành, nội dung khác hoặc tạo job khác cho cùng stream trả409. Tạo mới trả201, version1 và next_run_at bằng giờ server. Chỉ nguồn synthetic được hỗ trợ ở phiên bản này.
+Mỗi owner/stream có một job. interval_seconds là integer60–86400; enabled là boolean. UUID retry cùng nội dung tạo ban đầu trả 200 cùng job hiện hành, nội dung khác hoặc tạo job khác cho cùng stream trả 409. Tạo mới trả 201, version1 và next_run_at bằng giờ server. Chỉ nguồn synthetic được hỗ trợ ở phiên bản này.
 
-PUT nhận base_version, enabled và interval_seconds. Cập nhật thành công tăng version, đặt next_run_at bằng giờ server và hủy các run pending/retry của cấu hình cũ. Retry cùng cấu hình với base_version hiện hành hoặc version-1 trả200; stale khác nội dung trả409.
+PUT nhận base_version, enabled và interval_seconds. Cập nhật thành công tăng version, đặt next_run_at bằng giờ server và hủy các run pending/retry của cấu hình cũ. Retry cùng cấu hình với base_version hiện hành hoặc version-1 trả 200; stale khác nội dung trả 409.
 
 Lượt đã chuyển running có thể hoàn tất sau khi user tắt job. Nếu worker chết trước khi lưu forecast và job đã tắt, recovery chuyển lượt đó sang cancelled. Nếu forecast đã commit, recovery hoàn tất liên kết tới forecast đó. Job enabled là sự cho phép bền vững theo owner; logout hoặc token hết hạn vẫn giữ lịch. User tắt lịch bằng PUT enabled=false. Worker đọc owner từ DB và thực thi hàm T05 trong app context; credentials và Bearer token không nằm trong cấu hình job.
 
@@ -55,7 +55,7 @@ Thay8001 bằng forecast_worker_port của launcher. Có thể chạy worker FM-
 & D:\AEGIS\forecast_demo\.venv\Scripts\python.exe -u -B D:\AEGIS\forecast_demo\runtime\serve_synthetic_forecast.py --port 8001
 ```
 
-`--once` xử lý một poll rồi thoát. `--duration` giới hạn thời gian chạy, mặc định0 tiếp tục đến Ctrl+C. Poll cho phép5–3600giây, mặc định5. CLI in status và số run, trả1 cho lỗi SQLite khi chạy once; chế độ liên tục thử lại poll sau lỗi storage. Dừng giữa một lượt sẽ được khôi phục từ ledger ở lần chạy tiếp.
+`--once` xử lý một poll rồi thoát. `--duration` giới hạn thời gian chạy, mặc định0 tiếp tục đến Ctrl+C. Poll cho phép5–3600 giây, mặc định5. CLI in status và số run, trả 1 cho lỗi SQLite khi chạy once; chế độ liên tục thử lại poll sau lỗi storage. Dừng giữa một lượt sẽ được khôi phục từ ledger ở lần chạy tiếp.
 
 Mỗi poll chọn tối đa100job đến hạn. Các mốc bị lỡ trong downtime được gộp thành một run tại giờ tick hiện tại; next_run_at đặt bằng giờ tick cộng interval. Một job có tối đa một run pending/retry/running. Khi active run đang chờ retry, job hoàn tất active run trước khi tạo lượt mới. Worker đọc nguồn hourly T04 đã lưu; nguồn mới được cấp qua API T04 và sẽ được chọn ở lượt sau.
 
@@ -65,7 +65,7 @@ StoreLease `.automation.lock` bao phủ toàn poll, tuần tự hóa hai tiến 
 
 Các bảng forecast_jobs, forecast_runs và forecast_attempts nằm trong telemetry.sqlite3, có FK, unique run theo job/scheduled_at/job_version và unique active run theo job. Claim run và attempt được commit trước khi gọi T05. Forecast/input/source link dùng transaction T05. Run completion được ghi sau đó.
 
-Các lỗi model_unavailable, forecast_timeout và forecast_invalid_response được retry tối đa3attempt, gồm lần đầu. Backoff lần lượt30 và60giây sau các lỗi trước. SQLite error trong bước xử lý được thử lại có giới hạn; validation, scope, hash hoặc model pin thay đổi chuyển failed. Khi thiếu nguồn hourly tại tick, run skipped với hourly_source_missing và0attempt. Các khoảng chờ chỉ ghi vào next_attempt_at; worker tiếp tục xử lý job khác ở poll sau.
+Các lỗi model_unavailable, forecast_timeout và forecast_invalid_response được retry tối đa3attempt, gồm lần đầu. Backoff lần lượt30 và 60 giây sau các lỗi trước. SQLite error trong bước xử lý được thử lại có giới hạn; validation, scope, hash hoặc model pin thay đổi chuyển failed. Khi thiếu nguồn hourly tại tick, run skipped với hourly_source_missing và 0 attempt. Các khoảng chờ chỉ ghi vào next_attempt_at; worker tiếp tục xử lý job khác ở poll sau.
 
 Recovery nhận diện run running sau khi đã lấy được lease độc quyền. Nó gọi T05 ở chế độ chỉ tìm record đã lưu. Nếu forecast đã commit, run succeeded và attempt recovered, giữ cùng forecast_id. Nếu chưa có forecast, attempt interrupted và run retry hoặc failed khi đã hết3attempt. Nhờ đó crash sau forecast commit vẫn được đối soát ở attempt cuối mà không cần model worker còn hoạt động.
 
@@ -75,7 +75,7 @@ Nếu model pin của run khác pin hiện hành, run failed với model_changed
 
 Test tại `frontend/test_forecast_scheduler.py` dùng worker FM-02 thật, đồng hồ fixture và kho tạm. Các ca bao gồm lịch đến hạn, dedup với T05 manual, quyền hai tài khoản, bật/tắt/version, retry3lần, source pinning, lease cạnh tranh, crash trước/sau forecast commit, recovery ở attempt cuối, logout, thiếu source, downtime coalescing, CLI once và duration.
 
-Một ca riêng chạy process con và dùng os._exit(73) sau forecast commit để mô phỏng process crash thực tế. Parent xác nhận run còn running, lấy lại OS lease và recovery về succeeded với đúng một forecast khi model port không khả dụng. Log tại `hourly_contract_v1/t06_process_crash.log`. Hồi quy trước đó đạt206bài pilot và120bài Backend; ca process crash bổ sung chạy riêng và đạt.
+Một ca riêng chạy process con và dùng os._exit(73) sau forecast commit để mô phỏng process crash thực tế. Parent xác nhận run còn running, lấy lại OS lease và recovery về succeeded với đúng một forecast khi model port không khả dụng. Log tại `hourly_contract_v1/t06_process_crash.log`. Hồi quy trước đó đạt206bài pilot và 120 bài Backend; ca process crash bổ sung chạy riêng và đạt.
 
 ```powershell
 Set-Location D:\AEGIS\frontend

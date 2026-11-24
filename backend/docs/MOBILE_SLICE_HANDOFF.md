@@ -4,7 +4,7 @@ Cập nhật 03/11 sau mục91: người dùng nhận triển khai client; sourc
 đã có slice tối thiểu tại tab Cảnh báo, xem [hướng dẫn client](../../mobile/FOLLOWUP_INTEGRATION.md).
 Đã kiểm controller/API qua HTTP và Android bundle export; chưa nghiệm thu giao
 diện/native trên thiết bị hoặc ký nhận thay nhóm. Các gói đã tạo trước lượt này
-giữ nguyên; trạng thái chuẩn bị Backend ngày02/11 dưới đây là mốc lịch sử.
+giữ nguyên; trạng thái chuẩn bị Backend ngày 02/11 dưới đây là mốc lịch sử.
 
 02/11/2026, UTC+7. **Phần Backend đã chuẩn bị; nhóm mobile chưa xác nhận nhận scope.**
 Tài liệu này không xác nhận đã gửi, đã tích hợp hoặc đã nghiệm thu trên điện thoại.
@@ -88,15 +88,15 @@ Cập nhật 03/11/2026 sau H2-T01: list nhận một filter `state` tùy chọn
 `open`, `acknowledged`, `checked` hoặc `closed`. Ví dụ `?state=checked&page=1&page_size=20`.
 Không truyền filter giữ danh sách cũ. `total/total_pages/has_next` tính sau lọc;
 trang vượt hoặc tập lọc rỗng trả `items=[]`. Không cộng số case trên trang thành
-tổng toàn mùa. Filter sai/rỗng/lặp trả400 `invalid_followup_filter`, không tự bỏ
+tổng toàn mùa. Filter sai/rỗng/lặp trả 400 `invalid_followup_filter`, không tự bỏ
 filter để hiển thị mọi case thay cho lỗi. Query/phân trang khác sai vẫn400
 `invalid_pagination`. Các list route khác không tự hỗ trợ state.
 
-Nhóm cần kiểm riêng default, bốn state, trang2, tập rỗng và400; refresh khi case
+Nhóm cần kiểm riêng default, bốn state, trang2, tập rỗng và 400; refresh khi case
 đổi state vì offset pagination không giữ snapshot giữa các request. `state=checked`
 không đồng nghĩa `needs_recheck=false`. Filter không bắt buộc nhóm mở thêm màn hình.
-Fixture HTTP v2 ngày02/11 không chứa request filter mới; bằng chứng kiểm H2-T01
-ngày03/11 được giữ riêng, không gọi fixture cũ là lượt chạy mới.
+Fixture HTTP v2 ngày 02/11 không chứa request filter mới; bằng chứng kiểm H2-T01
+ngày 03/11 được giữ riêng, không gọi fixture cũ là lượt chạy mới.
 
 | Bước | Request hoặc dữ liệu | Kết quả cần quan sát |
 |---|---|---|

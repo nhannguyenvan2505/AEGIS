@@ -25,7 +25,7 @@ MySQL có 18 bảng thiết kế gốc và các bảng mở rộng giữ session
 
 Để giữ API/hourly hiện hành, MySQL còn giữ projection của raw readings và forecast snapshots. MongoDB giữ transport payload, telemetry document và full validated inference output. Đây là phần mở rộng tương thích của thiết kế, không phải chỉ đổi tên 18 bảng rồi bỏ lịch sử cũ. Các forecast có score chưa calibration tiếp tục giữ nguyên semantics; không tự chuyển thành xác suất bệnh trong risk_predictions.
 
-Role farmer được gán cho tài khoản mới. Xác thực hiện hành vẫn dùng hash mật khẩu Werkzeug và opaque Bearer session. JWT/OAuth2, enforcement RBAC đầy đủ, reset password và push notifications là các chức năng riêng chưa được bổ sung bởi việc chuyển storage này.
+Role farmer được gán cho tài khoản mới. Từ 15/11/2026 xác thực dùng JWT HS256 kèm session digest để thu hồi, và RBAC farmer/admin đọc role từ DB ([JWT_RBAC](../backend/docs/JWT_RBAC.md)); admin đầu tiên cấp bằng `flask bootstrap-admin`. Mật khẩu vẫn hash Werkzeug/scrypt. OAuth2, reset password và push notifications chưa được bổ sung.
 
 SQLite chỉ còn phục vụ migration, fixtures/evidence cũ và hàng đợi ngoại tuyến tại simulator/IoT sender. Hàng đợi tại sender độc lập với database server để có thể đệm dữ liệu khi mất mạng.
 

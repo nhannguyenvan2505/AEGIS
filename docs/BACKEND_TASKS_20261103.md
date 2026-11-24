@@ -7,17 +7,17 @@ Mỗi lượt ưu tiên một task triển khai, có review và điểm kết th
 Thứ tự: BE-01 -> BE-02 -> BE-03. BE-04/05 chỉ mở khi đủ điều kiện;
 chúng không chặn hoàn thiện Backend mock/ảnh hiện có.
 
-Tiến độ cập nhật04/11/2026:
+Tiến độ cập nhật 04/11/2026:
 
 - Ưu tiên theo yêu cầu midterm mới: [tổng duyệt luồng demo](MIDTERM_REHEARSAL_20261104.md)
-  đã đạt30checkpoint với AI thật và36checkpoint fallback; tiếp theo kiểm bằng
+  đã đạt30checkpoint với AI thật và 36 checkpoint fallback; tiếp theo kiểm bằng
   giao diện/thiết bị sẽ trình bày. Không thay mã/ý nghĩa BE-04 hoặc BE-05.
 
-- BE-01 đạt ngày03/11, xem backend/docs/FARM_JSON_VALIDATION.md.
-- BE-02 đạt batch S2 ngày04/11, xem [audit pilot](BE02_PILOT_AUDIT_20261104.md):
-  đọc38Python pilot,140test đạt và26bước acceptance kho tạm; không sửa runtime.
-- BE-03 đạt S3 ngày04/11: [bàn giao mobile/API](BE03_MOBILE_API_HANDOFF_20261104.md),
-  typecheck/lint,23unit và2bài HTTP đạt; không sửa runtime, native chưa nghiệm thu.
+- BE-01 đạt ngày 03/11, xem backend/docs/FARM_JSON_VALIDATION.md.
+- BE-02 đạt batch S2 ngày 04/11, xem [audit pilot](BE02_PILOT_AUDIT_20261104.md):
+  đọc38Python pilot,140 test đạt và 26 bước acceptance kho tạm; không sửa runtime.
+- BE-03 đạt S3 ngày 04/11: [bàn giao mobile/API](BE03_MOBILE_API_HANDOFF_20261104.md),
+  typecheck/lint,23 unit và 2 bài HTTP đạt; không sửa runtime, native chưa nghiệm thu.
 - BE-04/05 tiếp tục chờ điều kiện. Khảo sát tổng thể còn S4/S5; không tự mở train,
   sensor adapter hoặc feature khác để thay đầu vào đang thiếu.
 
@@ -32,7 +32,7 @@ Tiến độ cập nhật04/11/2026:
   backend/docs/FARM_JSON_VALIDATION.md. Giữ các sửa đổi sẵn có trong farm.py.
 - DB: không đổi schema/migration; không chạy runtime DB thật.
 - API: method/path hiện có giữ nguyên. JSON quá sâu ->400 invalid_json cùng envelope
-  success=false/error/request_id; Content-Type sai415, quá64KiB413, quota429,
+  success=false/error/request_id; Content-Type sai415, quá 64KiB413, quota429,
   thiếu auth401 theo contract cũ. Không đưa chi tiết decoder/body vào lỗi/log.
 - Quy tắc: require_auth trước parse; quota ghi giữ nguyên; không tạo plot/season/
   telemetry/revision/event khi body bị từ chối. Payload hợp lệ vẫn tạo/đọc được.
@@ -46,7 +46,7 @@ Tiến độ cập nhật04/11/2026:
 
 ## BE-02 — Hoàn tất khảo sát nghiệp vụ pilot và kiểm liên kết module
 
-**Đã nghiệm thu04/11/2026** trong phạm vi task; không đồng nghĩa đã đọc toàn dự án.
+**Đã nghiệm thu 04/11/2026** trong phạm vi task; không đồng nghĩa đã đọc toàn dự án.
 Ma trận, bằng chứng, giới hạn và lệnh chạy lại ở [review BE-02](BE02_PILOT_AUDIT_20261104.md).
 
 - Mục tiêu: chốt luồng assessment -> follow-up -> check dựa trên evidence đúng
@@ -66,7 +66,7 @@ Ma trận, bằng chứng, giới hạn và lệnh chạy lại ở [review BE-0
 
 ## BE-03 — Chốt bàn giao MVP API và dữ liệu thực/demo theo từng màn
 
-**Đã nghiệm thu04/11/2026** trong phạm vi bàn giao local; chưa là native sign-off.
+**Đã nghiệm thu 04/11/2026** trong phạm vi bàn giao local; chưa là native sign-off.
 [Review và ma trận BE-03](BE03_MOBILE_API_HANDOFF_20261104.md) ghi source/API,
 kiểm mới, khoảng thiếu client và task có điều kiện tiếp theo.
 
