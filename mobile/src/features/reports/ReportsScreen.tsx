@@ -74,24 +74,24 @@ function ReportSession() {
   return <ProfilePage title="Báo cáo thống kê" backTo="/profile">
     <Pressable testID="report-select-plot" accessibilityRole="button" accessibilityLabel="Chọn ruộng báo cáo" disabled={!!exporting}
       onPress={() => setSheet('plot')} style={({ pressed }) => [s.reportPlotSelect, pressed && s.profilePressed]}>
-      <Icon name="feather" color="#18a79c" size={24} /><View style={s.profileGrow}><Text style={s.reportPlotName}>{plot?.name ?? (workspace.loading || plotsResource.loading ? 'Đang tải ruộng…' : 'Chọn ruộng')}</Text>
+      <Icon name="feather" color="#0b7a54" size={24} /><View style={s.profileGrow}><Text style={s.reportPlotName}>{plot?.name ?? (workspace.loading || plotsResource.loading ? 'Đang tải ruộng…' : 'Chọn ruộng')}</Text>
         <Text style={s.reportMuted}>{plot ? [plot.area_ha === null ? 'Chưa nhập diện tích' : `${reportNumber(plot.area_ha)} ha`, plot.location_text || farm?.name].filter(Boolean).join(' · ') : 'Chọn nông trại và ruộng cần tổng hợp'}</Text></View>
-      <Icon name="chevron-down" color="#596c8a" size={20} />
+      <Icon name="chevron-down" color="#566a63" size={20} />
     </Pressable>
     <View><Text style={s.reportPeriodLabel}>Kỳ báo cáo</Text>
       <Pressable testID="report-select-period" accessibilityRole="button" accessibilityLabel="Chọn kỳ báo cáo" disabled={!!exporting}
         onPress={() => setSheet('period')} style={({ pressed }) => [s.reportPeriodSelect, pressed && s.profilePressed]}>
-        <Icon name="calendar" color="#7789aa" size={19} /><Text style={s.reportPeriodValue}>{reportRangeLabel(range)}</Text><Icon name="chevron-down" color="#596c8a" size={19} />
+        <Icon name="calendar" color="#566a63" size={19} /><Text style={s.reportPeriodValue}>{reportRangeLabel(range)}</Text><Icon name="chevron-down" color="#566a63" size={19} />
       </Pressable>
     </View>
-    {report?.asOf && !loading && <View style={s.reportAsOf}><Icon name="check-circle" size={16} color="#18a79c" /><Text style={s.reportMuted}>Đến {reportTimestamp(report.asOf)}{report.source === 'preview' ? ' · Dữ liệu minh họa' : ''}</Text></View>}
+    {report?.asOf && !loading && <View style={s.reportAsOf}><Icon name="check-circle" size={16} color="#0b7a54" /><Text style={s.reportMuted}>Đến {reportTimestamp(report.asOf)}{report.source === 'preview' ? ' · Dữ liệu minh họa' : ''}</Text></View>}
     {!!problem && <><ProfileNotice message={problem} /><ProfileButton title="Thử tải lại báo cáo" outline onPress={retry} /></>}
 
     {loading && <View testID="report-loading" style={s.reportLoading}>
-      <ActivityIndicator color="#18a79c" /><View style={s.profileGrow}><Text style={s.reportPlotName}>Đang tổng hợp báo cáo</Text><Text style={s.reportMuted}>{plot?.name ?? 'Ruộng của bạn'} · {reportRangeLabel(range)}</Text></View>
+      <ActivityIndicator color="#0b7a54" /><View style={s.profileGrow}><Text style={s.reportPlotName}>Đang tổng hợp báo cáo</Text><Text style={s.reportMuted}>{plot?.name ?? 'Ruộng của bạn'} · {reportRangeLabel(range)}</Text></View>
     </View>}
     {!loading && !problem && !hasData && <View testID="report-empty" style={s.reportEmpty}>
-      <Icon name="bar-chart-2" size={38} color="#22b1a5" /><Text style={s.reportEmptyTitle}>Chưa có dữ liệu báo cáo</Text>
+      <Icon name="bar-chart-2" size={38} color="#0b7a54" /><Text style={s.reportEmptyTitle}>Chưa có dữ liệu báo cáo</Text>
       <Text style={s.reportEmptyText}>{plot?.name ?? 'Ruộng của bạn'} · {reportRangeLabel(range)}. Hãy thử chọn ruộng khác hoặc mở rộng khoảng ngày.</Text>
       <ProfileButton title="Đổi ruộng hoặc kỳ báo cáo" outline onPress={() => setSheet(plot ? 'period' : 'plot')} />
     </View>}
@@ -102,7 +102,7 @@ function ReportSession() {
         {reportMetrics.map(metric => <EnvironmentChart key={metric.key} metric={metric} points={report.points} />)}
         <Text style={s.reportFootnote}>Lượng mưa tích lũy 24 giờ. Biểu đồ hiển thị tối đa 7 mốc đại diện trong kỳ.</Text>
       </ReportCard>
-      <ReportCard title="Khám lúa bằng AI" action={<Pressable accessibilityRole="button" accessibilityLabel="Mở khám lúa bằng ảnh" onPress={() => router.push('/diagnosis')} style={s.reportIconAction}><Icon name="maximize" size={19} color="#18a79c" /></Pressable>}>
+      <ReportCard title="Khám lúa bằng AI" action={<Pressable accessibilityRole="button" accessibilityLabel="Mở khám lúa bằng ảnh" onPress={() => router.push('/diagnosis')} style={s.reportIconAction}><Icon name="maximize" size={19} color="#0b7a54" /></Pressable>}>
         <Text style={s.reportMuted}>{totals.scans} lần đánh giá ảnh trong kỳ</Text>
         <View style={s.reportAiStats}><View style={s.reportAiStat}><Text style={s.reportAiCount}>{totals.suspected}</Text><Text style={s.reportMuted}>Nghi ngờ đạo ôn lá</Text></View>
           <View style={s.reportAiStat}><Text style={s.reportAiCount}>{totals.unclear}</Text><Text style={s.reportMuted}>Chưa thấy dấu hiệu rõ</Text></View></View>
@@ -117,13 +117,13 @@ function ReportSession() {
         <View style={s.reportSummaryRow}><Text style={s.reportMuted}>Ưu tiên tại {plot?.name}</Text><Text style={s.reportSummaryValue}>{totals.alerts} cảnh báo</Text></View>
         <View style={s.reportSummaryRow}><Text style={s.reportMuted}>Chưa đọc</Text><Text style={s.reportSummaryValue}>{totals.unread} thông báo</Text></View>
         {report.alerts.length ? <Pressable testID="report-open-alerts" accessibilityRole="button" onPress={() => setSheet('alerts')} style={s.reportAlertLink}>
-          <Text style={s.reportAlertLinkText}>{report.alerts.at(-1)!.title} · {reportDate(reportDay(Date.parse(report.alerts.at(-1)!.at)), true)}</Text><Icon name="chevron-right" size={20} color="#18a79c" />
+          <Text style={s.reportAlertLinkText}>{report.alerts.at(-1)!.title} · {reportDate(reportDay(Date.parse(report.alerts.at(-1)!.at)), true)}</Text><Icon name="chevron-right" size={20} color="#0b7a54" />
         </Pressable> : <Text style={s.reportFootnote}>Không có cảnh báo trong kỳ đã chọn.</Text>}
       </ReportCard>
-      <ReportCard title="Xem trước báo cáo" action={<Icon name="file-text" size={20} color="#18a79c" />}>
+      <ReportCard title="Xem trước báo cáo" action={<Icon name="file-text" size={20} color="#0b7a54" />}>
         <ReportPaper report={report} compact />
         <Pressable testID="report-open-preview" accessibilityRole="button" onPress={() => setPreview(report)} style={s.reportPreviewLink}>
-          <Text style={s.reportAlertLinkText}>Xem toàn bộ 2 trang</Text><Icon name="maximize-2" size={19} color="#18a79c" />
+          <Text style={s.reportAlertLinkText}>Xem toàn bộ 2 trang</Text><Icon name="maximize-2" size={19} color="#0b7a54" />
         </Pressable>
       </ReportCard>
     </>}

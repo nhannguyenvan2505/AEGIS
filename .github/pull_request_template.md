@@ -1,18 +1,30 @@
-## Vấn đề và thay đổi
+## Issue và mục tiêu
 
-Closes #<issue>
+Refs #<issue> (thay bằng issue thật).
 
-Mô tả hành vi trước/sau và phạm vi thay đổi.
+Hành vi trước/sau và phạm vi:
+
+## Nhánh và tích hợp
+
+- Nhánh đích và lý do:
+- Release/hotfix: PR đồng bộ main/develop, release đang mở và tag liên quan:
 
 ## Kiểm tra
 
 - Lệnh đã chạy và kết quả:
+- Bằng chứng/ảnh chụp nếu đổi giao diện (loại secrets và dữ liệu riêng):
 - Giới hạn/chưa kiểm tra:
 
-## Review
+## Rủi ro và bàn giao
 
-- [ ] Đã tự xem diff, không có secrets, dữ liệu runtime hay model/dataset lớn.
-- [ ] Tiêu chí issue được đáp ứng; tài liệu liên quan đã cập nhật.
-- [ ] Đã có một thành viên khác review trước khi merge.
+- Rủi ro/cách hoàn tác:
+- Migration, cấu hình hoặc việc thành viên khác cần làm sau merge:
 
-Rủi ro và cách hoàn tác (nếu có):
+## Checklist
+
+- [ ] Đúng phạm vi issue, tên nhánh và đích PR theo CONTRIBUTING.md.
+- [ ] Đã tự đọc diff, dọn debug/dead code; không có secrets/runtime data/dataset/weights.
+- [ ] Đã chạy kiểm tra phù hợp và ghi kết quả thực tế.
+- [ ] Đã ghi kết quả AI/bot review nếu nhóm đã cấu hình công cụ đó.
+- [ ] Đã chọn assignee và reviewer độc lập đã nhận việc.
+- [ ] Trước merge: approval độc lập, check đạt, người nhận xét xác nhận resolve.

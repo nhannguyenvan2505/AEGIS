@@ -94,6 +94,13 @@ def migrate_core(repo,path,data,uploads,report):
         if actual is None or any(actual.get(k)!=v for k,v in expected.items()):
             raise RuntimeError('Destination reconciliation failed: '+label)
     for row in data.get('users',[]):
+        # SQLite migration 6 adds role/status. Roles are never migrated: the first
+        # admin is granted only by the audited bootstrap-admin CLI.
+        if row.get('status','active')!='active':
+            raise RuntimeError('Inactive/locked legacy user requires manual migration')
+        if row.get('role','farmer')!='farmer':
+            report['legacy_roles_not_migrated']=report.get('legacy_roles_not_migrated',0)+1
+        row={key:row[key] for key in ('id','email','password_hash','created_at')}
         actual=repo.one('SELECT external_id id,email,password_hash,UNIX_TIMESTAMP(created_at) created_at FROM users WHERE external_id=%s',(row['id'],))
         if actual: assert_equal(actual,row,'users')
         else:

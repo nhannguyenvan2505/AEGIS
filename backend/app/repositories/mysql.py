@@ -64,6 +64,9 @@ def check_schema(config):
         row=repo.one('SELECT status FROM schema_versions WHERE version=5')
         if not row or row['status']!='complete':
             raise RuntimeError('Apply MySQL migration 005_farm_hierarchy.sql before selecting mysql')
+        row=repo.one('SELECT status FROM schema_versions WHERE version=6')
+        if not row or row['status']!='complete':
+            raise RuntimeError('Apply MySQL migration 006_outbox_delivery.sql (database/apply_hybrid.py) before selecting mysql')
 
 
 # Projections expose exactly the UUID/ISO strings expected by the existing API.
@@ -142,7 +145,8 @@ class MySQLRepository:
         return row['pk']
 
     def user_by_email(self, email):
-        return self.one("SELECT external_id id,email,password_hash FROM users WHERE email=%s AND status='active'", (email,))
+        return self.one("""SELECT u.external_id id,u.email,u.password_hash,r.role_name role
+            FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.email=%s AND u.status='active'""", (email,))
 
     def add_user(self, identifier, email, password_hash, created_at):
         if not self.one("SELECT role_id FROM roles WHERE role_name='farmer'"):
@@ -152,8 +156,32 @@ class MySQLRepository:
             (identifier,email,identifier,password_hash,datetime.fromtimestamp(created_at,timezone.utc).replace(tzinfo=None)))
 
     def session_user(self, token_hash, now):
-        return self.one('''SELECT u.external_id id,u.email FROM sessions s JOIN users u ON u.user_id=s.user_id
+        return self.one('''SELECT u.external_id id,u.email,r.role_name role FROM sessions s JOIN users u ON u.user_id=s.user_id
+            JOIN roles r ON r.role_id=u.role_id
             WHERE s.token_hash=%s AND s.expires_at>%s AND u.status='active' ''', (token_hash,now))
+
+    def admin_users(self, size, offset):
+        total = self.one('SELECT COUNT(*) n FROM users')['n']
+        rows = self.all('''SELECT u.external_id id,u.email,r.role_name role,u.status FROM users u
+            JOIN roles r ON r.role_id=u.role_id ORDER BY u.external_id LIMIT %s OFFSET %s''', (size, offset))
+        return total, rows
+
+    def role_user(self, identifier):
+        return self.one('''SELECT u.external_id id,u.email,r.role_name role,u.status FROM users u
+            JOIN roles r ON r.role_id=u.role_id WHERE u.external_id=%s''', (identifier,))
+
+    def active_admin_count(self):
+        return self.one("""SELECT COUNT(*) n FROM users u JOIN roles r ON r.role_id=u.role_id
+            WHERE r.role_name='admin' AND u.status='active'""")['n']
+
+    def set_user_role(self, identifier, role, actor_id, reason, created_at):
+        old = self.role_user(identifier)
+        self.execute('UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name=%s) WHERE external_id=%s',
+                     (role, identifier))
+        self.execute('''INSERT INTO audit_logs(user_id,action,entity_type,entity_id,details_json)
+            VALUES (%s,'user_role_changed','user',%s,%s)''',
+                     (self.uid(actor_id) if actor_id else None, identifier,
+                      json.dumps(dict(old_role=old['role'],new_role=role,reason=reason,recorded_at=created_at))))
 
     def add_session(self, token_hash, user_id, expires_at, now):
         self.execute('DELETE FROM sessions WHERE expires_at<=%s', (now,))
@@ -265,6 +293,28 @@ class MySQLRepository:
         self.execute('''INSERT INTO farm_fields(external_id,farm_id,user_id,field_name,crop_type,location_text,api_created_at,area_ha)
             VALUES (%s,%s,%s,%s,'rice',%s,%s,%s)''', (item['id'],farm,user,item['name'],item['location_text'],item['created_at'],area_ha))
         return dict(item, farm_id=farm_id, area_ha=area_ha)
+
+    def plot_summary(self, row):
+        return self.one('''SELECT f.external_id id,u.external_id user_id,h.external_id farm_id,
+            f.field_name name,f.location_text,f.area_ha,f.api_created_at created_at
+            FROM farm_fields f JOIN users u ON u.user_id=f.user_id
+            JOIN farms h ON h.farm_id=f.farm_id AND h.owner_user_id=f.user_id
+            WHERE f.external_id=%s AND u.external_id=%s''', (row['id'],row['user_id']))
+
+    def update_plot(self, fields):
+        user = self.uid(fields['user_id'])
+        self.execute('''UPDATE farm_fields SET field_name=%s,location_text=%s,area_ha=%s
+            WHERE external_id=%s AND user_id=%s''',
+            (fields['name'],fields['location_text'],fields['area_ha'],fields['id'],user))
+
+    def delete_plot(self, identifier, user_id):
+        field = self.pk('farm_plots',identifier,user_id)
+        owner = self.uid(user_id)
+        self.one('SELECT field_id FROM farm_fields WHERE field_id=%s AND user_id=%s FOR UPDATE', (field,owner))
+        if self.one('SELECT crop_cycle_id FROM crop_cycles WHERE field_id=%s LIMIT 1 FOR UPDATE', (field,)):
+            return False
+        self.execute('DELETE FROM farm_fields WHERE field_id=%s AND user_id=%s', (field,owner))
+        return True
 
     def add_season(self, item):
         field = self.pk('farm_plots',item['plot_id'],item['user_id'])

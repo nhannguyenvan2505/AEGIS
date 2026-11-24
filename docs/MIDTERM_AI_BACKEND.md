@@ -73,13 +73,13 @@ Nguồn source: [Backend factory](../backend/app/__init__.py),
 Chi tiết API: [core](../backend/docs/API.md), [farm](../backend/docs/FARM_WARNING_API.md),
 [follow-up](../backend/docs/MOBILE_FOLLOWUP_API.md),
 [actions](../backend/docs/MOBILE_ACTIONS.md), [recovery](../backend/docs/MOBILE_RECOVERY.md).
-Các dòng bổ sung sau28/10 lấy mốc mới ở mục86–89, không lấy ma trận cũ làm ngày hiện hành.
+Các dòng bổ sung sau 28/10 lấy mốc mới ở mục86–89, không lấy ma trận cũ làm ngày hiện hành.
 
 ## 4. Phương pháp và kết quả AI ảnh
 
 ### 4.1. Model và cách sử dụng
 
-V4 (YOLO11n, checkpoint baseline 50epoch) là model mặc định. Ảnh được xử lý
+V4 (YOLO11n, checkpoint baseline 50 epoch) là model mặc định. Ảnh được xử lý
 orientation EXIF; output bbox theo tọa độ pixel trên ảnh đã sửa orientation.
 Contract hiện dùng imgsz640 và confidence threshold0,25. V4, class mapping,
 threshold và split không bị thay đổi trong H6-T02. Boundary-r2 và FT25 giữ vai trò candidate.
@@ -88,11 +88,11 @@ Không có detection chỉ có nghĩa model không trả detection vượt đi�
 tại, không xác nhận cây khỏe. Confidence không phải xác suất bệnh đã hiệu chuẩn.
 Nguồn: [API ảnh](../backend/docs/API.md) và [AI service](../../AEGIS-AI/api/app.py).
 
-### 4.2. Thí nghiệm FT25 ngày30/10/2026
+### 4.2. Thí nghiệm FT25 ngày 30/10/2026
 
 FT25 khởi tạo từ trọng số V4 rồi train thêm25epoch mới, optimizer/scheduler reset;
 không gọi đây là resume liên tục epoch51–75. V4 và candidate được so sánh trên
-cùng1034ảnh/3161GT validation của nguồn, FP32,imgsz640,batch4,conf0.001,IoU0.7,max_det300.
+cùng1034 ảnh/3161GT validation của nguồn, FP32,imgsz640,batch4,conf0.001,IoU0.7,max_det300.
 Ngưỡng validator này khác ngưỡng hiển thị/API0,25; không trộn các loại metric.
 
 | Chỉ số validation | V4 | FT25 | Chênh lệch điểm phần trăm |
@@ -111,15 +111,15 @@ Metric được đọc/tính đối chiếu khi viết báo cáo; không chạy 
 
 ## 5. Dữ liệu môi trường và prototype IoT
 
-H3-T01 đã tiếp nhận CSV1000dòng gồm temperature,humidity,rainfall,soil_ph,disease
+H3-T01 đã tiếp nhận CSV1000dòng gồm temperature, humidity, rainfall, soil_ph, disease
 và Word đi kèm. Intake không phát hiện missing/nonfinite/duplicate/conflicting
 feature-label theo kiểm tra đã ghi; điều này không chứng minh nguồn/nhãn đúng.
 CSV thiếu timestamp, định danh thiết bị/ruộng/mùa vụ và metadata thu/gán nhãn.
 Nguồn/quyền chưa xác minh đầy đủ, H4-T01 vẫn một phần và đang tạm gác theo người dùng.
 
-Ngày02/11 có lượt train RandomForest theo yêu cầu riêng:200trees,max_depth8,
-min_samples_leaf2,seed42;800dòngtrain/200dòngđánh giá theo membership cũ.
-Đặc trưng là4cột môi trường; đầu ra4nhãn được cung cấp, gồm Healthy.
+Ngày 02/11 có lượt train RandomForest theo yêu cầu riêng:200trees, max_depth8,
+min_samples_leaf2,seed42;800 dòngtrain/200dòngđánh giá theo membership cũ.
+Đặc trưng là 4 cột môi trường; đầu ra4nhãn được cung cấp, gồm Healthy.
 
 | Chỉ số khớp nhãn CSV trên200dòng đánh giá đã dùng trước | Kết quả |
 |---|---:|
@@ -155,22 +155,22 @@ Nguồn: [temporal README](../../AEGIS-AI/temporal_warning/README.md),
 
 | Ngày / phiên | Kết quả lịch sử được phép trích | Giới hạn |
 |---|---|---|
-| 29/10 — H1-T01 | 300tests CPU trong env cài mới, cùng máy Windows | Không máy thứhai/GPU/field; không phải lượt vừa chạy ở H6-T02 |
-| 29/10 — H5-T01 | 9tests session mới +20liên quan đạt | Không native token/cache hoặc security audit |
-| 02/11 — H5-T03 | 2focused+2regression; crash boundary restore, fresh destination recovery | Không mất điện/hỏng đĩa thật; không RPO/RTO production |
-| 02/11 — H2-T02 | 8focused (gồm1HTTP) +15regression đạt | Không strict parser/native; projection chưa validate lựa chọn observation |
+| 29/10 — H1-T01 | 300 tests CPU trong env cài mới, cùng máy Windows | Không máy thứhai/GPU/field; không phải lượt vừa chạy ở H6-T02 |
+| 29/10 — H5-T01 | 9 tests session mới +20liên quan đạt | Không native token/cache hoặc security audit |
+| 02/11 — H5-T03 | 2 focused+2regression; crash boundary restore, fresh destination recovery | Không mất điện/hỏng đĩa thật; không RPO/RTO production |
+| 02/11 — H2-T02 | 8 focused (gồm1HTTP) +15regression đạt | Không strict parser/native; projection chưa validate lựa chọn observation |
 | 02/11 — H2-T04 actions | 35HTTP/191assertions từ source gói,2task_kind | Store synthetic dọn sau chạy; không IDs/account live |
-| 03/11 — H2-T01 | 6focused (gồm1HTTP) +11regression đạt;18tempdir sạch | Không fullsuite/native/freshinstall |
-| 03/11 — H2-T04 state package | Source152file,manifest177file;ZIP/extract/verify đạt | Lượt đóng gói không chạy runtime mới; nhóm chưa nhận scope |
+| 03/11 — H2-T01 | 6 focused (gồm1HTTP) +11regression đạt;18 tempdir sạch | Không fullsuite/native/freshinstall |
+| 03/11 — H2-T04 state package | Source152file, manifest177file;ZIP/extract/verify đạt | Lượt đóng gói không chạy runtime mới; nhóm chưa nhận scope |
 
 Không cộng các phiên thành số test độc lập hoặc dùng test pass rate làm accuracy bệnh.
 Nguồn: [H1 acceptance](../h1_t01_fresh_cpu_20261029/ACCEPTANCE.json),
 [session acceptance](../h5_t01_sessions_20261029/ACCEPTANCE.json),
 [restore acceptance](../h5_t03_restore_20261102/ACCEPTANCE.json),
 [actions acceptance](../h2_t02_actions_20261102/ACCEPTANCE.json),
-[fixture summary02/11](../h2_t04_actions_handoff_20261102/packaged_fixture01/summary.json),
-[filter acceptance03/11](../h2_t01_state_filter_20261103/ACCEPTANCE.json),
-[package acceptance03/11](../h2_t04_state_handoff_20261103/ACCEPTANCE.json).
+[fixture summary 02/11](../h2_t04_actions_handoff_20261102/packaged_fixture01/summary.json),
+[filter acceptance 03/11](../h2_t01_state_filter_20261103/ACCEPTANCE.json),
+[package acceptance 03/11](../h2_t04_state_handoff_20261103/ACCEPTANCE.json).
 
 ## 8. Phạm vi đóng góp và phối hợp
 

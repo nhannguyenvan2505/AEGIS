@@ -1,18 +1,18 @@
 # Tổng duyệt midterm — AI thật, Backend và client TypeScript
 
-Ngày04/11/2026, Asia/Bangkok. **Đạt tổng duyệt kỹ thuật tự động**: client
+Ngày 04/11/2026, Asia/Bangkok. **Đạt tổng duyệt kỹ thuật tự động**: client
 TypeScript của mobile -> Backend trong môi trường riêng -> AI V4 thật trên CUDA
 -> lưu/đọc lịch sử/ảnh -> bối cảnh môi trường mock -> follow-up/recheck/ownership.
 Đây chưa là nghiệm thu UI trên điện thoại hoặc phiên thao tác browser trực tiếp.
 
 ## 1. Kết quả thực chạy
 
-| Hạng mục | Kết quả ngày04/11 |
+| Hạng mục | Kết quả ngày 04/11 |
 |---|---|
 | Model |aegis-yolo11n-v4-50epochs; checkpoint đã nạp; device cuda:0 |
 | Danh tính checkpoint |SHA-256 1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a, đúng V4 đã chốt |
 | Ảnh demo |backend/postman/fixtures/sample.jpg; SHA-256 1a6f680e6945f56f89592d233a9ef3e16b764ee5a2df902ffa13d4971706c1d5 |
-| Kết quả ảnh |detection_found;1detection rice_blast; đây là output inference trên fixture, không xác nhận ground truth/accuracy thực địa |
+| Kết quả ảnh |detection_found;1 detection rice_blast; đây là output inference trên fixture, không xác nhận ground truth/accuracy thực địa |
 | Timing của lần ảnh này |AI processing5512,29ms; Backend->AI roundtrip5594,514ms. Không là SLA hoặc thống kê latency nhiều mẫu |
 | Luồng chính |**30/30 checkpoint đạt** qua Node chạy api.ts và FollowupController thật, HTTP loopback |
 | Phương án không GPU |**36/36 checkpoint đạt**, tools/demo_thesis.py; không nạp checkpoint, có replay synthetic, không train/forecast |
@@ -26,8 +26,8 @@ Evidence mới:
 - Logs client/Backend tại run01, AI/rehearsal log tại
   `D:/AEGIS/midterm_rehearsal_20261104_run01.log`.
 
-Các con số30/36 là checkpoint của hai kịch bản, không số ảnh, số unit test hoặc
-accuracy.140test BE-02 và23unit BE-03 giữ nguyên ngày/phạm vi riêng; không chạy
+Các con số 30/36 là checkpoint của hai kịch bản, không số ảnh, số unit test hoặc
+accuracy.140test BE-02 và 23 unit BE-03 giữ nguyên ngày/phạm vi riêng; không chạy
 lại toàn bộ chúng chỉ để tăng số kiểm thử của lượt này.
 
 ## 2. Thay đổi phục vụ chạy lại
@@ -54,15 +54,15 @@ lại toàn bộ chúng chỉ để tăng số kiểm thử của lượt này.
 3. Đọc history/detail, tải ảnh bằng Bearer và so hash bytes. User khác nhận404,
    không token nhận401. Ảnh sai nhận400 và không tạo analysis mới.
 4. Tạo device mock, nạp24bucket26°C/RH95%/leaf_wet=true. Replay bucket không
-   nhân đôi; rule trả advisory với is_mock=true,field_validated=false.
+   nhân đôi; rule trả advisory với is_mock=true, field_validated=false.
 5. Liên kết analysis thật vào assessment mock; tạo follow-up và observation
    synthetic/finding uncertain. Không lấy prediction làm nhãn quan sát bệnh.
 6. FollowupController chọn plot/season/case, đọc required/current, acknowledge,
    check. Sửa observation revision1->2; refresh thấy observation_changed.
-7. Close trước recheck bị409; check ý định mới rồi close được. Replay command
+7. Close trước recheck bị 409; check ý định mới rồi close được. Replay command
    acknowledge cũ giữ event cũ, item trả version hiện tại; assessment gốc không đổi.
 8. Owner khác không đọc được case. Logout thu hồi token; controller xóa view,
-   history bằng token cũ401. Cuối cùng server dừng và kho tạm được dọn.
+   history bằng token cũ 401. Cuối cùng server dừng và kho tạm được dọn.
 
 Ảnh và môi trường là hai nguồn độc lập: inference ảnh thật không biến số đo mock
 thành sensor thật; assessment advisory không là chẩn đoán hoặc xác suất bệnh.
@@ -81,7 +81,7 @@ $demoResult.client.steps | Format-Table name,passed
 ```
 
 Expected: success/ba cleanup flags=true, forced_backend_stop=false; model V4,
-device được ghi từ runtime thực tế;30step passed. Nếu run02 đã có, chọn run03,
+device được ghi từ runtime thực tế;30 step passed. Nếu run02 đã có, chọn run03,
 không ghi đè lịch sử. Lượt đầu load/warm model có thể chậm; chờ tiến trình hữu hạn,
 không coi chưa có summary là đã đạt. Script có timeout cho startup/Node/cleanup.
 
@@ -98,7 +98,7 @@ Có thể trình diễn phương án phần mềm không GPU, ghi đúng giới 
 Get-Content midterm_rehearsal_20261104/fallback02/summary.json -Raw | ConvertFrom-Json | Select-Object success,server_stopped,temporary_store_cleaned,checkpoint_loaded,training_performed
 ```
 
-Expected success/cleanup=true,checkpoint_loaded=false,training_performed=false.
+Expected success/cleanup=true, checkpoint_loaded=false, training_performed=false.
 Không nói fallback đang inference thật. Mô tả gốc: [THESIS_DEMO](THESIS_DEMO.md).
 
 ## 5. Lời dẫn demo khoảng5phút
@@ -108,8 +108,8 @@ Không nói fallback đang inference thật. Mô tả gốc: [THESIS_DEMO](THESI
 |0:00–0:45 |Sơ đồ mobile client -> Flask Backend -> AI service, SQLite/ảnh riêng |Backend xử lý nghiệp vụ/quyền/lưu trữ; model được nạp ở service riêng |
 |0:45–2:00 |Chạy rehearsal; xem model/device và kết quả ảnh |Một detection từ ảnh fixture; request ID/model hash/timing; không nói accuracy từ một ảnh |
 |2:00–2:45 |History/detail/private image và owner khác |Bytes ảnh giữ đúng;404 cho owner khác,401 không token; đây là kiểm Backend |
-|2:45–4:15 |Luồng môi trường mock và follow-up |24bucket -> advisory demo -> check -> sửa observation ->close409 ->recheck ->close |
-|4:15–5:00 |Kết quả/giới hạn/kế hoạch tiếp |30check đạt và cleanup; sensor/forecast/native chưa hoàn tất, ưu tiên tích hợp từng luồng |
+|2:45–4:15 |Luồng môi trường mock và follow-up |24 bucket -> advisory demo -> check -> sửa observation ->close409 ->recheck ->close |
+|4:15–5:00 |Kết quả/giới hạn/kế hoạch tiếp |30 check đạt và cleanup; sensor/forecast/native chưa hoàn tất, ưu tiên tích hợp từng luồng |
 
 Câu có thể dùng:
 
@@ -128,7 +128,7 @@ có thể dùng làm bề mặt thao tác local theo [frontend README](../fronte
 
 Mặc định kho tạm và port ngẫu nhiên; mở đúng URL launcher in ra. Tạo account/plot/
 season mới trong phiên đó; chọn ảnh fixture local và kiểm detect/history trước.
-Mẫu môi trường trên UI cũ dùng mốc24/10: mùa vụ demo phải bao phủ mốc này và phải
+Mẫu môi trường trên UI cũ dùng mốc 24/10: mùa vụ demo phải bao phủ mốc này và phải
 nói rõ đó là dữ liệu lịch sử mock, không số đo hiện tại. Làm follow-up/nhật ký
 synthetic theo contract, không dùng ảnh làm finding confirmed.
 

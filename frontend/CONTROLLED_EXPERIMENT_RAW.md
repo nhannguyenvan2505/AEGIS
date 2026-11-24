@@ -81,7 +81,7 @@ experiment_context canonical và source_policy:
 Provenance vẫn user_declared, calibration_verified=false. Reference bắt buộc
 chỉ hỗ trợ truy vết, không xác minh sự tồn tại/nội dung/quyền hoặc người ký.
 Đừng lưu thông tin liên hệ/token/giấy tờ riêng trực tiếp trong các trường này.
-Metadata bất biến: retry cùng UUID/nội dung trả200; khác context/source trả409;
+Metadata bất biến: retry cùng UUID/nội dung trả 200; khác context/source trả 409;
 tạo mới201. Đổi setup/đợt/quy trình đo cần stream mới với reference phù hợp.
 
 ## Lọc nguồn và contract cho mobile
@@ -102,7 +102,7 @@ nhất; không sửa HTML/JS/CSS hoặc viết màn hình mobile trong task này
 
 Giữ endpoint và payload cũ ở ENVIRONMENT_INGEST.md. POST records không nhận
 source/context riêng: mọi record thuộc đúng stream owner đã chọn. Gửi thêm
-source hoặc trộn payload vào batch bị400 và rollback toàn batch. Retry/value/
+source hoặc trộn payload vào batch bị 400 và rollback toàn batch. Retry/value/
 timestamp conflict, numeric/null/QC và server received/available giữ nguyên.
 
 Sample response controlled thêm declared_source=controlled_experiment và

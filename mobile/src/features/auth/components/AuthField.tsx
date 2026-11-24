@@ -18,7 +18,7 @@ export function AuthField({ label, icon, password = false, error, hint, variant,
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const theme = variant ? authThemes[variant] : undefined;
-  const iconColor = error ? '#be123c' : theme?.placeholder ?? '#64748b';
+  const iconColor = error ? '#b42318' : theme?.placeholder ?? '#566a63';
 
   return (
     <View style={s.authField}>
@@ -27,7 +27,7 @@ export function AuthField({ label, icon, password = false, error, hint, variant,
         s.authInputRow,
         theme && s.authPageInputRow,
         theme && { borderColor: theme.border },
-        focused && { borderColor: theme?.primary ?? '#059669' },
+        focused && { borderColor: theme?.primary ?? '#0b7a54' },
         !!error && s.authInputInvalid,
       ]}>
         {!theme && <Icon name={icon} size={19} color={iconColor} />}
@@ -35,9 +35,10 @@ export function AuthField({ label, icon, password = false, error, hint, variant,
           ref={ref}
           accessibilityLabel={label}
           accessibilityHint={error || hint}
-          placeholderTextColor={theme?.placeholder ?? '#94a3b8'}
-          selectionColor={theme?.primary ?? '#059669'}
+          placeholderTextColor={theme?.placeholder ?? '#7b8e87'}
+          selectionColor={theme?.primary ?? '#0b7a54'}
           underlineColorAndroid="transparent"
+          maxFontSizeMultiplier={1.05}
           autoCapitalize={inputProps.autoCapitalize ?? 'none'}
           autoCorrect={inputProps.autoCorrect ?? false}
           autoComplete={password ? 'off' : undefined}

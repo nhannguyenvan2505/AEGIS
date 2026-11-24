@@ -4,8 +4,8 @@
 đúng hash và chạy service từ checkout. Các lệnh absolute `D:/AEGIS-AI` bên dưới
 là nhật ký workstation, không phải đường dẫn dùng trong repo này.
 
-Current local handoff, 28/10/2026: [index](D:/AEGIS/docs/CURRENT_HANDOFF.md)
-and [runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md). Image service, temporal research
+Current local handoff, 28/10/2026: [index](../../docs/CURRENT_HANDOFF.md)
+and [runbook](../../docs/CURRENT_RUNBOOK.md). Image service, temporal research
 and pilot raw contracts are separate. A test-host label or mocked response
 does not establish this checkpoint was loaded. TASK-19 does not rerun GPU inference.
 

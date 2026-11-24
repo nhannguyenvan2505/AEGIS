@@ -2,7 +2,7 @@
 
 05/11/2026, Asia/Bangkok. **Đạt FM-01: dữ liệu/feature/split sẵn sàng cho thử
 baseline kỹ thuật**, chưa train hoặc gọi model. Người dùng đã chọn forecast
-synthetic làm MVP mobile cho09/11; không có phê duyệt thực địa/nghiên cứu từ
+synthetic làm MVP mobile cho 09/11; không có phê duyệt thực địa/nghiên cứu từ
 việc đó. Mọi dữ liệu ở đây do phần mềm tạo, không phải đo/nhãn bệnh thật.
 
 ## Mục tiêu và file thay đổi
@@ -24,15 +24,15 @@ Hợp đồng `aegis-synthetic-forecast-contract-v1`:
 | source / usage | synthetic / synthetic_demonstration |
 | crop / disease | rice / leaf_blast — chỉ tên mục tiêu của thế giới giả lập |
 | target_kind | synthetic_first_future_event |
-| Lookback |120bucket giờ trước issued_at |
-| Horizon |72giờ; khoảng `(issued_at,issued_at+72h]` |
+| Lookback |120 bucket giờ trước issued_at |
+| Horizon |72 giờ; khoảng `(issued_at,issued_at+72h]` |
 | Cohort | Đơn vị synthetic chưa có sự kiện ở thời điểm issued_at |
 | y=1 | Oracle generator có sự kiện đầu tiên trong cửa sổ tương lai |
 | y=0 | Không có sự kiện đó và đã quan sát đủ cửa sổ giả lập |
 | y=null | Future follow-up chưa đủ: censored; không đưa vào fit |
 | label_available_at | Sau khi đóng horizon cộng1giờ, cho cả positive/negative |
-| Feature contract | aegis-hourly-features-v1,61tên theo allowlist hiện có |
-| Quyền/phạm vi | synthetic_training_authorized=true; field_training_approved=false,field_validated=false |
+| Feature contract | aegis-hourly-features-v1,61 tên theo allowlist hiện có |
+| Quyền/phạm vi | synthetic_training_authorized=true; field_training_approved=false, field_validated=false |
 
 72h/120h và mọi hệ số generator là lựa chọn kỹ thuật demo, không là ngưỡng
 bệnh hoặc lead time đã được chứng minh. CORE-01 vẫn trả training_approved=false
@@ -41,13 +41,13 @@ của người dùng, không chuyển thành field training approval.
 
 ## Cách tạo thế giới giả lập
 
-Seed mặc định42.100cluster:60train,20validation,20test; mỗi cluster có2plot
+Seed mặc định42.100cluster:60train,20 validation,20 test; mỗi cluster có 2 plot
 dùng cùng logger/shared_environment. Mỗi plot-season có **một issue time**;
 hai plot dùng cùng weather realization nhưng có measurement noise/event RNG
 riêng. Hai plot chung môi trường luôn nằm cùng partition. Không coi200mẫu là
-200đơn vị môi trường độc lập hoặc là cỡ mẫu đủ nghiên cứu thực địa.
+200 đơn vị môi trường độc lập hoặc là cỡ mẫu đủ nghiên cứu thực địa.
 
-Mỗi world gồm120giờ history và72giờ future. T/RH có thành phần ngày/đêm,
+Mỗi world gồm120giờ history và 72 giờ future. T/RH có thành phần ngày/đêm,
 baseline theo cluster và nhiễu AR(1); wetness là trạng thái synthetic của cả
 bucket1h. Không chuyển một giá trị raw điểm đo thành trạng thái cả giờ.
 Context/sown_on cũng synthetic; source=user_declared bên trong chỉ để tương
@@ -76,9 +76,9 @@ chứng minh predictor không leakage; kiểm prediction invariance thuộc FM-0
 
 | Tập | Issue simulation time | Cutoff nhãn | Số cụm / mẫu đủ feature |
 |---|---|---|---|
-| Train |01–11/04/2026 theo seed | Không sau30/04 |60 /102 |
-| Validation |15–25/05/2026 theo seed | Không sau31/05 |20 /34 |
-| Test |15–25/06/2026 theo seed | Không sau30/06 |20 /34 |
+| Train |01–11/04/2026 theo seed | Không sau 30/04 |60 /102 |
+| Validation |15–25/05/2026 theo seed | Không sau 31/05 |20 /34 |
+| Test |15–25/06/2026 theo seed | Không sau 30/06 |20 /34 |
 
 Các mốc là timeline **giả lập cố định**, không phải giờ thu thật hôm nay.
 Plan có purge tối thiểu120giờ; history của validation không chạm vùng train,
@@ -99,11 +99,11 @@ Evidence đã chạy: `D:/AEGIS/fm01_synthetic_forecast_20261105/run02`.
 |---|---|---|
 | contract.json | Target/window/source/feature order/giới hạn | Metadata, không predictor |
 | inputs.synthetic.jsonl | sample_id + envelope hourly không nhãn | Chỉ qua prepare và chọn row.predictors |
-| feature_rows.synthetic.jsonl | sample_id,identity,issued/window,readiness,coverage,predictors/hash | Chỉ mapping predictors61field, không flatten cả row |
-| labels.synthetic.jsonl | sample_id,y,status,event_at,label_available_at,target_end,source=synthetic_oracle | Chỉ y làm target khi fit/evaluate, không inference input |
-| future_worlds.synthetic.jsonl |72bucket tương lai,first_event_at,followup_end | Chỉ oracle/kiểm nhãn, tuyệt đối không predictor |
+| feature_rows.synthetic.jsonl | sample_id, identity, issued/window, readiness, coverage, predictors/hash | Chỉ mapping predictors61field, không flatten cả row |
+| labels.synthetic.jsonl | sample_id, y, status, event_at, label_available_at, target_end, source=synthetic_oracle | Chỉ y làm target khi fit/evaluate, không inference input |
+| future_worlds.synthetic.jsonl |72 bucket tương lai, first_event_at, followup_end | Chỉ oracle/kiểm nhãn, tuyệt đối không predictor |
 | metadata.synthetic.jsonl | Partition/cụm/case/identity/issue | Join/audit, không predictor |
-| split_manifest.json | Plan,registry,selected sample_ids,excluded/reasons,group audit,class counts | Dùng membership đã chốt; không chia lại row |
+| split_manifest.json | Plan, registry, selected sample_ids, excluded/reasons, group audit, class counts | Dùng membership đã chốt; không chia lại row |
 | dataset_manifest.json | Schema/seed/contract hash/file SHA256/counts/flags | Verify trước đọc/fit |
 | input_ready/insufficient.synthetic.json | Hai request feature mẫu thực sự hợp lệ | Không chứa nhãn |
 | features_ready/insufficient.synthetic.json | Output thực chạy của prepare cho hai request trên | Chưa phải forecast/model output |
@@ -112,16 +112,16 @@ Join theo sample_id, không theo thứ tự dòng. FM-02 chỉ fit các ID trong
 split_manifest.partitions.train, chọn đúng predictors allowlist61field và y.
 Validation dùng để chọn chính sách/threshold nếu cần; test để đánh giá cuối,
 không tune rồi báo test như đánh giá độc lập chưa thấy. Categorical gồm
-region,rice_variety,planting_method,season_status; crop_age_days là số. Model
+region, rice_variety, planting_method, season_status; crop_age_days là số. Model
 phải đóng gói preprocessing, không coi61feature là ma trận số đã encode.
 
 ## Kết quả thực chạy và nghiệm thu
 
--200input/feature/label/world/metadata records,100cluster;170mẫu ready,
-  30mẫu insufficient được giữ và loại khỏi danh sách fit.
-- Train102:58negative,44positive. Validation34:18negative,16positive.
-  Test34:18negative,16positive. Cả ba tập có hai lớp; chưa có accuracy/F1.
-- **42/42test đạt**,2,940giây, exit0:10test mới,14feature preparation và18cluster
+-200input/feature/label/world/metadata records,100 cluster;170 mẫu ready,
+  30 mẫu insufficient được giữ và loại khỏi danh sách fit.
+- Train102:58negative,44 positive. Validation34:18negative,16 positive.
+  Test34:18negative,16 positive. Cả ba tập có hai lớp; chưa có accuracy/F1.
+- **42/42test đạt**,2,940 giây, exit0:10test mới,14 feature preparation và 18 cluster
   partition hồi quy. Log thật ở run02/tests.log. Lượt đầu41test đạt trước
   bổ sung censor test/ví dụ output; run02 là bản giao sau bổ sung.
 - Test kiểm seed tái lập, predictor allowlist, future/label injection bị từ
@@ -147,7 +147,7 @@ Set-Location D:\AEGIS
 Get-Content D:\AEGIS\fm01_synthetic_forecast_20261105\manual01\dataset_manifest.json
 ```
 
-Kỳ vọng200rows,170ready,30excluded,both_classes_per_partition=true,
+Kỳ vọng200rows,170 ready,30 excluded, both_classes_per_partition=true,
 training_performed=false. Output cũ hoặc input sai trả exit2. Artifact phải
 được đọc đúng schema/allowlist; chưa có loader train tự động trong FM-01.
 

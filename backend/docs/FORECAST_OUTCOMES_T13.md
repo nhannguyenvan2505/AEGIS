@@ -1,10 +1,10 @@
 # T13 — Liên kết observation/follow-up sau forecast
 
-Ngày08/11/2026. Đây là Backend theo dõi nghiệp vụ, chưa là bộ sinh ground truth hoặc đánh giá hiệu năng bệnh thực địa. Tái dùng journal và follow-up hiện có; không sửa hai kho nguồn, forecast, alert hoặc model.
+Ngày 08/11/2026. Đây là Backend theo dõi nghiệp vụ, chưa là bộ sinh ground truth hoặc đánh giá hiệu năng bệnh thực địa. Tái dùng journal và follow-up hiện có; không sửa hai kho nguồn, forecast, alert hoặc model.
 
 ## API
 
-Tất cả route cần Bearer owner, Cache-Control private,no-store và Vary Authorization.
+Tất cả route cần Bearer owner, Cache-Control private, no-store và Vary Authorization.
 
 | Method/path | Hành vi |
 |---|---|
@@ -13,7 +13,7 @@ Tất cả route cần Bearer owner, Cache-Control private,no-store và Vary Aut
 | GET /api/farm/forecasts/{id}/outcome | Tổng hợp trạng thái theo dõi từ các liên kết được chọn rõ ràng |
 | POST /api/farm/forecast-outcome-links/{id}/retractions | Rút liên kết, giữ snapshot và lịch sử |
 
-Forecast cần scenario hourly/source và input snapshot hợp lệ; cả forecast_ready và insufficient_data đều có thể được theo dõi. Fixture ready/insufficient tĩnh thiếu lịch sử thực của đơn vị trả409 forecast_outcome_not_supported. Đọc/tạo/retract liên kết không gọi worker.
+Forecast cần scenario hourly/source và input snapshot hợp lệ; cả forecast_ready và insufficient_data đều có thể được theo dõi. Fixture ready/insufficient tĩnh thiếu lịch sử thực của đơn vị trả 409 forecast_outcome_not_supported. Đọc/tạo/retract liên kết không gọi worker.
 
 Body tạo liên kết:
 
@@ -31,7 +31,7 @@ Body tạo liên kết:
 
 Observation/case phải cùng owner và season. Observation phải active và cùng source với forecast; hiện worker chỉ có synthetic, nên observation field_observed không được ghép thành outcome của forecast synthetic. Field observations vẫn có thể được lưu riêng theo API journal hiện có. Follow-up mock được phép liên kết như workflow_reference, luôn không đóng góp vào outcome bệnh.
 
-POST201 tạo mới. Retry cùng client_link_id/nội dung trả200/replayed và giữ nguyên captured snapshot; thông tin drift đọc tại thời điểm retry có thể khác. Cùng ID khác nội dung409. Một reference/revision đang active không được tạo bản sao bằng ID khác409 outcome_link_exists. Source revision đã đổi409, voided409, khác owner/season/không biết tại capture time404. Liên kết không được có timestamp trước lúc forecast được lưu.
+POST201 tạo mới. Retry cùng client_link_id/nội dung trả 200/replayed và giữ nguyên captured snapshot; thông tin drift đọc tại thời điểm retry có thể khác. Cùng ID khác nội dung409. Một reference/revision đang active không được tạo bản sao bằng ID khác409 outcome_link_exists. Source revision đã đổi409, voided409, khác owner/season/không biết tại capture time404. Liên kết không được có timestamp trước lúc forecast được lưu.
 
 ## Snapshot, nguồn thay đổi và concurrency
 
@@ -47,7 +47,7 @@ Journal/follow-up mở bằng SQLite URI mode=ro, query_only, read transaction. 
 | changed_snapshot | Cùng version nhưng nội dung khác captured hash; loại khỏi tổng hợp |
 | reference_unavailable / reference_scope_changed | Không biết reference tại cutoff hoặc scope không khớp; loại khỏi tổng hợp |
 
-Nguồn/hash/ledger hỏng trả lỗi integrity500; không âm thầm biến lỗi thành ghi nhận âm. Các source DB không mở được trả500 outcome_reference_unavailable. Snapshot đã capture vẫn nằm trong telemetry/backup; T13 không ghi đè nguồn để sửa lỗi.
+Nguồn/hash/ledger hỏng trả lỗi integrity500; không âm thầm biến lỗi thành ghi nhận âm. Các source DB không mở được trả 500 outcome_reference_unavailable. Snapshot đã capture vẫn nằm trong telemetry/backup; T13 không ghi đè nguồn để sửa lỗi.
 
 `usable_for_observation_summary` chỉ có nghĩa được dùng cho tổng hợp nghiệp vụ ở cutoff; không có nghĩa reference đã đủ điều kiện làm nhãn ML. Workflow reference không bao giờ nhận cờ này.
 
@@ -62,7 +62,7 @@ Phase observation tự tính từ observed_at, không do client chọn:
 
 `known_at_issue` chỉ so available_at của reference revision với issued_at. Baseline quan sát trước issue nhưng nhập/review sau đó được ghi retrospective, không được nói là model đã biết baseline đó. Forecaster hiện cũng không sử dụng các link này làm predictor.
 
-GET list nhận `as_of`, page/page_size chuẩn1/20, tối đa100/trang. GET outcome chỉ nhận as_of. Timestamp phải có timezone, không ở tương lai; query lặp/lạ bị từ chối400. as_of giới hạn cả lúc tạo link, source revision đã available và retraction action đã ghi. `reference_assessed_as_of` ghi cutoff cho thông tin drift.
+GET list nhận `as_of`, page/page_size chuẩn 1/20, tối đa100/trang. GET outcome chỉ nhận as_of. Timestamp phải có timezone, không ở tương lai; query lặp/lạ bị từ chối400. as_of giới hạn cả lúc tạo link, source revision đã available và retraction action đã ghi. `reference_assessed_as_of` ghi cutoff cho thông tin drift.
 
 Khi hỏi trước thời điểm forecast được lưu, forecast_known_at_as_of=false và status=forecast_not_yet_available. API không tái dựng một forecast đã tồn tại lúc đó: record được chọn hiện tại chỉ là context. as_of không đưa thông tin mới ngược vào snapshot dự báo.
 
@@ -92,7 +92,7 @@ T13 không tính TP/FP/FN, lead time hoặc accuracy từ các link do người 
 
 ## Retraction và lịch sử
 
-Body `{"base_version":1,"reason":"Lý do rút liên kết"}`. First action201 chuyển active/version1→retracted/version2 và ghi action; retry cùng reason/base1 hoặc2 trả200/replayed, khác reason/version409. Không xóa/sửa snapshot. Có thể tạo ID mới để gắn lại cùng current reference sau khi liên kết trước đã retract; bản cũ vẫn trong lịch sử.
+Body `{"base_version":1,"reason":"Lý do rút liên kết"}`. First action201 chuyển active/version1→retracted/version2 và ghi action; retry cùng reason/base1 hoặc2 trả 200/replayed, khác reason/version409. Không xóa/sửa snapshot. Có thể tạo ID mới để gắn lại cùng current reference sau khi liên kết trước đã retract; bản cũ vẫn trong lịch sử.
 
 as_of trước retraction trả state active; sau đó trả retracted. Source revision thay đổi và rút liên kết là hai chiều riêng: snapshot cũ vẫn đọc được, còn hiệu lực đóng góp được đánh giá theo cả state và head nguồn.
 
@@ -100,9 +100,9 @@ Thêm2bảng forecast_outcome_links/actions vào telemetry.sqlite3, không thêm
 
 ## Kiểm thử và tổng duyệt
 
-18test T13 mới đạt: status/uncertain/censored, absence tại horizon, revision/review/void, retrospective baseline, interval vượt biên, duplicate/replay/retract/as_of, quyền forecast lẫn quyền reference, source mismatch, Unicode hash, source/forecast corruption, concurrent source edit, concurrent retry/quota, reopen/offline/backup và follow-up closed không tạo outcome bệnh.
+18 test T13 mới đạt: status/uncertain/censored, absence tại horizon, revision/review/void, retrospective baseline, interval vượt biên, duplicate/replay/retract/as_of, quyền forecast lẫn quyền reference, source mismatch, Unicode hash, source/forecast corruption, concurrent source edit, concurrent retry/quota, reopen/offline/backup và follow-up closed không tạo outcome bệnh.
 
-Hồi quy260test pilot và120test Backend đạt; 18test mới là subset của260, không cộng trùng. Log ở `forecast_outcomes_t13/`.
+Hồi quy260test pilot và 120 test Backend đạt; 18 test mới là subset của260, không cộng trùng. Log ở `forecast_outcomes_t13/`.
 
 Ví dụ cuối [outcome states](../../forecast_outcomes_t13/run02/outcome_states.synthetic.json), [links/snapshots](../../forecast_outcomes_t13/run02/links.synthetic.json), [journal revisions](../../forecast_outcomes_t13/run02/observation_revisions.synthetic.json), [verification](../../forecast_outcomes_t13/run02/verification.json).
 

@@ -9,7 +9,7 @@ Không có HTTP route hoặc migration T17.
 - `load_candidate(root,expected_manifest_sha256)`: kiểm bundle/runtime/dependency
   trước deserialize artifact thí nghiệm đã biết/pin.
 - `forecast_candidate(manifest,artifact,label_free_payload)`: dùng gate FM03 và
-  41predictors, chặn source thực/label injection, abstain khi missing/unknown age.
+  41 predictors, chặn source thực/label injection, abstain khi missing/unknown age.
 - `calibrated_scores(artifact,predictor_mappings)`: exact whitelist, không nhận
   labels/metadata hoặc numeric bool/nonfinite.
 
@@ -29,7 +29,7 @@ Output có issue/target end/horizon72, predictor hash, score, threshold0,30,
 predicted_event/insufficient reasons. Score semantics:
 `calibrated_within_t17_simulator_not_field_probability`. Feature vector contract
 giữ nguyên; calibration/score semantics là của candidate riêng. Luôn giữ
-field_validated=false,deployment_activated=false; không tự tạo label/alert.
+field_validated=false, deployment_activated=false; không tự tạo label/alert.
 
 Load/replay được không có nghĩa được promote. T18 phải kiểm report qualification,
 target/protocol/calibration semantics, shadow, rollback và history/explanation/

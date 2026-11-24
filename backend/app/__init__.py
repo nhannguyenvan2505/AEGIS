@@ -27,6 +27,8 @@ def create_app(config=None):
         DATABASE_PATH=data_dir / 'aegis.sqlite3',
         STORAGE_BACKEND=os.environ.get('AEGIS_STORAGE_BACKEND', default_backend),
         MONGO_DELIVERY_ENABLED=os.environ.get('AEGIS_MONGO_DELIVERY_ENABLED','1')=='1',
+        MONGO_DELIVERY_INTERVAL_SECONDS=float(os.environ.get('AEGIS_MONGO_DELIVERY_INTERVAL','2')),
+        MONGO_DELIVERY_BATCH=100,
         MYSQL=dict(host=os.environ.get('AEGIS_MYSQL_HOST','127.0.0.1'),
                    port=int(os.environ.get('AEGIS_MYSQL_PORT','3307')),
                    user=os.environ.get('AEGIS_MYSQL_USER','aegis_app'),
@@ -52,23 +54,28 @@ def create_app(config=None):
     if app.config['STORAGE_BACKEND']=='mysql' and not (config and 'UPLOAD_DIR' in config):
         app.config['UPLOAD_DIR']=data_dir.parent/'mysql-instance'/'uploads'
     init_storage(app.config)
+    from .jwt_tokens import init_jwt
+    init_jwt(app)
     init_observability(app)
     init_limits(app)
     app.register_blueprint(api)
     app.register_blueprint(auth)
+    from .rbac_admin import admin, register_admin_cli
+    app.register_blueprint(admin)
+    register_admin_cli(app)
     app.register_blueprint(farm)
+    from .admin import register_admin
+    register_admin(app)
     from .mobile_contract import enable_mobile_contract
     enable_mobile_contract(app)
+    from .iot_mqtt import enable_iot_mqtt
+    enable_iot_mqtt(app)
 
-    @app.after_request
-    def deliver_mongo_outbox(response):
-        if app.config['STORAGE_BACKEND']=='mysql' and not app.testing and app.config.get('MONGO_DELIVERY_ENABLED',True):
-            try:
-                from .mongo_delivery import deliver
-                deliver(app.config,limit=50)
-            except Exception as exc:
-                app.logger.error('Mongo delivery deferred: %s',type(exc).__name__)
-        return response
+    # BE-02: Mongo delivery runs in a background dispatcher, never on the
+    # response path. Business writes still enqueue in their own transaction.
+    if app.config['STORAGE_BACKEND']=='mysql' and not app.testing and app.config.get('MONGO_DELIVERY_ENABLED',True):
+        from .outbox_dispatcher import start_dispatcher
+        app.extensions['outbox_dispatcher']=start_dispatcher(app)
 
     @app.errorhandler(sqlite3.Error)
     def database_error(error):

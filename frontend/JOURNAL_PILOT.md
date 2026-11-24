@@ -72,26 +72,26 @@ Bearer/ownership/quota/trace theo các API farm. Ảnh/mùa vụ kiểm owner �
 DB; revision/visit có FK owner trong DB nhật ký. Hai DB không có FK liên DB:
 phải sao lưu/khôi phục chung, không chép mỗi journal sang một kho user khác.
 
-POST có đúng:client_visit_id(UUID),source,observed_at,scheduled(bool),finding,
-notes,analysis_id(UUID/null),review(null/object),record_status,change_reason.
-review gồm reviewer_alias,reviewed_at,reference. record_status=active/voided.
-PUT gửi đủ finding,notes,analysis_id,review,record_status,change_reason và
+POST có đúng:client_visit_id(UUID),source, observed_at, scheduled(bool),finding,
+notes, analysis_id(UUID/null),review(null/object),record_status, change_reason.
+review gồm reviewer_alias, reviewed_at, reference. record_status=active/voided.
+PUT gửi đủ finding, notes, analysis_id, review, record_status, change_reason và
 base_revision; không đổi nguồn/thời điểm/mùa vụ/cờ theo lịch. Các giá trị chưa
 xác minh không được ép thành confirmed. Payload trả verification=confirmed
 khi có khai báo review, đi kèm verification_provenance=user_reported_external_review,
 platform_verified=false và cờ chưa duyệt train; không bỏ các cờ provenance.
 
-Tạo/sửa mới trả201; retry/no-op200, header Idempotency-Replayed. POST cùng UUID
+Tạo/sửa mới trả 201; retry/no-op200, header Idempotency-Replayed. POST cùng UUID
 và nội dung ban đầu đọc lại revision1, kể cả sau khi có revision mới; dùng GET
-để đọc bản hiện tại. Stale PUT khác nội dung trả409 observation_revision_conflict.
-Cùng UUID khác payload trả409 observation_conflict. Không tự retry POST bằng
+để đọc bản hiện tại. Stale PUT khác nội dung trả 409 observation_revision_conflict.
+Cùng UUID khác payload trả 409 observation_conflict. Không tự retry POST bằng
 UUID mới nếu chưa kiểm tra lịch sử. Lỗi nhập400,owner sai404,thiếu token401,
 quota429 giữ Retry-After. Notes tối đa2000ký tự; lý do1–500; JSON64KiB. List/history
 dùng page/page_size; list sort observed_at DESC, history sort revision DESC.
 
 ## Backup/restore thủ công
 
-> TASK-17, 28/10/2026: xem [CLI backup/verify/restore bảy DB](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md)
+> TASK-17, 28/10/2026: xem [CLI backup/verify/restore bảy DB](PILOT_BACKUP_RESTORE.md)
 > với manifest, hai lease và guard restore dở. Rehearsal mới kiểm đủ bảy DB,
 > uploads/metadata cùng ownership/chain; đoạn Copy-Item dưới giữ làm lịch sử,
 > không là bằng chứng rằng đã restore kho thật của người dùng.

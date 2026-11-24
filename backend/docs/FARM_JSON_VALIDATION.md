@@ -8,7 +8,7 @@ Phạm vi: helper `app.farm.body`, core và pilot đang dùng helper này.
 Client gửi JSON lồng quá sâu phải nhận lỗi đầu vào có thể xử lý được. Trước sửa,
 body chỉ bắt ValueError/UnicodeError; json.loads có thể ném RecursionError ngay cả
 khi request chỉ khoảng4KB, dưới giới hạn64KiB. TESTING=True phát sinh exception;
-trong cấu hình production mặc định Flask trả500. Việc này xảy ra trước validation
+trong cấu hình production mặc định Flask trả 500. Việc này xảy ra trước validation
 field và ghi nghiệp vụ. Tái hiện ban đầu dùng2.000tầng; không đổi recursion limit.
 
 ## 2. Thay đổi
@@ -27,7 +27,7 @@ field và ghi nghiệp vụ. Tái hiện ban đầu dùng2.000tầng; không đ�
 
 Bearer -> require_auth -> quota ghi -> Content-Type -> đọc tối đa64KiB+1 ->
 json.loads -> nếu decoder quá sâu: FarmError -> handler blueprint core/pilot ->
-HTTP400 JSON -> cache headers private,no-store / Vary Authorization ->
+HTTP400 JSON -> cache headers private, no-store / Vary Authorization ->
 observability thêm request_id và headers. Không đi tới INSERT nghiệp vụ.
 
 ```json
@@ -41,8 +41,8 @@ observability thêm request_id và headers. Không đi tới INSERT nghiệp v�
 }
 ```
 
-401unauthorized nếu chưa có phiên;429+Retry-After khi quota từ chối trước parse;
-413payload_too_large nếu JSON farm quá64KiB;415invalid_json nếu Content-Type sai.
+401 unauthorized nếu chưa có phiên;429+Retry-After khi quota từ chối trước parse;
+413payload_too_large nếu JSON farm quá 64KiB;415invalid_json nếu Content-Type sai.
 Các mã này là contract có sẵn. Độ sâu tối đa cụ thể không được công bố như một
 business rule: phụ thuộc decoder/runtime, payload quá khả năng được từ chối400.
 
@@ -50,17 +50,17 @@ business rule: phụ thuộc decoder/runtime, payload quá khả năng được 
 
 | Lượt chạy | Kết quả thực tế | Ý nghĩa |
 |---|---|---|
-| Baseline trước sửa: discovery backend/checks test_*.py |113test,1failure+11errors trong143,605s |101pass; các test HTTP loopback bị WinError10013, một test chờ request fail vì không tới server; không gọi full suite xanh |
-| Regression trước sửa |2test,7errors trong1,575s |6subtest core và1pilot tái hiện RecursionError; xem json_before.log |
-| Sau sửa: test_farm_json,test_farm,test_cultivation |30/30pass trong38,156s |5test mới +25test farm/cultivation có sẵn; persistence, owner, rollback, revision, invalid inputs |
+| Baseline trước sửa: discovery backend/checks test_*.py |113 test,1 failure+11errors trong143,605s |101 pass; các test HTTP loopback bị WinError10013, một test chờ request fail vì không tới server; không gọi full suite xanh |
+| Regression trước sửa |2 test,7 errors trong1,575s |6 subtest core và 1 pilot tái hiện RecursionError; xem json_before.log |
+| Sau sửa: test_farm_json, test_farm, test_cultivation |30/30pass trong38,156s |5 test mới +25test farm/cultivation có sẵn; persistence, owner, rollback, revision, invalid inputs |
 | Chạy lại nhóm HTTP/pilot với quyền loopback |23/23pass trong44,459s |Gồm12test bị lỗi/fail ở baseline, toàn bộ test_mobile_pilot và test_mobile_recovery; HTTP local, retry/conflict, session và concurrent idempotency |
 
 Log local: `D:/AEGIS/backend/checks/survey_baseline_20261103.log`,
 `D:/AEGIS/backend_audit_20261103/json_before.log`, `json_after.log`.
 Lượt chạy lại nhóm HTTP với quyền loopback được ghi riêng trong http_retry.log.
 Các lỗi ở baseline được tái kiểm thành công sau khi cho phép socket; không cần
-sửa/bỏ các test này. Không chạy lại toàn bộ113test sau patch; kết quả sau patch
-là hai nhóm30 và23test nêu trên, không tuyên bố đã chạy full discovery xanh.
+sửa/bỏ các test này. Không chạy lại toàn bộ 113 test sau patch; kết quả sau patch
+là hai nhóm30 và 23 test nêu trên, không tuyên bố đã chạy full discovery xanh.
 
 ## 5. Cách kiểm tra lại
 
@@ -97,7 +97,7 @@ trên kho thật chỉ để nghiệm thu; suite ở trên tự dùng TemporaryD
 
 ## 6. Giới hạn và trạng thái nghiệm thu
 
-Đạt phạm vi BE-01 theo30test focused và23test HTTP/pilot: xử lý decoder-depth failure ở shared farm
+Đạt phạm vi BE-01 theo30test focused và 23 test HTTP/pilot: xử lý decoder-depth failure ở shared farm
 boundary. Chưa phải audit mọi parser JSON, every pilot write path hoặc chống mọi
 input DoS. Auth và upstream AI có parser riêng, ngoài task. Một pilot observation
 route chứng minh helper/handler dùng chung, không thay cho kiểm toàn bộ pilot.

@@ -24,10 +24,10 @@ Checkpoint và ảnh có nguồn/quyền chưa rõ ở máy nhận: dừng bư�
 
 | Vai trò | Dependency/cấu hình | Bằng chứng và điều chưa kiểm |
 |---|---|---|
-| CPU software regression | Python3.11; `AEGIS/tools/requirements-handoff.txt`15pin | H1-T01/T02 fresh env trên Windows3.11.9; không torch/YOLO/weights, không CPU inference |
+| CPU software regression | Python3.11; `AEGIS/tools/requirements-handoff.txt`15 pin | H1-T01/T02 fresh env trên Windows3.11.9; không torch/YOLO/weights, không CPU inference |
 | Backend HTTP | Env riêng; backend/requirements.txt: Flask3.1.3,requests2.34.2 | Env Backend local không có torch/ultralytics/numpy/Pillow; H1-T03 smoke dùng env này trong process riêng |
 | AI inference trên CPU | Env AI riêng; torch CPU/torchvision tương thích; api/requirements.txt | Source tự chọn cpu khi CUDA không khả dụng; chưa cài hoặc smoke env CPU inference mới ở H1-T03; không suy từ regression CPU |
-| AI inference NVIDIA | Env AI riêng; torch/torchvision CUDA phù hợp OS/Python/driver; api/requirements.txt | Local Windows/Python3.11.9,RTX3050Laptop4GiB,driver610.62; torch2.11.0+cu128/torchvision0.26.0+cu128,CUDA build12.8 được smoke mới |
+| AI inference NVIDIA | Env AI riêng; torch/torchvision CUDA phù hợp OS/Python/driver; api/requirements.txt | Local Windows/Python3.11.9,RTX3050Laptop4GiB, driver610.62; torch2.11.0+cu128/torchvision0.26.0+cu128,CUDA build12.8 được smoke mới |
 | Máy/OS khác | Chọn wheel/runtime phù hợp máy thực, giữ app/model pin và ghi inventory | Chưa kiểm máy thứ hai, Linux/macOS/MPS/ROCm; không coi cấu hình local là lock phổ quát |
 
 AI requirements hiện tại: Flask>=3.1,<4, numpy>=1.26,<3, Pillow>=10,<13,
@@ -116,7 +116,7 @@ Checklist smoke:
    ground truth; không kỳ vọng số detection cụ thể hoặc suy ảnh trắng là khỏe.
 6. Lưu summary version/hash/device/status/count, không token/password/DB/body ảnh.
    Dừng đúng hai instance của mình, dọn account/DB/uploads/config kỹ thuật trong
-   runtime mới sau khi lưu evidence. Không xóa instance,env hoặc storage có sẵn.
+   runtime mới sau khi lưu evidence. Không xóa instance, env hoặc storage có sẵn.
 
 H1-T03 đã smoke mới ở **cùng máy**, hai process với env riêng, cổng loopback
 ngẫu nhiên và kho tạm, không chạy lệnh startup18000/18001 trên storage thật.

@@ -1,6 +1,6 @@
 # T16 — ghép dữ liệu và chia tập synthetic
 
-Ngày08/11/2026. Phạm vi Nhân đã chốt: toàn bộ dữ liệu ảo. Công cụ T16 là Backend/
+Ngày 08/11/2026. Phạm vi Nhân đã chốt: toàn bộ dữ liệu ảo. Công cụ T16 là Backend/
 dữ liệu offline; không sửa UI, API/schema DB, model hoặc các protocol/pin T14–T15.
 
 ## Kiến trúc và input
@@ -84,8 +84,8 @@ Sau kiểm nhóm/feature/endpoint, purge hàng ở split trước nếu
 `target_window_end + embargo >= feature_window_start` của bất kỳ candidate hàng
 ở split sau. Equality cũng purge vì target upper bound là closed. Rule bảo thủ
 này áp dụng cả nhóm khác nhau để không chia cửa sổ feature/target chồng lấn qua
-tập. Ví dụ train issue06/09 có target tới09/09; validation issue12/09 dùng feature
-từ07/09 thì hàng train bị purge. Không chỉ so sánh issue times.
+tập. Ví dụ train issue 06/09 có target tới 09/09; validation issue 12/09 dùng feature
+từ 07/09 thì hàng train bị purge. Không chỉ so sánh issue times.
 
 Các hàng trong cùng split có thể phụ thuộc/chồng lấn; không gọi số row là số mẫu
 độc lập. Event count dedup theo unit/season/present visit, component count báo
@@ -106,7 +106,7 @@ Chỉ đưa `record.predictors` vào estimator tương lai; row_id/seed/alias/ha
 endpoint status/timestamps/label_cutoff/selected revisions không là predictors.
 
 `ready_for_engineering_experiment=true` yêu cầu không có dependency conflict và
-mọi split còn hàng với cả hai lớp0/1. Đây là điều kiện kỹ thuật cho bài toán
+mọi split còn hàng với cả hai lớp 0/1. Đây là điều kiện kỹ thuật cho bài toán
 binary hiện tại, không là cỡ mẫu tối thiểu có căn cứ thống kê. Các hàng bị loại
 vẫn có thể tồn tại trong một report ready nếu phần đủ điều kiện còn đáp ứng gate.
 
@@ -123,10 +123,10 @@ và holdout mới nếu muốn đánh giá lựa chọn model có kiểm soát.
 
 ## Tổng duyệt
 
-`dataset_simulation` tạo3seed ×3period ×2outcome =18mapping/row; mỗi row có720raw
-point/120giờ, context và quan sát T15. Issue times mô phỏng ở01/09,12/09,23/09/2026
-(+65s để hourly cuối đã đóng), lock01/10. Mỗi period có6hàng, class3/3 và3component;
-tổng9component khai báo,9event giả lập,12960raw point. Các mốc là thời gian mô
+`dataset_simulation` tạo3seed ×3 period ×2 outcome =18 mapping/row; mỗi row có 720 raw
+point/120giờ, context và quan sát T15. Issue times mô phỏng ở 01/09,12/09,23/09/2026
+(+65s để hourly cuối đã đóng), lock 01/10. Mỗi period có 6 hàng, class 3/3 và 3 component;
+tổng9component khai báo,9 event giả lập,12960 raw point. Các mốc là thời gian mô
 phỏng, không phải lịch thu hoặc thời gian dự báo thật của dự án.
 
 **Cặp positive/negative dùng cùng waveform môi trường** trong một component.
@@ -134,11 +134,11 @@ Cohort này kiểm tính đúng của mapping/split; không được dùng để
 học quan hệ thời tiết–bệnh. T17 cần chốt cơ chế sinh cohort dự báo có căn cứ mô
 phỏng, version/budget và comparator; không biến nhãn T15 thành nhãn model đã pin.
 
-Final run02 giữ input nguyên bản, report replay khớp toàn bộ và5control:
+Final run02 giữ input nguyên bản, report replay khớp toàn bộ và 5 control:
 
 | Control | Kết quả cần |
 |---|---|
-| shared_environment | Một component xuyên3split,0hàng eligible |
+| shared_environment | Một component xuyên3split,0 hàng eligible |
 | late_raw_receipt | Thiếu feature tại issue dù endpoint đã mature |
 | future_context_and_qc | Predictor và feature evidence giữ nguyên |
 | immature_train_labels | Train chưa có binary rows, readiness=false |
@@ -156,7 +156,7 @@ PowerShell từ `D:\AEGIS`, chọn output mới:
 & backend/.venv/Scripts/python.exe -X utf8 -B frontend/synthetic_dataset.py --input forecast_dataset_t16/run02/cohort.input.synthetic.json --out forecast_dataset_t16/manual.report.synthetic.json
 ```
 
-15test T16 bao phủ scope/pin/rights, duplicate rows, transitive/reused dependency,
+15 test T16 bao phủ scope/pin/rights, duplicate rows, transitive/reused dependency,
 receipt/context/label as-of, snapshot linkage sau export, lock/maturity, temporal
 purge, predictor whitelist và input immutability. Bằng chứng cuối tại
 [T16](../../forecast_dataset_t16/README.md).

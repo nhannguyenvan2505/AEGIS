@@ -11,15 +11,33 @@ class SQLiteRepository:
         self.db.execute('BEGIN IMMEDIATE' if write else 'BEGIN')
 
     def user_by_email(self, email):
-        return self.db.execute('SELECT * FROM users WHERE email=?', (email,)).fetchone()
+        return self.db.execute("SELECT * FROM users WHERE email=? AND status='active'", (email,)).fetchone()
 
     def add_user(self, identifier, email, password_hash, created_at):
         self.db.execute('INSERT INTO users(id,email,password_hash,created_at) VALUES (?,?,?,?)',
                         (identifier,email,password_hash,created_at))
 
     def session_user(self, token_hash, now):
-        return self.db.execute('''SELECT users.id,users.email FROM sessions JOIN users ON users.id=sessions.user_id
-            WHERE token_hash=? AND expires_at>?''', (token_hash,now)).fetchone()
+        return self.db.execute('''SELECT users.id,users.email,users.role FROM sessions JOIN users ON users.id=sessions.user_id
+            WHERE token_hash=? AND expires_at>? AND users.status='active' ''', (token_hash,now)).fetchone()
+
+    def admin_users(self, size, offset):
+        total = self.db.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        rows = self.db.execute('SELECT id,email,role,status FROM users ORDER BY id LIMIT ? OFFSET ?',
+                               (size, offset)).fetchall()
+        return total, rows
+
+    def role_user(self, identifier):
+        return self.db.execute('SELECT id,email,role,status FROM users WHERE id=?', (identifier,)).fetchone()
+
+    def active_admin_count(self):
+        return self.db.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND status='active'").fetchone()[0]
+
+    def set_user_role(self, identifier, role, actor_id, reason, created_at):
+        old = self.role_user(identifier)
+        self.db.execute('UPDATE users SET role=? WHERE id=?', (role, identifier))
+        self.db.execute('INSERT INTO role_audit(actor_id,target_id,old_role,new_role,reason,created_at) VALUES (?,?,?,?,?,?)',
+                        (actor_id, identifier, old['role'], role, reason, created_at))
 
     def add_session(self, token_hash, user_id, expires_at, now):
         self.db.execute('DELETE FROM sessions WHERE expires_at<=?', (now,))
@@ -93,6 +111,26 @@ class SQLiteRepository:
         self.db.execute('INSERT INTO farm_plot_memberships (plot_id,user_id,farm_id,area_ha) VALUES (?,?,?,?)',
                         (item['id'], item['user_id'], farm_id, area_ha))
         return dict(item, farm_id=farm_id, area_ha=area_ha)
+
+    def plot_summary(self, row):
+        membership = self.db.execute('SELECT farm_id,area_ha FROM farm_plot_memberships WHERE plot_id=? AND user_id=?',
+                                      (row['id'],row['user_id'])).fetchone()
+        return dict(row, farm_id=membership['farm_id'], area_ha=membership['area_ha'])
+
+    def update_plot(self, fields):
+        self.db.execute('UPDATE farm_plots SET name=?,location_text=? WHERE id=? AND user_id=?',
+                        (fields['name'],fields['location_text'],fields['id'],fields['user_id']))
+        self.db.execute('UPDATE farm_plot_memberships SET area_ha=? WHERE plot_id=? AND user_id=?',
+                        (fields['area_ha'],fields['id'],fields['user_id']))
+
+    def delete_plot(self, identifier, user_id):
+        season = self.db.execute('SELECT 1 FROM farm_seasons WHERE plot_id=? AND user_id=? LIMIT 1',
+                                 (identifier,user_id)).fetchone()
+        if season:
+            return False
+        self.db.execute('DELETE FROM farm_plot_memberships WHERE plot_id=? AND user_id=?', (identifier,user_id))
+        self.db.execute('DELETE FROM farm_plots WHERE id=? AND user_id=?', (identifier,user_id))
+        return True
 
     def add_season(self, item):
         self.db.execute('INSERT INTO farm_seasons VALUES (:id,:user_id,:plot_id,:name,:crop,:start_date,:end_date,:created_at)', item)
