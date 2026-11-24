@@ -8,12 +8,12 @@ thuẫn với bảng này thì bảng này đúng. Phạm vi và quyết định
 | Khối | Hiện hành | Nguồn |
 |---|---|---|
 | Phạm vi | Kết thúc 02/12/2026. Bệnh: Rice Blast, Brown Spot, Sheath Blight. Biến môi trường: nhiệt độ, độ ẩm, leaf wetness. Bắt buộc thêm MQTT/ESP32, deploy cloud, push, xuất PDF/Excel. Bỏ multimodal fusion, OAuth2 | [DECISIONS_20261120](DECISIONS_20261120.md) |
-| Auth | JWT HS256 + session digest để thu hồi; RBAC farmer/admin đọc role từ DB; scrypt. PR #9 (draft) | [JWT_RBAC](../backend/docs/JWT_RBAC.md) |
-| Database | MySQL + MongoDB mặc định. Outbox gửi Mongo bằng dispatcher nền, có trạng thái failed và retry (PR #11, cần migration 6; migration 5 là farm hierarchy) | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
+| Auth | JWT HS256 + session digest để thu hồi; RBAC farmer/admin đọc role từ DB; scrypt. Đã merge vào `develop` qua PR #9 (24/11); API RBAC nằm ở `/api/admin/rbac/*` | [JWT_RBAC](../backend/docs/JWT_RBAC.md) |
+| Database | MySQL + MongoDB mặc định. Outbox gửi Mongo bằng dispatcher nền, có trạng thái failed và retry (PR #11, đang review; cần migration 6; migration 5 là farm hierarchy) | [runbook hybrid](HYBRID_DATABASE_RUNBOOK.md) |
 | AI ảnh | YOLO11 V4 mặc định. Test 520 ảnh: mAP50 72,7%, mAP50-95 33,7%. Ngưỡng Low Confidence 0,50 | [DECISIONS_20261120](DECISIONS_20261120.md) |
 | Forecast | FM03 phục vụ; T17 không qua gate; dữ liệu toàn bộ synthetic | [status mục 124](../AEGIS_PROJECT_STATUS.md) |
 | API | Bảng route sinh tự động từ code (gồm Farm → Plot → Season của mobile) | [API_REFERENCE](API_REFERENCE.md) |
-| CI / PR | `Team policy` trên main; `Backend tests` xanh trên PR #9. PR #8 đã gỡ xung đột với main (20/11). Thứ tự merge: #8 → #9 → #10, #11 | [TEAM_PROGRESS](TEAM_PROGRESS.md) |
+| CI / PR | `Team policy` trên main; `Backend tests` xanh trên PR #9, #10, #11. Từ 24/11 repo dùng Gitflow (`develop` mặc định, `TEAM_FLOW=gitflow`); PR #8 và #9 đã vào `develop`. Còn lại: #10, #11, #12, #13, #14 | [TEAM_PROGRESS](TEAM_PROGRESS.md) |
 | Hồ sơ môn học | Bộ hồ sơ C1SE.21 đã cập nhật theo quyết định 20/11; thêm SRS, Test Plan, User Guide, Test Report (nháp). Nằm ngoài repo, xem `DANH_MUC.txt` trong thư mục hồ sơ | — |
 | Artifact | Artifact forecast T07–T17 và bằng chứng có ngày không vào Git; chia sẻ qua Release riêng tư | [ARTIFACT_STORAGE](ARTIFACT_STORAGE.md) |
 | Việc mở | Benchmark NFR01, E2E trên thiết bị, 4 hạng mục bắt buộc ở D-04, nhãn Low Confidence trên mobile, mentor xác nhận thay đổi phạm vi | [DECISIONS_20261120](DECISIONS_20261120.md) |
