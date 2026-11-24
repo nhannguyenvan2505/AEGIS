@@ -6,4 +6,4 @@ import { DemoProvider } from '../state/DemoContext';
 import { FarmWorkspaceProvider } from '../features/farms/FarmWorkspace';
 import { IotPreviewProvider } from '../features/prediction/IotPreviewContext';
 import { ProfileProvider } from '../features/profile/ProfileContext';
-export default function Layout() { return <SafeAreaProvider><AuthProvider><DemoProvider><ProfileProvider><IotPreviewProvider><FarmWorkspaceProvider><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#f4f7fb' } }} /></FarmWorkspaceProvider></IotPreviewProvider></ProfileProvider></DemoProvider></AuthProvider></SafeAreaProvider>; }
+export default function Layout() { return <SafeAreaProvider><AuthProvider><DemoProvider><ProfileProvider><IotPreviewProvider><FarmWorkspaceProvider><StatusBar style="dark" hidden={false} translucent={false} backgroundColor="#f7f3e8" /><Stack screenOptions={{ headerShown: false, animation: 'fade', animationDuration: 140, freezeOnBlur: true, contentStyle: { backgroundColor: '#f7f3e8' } }} /></FarmWorkspaceProvider></IotPreviewProvider></ProfileProvider></DemoProvider></AuthProvider></SafeAreaProvider>; }

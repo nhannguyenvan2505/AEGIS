@@ -112,6 +112,26 @@ class SQLiteRepository:
                         (item['id'], item['user_id'], farm_id, area_ha))
         return dict(item, farm_id=farm_id, area_ha=area_ha)
 
+    def plot_summary(self, row):
+        membership = self.db.execute('SELECT farm_id,area_ha FROM farm_plot_memberships WHERE plot_id=? AND user_id=?',
+                                      (row['id'],row['user_id'])).fetchone()
+        return dict(row, farm_id=membership['farm_id'], area_ha=membership['area_ha'])
+
+    def update_plot(self, fields):
+        self.db.execute('UPDATE farm_plots SET name=?,location_text=? WHERE id=? AND user_id=?',
+                        (fields['name'],fields['location_text'],fields['id'],fields['user_id']))
+        self.db.execute('UPDATE farm_plot_memberships SET area_ha=? WHERE plot_id=? AND user_id=?',
+                        (fields['area_ha'],fields['id'],fields['user_id']))
+
+    def delete_plot(self, identifier, user_id):
+        season = self.db.execute('SELECT 1 FROM farm_seasons WHERE plot_id=? AND user_id=? LIMIT 1',
+                                 (identifier,user_id)).fetchone()
+        if season:
+            return False
+        self.db.execute('DELETE FROM farm_plot_memberships WHERE plot_id=? AND user_id=?', (identifier,user_id))
+        self.db.execute('DELETE FROM farm_plots WHERE id=? AND user_id=?', (identifier,user_id))
+        return True
+
     def add_season(self, item):
         self.db.execute('INSERT INTO farm_seasons VALUES (:id,:user_id,:plot_id,:name,:crop,:start_date,:end_date,:created_at)', item)
 

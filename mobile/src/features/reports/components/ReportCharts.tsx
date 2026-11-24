@@ -47,8 +47,8 @@ export function RiskChart({ risks }: { risks: ReportRisk[] }) {
   const maximum = Math.max(1, ...risks.map(day => day.high + day.low));
   return <>
     <View style={s.reportLegends}>
-      <View style={s.reportLegend}><View style={[s.reportLegendLine, { backgroundColor: '#e58b09' }]} /><Text style={s.reportChartLabel}>Nguy cơ cao</Text></View>
-      <View style={s.reportLegend}><View style={[s.reportLegendLine, { backgroundColor: '#159d96' }]} /><Text style={s.reportChartLabel}>Nguy cơ thấp</Text></View>
+      <View style={s.reportLegend}><View style={[s.reportLegendLine, { backgroundColor: '#d98b1b' }]} /><Text style={s.reportChartLabel}>Nguy cơ cao</Text></View>
+      <View style={s.reportLegend}><View style={[s.reportLegendLine, { backgroundColor: '#0b7a54' }]} /><Text style={s.reportChartLabel}>Nguy cơ thấp</Text></View>
     </View>
     <View style={s.reportRiskChart}>
       <View style={s.reportRiskYAxis}><Text style={s.reportAxisText}>{maximum}</Text><Text style={s.reportAxisText}>0</Text></View>
@@ -56,8 +56,8 @@ export function RiskChart({ risks }: { risks: ReportRisk[] }) {
         {risks.map(day => <View key={day.day} style={s.reportRiskDay} accessible accessibilityLabel={`${reportDate(day.day)}: ${day.high} dự báo nguy cơ cao, ${day.low} dự báo nguy cơ thấp`}>
           <View style={s.reportRiskColumns}>
             {!day.high && !day.low && <Text style={s.reportAxisText}>0</Text>}
-            {day.low > 0 && <View style={[s.reportRiskBar, { height: Math.max(5, 80 * day.low / maximum), backgroundColor: '#159d96' }]} />}
-            {day.high > 0 && <View style={[s.reportRiskBar, { height: Math.max(5, 80 * day.high / maximum), backgroundColor: '#e58b09' }]} />}
+            {day.low > 0 && <View style={[s.reportRiskBar, { height: Math.max(5, 80 * day.low / maximum), backgroundColor: '#0b7a54' }]} />}
+            {day.high > 0 && <View style={[s.reportRiskBar, { height: Math.max(5, 80 * day.high / maximum), backgroundColor: '#d98b1b' }]} />}
           </View>
           <Text style={s.reportAxisText} maxFontSizeMultiplier={1.3}>{reportDate(day.day, true)}</Text>
         </View>)}

@@ -6,6 +6,7 @@ import {
   Easing,
   Image,
   Pressable,
+  Text,
   useAnimatedValue,
   View,
   type ImageSourcePropType,
@@ -92,7 +93,7 @@ function NavigationItem({ tab, selected, reduceMotion, onPress }: {
       onPress={onPress}
       onPressIn={() => animatePress(true)}
       onPressOut={() => animatePress(false)}
-      style={({ pressed }) => [s.bottomNavTab, tab.scan && s.bottomNavScanTab, pressed && s.bottomNavTabPressed]}
+      style={s.bottomNavTab}
     >
       <Animated.View
         accessible={false}
@@ -102,41 +103,35 @@ function NavigationItem({ tab, selected, reduceMotion, onPress }: {
           s.bottomNavIconSlot,
           tab.scan && s.bottomNavScanCircle,
           tab.scan && selected && s.bottomNavScanSelected,
-          {
-            transform: [
-              { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [0, tab.scan ? -4 : -8] }) },
-              { scale: pressScale },
-            ],
-          },
+          { transform: [{ scale: pressScale }] },
         ]}
       >
-        {!tab.scan && <Animated.View style={[s.bottomNavSelectedPill, { opacity: progress }]} />}
+        {!tab.scan && (
+          <Animated.View
+            style={[
+              s.bottomNavSelectedPill,
+              { opacity: progress, transform: [{ scaleX: progress.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] }) }] },
+            ]}
+          />
+        )}
         <Image
           source={tab.icon}
           accessible={false}
           resizeMode="contain"
           fadeDuration={0}
-          style={[s.bottomNavImage, tab.scan && s.bottomNavScanImage, { tintColor: tab.scan ? '#ffffff' : selected ? '#009b73' : '#7b8aa0' }]}
+          style={[s.bottomNavImage, tab.scan && s.bottomNavScanImage, { tintColor: tab.scan ? '#ffffff' : selected ? '#0b7a54' : '#7b8e87' }]}
         />
       </Animated.View>
-      {selected && (
-        <Animated.Text
-          accessible={false}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.85}
-          maxFontSizeMultiplier={1.5}
-          style={[
-            s.bottomNavLabel,
-            {
-              opacity: progress,
-              transform: [{ translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }],
-            },
-          ]}
-        >
-          {tab.label}
-        </Animated.Text>
-      )}
+      <Text
+        accessible={false}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        maxFontSizeMultiplier={1}
+        style={[s.bottomNavLabel, tab.scan && s.bottomNavScanLabel, selected && s.bottomNavLabelSelected]}
+      >
+        {tab.label}
+      </Text>
     </Pressable>
   );
 }
