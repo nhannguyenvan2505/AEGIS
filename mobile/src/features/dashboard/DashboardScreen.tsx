@@ -31,7 +31,7 @@ function DashboardHome() {
     : selectedPlot?.farm_id === farmId ? selectedPlot : undefined;
   const [sheet, setSheet] = useState<'plots' | 'sensors'>();
   const { fontScale, width } = useWindowDimensions();
-  const single = fontScale > 1.6 || width < 330;
+  const single = fontScale > 1.8 || width < 300;
   const { readings, forecast: outlook, refresh: refreshIot } = usePlotIot(plot?.id);
   const date = new Date();
   const day = date.toLocaleDateString('vi-VN', { weekday: 'long' });
@@ -67,18 +67,20 @@ function DashboardHome() {
         <Pressable testID="home-field-selector" accessibilityRole="button" accessibilityLabel={plot ? `Đổi ruộng đang theo dõi, ${plot.name}` : 'Chọn ruộng đang theo dõi'}
           accessibilityHint="Mở danh sách nông trại và ruộng" onPress={() => setSheet('plots')} style={({ pressed }) => [s.homeFieldCard, pressed && s.homePressed]}>
           <View style={s.homeFieldPhoto}>
-            <Image source={require('../../../assets/images/rice-field-morning.png')} resizeMode="cover" style={s.homeFieldImage} accessible={false} />
+            <Image source={require('../../../assets/images/rice-field-morning.jpg')} resizeMode="cover" style={s.homeFieldImage} accessible={false} />
             <View style={s.homeFieldBadge}><Icon name="check-circle" size={15} color={colors.green} /><Text style={s.homeFieldBadgeText}>{plot ? 'Đang theo dõi' : 'Ruộng của bạn'}</Text></View>
+            <View style={s.homeFieldOverlay}>
+              <Text style={s.homeOverlayFarm}>{farm?.name ?? (workspace.loading || !ready ? 'Đang tải nông trại…' : 'Nông trại của bạn')}</Text>
+              <Text style={s.homeOverlayName}>{plot?.name ?? (resource.loading || workspace.loading || !ready ? 'Đang tải ruộng…' : 'Chọn ruộng để theo dõi')}</Text>
+            </View>
           </View>
           <View style={s.homeFieldInfo}>
             <View style={s.homeGrow}>
-              <Text style={s.homeFarmName}>{farm?.name ?? (workspace.loading || !ready ? 'Đang tải nông trại…' : 'Nông trại của bạn')}</Text>
-              <Text style={s.homeFieldName}>{plot?.name ?? (resource.loading || workspace.loading || !ready ? 'Đang tải ruộng…' : 'Chọn ruộng để theo dõi')}</Text>
               <View style={s.homeLocationRow}><Icon name="map-pin" size={14} color={colors.muted} /><Text style={s.homeLocation}>
                 {plot ? [plot.location_text || farm?.address, plot.area_ha === null ? 'Chưa nhập diện tích' : `${forecastNumber(plot.area_ha, 2)} ha`].filter(Boolean).join(' · ') : 'Chạm để chọn nông trại và ruộng'}
               </Text></View>
             </View>
-            <View style={s.homeFieldChevron}><Icon name="chevron-down" size={21} color={colors.green} /></View>
+            <View style={s.homeFieldChange}><Text style={s.homeFieldChangeText}>Đổi ruộng</Text><Icon name="chevron-down" size={16} color={colors.green} /></View>
           </View>
         </Pressable>
 
@@ -99,15 +101,23 @@ function DashboardHome() {
           </View>
         </Pressable>}
 
+        <View style={s.homeQuick}>
+          {([['camera', 'Khám lúa', '/diagnosis'], ['activity', 'Dự báo', null], ['bar-chart-2', 'Báo cáo', '/reports'], ['check-square', 'Nhiệm vụ', '/followups']] as const).map(([icon, label, path]) =>
+            <Pressable key={label} accessibilityRole="button" accessibilityLabel={label} onPress={() => path ? router.push(path) : openForecast()} style={({ pressed }) => [s.homeQuickItem, pressed && s.homePressed]}>
+              <View style={s.homeQuickIcon}><Icon name={icon} size={22} color={colors.green} /></View>
+              <Text style={s.homeQuickText}>{label}</Text>
+            </Pressable>)}
+        </View>
+
         <View style={s.homeSectionHeader}><Text accessibilityRole="header" style={s.homeSectionTitle}>Nhịp sống của ruộng</Text>
           <View style={s.homeConnection}><Icon name="radio" size={13} color={colors.green} /><Text style={s.homeConnectionText}>Số đo IoT</Text></View>
         </View>
         <Text style={s.homeUpdated}>{measured ? `Cập nhật ${stamp}` : stamp}</Text>
         <View style={s.homeMetrics}>
-          <HomeMetric label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" single={single} />
-          <HomeMetric label="Độ ẩm không khí" value={readings.humidity} unit="%" icon="droplet" single={single} />
-          <HomeMetric label="pH đất" value={readings.soilPh} unit="pH" icon="activity" single={single} />
-          <HomeMetric label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" single={single} />
+          <HomeMetric label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" single={single} accent="#d98b1b" min={15} max={40} />
+          <HomeMetric label="Độ ẩm" value={readings.humidity} unit="%" icon="droplet" single={single} accent="#5ab4e8" min={0} max={100} />
+          <HomeMetric label="pH đất" value={readings.soilPh} unit="pH" icon="activity" single={single} accent="#b48cf0" min={4} max={9} />
+          <HomeMetric label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" single={single} accent="#4fd8d0" min={0} max={50} />
         </View>
 
         <Pressable testID="home-open-forecast" accessibilityRole="button" onPress={openForecast} style={({ pressed }) => [s.homeForecastLink, pressed && s.homePressed]}>

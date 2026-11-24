@@ -62,6 +62,8 @@ def create_app(config=None):
     app.register_blueprint(admin)
     register_admin_cli(app)
     app.register_blueprint(farm)
+    from .admin import register_admin
+    register_admin(app)
     from .mobile_contract import enable_mobile_contract
     enable_mobile_contract(app)
 

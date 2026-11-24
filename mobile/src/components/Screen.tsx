@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Icon } from "./Design";
+import { AppHeader } from "./AppHeader";
 import { BottomNavigation } from "./BottomNavigation";
 import { useAuth } from "../state/AuthContext";
 import { s } from "../styles/generated/styles";
@@ -67,18 +67,7 @@ export function Screen({
             </>
           ) : (
             <>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Quay lại"
-                disabled={backDisabled}
-                style={s.back}
-                onPress={() =>
-                  router.canGoBack() ? router.back() : router.replace(backTo)
-                }
-              >
-                <Icon name="arrow-left" color="#0f172a" />
-              </Pressable>
-              <Text style={[s.title, { flex: 1 }]}>{title}</Text>
+              <AppHeader title={title} onBack={backDisabled ? () => {} : () => (router.canGoBack() ? router.back() : router.replace(backTo))} />
             </>
           )}
         </View>

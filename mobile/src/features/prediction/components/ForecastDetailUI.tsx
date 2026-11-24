@@ -1,35 +1,27 @@
 import type { ReactNode } from 'react';
 import { router } from 'expo-router';
-import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppHeader, HeaderIconButton } from '../../../components/AppHeader';
 import { BottomNavigation } from '../../../components/BottomNavigation';
 import { Icon, type IconName } from '../../../components/Design';
 import { s } from '../../../styles/generated/styles';
 import { forecastNumber, type FieldStatus } from '../forecastFields';
 import type { IotReadings } from '../iotPreview';
-import { detailDate, type CultivationSummary } from '../forecastDetail';
+import { type CultivationSummary } from '../forecastDetail';
 import type { Farm, FarmPlot, FarmSeason } from '../../farms/client';
 
-export const detailColors = { ink: '#1d2946', muted: '#7789a7', teal: '#16b4a8', high: '#9b5d14', low: '#247456', pending: '#66788b' };
+export const detailColors = { ink: '#12332b', muted: '#566a63', teal: '#0b7a54', high: '#8a4b08', low: '#12332b', pending: '#566a63' };
 
 export function ForecastDetailPage({ children, refreshing = false, onRefresh }: {
   children: ReactNode; refreshing?: boolean; onRefresh?: () => void;
 }) {
   return <SafeAreaView style={s.forecastDetailPage}>
+    <AppHeader title="Chi tiết dự báo" eyebrow="DỰ BÁO MÙA VỤ" onBack={() => router.canGoBack() ? router.back() : router.replace('/analysis')}
+      right={onRefresh ? <HeaderIconButton icon="refresh-cw" label="Tải lại chi tiết dự báo" onPress={() => { if (!refreshing) onRefresh(); }} /> : undefined} />
     <ScrollView contentContainerStyle={s.forecastDetailScroll} showsVerticalScrollIndicator={false}
       refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={detailColors.teal} /> : undefined}>
       <View style={s.forecastDetailColumn}>
-        <View style={s.forecastDetailHeader}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Quay lại danh sách dự báo" style={s.forecastDetailBack}
-            onPress={() => router.canGoBack() ? router.back() : router.replace('/analysis')}>
-            <Icon name="arrow-left" color={detailColors.muted} size={21} />
-          </Pressable>
-          <Text accessibilityRole="header" style={s.forecastDetailPageTitle}>Chi tiết dự báo</Text>
-          {onRefresh && <Pressable accessibilityRole="button" accessibilityLabel="Tải lại chi tiết dự báo" disabled={refreshing}
-            style={s.forecastDetailBack} onPress={onRefresh}>
-            {refreshing ? <ActivityIndicator color={detailColors.teal} size="small" /> : <Icon name="refresh-cw" size={18} color={detailColors.muted} />}
-          </Pressable>}
-        </View>
         {children}
       </View>
     </ScrollView>
@@ -64,28 +56,30 @@ export function DetailMeta({ label, value }: { label: string; value: string }) {
   return <View style={s.forecastDetailMetaRow}><Text style={s.forecastDetailMuted}>{label}</Text><Text style={s.forecastDetailMetaValue}>{value}</Text></View>;
 }
 
-function Reading({ label, value, unit, icon, measuredAt, lastRow, right, single }: {
-  label: string; value: number | null; unit: string; icon: IconName; measuredAt: string | null;
-  lastRow: boolean; right: boolean; single: boolean;
+const readingAccent = { temperature: '#d98b1b', humidity: '#5ab4e8', soilPh: '#b48cf0', rainfall: '#4fd8d0' };
+
+function Reading({ label, value, unit, icon, accent, min, max }: {
+  label: string; value: number | null; unit: string; icon: IconName; accent: string; min: number; max: number;
 }) {
-  return <View style={[s.forecastDetailReading, single && s.forecastDetailReadingFull,
-    !lastRow && s.forecastDetailReadingBottom, right && !single && s.forecastDetailReadingLeft]} accessible
+  const ratio = value === null ? 0 : Math.min(1, Math.max(0, (value - min) / (max - min)));
+  return <View style={[s.forecastReadingTile, { backgroundColor: accent + '1c', borderColor: accent + '40' }]} accessible
     accessibilityLabel={`${label}: ${value === null ? 'Chưa có số đo' : forecastNumber(value) + ' ' + unit}`}>
-    <View style={s.forecastDetailReadingTitle}><Icon name={icon} size={17} color="#56838a" /><Text style={s.forecastDetailReadingLabel}>{label}</Text></View>
-    <Text style={[s.forecastDetailReadingValue, value === null && s.forecastDetailReadingMissing]}>{value === null ? '—' : forecastNumber(value)}
-      {value !== null && <Text style={s.forecastDetailReadingUnit}> {unit}</Text>}</Text>
-    <Text style={s.forecastDetailReadingTime}>{value === null ? 'Chưa có số đo' : detailDate(measuredAt, true, true)}</Text>
+    <View style={s.forecastReadingTop}>
+      <View style={[s.forecastReadingIcon, { backgroundColor: accent + '33' }]}><Icon name={icon} size={16} color={accent} /></View>
+      <Text numberOfLines={1} maxFontSizeMultiplier={1.15} style={s.forecastReadingLabel}>{label}</Text>
+    </View>
+    <Text style={[s.forecastReadingValue, value === null && s.forecastDetailReadingMissing]}>{value === null ? '—' : forecastNumber(value)}
+      {value !== null && <Text style={s.forecastReadingUnit}> {unit}</Text>}</Text>
+    <View style={s.homeGauge}><View style={[s.homeGaugeFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: accent }]} /></View>
   </View>;
 }
 
 export function DetailReadings({ readings }: { readings: IotReadings }) {
-  const { fontScale, width } = useWindowDimensions();
-  const single = fontScale > 1.65 || width < 330;
-  return <View style={s.forecastDetailReadings}>
-    <Reading label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" measuredAt={readings.observedAt} lastRow={false} right={false} single={single} />
-    <Reading label="Độ ẩm" value={readings.humidity} unit="%" icon="droplet" measuredAt={readings.observedAt} lastRow={false} right single={single} />
-    <Reading label="pH đất" value={readings.soilPh} unit="pH" icon="activity" measuredAt={readings.observedAt} lastRow={!single} right={false} single={single} />
-    <Reading label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" measuredAt={readings.observedAt} lastRow right single={single} />
+  return <View style={s.forecastReadingGrid}>
+    <Reading label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" accent={readingAccent.temperature} min={15} max={40} />
+    <Reading label="Độ ẩm" value={readings.humidity} unit="%" icon="droplet" accent={readingAccent.humidity} min={0} max={100} />
+    <Reading label="pH đất" value={readings.soilPh} unit="pH" icon="activity" accent={readingAccent.soilPh} min={4} max={9} />
+    <Reading label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" accent={readingAccent.rainfall} min={0} max={50} />
   </View>;
 }
 
@@ -98,6 +92,28 @@ export function DetailReadingsHeader({ onRefresh, busy = false }: { onRefresh: (
       {busy ? <ActivityIndicator size="small" color={detailColors.teal} /> : <Icon name="refresh-cw" size={17} color={detailColors.teal} />}
       <Text style={s.forecastDetailRefreshText}>Tải mới</Text>
     </Pressable>
+  </View>;
+}
+
+export function DetailHero({ status, title, time, note, farm, plot, season, profile, readState }: {
+  status: FieldStatus; title: string; time: string; note: string; farm: Farm; plot: FarmPlot; season: FarmSeason | null;
+  profile?: CultivationSummary | null; readState: string;
+}) {
+  const tone = status.tone;
+  return <View style={[s.forecastHero, tone === 'high' ? s.forecastHeroHigh : tone === 'low' ? s.forecastHeroLow : s.forecastHeroPending]} testID="forecast-current-plot">
+    <View style={s.forecastHeroPlot}>
+      <View style={s.forecastHeroPlotIcon}><Icon name="map-pin" size={15} color={detailColors.teal} /></View>
+      <View style={s.forecastGrow}><Text numberOfLines={1} style={s.forecastHeroPlotName}>{plot.name}</Text>
+        <Text numberOfLines={1} style={s.forecastDetailMuted}>{[farm.name, plot.area_ha === null ? null : `${forecastNumber(plot.area_ha, 2)} ha`, season?.name ?? 'Chưa có mùa vụ', profile?.rice_variety].filter(Boolean).join(' · ')}</Text></View>
+    </View>
+    <View style={s.forecastHeroMain}>
+      <View style={[s.forecastHeroBadgeIcon, tone === 'high' ? s.forecastHeroIconHigh : tone === 'low' ? s.forecastHeroIconLow : s.forecastHeroIconPending]}>
+        <Icon name={tone === 'high' ? 'alert-triangle' : tone === 'low' ? 'check-circle' : 'clock'} size={26} color="#ffffff" /></View>
+      <View style={s.forecastGrow}><Text style={s.forecastHeroTitle}>{title}</Text></View>
+    </View>
+    <View style={s.forecastDetailTimeRow}><Icon name="clock" size={14} color={detailColors.muted} /><Text style={[s.forecastDetailMuted, s.forecastGrow]}>{time}</Text>
+      <View style={s.forecastDetailReadState}><View style={s.forecastDetailReadDot} /><Text style={s.forecastDetailReadText}>{readState}</Text></View></View>
+    <Text style={s.forecastHeroNote}>{note}</Text>
   </View>;
 }
 
@@ -115,7 +131,7 @@ export function DetailPlotSummary({ farm, plot, season, profile }: {
 }
 
 export function DetailSuggestion({ title, body, icon, onPress }: { title: string; body: string; icon: IconName; onPress?: () => void }) {
-  const content = <><View style={s.forecastDetailSuggestionIcon}><Icon name={icon} size={23} color="#3b4864" /></View>
+  const content = <><View style={s.forecastDetailSuggestionIcon}><Icon name={icon} size={18} color="#0b7a54" /></View>
     <View style={s.forecastGrow}><Text style={s.forecastDetailSuggestionTitle}>{title}</Text><Text style={s.forecastDetailMuted}>{body}</Text></View>
     {onPress && <Icon name="chevron-right" size={17} color={detailColors.muted} />}</>;
   return onPress ? <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [s.forecastDetailSuggestion, pressed && s.forecastPressed]}>{content}</Pressable> :
@@ -127,6 +143,6 @@ export function DetailPlantIcon() {
 }
 
 export function DetailNotice({ message }: { message: string }) {
-  return <View accessibilityRole="alert" style={s.forecastDetailError}><Icon name="alert-circle" size={18} color="#a15335" />
+  return <View accessibilityRole="alert" style={s.forecastDetailError}><Icon name="alert-circle" size={18} color="#b42318" />
     <Text style={s.forecastDetailErrorText}>{message}</Text></View>;
 }

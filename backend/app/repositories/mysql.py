@@ -291,6 +291,28 @@ class MySQLRepository:
             VALUES (%s,%s,%s,%s,'rice',%s,%s,%s)''', (item['id'],farm,user,item['name'],item['location_text'],item['created_at'],area_ha))
         return dict(item, farm_id=farm_id, area_ha=area_ha)
 
+    def plot_summary(self, row):
+        return self.one('''SELECT f.external_id id,u.external_id user_id,h.external_id farm_id,
+            f.field_name name,f.location_text,f.area_ha,f.api_created_at created_at
+            FROM farm_fields f JOIN users u ON u.user_id=f.user_id
+            JOIN farms h ON h.farm_id=f.farm_id AND h.owner_user_id=f.user_id
+            WHERE f.external_id=%s AND u.external_id=%s''', (row['id'],row['user_id']))
+
+    def update_plot(self, fields):
+        user = self.uid(fields['user_id'])
+        self.execute('''UPDATE farm_fields SET field_name=%s,location_text=%s,area_ha=%s
+            WHERE external_id=%s AND user_id=%s''',
+            (fields['name'],fields['location_text'],fields['area_ha'],fields['id'],user))
+
+    def delete_plot(self, identifier, user_id):
+        field = self.pk('farm_plots',identifier,user_id)
+        owner = self.uid(user_id)
+        self.one('SELECT field_id FROM farm_fields WHERE field_id=%s AND user_id=%s FOR UPDATE', (field,owner))
+        if self.one('SELECT crop_cycle_id FROM crop_cycles WHERE field_id=%s LIMIT 1 FOR UPDATE', (field,)):
+            return False
+        self.execute('DELETE FROM farm_fields WHERE field_id=%s AND user_id=%s', (field,owner))
+        return True
+
     def add_season(self, item):
         field = self.pk('farm_plots',item['plot_id'],item['user_id'])
         self.execute('''INSERT INTO crop_cycles(external_id,field_id,user_id,name,crop_type,start_date,expected_end_date,api_created_at)

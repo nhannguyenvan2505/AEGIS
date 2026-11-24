@@ -5,7 +5,7 @@ import { Icon, type IconName } from '../../../components/Design';
 import { s } from '../../../styles/generated/styles';
 import { forecastNumber } from '../../prediction/forecastFields';
 
-export const homeColors = { ink: '#193234', muted: '#597172', green: '#248233', red: '#bd3030' };
+export const homeColors = { ink: '#12332b', muted: '#566a63', green: '#0b7a54', red: '#b42318' };
 
 export function HomeSheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   return <Modal visible transparent animationType="slide" onRequestClose={onClose}>
@@ -25,13 +25,18 @@ export function HomeSheet({ title, onClose, children }: { title: string; onClose
   </Modal>;
 }
 
-export function HomeMetric({ label, value, unit, icon, single }: {
-  label: string; value: number | null; unit: string; icon: IconName; single: boolean;
+export function HomeMetric({ label, value, unit, icon, single, accent, min, max }: {
+  label: string; value: number | null; unit: string; icon: IconName; single: boolean; accent: string; min: number; max: number;
 }) {
-  return <View style={[s.homeMetric, single && s.homeMetricFull]} accessible
+  const ratio = value === null ? 0 : Math.min(1, Math.max(0, (value - min) / (max - min)));
+  return <View style={[s.homeMetric, single && s.homeMetricFull, { backgroundColor: accent + '1c', borderColor: accent + '40' }]} accessible
     accessibilityLabel={`${label}: ${value === null ? 'Chưa có số đo' : `${forecastNumber(value)} ${unit}`}`}>
-    <View style={s.homeMetricHeading}><Icon name={icon} size={18} color={homeColors.green} /><Text style={s.homeMetricLabel}>{label}</Text></View>
+    <View style={s.homeMetricHeading}>
+      <View style={[s.homeMetricIcon, { backgroundColor: accent + '33' }]}><Icon name={icon} size={18} color={accent} /></View>
+      <Text numberOfLines={2} maxFontSizeMultiplier={1.15} style={s.homeMetricLabel}>{label}</Text>
+    </View>
     <Text style={s.homeMetricValue}>{value === null ? '—' : forecastNumber(value)}<Text style={s.homeMetricUnit}>{value === null ? '' : ` ${unit}`}</Text></Text>
-    <Text style={s.homeMetricStatus}>{value === null ? 'Chờ số đo' : 'Đã cập nhật'}</Text>
+    <View style={s.homeGauge}><View style={[s.homeGaugeFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: accent }]} /></View>
+    <View style={s.homeGaugeScale}><Text style={s.homeGaugeText}>{min}</Text><Text style={s.homeGaugeText}>{value === null ? 'Chờ số đo' : 'Mới'}</Text><Text style={s.homeGaugeText}>{max}</Text></View>
   </View>;
 }
