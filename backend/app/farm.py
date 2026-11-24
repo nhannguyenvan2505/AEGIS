@@ -271,8 +271,8 @@ def plots():
     with connect(current_app.config) as db:
         db.begin(True)
         item = create_plot(db, data)
-    # Keep the legacy create/detail response contract unchanged.
-    return jsonify(success=True, item={key: item[key] for key in ('id', 'user_id', 'name', 'location_text', 'created_at')}), 201
+    # Same shape as GET /plots/<id> (plot_summary), so create and detail stay consistent.
+    return jsonify(success=True, item=item), 201
 
 
 @farm.route('/plots/<uuid:identifier>', methods=['GET', 'PUT', 'DELETE'])

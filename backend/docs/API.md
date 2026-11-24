@@ -1,5 +1,10 @@
 # AEGIS Backend — hợp đồng API hiện tại
 
+**15/11 — JWT và RBAC:** đăng nhập phát JWT HS256; token vẫn có session digest
+để logout/expiry thu hồi được. Token opaque cũ không được chấp nhận; client cần
+đăng nhập lại. `user` trong register/login/me có thêm `role: farmer|admin`.
+Xem [contract JWT/admin và cách cấp admin đầu tiên](JWT_RBAC.md).
+
 **05/11 — forecast pilot:** [contract và runbook dự báo](../../docs/FORECAST_MVP_MIDTERM_20261105.md)
 mô tả nguồn hourly có revision, create/list/detail/input và tổng quan theo
 owner. Chạy qua launcher/kho pilot; không thay API ảnh hoặc core mặc định.

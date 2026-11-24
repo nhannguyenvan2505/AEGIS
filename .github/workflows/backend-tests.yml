@@ -1,0 +1,66 @@
+name: Backend tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-contracts:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      AEGIS_STORAGE_BACKEND: sqlite
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            tools/requirements-handoff.txt
+            forecast_demo/requirements.txt
+      - name: Install CPU test dependencies
+        run: python -m pip install -r backend/requirements.txt -r tools/requirements-handoff.txt -r forecast_demo/requirements.txt
+      - name: Run Backend regression with local forecast worker
+        shell: pwsh
+        run: |
+          $env:FM02_PYTHON = (Get-Command python).Source
+          python -B -m unittest discover -s backend/checks -p 'test_*.py'
+          exit $LASTEXITCODE
+
+  mysql-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AEGIS_RUN_MYSQL_TESTS: '1'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Backend dependencies
+        run: python -m pip install -r backend/requirements.txt
+      - name: Create disposable CI database configuration
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import secrets
+          keys = ['AEGIS_MYSQL_ROOT_PASSWORD', 'AEGIS_MYSQL_PASSWORD',
+                  'AEGIS_MONGO_ROOT_PASSWORD', 'AEGIS_MONGO_PASSWORD']
+          Path('backend/database/.env').write_text(
+              '\n'.join(key + '=' + secrets.token_hex(24) for key in keys) + '\n',
+              encoding='utf-8')
+          PY
+      - name: Start disposable database services
+        run: docker compose --env-file backend/database/.env -f backend/database/compose.yaml up -d --wait
+      - name: Run MySQL core and JWT RBAC acceptance
+        run: python -B -m unittest discover -s backend/checks -p test_mysql_core.py
+      - name: Remove CI database services and volumes
+        if: always()
+        run: docker compose --env-file backend/database/.env -f backend/database/compose.yaml down --volumes

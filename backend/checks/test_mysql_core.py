@@ -322,6 +322,44 @@ class MySQLCoreTests(unittest.TestCase):
             response=self.client.post('/api/auth/register',json=dict(email=prefix+suffix+'@example.invalid',password='test-password-123'))
             self.assertEqual(response.status_code,201,response.json)
 
+    def test_jwt_admin_roles_audit_and_last_admin(self):
+        import jwt
+        token = self.headers[0]['Authorization'].split()[1]
+        claims = jwt.decode(token, self.app.config['JWT_SECRET'], algorithms=['HS256'],
+                            issuer='aegis-backend', audience='aegis-api')
+        self.assertEqual(claims['sub'], self.identifiers[0])
+        self.assertEqual(self.client.get('/api/admin/rbac/users',headers=self.headers[0]).status_code,403)
+        result = self.app.test_cli_runner().invoke(args=[
+            'bootstrap-admin',self.identifiers[0],'--reason','MySQL integration acceptance'])
+        self.assertEqual(result.exit_code,0,result.output)
+        try:
+            response=self.client.get('/api/admin/rbac/users?page_size=1',headers=self.headers[0])
+            self.assertEqual(response.status_code,200,response.json)
+            self.assertEqual(set(response.json['items'][0]),{'id','email','role','status'})
+            def change(owner,target,role):
+                return self.client.put('/api/admin/rbac/users/'+self.identifiers[target]+'/role',
+                    headers=self.headers[owner],json=dict(role=role,reason='MySQL acceptance'))
+            self.assertEqual(change(0,0,'farmer').status_code,409)
+            self.assertEqual(change(0,1,'admin').status_code,200)
+            def demote(index):
+                return self.app.test_client().put('/api/admin/rbac/users/'+self.identifiers[index]+'/role',
+                    headers=self.headers[index],json=dict(role='farmer',reason='Concurrent demotion')).status_code
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                statuses=list(pool.map(demote,[0,1]))
+            self.assertEqual(sorted(statuses),[200,409])
+            demoted=statuses.index(200)
+            survivor=1-demoted
+            self.assertEqual(self.client.get('/api/admin/rbac/users',headers=self.headers[demoted]).status_code,403)
+            self.assertEqual(change(survivor,survivor,'farmer').status_code,409)
+            with repository(self.config) as repo:
+                count=repo.one("SELECT COUNT(*) n FROM audit_logs WHERE action='user_role_changed' AND entity_id IN (%s,%s)",tuple(self.identifiers))['n']
+                self.assertEqual(count,3)
+        finally:
+            # This suite shares its disposable schema across tests.
+            with repository(self.config) as repo:
+                for identifier in self.identifiers:
+                    repo.execute("UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name='farmer') WHERE external_id=%s",(identifier,))
+
 
 if __name__ == '__main__':
     unittest.main()

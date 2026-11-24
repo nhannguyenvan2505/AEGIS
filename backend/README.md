@@ -1,5 +1,9 @@
 # AEGIS Backend — local integration milestone
 
+**15/11/2026:** access tokens are now JWTs with persisted revocation and live
+RBAC. Existing opaque tokens require login again. See [JWT/admin setup and
+API contract](docs/JWT_RBAC.md) before provisioning the first administrator.
+
 09/11/2026: runtime mặc định là MySQL + MongoDB cho cả core và pilot. Dữ liệu SQLite cũ đã được nhập/đối chiếu, có backup và kiểm chứng restore. Bắt đầu bằng [hybrid database runbook](../docs/HYBRID_DATABASE_RUNBOOK.md) và bật Compose trước khi chạy backend. Các mốc SQLite bên dưới là evidence lịch sử.
 
 09/11/2026: mobile hỗ trợ **Nông trại → Ruộng → Mùa vụ**, gồm thêm/sửa nông trại,

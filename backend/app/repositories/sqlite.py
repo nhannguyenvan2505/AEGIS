@@ -11,15 +11,33 @@ class SQLiteRepository:
         self.db.execute('BEGIN IMMEDIATE' if write else 'BEGIN')
 
     def user_by_email(self, email):
-        return self.db.execute('SELECT * FROM users WHERE email=?', (email,)).fetchone()
+        return self.db.execute("SELECT * FROM users WHERE email=? AND status='active'", (email,)).fetchone()
 
     def add_user(self, identifier, email, password_hash, created_at):
         self.db.execute('INSERT INTO users(id,email,password_hash,created_at) VALUES (?,?,?,?)',
                         (identifier,email,password_hash,created_at))
 
     def session_user(self, token_hash, now):
-        return self.db.execute('''SELECT users.id,users.email FROM sessions JOIN users ON users.id=sessions.user_id
-            WHERE token_hash=? AND expires_at>?''', (token_hash,now)).fetchone()
+        return self.db.execute('''SELECT users.id,users.email,users.role FROM sessions JOIN users ON users.id=sessions.user_id
+            WHERE token_hash=? AND expires_at>? AND users.status='active' ''', (token_hash,now)).fetchone()
+
+    def admin_users(self, size, offset):
+        total = self.db.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        rows = self.db.execute('SELECT id,email,role,status FROM users ORDER BY id LIMIT ? OFFSET ?',
+                               (size, offset)).fetchall()
+        return total, rows
+
+    def role_user(self, identifier):
+        return self.db.execute('SELECT id,email,role,status FROM users WHERE id=?', (identifier,)).fetchone()
+
+    def active_admin_count(self):
+        return self.db.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND status='active'").fetchone()[0]
+
+    def set_user_role(self, identifier, role, actor_id, reason, created_at):
+        old = self.role_user(identifier)
+        self.db.execute('UPDATE users SET role=? WHERE id=?', (role, identifier))
+        self.db.execute('INSERT INTO role_audit(actor_id,target_id,old_role,new_role,reason,created_at) VALUES (?,?,?,?,?,?)',
+                        (actor_id, identifier, old['role'], role, reason, created_at))
 
     def add_session(self, token_hash, user_id, expires_at, now):
         self.db.execute('DELETE FROM sessions WHERE expires_at<=?', (now,))

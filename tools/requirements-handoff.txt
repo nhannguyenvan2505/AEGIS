@@ -1,5 +1,6 @@
 # Windows Python 3.11; CPU contract tests only. No torch/ultralytics/checkpoint.
 Flask==3.1.3
+PyJWT==2.15.1
 requests==2.34.2
 Pillow==12.3.0
 numpy==2.4.6
