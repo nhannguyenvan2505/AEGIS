@@ -65,6 +65,13 @@ class V2Tests(unittest.TestCase):
         self.assertEqual(r.json['status'], 'no_detection'); self.assertEqual(r.json['diagnosis']['status'], 'healthy')
         self.assertEqual(self.count(), 1)
 
+    def test_missing_gatekeeper_weights_is_service_unavailable(self):
+        with patch('app.ai_service.requests.post', return_value=Mock(status_code=503, json=lambda: {'error': {'code': 'gatekeeper_unavailable'}})):
+            r = self.client.post('/api/disease/detect', headers={'Authorization': 'Bearer ' + self.token},
+                                 data={'image': (io.BytesIO(b'synthetic'), 'x.png')})
+        self.assertEqual((r.status_code, r.json['error']['code']), (503, 'ai_gatekeeper_unavailable'))
+        self.assertEqual(self.count(), 0)
+
     def test_v1_flag_uses_predict(self):
         self.app.config['AI_API_VERSION'] = 'v1'
         self.post(dict(model_sha256='e' * 64, model_version='m', processing_ms=1, image=dict(width=32, height=32), detections=[]))

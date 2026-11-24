@@ -117,8 +117,12 @@ class YoloClsGatekeeper:
         return {"rice_probability": float(probs[self.rice_index]), "probabilities": probs.tolist()}
 
 
+DEFAULT_GATE_WEIGHTS = Path(__file__).resolve().parents[1] / "experiments/gatekeeper/gate_v1b/best.pt"
+
+
 def build_gatekeeper():
-    weights = os.environ.get("AEGIS_GATE_WEIGHTS")
+    """AEGIS_GATE_WEIGHTS, else the provisioned default file, else the always-rejecting heuristic."""
+    weights = os.environ.get("AEGIS_GATE_WEIGHTS") or (str(DEFAULT_GATE_WEIGHTS) if DEFAULT_GATE_WEIGHTS.is_file() else None)
     return YoloClsGatekeeper(weights) if weights else HeuristicGatekeeper()
 
 

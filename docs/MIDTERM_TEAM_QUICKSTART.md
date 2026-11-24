@@ -21,6 +21,14 @@ Nếu đã tải `best.pt` bằng trình duyệt từ trang Release riêng tư:
 powershell -ExecutionPolicy Bypass -File tools/setup_midterm.ps1 -IncludeImageAI -CheckpointPath 'C:\Downloads\best.pt'
 ```
 
+**Nhận diện cây lúa / không phải cây lúa:** ngoài `best.pt` (detector), cần thêm trọng số gatekeeper `gate_v1b` (Release `gatekeeper-gate-v1b-2026-11-24`). Nếu thiếu, dịch vụ AI trả lỗi `gatekeeper_unavailable` (HTTP 503) và `/v2/health` báo `degraded`; không còn trả "không phải cây lúa" cho mọi ảnh. Đã có repo từ trước, chỉ cần tải riêng gatekeeper rồi khởi động lại AI:
+
+```powershell
+& .ackend\.venv\Scripts\python.exe tools/provision_midterm_model.py --artifact gatekeeper
+```
+
+Đã tải file bằng trình duyệt: thêm `--source 'C:\Downloads\gate_v1b_best.pt'`. Kiểm tra: `GET http://127.0.0.1:8000/v2/health` phải có `"production_ready": true`.
+
 Muốn thử forecast/IoT trước, bỏ `-IncludeImageAI`. Cấu hình và volumes được giữ khi chạy setup lần sau; không thay password sau khi database đã khởi tạo nếu chưa đồng bộ tài khoản trong database.
 
 ## Chạy các dịch vụ

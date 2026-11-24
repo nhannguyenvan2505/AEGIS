@@ -8,6 +8,7 @@ from PIL import Image
 
 spec = importlib.util.spec_from_file_location('diag_app', Path(__file__).resolve().parents[1] / 'app.py')
 api = importlib.util.module_from_spec(spec); spec.loader.exec_module(api)
+from diagnosis import HeuristicGatekeeper  # app.py put the api directory on sys.path
 
 
 class FakeGate:
@@ -76,12 +77,13 @@ class DiagnoseTests(unittest.TestCase):
         r, _ = self.post(0.97, [], textured_png())
         self.assertEqual(r.json['status'], 'healthy'); self.assertFalse(r.json['healthy_validated'])
 
-    def test_default_heuristic_gate_never_accepts(self):
-        app = api.create_app(FakeDetector(BOX(0.9)), max_inflight=1)
+    def test_missing_gate_weights_is_an_error_not_a_rejection(self):
+        app = api.create_app(FakeDetector(BOX(0.9)), max_inflight=1, gatekeeper=HeuristicGatekeeper())
         with app.test_client() as c:
             r = c.post('/v2/diagnose', data={'image': (textured_png(), 'x.png')})
-            self.assertTrue(r.json['status'].startswith('rejected_'))
-            self.assertFalse(c.get('/v2/health').json['gatekeeper']['production_ready'])
+            self.assertEqual((r.status_code, r.json['error']['code']), (503, 'gatekeeper_unavailable'))
+            h = c.get('/v2/health').json
+            self.assertEqual(h['status'], 'degraded'); self.assertFalse(h['gatekeeper']['production_ready'])
 
 
 if __name__ == '__main__': unittest.main()

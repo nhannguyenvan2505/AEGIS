@@ -1,0 +1,10 @@
+{
+  "repository": "nhannguyenvan2505/AEGIS",
+  "release": "gatekeeper-gate-v1b-2026-11-24",
+  "asset": "gate_v1b_best.pt",
+  "target": "ai_service/experiments/gatekeeper/gate_v1b/best.pt",
+  "sha256": "be639ce13319273dcb3ef9f50ea92a9839c2522fcb2018b5a1bfb14deb120602",
+  "size_bytes": 3186754,
+  "classes": {"0": "non_rice", "1": "rice"},
+  "purpose": "YOLO11n-cls rice / non_rice gatekeeper (gate_v1b). Test: 0/804 non-rice accepted, 2/1160 rice missed; not validated on field photos."
+}
