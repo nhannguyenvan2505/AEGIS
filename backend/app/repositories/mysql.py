@@ -219,6 +219,10 @@ class MySQLRepository:
     def mark_uncertain(self, user_id, key_hash):
         self.execute("UPDATE inference_requests SET state='uncertain' WHERE user_id=%s AND key_hash=%s AND state='running'", (self.uid(user_id),key_hash))
 
+    def user_plot_ids(self, user_id):
+        _, source, _, external_column, owner_column = PROJECTIONS['farm_plots']
+        return [row['id'] for row in self.all(f'SELECT {external_column} id FROM {source} WHERE {owner_column}=%s', (user_id,))]
+
     def owned(self, kind, identifier, user_id):
         projection, source, _, external_column, owner_column = PROJECTIONS[kind]
         return self.one(f'SELECT {projection} FROM {source} WHERE {external_column}=%s AND {owner_column}=%s', (identifier,user_id))

@@ -74,6 +74,9 @@ class SQLiteRepository:
     def mark_uncertain(self, user_id, key_hash):
         self.db.execute("UPDATE inference_requests SET state='uncertain' WHERE user_id=? AND key_hash=? AND state='running'", (user_id,key_hash))
 
+    def user_plot_ids(self, user_id):
+        return [row['id'] for row in self.db.execute('SELECT id FROM farm_plots WHERE user_id=?', (user_id,)).fetchall()]
+
     def owned(self, kind, identifier, user_id):
         return self.db.execute(f'SELECT * FROM {kind} WHERE id=? AND user_id=?', (identifier,user_id)).fetchone()
 

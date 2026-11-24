@@ -20,6 +20,7 @@ def list_esp32_readings():
         raise ApiError('invalid_limit', 'limit phải từ 1 đến 200.', 422)
     data = query_esp32_telemetry(
         current_app.config,
+        plot_ids=None,  # administrators see every device
         plot_id=request.args.get('plot_id') or None,
         device_uid=request.args.get('device_uid') or None,
         limit=int(raw_limit),
