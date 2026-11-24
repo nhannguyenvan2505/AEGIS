@@ -1,0 +1,91 @@
+{
+  "schema_version": "aegis-raw-telemetry-export-v1",
+  "exported_at": "2026-10-25T03:38:02.637088+00:00",
+  "owner_id": "af95dd15-662a-4947-91b6-bba732598e9c",
+  "season_id": "c8751073-a1c5-4c39-b2f8-f48223afb99a",
+  "stream_id": "4c5d2d55-a681-4957-a1d4-50a00ced5822",
+  "metadata": {
+    "name": "Synthetic instrument",
+    "source": "synthetic",
+    "method": "sensor_reading",
+    "instrument": "Software fixture — no physical sensor",
+    "reference": "SYNTHETIC",
+    "nominal_interval_seconds": 600,
+    "measurement_semantics": "point_observation",
+    "units": {
+      "air_temperature_c": "degC",
+      "relative_humidity_pct": "percent",
+      "leaf_wet": "boolean_point_state"
+    },
+    "provenance": "user_declared",
+    "calibration_verified": false
+  },
+  "metadata_sha256": "15a5d304dfa3c9ba76fd8c6bfa57af09bcfa971eea6c21ed31e12ef51fe1f33d",
+  "stream_created_at": "2026-10-25T03:38:00.755049+00:00",
+  "readings": [
+    {
+      "id": "c6b4143d-3954-4ee1-90e1-cc3c87a9c80c",
+      "stream_id": "4c5d2d55-a681-4957-a1d4-50a00ced5822",
+      "observed_at": "2026-10-25T03:18:00.720260+00:00",
+      "payload_sha256": "70c669c12a9ccef0d25ad9d08f4e65f4726692f0df0ed63055dc717a6220b5ab",
+      "received_at": "2026-10-25T03:38:01.330662+00:00",
+      "request_id": "b7762dc5-2d8c-4908-b78e-3236365fa604",
+      "exclusion_reason": "Synthetic sensor issue",
+      "excluded_at": "2026-10-25T03:38:01.901755+00:00",
+      "exclusion_request_id": "17297cd0-8df3-4a69-a465-71f18fe5a55d",
+      "payload": {
+        "air_temperature_c": 26,
+        "relative_humidity_pct": 95,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-1"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-10-25T03:38:01.330662+00:00"
+    },
+    {
+      "id": "d8614c26-726c-48cb-ab9c-23b3b03881d8",
+      "stream_id": "4c5d2d55-a681-4957-a1d4-50a00ced5822",
+      "observed_at": "2026-10-25T03:28:00.720260+00:00",
+      "payload_sha256": "0e7cfcc26dc2a1433f9ef215099d5cc622f9ff174bb08ae5f55f3f938faac3f4",
+      "received_at": "2026-10-25T03:38:01.330662+00:00",
+      "request_id": "b7762dc5-2d8c-4908-b78e-3236365fa604",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 26,
+        "relative_humidity_pct": 95,
+        "leaf_wet": null,
+        "reported_quality": "suspect",
+        "reference": "SYNTHETIC-2"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [
+          "leaf_wet"
+        ],
+        "reported_suspect": true,
+        "status": "incomplete",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-10-25T03:38:01.330662+00:00"
+    }
+  ],
+  "training_approved": false,
+  "hourly_aggregation_performed": false,
+  "limits": [
+    "Declared source/instrument, calibration not verified",
+    "Point wetness does not establish wet duration",
+    "Empty stream does not establish coverage"
+  ],
+  "bundle_sha256": "70707b0c548957a72395c8fc4fd8f31c508c65174b3169c99edb570b3dd626bb"
+}

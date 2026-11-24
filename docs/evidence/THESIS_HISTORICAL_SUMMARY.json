@@ -1,0 +1,159 @@
+{
+  "schema_version": "aegis-thesis-curated-evidence-v1",
+  "curated_on": "2026-10-28",
+  "new_inference_or_training": false,
+  "scope": "Historical technical metadata; no field-performance claim",
+  "image": {
+    "validation_source": "AEGIS-AI/experiments/ai_quality_source_r1_20261021/baseline_summary.json",
+    "validation_source_sha256": "591f7946412be9cefec099e619fcaae018b27fa66a0791b039aa09847f6c5afa",
+    "checkpoint_sha256": "1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a",
+    "default_model": "V4",
+    "candidate": "boundary-r2 seed42",
+    "map50": 0.6879013827662214,
+    "map50_95": 0.3258014222828708,
+    "micro_f1_at_conf_025": 0.6613928959205833,
+    "matching_iou": 0.5,
+    "paired_source": "AEGIS/handoff_20261024/metrics_recomputed.json",
+    "paired_source_sha256": "f60b558089233d1634ec2506e8533aebd3e149aec7ab612b93c29e58fca4dfa1",
+    "three_seed_comparison": {
+      "map50_95": {
+        "source_r1": {
+          "values": [
+            0.32760022746164785,
+            0.3292352322182835,
+            0.32742342884175707
+          ],
+          "mean": 0.3280862961738961,
+          "sample_sd": 0.0009989269060187364
+        },
+        "boundary_r2": {
+          "values": [
+            0.3289023504057756,
+            0.3297998736082773,
+            0.331782610414212
+          ],
+          "mean": 0.3301616114760883,
+          "sample_sd": 0.0014738097376547044
+        },
+        "paired_delta": {
+          "values": [
+            0.001302122944127737,
+            0.0005646413899937919,
+            0.0043591815724549066
+          ],
+          "mean": 0.0020753153021921453,
+          "sample_sd": 0.0020119651130188383
+        }
+      },
+      "f1": {
+        "source_r1": {
+          "values": [
+            0.6607307338041142,
+            0.6624960900844542,
+            0.6558102766798419
+          ],
+          "mean": 0.6596790335228034,
+          "sample_sd": 0.003464762665985234
+        },
+        "boundary_r2": {
+          "values": [
+            0.6645894999221063,
+            0.6648691514670897,
+            0.6676118462507876
+          ],
+          "mean": 0.6656901658799945,
+          "sample_sd": 0.001670087672031482
+        },
+        "paired_delta": {
+          "values": [
+            0.003858766117992074,
+            0.0023730613826354885,
+            0.011801569570945691
+          ],
+          "mean": 0.006011132357191085,
+          "sample_sd": 0.0050693887190657325
+        }
+      },
+      "recall": {
+        "source_r1": {
+          "values": [
+            0.6807972160708636,
+            0.6700411262258779,
+            0.6561214805441316
+          ],
+          "mean": 0.6689866076136244,
+          "sample_sd": 0.012371620268744055
+        },
+        "boundary_r2": {
+          "values": [
+            0.6747864599810187,
+            0.6630813033850047,
+            0.6703574818095539
+          ],
+          "mean": 0.6694084150585258,
+          "sample_sd": 0.005910010026026427
+        },
+        "paired_delta": {
+          "values": [
+            -0.006010756089844915,
+            -0.006959822840873153,
+            0.014236001265422349
+          ],
+          "mean": 0.0004218074449014268,
+          "sample_sd": 0.011972850333469705
+        }
+      }
+    },
+    "warnings": [
+      "Validation only; mAP is not accuracy",
+      "Three seeds compare source-r1 and boundary-r2, not V4",
+      "Not independent field validation; no healthy/OOD/calibration claim"
+    ]
+  },
+  "historical_h2_regression": {
+    "at_utc7": "2026-10-28T18:00:31+07:00",
+    "source": "AEGIS/h2_mobile_backend_20261028/progress_verification.json",
+    "source_sha256": "13a2ada5c8d37f0f6b6b920f7406522befa1578a566b929625b300f4bb4032fc",
+    "tests": 300,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source_copy_only": true,
+    "fresh_install_tested": false,
+    "native_ui_tested": false
+  },
+  "operations": [
+    {
+      "path": "AEGIS/late_assessment_20261025/soak_four_hours/RESULT.json",
+      "sha256": "c4045ebccd2d07e8a77293854991937d4ff27b90cb064a2f352d9916eb479dc7",
+      "state": "stopped",
+      "requested_seconds": 14400,
+      "actual_elapsed_seconds": 5949.75,
+      "completed_requested_duration": false,
+      "coverage_ok": false,
+      "resource_samples": 1163,
+      "http_requests": 3499
+    },
+    {
+      "path": "AEGIS/late_assessment_20261025/soak_four_hours_restart_20261026_074411/RESULT.json",
+      "sha256": "9c55254eab29f56079c3715a748b18c539d4d646905dd888d0fac5cad5c86e82",
+      "state": "completed",
+      "requested_seconds": 14400,
+      "actual_elapsed_seconds": 14407.469,
+      "completed_requested_duration": true,
+      "coverage_ok": true,
+      "resource_samples": 2799,
+      "http_requests": 8439
+    }
+  ],
+  "temporal": {
+    "trained_model_available": false,
+    "field_metrics": null,
+    "protocol": "v0.2 DRAFT",
+    "proposed_horizon_hours": 72,
+    "proposed_survey_gap_hours": 24,
+    "source_direction": "pots/trays planned",
+    "expert_verifier_confirmed": false,
+    "training_authorized": false
+  }
+}

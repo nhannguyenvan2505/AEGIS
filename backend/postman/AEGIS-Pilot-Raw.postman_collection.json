@@ -1,0 +1,704 @@
+{
+  "info": {
+    "name": "AEGIS Pilot Raw - software fixture only",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Temporary pilot server with controlled raw opt-in. No checkpoint/inference. All three source enums here carry SOFTWARE FIXTURES, never disease/field evidence. Do not run against a real store or export resolved credentials."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:REPLACE_WITH_TEMP_PORT"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{owner_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 Health - no model required",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/health",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id=()=>pm.variables.replaceIn('{{$guid}}');",
+              "pm.collectionVariables.set('owner_email','raw-owner-'+id()+'@example.test');",
+              "pm.collectionVariables.set('other_email','raw-other-'+id()+'@example.test');",
+              "pm.collectionVariables.set('software_password','Software-fixture-'+id());",
+              "for(const key of ['synthetic_client','field_client','controlled_client']) pm.collectionVariables.set(key,id());",
+              "const now=Date.now();",
+              "pm.collectionVariables.set('season_start',new Date(now-10*86400000).toISOString().slice(0,10));",
+              "pm.collectionVariables.set('season_end',new Date(now+10*86400000).toISOString().slice(0,10));",
+              "pm.collectionVariables.set('sample_payload',JSON.stringify({records:[{client_sample_id:id(),observed_at:new Date(now-600000).toISOString(),air_temperature_c:26,relative_humidity_pct:95,leaf_wet:null,reported_quality:'unknown',reference:'SOFTWARE FIXTURE - not field evidence'}]}));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Register fixture owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{owner_email}}\", \"password\": \"{{software_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Login fixture owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{owner_email}}\", \"password\": \"{{software_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('owner_token',pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Create fixture plot",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/plots",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"SOFTWARE FIXTURE raw contract\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('plot_id',pm.response.json().item.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Create fixture season",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/plots/{{plot_id}}/seasons",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"SOFTWARE FIXTURE\", \"start_date\": \"{{season_start}}\", \"end_date\": \"{{season_end}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('season_id',pm.response.json().item.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Create synthetic fixture stream",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"client_stream_id\": \"{{synthetic_client}}\", \"name\": \"SOFTWARE FIXTURE - not real measurements\", \"source\": \"synthetic\", \"method\": \"manual_reading\", \"instrument\": \"SOFTWARE FIXTURE - no device\", \"reference\": \"SOFTWARE FIXTURE\", \"nominal_interval_seconds\": null}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Exercise field enum with software fixture",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"client_stream_id\": \"{{field_client}}\", \"name\": \"SOFTWARE FIXTURE - not real measurements\", \"source\": \"field_observed\", \"method\": \"manual_reading\", \"instrument\": \"SOFTWARE FIXTURE - no device\", \"reference\": \"SOFTWARE FIXTURE\", \"nominal_interval_seconds\": null}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Create controlled fixture stream",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"client_stream_id\": \"{{controlled_client}}\", \"name\": \"SOFTWARE FIXTURE - not real measurements\", \"source\": \"controlled_experiment\", \"method\": \"manual_reading\", \"instrument\": \"SOFTWARE FIXTURE - no device\", \"reference\": \"SOFTWARE FIXTURE\", \"nominal_interval_seconds\": null, \"experiment_context\": {\"schema_version\": \"aegis-controlled-experiment-context-v1\", \"setting\": \"tray\", \"unit_alias\": \"SOFTWARE-FIXTURE-UNIT\", \"batch_alias\": \"SOFTWARE-FIXTURE-BATCH\", \"shared_environment_cluster_alias\": \"SOFTWARE-FIXTURE-CLUSTER\", \"control_level\": \"observational_setup\", \"control_description\": \"Software contract run only - no plants\", \"uncontrolled_factors\": [\"All conditions are simulated\"], \"setup_reference\": \"SOFTWARE FIXTURE\", \"source_dossier_reference\": \"SOFTWARE FIXTURE - unconfirmed\", \"collection_permission_reference\": \"SOFTWARE FIXTURE - not a real permission\"}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "const d=pm.response.json();pm.collectionVariables.set('stream_id',d.item.id);",
+              "pm.test('Raw-only policy',()=>{pm.expect(d.item.training_approved).to.eql(false);const p=d.item.metadata.source_policy;pm.expect(p.raw_only).to.eql(true);for(const k of ['rule_input_approved','disease_labels_approved','field_evaluation_approved','training_approved'])pm.expect(p[k]).to.eql(false);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Retry same controlled create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"client_stream_id\": \"{{controlled_client}}\", \"name\": \"SOFTWARE FIXTURE - not real measurements\", \"source\": \"controlled_experiment\", \"method\": \"manual_reading\", \"instrument\": \"SOFTWARE FIXTURE - no device\", \"reference\": \"SOFTWARE FIXTURE\", \"nominal_interval_seconds\": null, \"experiment_context\": {\"schema_version\": \"aegis-controlled-experiment-context-v1\", \"setting\": \"tray\", \"unit_alias\": \"SOFTWARE-FIXTURE-UNIT\", \"batch_alias\": \"SOFTWARE-FIXTURE-BATCH\", \"shared_environment_cluster_alias\": \"SOFTWARE-FIXTURE-CLUSTER\", \"control_level\": \"observational_setup\", \"control_description\": \"Software contract run only - no plants\", \"uncontrolled_factors\": [\"All conditions are simulated\"], \"setup_reference\": \"SOFTWARE FIXTURE\", \"source_dossier_reference\": \"SOFTWARE FIXTURE - unconfirmed\", \"collection_permission_reference\": \"SOFTWARE FIXTURE - not a real permission\"}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Same stream',()=>pm.expect(pm.response.json().item.id).to.eql(pm.collectionVariables.get('stream_id')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Context conflict is not a rewrite",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"client_stream_id\": \"{{controlled_client}}\", \"name\": \"SOFTWARE FIXTURE - not real measurements\", \"source\": \"controlled_experiment\", \"method\": \"manual_reading\", \"instrument\": \"SOFTWARE FIXTURE - no device\", \"reference\": \"SOFTWARE FIXTURE\", \"nominal_interval_seconds\": null, \"experiment_context\": {\"schema_version\": \"aegis-controlled-experiment-context-v1\", \"setting\": \"tray\", \"unit_alias\": \"SOFTWARE-FIXTURE-UNIT\", \"batch_alias\": \"DIFFERENT-SOFTWARE-FIXTURE\", \"shared_environment_cluster_alias\": \"SOFTWARE-FIXTURE-CLUSTER\", \"control_level\": \"observational_setup\", \"control_description\": \"Software contract run only - no plants\", \"uncontrolled_factors\": [\"All conditions are simulated\"], \"setup_reference\": \"SOFTWARE FIXTURE\", \"source_dossier_reference\": \"SOFTWARE FIXTURE - unconfirmed\", \"collection_permission_reference\": \"SOFTWARE FIXTURE - not a real permission\"}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409',()=>pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Filter controlled_experiment",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams?source=controlled_experiment&page_size=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Only selected source',()=>{const d=pm.response.json();pm.expect(d.pagination.total).to.eql(1);pm.expect(d.items[0].metadata.source).to.eql('controlled_experiment');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Filter synthetic",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams?source=synthetic&page_size=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Only selected source',()=>{const d=pm.response.json();pm.expect(d.pagination.total).to.eql(1);pm.expect(d.items[0].metadata.source).to.eql('synthetic');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Filter field_observed",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/environment-streams?source=field_observed&page_size=1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Only selected source',()=>{const d=pm.response.json();pm.expect(d.pagination.total).to.eql(1);pm.expect(d.items[0].metadata.source).to.eql('field_observed');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 Import fixture point",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/environment-streams/{{stream_id}}/samples",
+        "body": {
+          "mode": "raw",
+          "raw": "{{sample_payload}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('Point null and no hourly/train approval',()=>{const r=pm.response.json().items[0];pm.expect(r.payload.leaf_wet).to.eql(null);pm.expect(r.declared_source).to.eql('controlled_experiment');pm.expect(r.qc.hourly_eligible).to.eql(false);pm.expect(r.training_approved).to.eql(false);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 Retry fixture point",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/environment-streams/{{stream_id}}/samples",
+        "body": {
+          "mode": "raw",
+          "raw": "{{sample_payload}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Replay only',()=>{const d=pm.response.json();pm.expect(d.created).to.eql(0);pm.expect(d.replayed).to.eql(1);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 Source on sample is rejected",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/environment-streams/{{stream_id}}/samples",
+        "body": {
+          "mode": "raw",
+          "raw": "{{mixed_payload}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const p=JSON.parse(pm.collectionVariables.get('sample_payload'));p.records[0].source='field_observed';pm.collectionVariables.set('mixed_payload',JSON.stringify(p));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 Read points without mixing",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/environment-streams/{{stream_id}}/samples"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Exactly one point',()=>pm.expect(pm.response.json().pagination.total).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Register other fixture account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{other_email}}\", \"password\": \"{{software_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Login other fixture account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{other_email}}\", \"password\": \"{{software_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('other_token',pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 Foreign source access denied",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/environment-streams/{{stream_id}}/samples",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{other_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 Logout owner",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/auth/logout"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 Revoked owner token denied",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/environment-streams/{{stream_id}}/samples"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "for(const k of ['owner_token','other_token','software_password','owner_email','other_email','sample_payload','mixed_payload'])pm.collectionVariables.unset(k);"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

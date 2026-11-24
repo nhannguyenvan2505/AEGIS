@@ -1,11 +1,11 @@
 import { useRef } from 'react';
 import { Link, router } from 'expo-router';
 import { Pressable, Text, TextInput, View } from 'react-native';
-import { Button } from '../../components/UI';
 import { s } from '../../styles/generated/styles';
 import { useAuth } from '../../state/AuthContext';
+import { authThemes } from './authTheme';
 import { AuthField } from './components/AuthField';
-import { GoogleLoginButton } from './components/GoogleLoginButton';
+import { AuthLayout, AuthSecurityNote, AuthSubmitButton } from './components/AuthLayout';
 import { useAuthForm } from './useAuthForm';
 import { validateLogin, type LoginValues } from './validation';
 
@@ -17,32 +17,45 @@ export function LoginScreen({ onDemo }: { onDemo: () => void }) {
   const { values, errors, setField, submit, busy, error } = useAuthForm(initialValues, validateLogin, async values => { await signIn(values.email, values.password); router.replace('/'); });
 
   return (
-    <>
-      <Text style={s.subtitle}>Theo dõi đồng ruộng, phát hiện nguy cơ sớm và quản lý mùa vụ trong một ứng dụng.</Text>
-      <View style={s.card}>
-        <Text style={s.heading}>Chào mừng bạn trở lại</Text>
+    <AuthLayout
+      variant="login"
+      title={'Chăm lúa chủ động.\nAn tâm mùa vụ.'}
+      description="Theo dõi ruộng bằng IoT, nhận cảnh báo sớm từ AI."
+      onDemo={onDemo}
+    >
+      <View style={[s.authPageCard, s.authLoginForm]}>
+        <Text accessibilityRole="header" style={[s.authPageFormTitle, { color: authThemes.login.text }]}>Đăng nhập</Text>
         <AuthField
-          label="Email" icon="mail" placeholder="Nhập email của bạn" keyboardType="email-address"
+          variant="login" label="Email" icon="mail" placeholder="Nhập email" keyboardType="email-address"
           autoComplete="email" value={values.email} error={errors.email}
           onChangeText={value => setField('email', value)}
           returnKeyType="next" submitBehavior="submit" onSubmitEditing={() => passwordRef.current?.focus()}
         />
         <AuthField
-          ref={passwordRef} label="Mật khẩu" icon="lock" placeholder="Nhập mật khẩu" password
+          ref={passwordRef} variant="login" label="Mật khẩu" icon="lock" placeholder="Nhập mật khẩu" password
           value={values.password} error={errors.password} onChangeText={value => setField('password', value)}
           returnKeyType="done" onSubmitEditing={submit}
         />
-        {!!(error || restoreError) && <Text accessibilityRole="alert" style={s.error}>{error || restoreError}</Text>}
-        <Button title={busy ? "Đang xử lý…" : "Đăng nhập"} disabled={busy || !ready} onPress={() => void submit()} />
-        <GoogleLoginButton />
-      </View>
-      <Link href="/register" asChild>
-        <Pressable accessibilityRole="link" style={s.authLink}>
-          <Text style={s.authLinkText}>Chưa có tài khoản? <Text style={s.authLinkEmphasis}>Đăng ký</Text></Text>
+        <View style={s.authLoginSpacer} />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/forgot-password')}
+          style={({ pressed }) => [s.authForgotPassword, pressed && s.authPagePressed]}
+        >
+          <Text style={[s.authForgotPasswordText, { color: authThemes.login.text }]}>Quên mật khẩu?</Text>
         </Pressable>
-      </Link>
-      <Button title="Khám phá bản demo" secondary onPress={onDemo} />
-      <Text style={s.authDemoNote}>Bản demo sử dụng dữ liệu mẫu và không yêu cầu tài khoản.</Text>
-    </>
+        {!!(error || restoreError) && <Text accessibilityRole="alert" style={s.error}>{error || restoreError}</Text>}
+        <AuthSubmitButton variant="login" title={busy ? 'Đang xử lý…' : 'Đăng nhập'} disabled={busy || !ready} onPress={() => void submit()} />
+        <Link href="/register" asChild>
+          <Pressable accessibilityRole="link" style={s.authPageSwitch}>
+            <Text style={[s.authPageSwitchText, { color: authThemes.login.muted }]}>
+              Chưa có tài khoản?{'  '}
+              <Text style={[s.authPageSwitchEmphasis, { color: authThemes.login.link }]}>Đăng ký</Text>
+            </Text>
+          </Pressable>
+        </Link>
+        <AuthSecurityNote variant="login" />
+      </View>
+    </AuthLayout>
   );
 }

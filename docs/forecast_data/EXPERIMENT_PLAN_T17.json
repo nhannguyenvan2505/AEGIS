@@ -1,0 +1,40 @@
+{
+  "schema_version": "aegis-synthetic-forecast-experiment-v1",
+  "experiment_id": "t17-stochastic-hazard-v1",
+  "source": "synthetic",
+  "generator_version": "aegis-t17-persistent-weather-hazard-v1",
+  "seeds": [2026111701, 2026111702, 2026111703],
+  "units_per_group": 2,
+  "groups": {"train": 40, "calibration": 16, "selection": 16, "test": 24},
+  "split_issue_dates": {"train": "2026-07-01", "calibration": "2026-07-12", "selection": "2026-07-23", "test": "2026-08-03"},
+  "raw_interval_seconds": 600,
+  "lookback_hours": 120,
+  "horizon_hours": 72,
+  "generator": {
+    "temperature_mean_range": [21, 31],
+    "humidity_mean_range": [65, 95],
+    "future_persistence": 0.96,
+    "hourly_log_hazard_intercept": -5.5,
+    "weather_log_hazard_coefficient": 2.3,
+    "group_frailty_std": 0.45,
+    "unit_susceptibility_std": 0.7,
+    "raw_hour_dropout_probability": 0.12,
+    "unknown_age_probability": 0.04,
+    "uncertain_observation_probability": 0.04,
+    "unreviewed_observation_probability": 0.04,
+    "missed_last_visit_probability": 0.04
+  },
+  "models": {
+    "logistic": {"C": 1.0, "max_iter": 1000},
+    "hist_gradient_boosting": {"max_iter": 120, "max_leaf_nodes": 7, "min_samples_leaf": 12, "l2_regularization": 1.0}
+  },
+  "calibration": {"method": "logistic_on_clipped_logit", "C": 1.0, "epsilon": 0.000001},
+  "selection": {"criterion": "pooled_selection_log_loss_then_brier_then_name", "threshold_grid": [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95], "minimum_event_recall_including_abstentions": 0.75, "primary_artifact_seed": 2026111701},
+  "bootstrap": {"replicates": 300, "seed": 2026111799, "unit": "dependency_group_within_seed", "interval": "percentile_95"},
+  "acceptance": {"paired_delta_brier_upper_vs_prior_below": 0.0, "paired_delta_log_loss_upper_vs_prior_below": 0.0, "minimum_feature_coverage": 0.75, "minimum_event_recall_including_abstentions": 0.65},
+  "holdout_policy": "generate_and_open_only_after_selection_and_candidate_artifacts_frozen",
+  "threshold_policy": "selection_only_no_holdout_retuning",
+  "training_scope": "this_synthetic_experiment_only",
+  "deployment_activated": false,
+  "field_validated": false
+}

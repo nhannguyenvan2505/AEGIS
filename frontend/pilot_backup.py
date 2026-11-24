@@ -83,6 +83,10 @@ def readonly(path):
 
 
 def audit_data(root):
+    from app.hybrid_pilot import initialized
+    if initialized(Path(root)/'journal.sqlite3'):
+        from app.hybrid_backup import audit
+        return audit(root)
     """Structural and selected cross-file checks; not a clinical/training audit."""
     if decode((root/MARKER).read_text(encoding='utf-8')).get('kind')!=KIND:raise ValueError('Missing/unknown pilot marker')
     if not (root/'uploads').is_dir() or any(not (root/name).is_file() for name in DATABASES):raise ValueError('Current seven databases and uploads are required')
@@ -167,6 +171,10 @@ def audit_data(root):
 
 
 def backup(store,out):
+    from app.hybrid_pilot import initialized
+    if initialized(Path(store)/'journal.sqlite3'):
+        from app.hybrid_backup import backup as hybrid_backup
+        return hybrid_backup(store,out)
     store=validate_storage(plain_path(store));out=plain_path(out)
     if out.exists() or out.is_relative_to(store) or store.is_relative_to(out):raise ValueError('Use new backup outside source store')
     with StoreLease(store),StoreLease(store,'.automation.lock'):
@@ -184,6 +192,9 @@ def backup(store,out):
 
 
 def verify(bundle):
+    if (Path(bundle)/'hybrid-manifest.json').is_file():
+        from app.hybrid_backup import verify as hybrid_verify
+        return hybrid_verify(bundle)
     bundle=plain_path(bundle)
     if {p.name for p in bundle.iterdir()}!={'manifest.json','files'}:raise ValueError('Incomplete/unexpected backup contents')
     manifest_path=bundle/'manifest.json'

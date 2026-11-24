@@ -77,8 +77,11 @@ def context_check(profile):
 
 
 def latest_profile(db, season_id, user_id):
-    return db.execute('SELECT * FROM farm_cultivation_revisions WHERE season_id=? AND user_id=? ORDER BY revision DESC LIMIT 1',
-                      (season_id, user_id)).fetchone()
+    if hasattr(db, 'latest_profile'):
+        return db.latest_profile(season_id, user_id)
+    # Pilot automation still passes its read-only raw SQLite connection.
+    from .repositories.sqlite import SQLiteRepository
+    return SQLiteRepository(db).latest_profile(season_id, user_id)
 
 
 def serialize(row):

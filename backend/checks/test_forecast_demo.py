@@ -52,6 +52,7 @@ class ForecastDemo(unittest.TestCase):
                 self.fail(json.dumps(result)+'\n'+Path(result['log_path']).read_text(encoding='utf-8'))
             self.assertTrue(result['services_stopped'])
             self.assertTrue(result['store_preserved'])
+            self.assertTrue(1 <= result['forecast_worker_port'] <= 65535)
             self.assertNotIn(password, output.getvalue())
             ready = Path(result['log_path']).parent/'ready.json'
             self.assertEqual(json.loads(ready.read_text(encoding='utf-8'))['regions'], result['regions'])
@@ -61,8 +62,8 @@ class ForecastDemo(unittest.TestCase):
         self.assertEqual(len(results[0]['regions']), 2)
         self.assertNotEqual(*[r['score'] for r in results[0]['regions']])
         with contextlib.closing(sqlite3.connect(store/'telemetry.sqlite3')) as db:
-        self.assertEqual(db.execute('SELECT COUNT(*) FROM synthetic_forecasts').fetchone()[0], 4)
-        self.assertEqual(db.execute('SELECT COUNT(*) FROM synthetic_hourly_sources').fetchone()[0], 4)
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM synthetic_forecasts').fetchone()[0], 4)
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM synthetic_hourly_sources').fetchone()[0], 4)
         with contextlib.closing(sqlite3.connect(store/'demo.db')) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM users').fetchone()[0], 1)
 

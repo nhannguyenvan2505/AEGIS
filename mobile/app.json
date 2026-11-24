@@ -4,7 +4,7 @@
     "slug": "farmer-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app-logo.png",
+    "icon": "./assets/icons/app-logo.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
@@ -14,7 +14,7 @@
       "package": "com.aegis.mobile"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icons/app-logo.png"
     },
     "scheme": "aegis",
     "plugins": [
@@ -28,7 +28,8 @@
         }
       ],
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-sharing"
     ]
   }
 }

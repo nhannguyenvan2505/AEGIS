@@ -1,0 +1,197 @@
+{
+  "schema_version": "aegis-raw-telemetry-export-v1",
+  "exported_at": "2026-11-02T00:00:00+00:00",
+  "owner_id": "af95dd15-662a-4947-91b6-bba732598e9c",
+  "season_id": "c8751073-a1c5-4c39-b2f8-f48223afb99a",
+  "stream_id": "11111111-1111-4111-8111-111111111111",
+  "metadata": {
+    "name": "Synthetic instrument",
+    "source": "synthetic",
+    "method": "sensor_reading",
+    "instrument": "Software fixture \u2014 no physical sensor",
+    "reference": "SYNTHETIC",
+    "nominal_interval_seconds": 600,
+    "measurement_semantics": "point_observation",
+    "units": {
+      "air_temperature_c": "degC",
+      "relative_humidity_pct": "percent",
+      "leaf_wet": "boolean_point_state"
+    },
+    "provenance": "user_declared",
+    "calibration_verified": false
+  },
+  "metadata_sha256": "15a5d304dfa3c9ba76fd8c6bfa57af09bcfa971eea6c21ed31e12ef51fe1f33d",
+  "stream_created_at": "2026-11-01T00:00:00+00:00",
+  "readings": [
+    {
+      "id": "22222222-2222-4222-8222-000000000001",
+      "stream_id": "11111111-1111-4111-8111-111111111111",
+      "observed_at": "2026-11-01T00:00:00+00:00",
+      "payload_sha256": "807dc22bfd8f1eb1c183ecedeb67d8aa73988c7ce4aa1eab2674c72c2ff049c9",
+      "received_at": "2026-11-01T00:00:00+00:00",
+      "request_id": "synthetic-hourly-fixture",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 20,
+        "relative_humidity_pct": 60,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-T02"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-11-01T00:00:00+00:00"
+    },
+    {
+      "id": "22222222-2222-4222-8222-000000000002",
+      "stream_id": "11111111-1111-4111-8111-111111111111",
+      "observed_at": "2026-11-01T00:10:00+00:00",
+      "payload_sha256": "0bdc996df648106fc6b2c80bc283cedb85145b87612cdddb59f959942ab04241",
+      "received_at": "2026-11-01T00:10:00+00:00",
+      "request_id": "synthetic-hourly-fixture",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 22,
+        "relative_humidity_pct": 62,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-T02"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-11-01T00:10:00+00:00"
+    },
+    {
+      "id": "22222222-2222-4222-8222-000000000003",
+      "stream_id": "11111111-1111-4111-8111-111111111111",
+      "observed_at": "2026-11-01T00:20:00+00:00",
+      "payload_sha256": "b688ad8efad4c4b416af747bbce73e0b691a1becc89d1ba5be8bf013b9c28c76",
+      "received_at": "2026-11-01T00:20:00+00:00",
+      "request_id": "synthetic-hourly-fixture",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 24,
+        "relative_humidity_pct": 64,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-T02"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-11-01T00:20:00+00:00"
+    },
+    {
+      "id": "22222222-2222-4222-8222-000000000004",
+      "stream_id": "11111111-1111-4111-8111-111111111111",
+      "observed_at": "2026-11-01T00:30:00+00:00",
+      "payload_sha256": "c8a21ad9c862a8b8437e45c9efdfa8150a9bb8b052561fa1789b1b079b55b3b9",
+      "received_at": "2026-11-01T00:30:00+00:00",
+      "request_id": "synthetic-hourly-fixture",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 26,
+        "relative_humidity_pct": 66,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-T02"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-11-01T00:30:00+00:00"
+    },
+    {
+      "id": "22222222-2222-4222-8222-000000000005",
+      "stream_id": "11111111-1111-4111-8111-111111111111",
+      "observed_at": "2026-11-01T00:40:00+00:00",
+      "payload_sha256": "27915b2f9729658a48ede792521f9d5aa2f0f5190d8802c90509e42bc3522656",
+      "received_at": "2026-11-01T00:40:00+00:00",
+      "request_id": "synthetic-hourly-fixture",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 28,
+        "relative_humidity_pct": 68,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-T02"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-11-01T00:40:00+00:00"
+    },
+    {
+      "id": "22222222-2222-4222-8222-000000000006",
+      "stream_id": "11111111-1111-4111-8111-111111111111",
+      "observed_at": "2026-11-01T00:50:00+00:00",
+      "payload_sha256": "b388e165f1636b202a45f0a75a2ed12abe2fcad58017c6e5070cca5a6b9edbcf",
+      "received_at": "2026-11-01T00:50:00+00:00",
+      "request_id": "synthetic-hourly-fixture",
+      "exclusion_reason": null,
+      "excluded_at": null,
+      "exclusion_request_id": null,
+      "payload": {
+        "air_temperature_c": 30,
+        "relative_humidity_pct": 70,
+        "leaf_wet": true,
+        "reported_quality": "unknown",
+        "reference": "SYNTHETIC-T02"
+      },
+      "qc": {
+        "version": "aegis-raw-qc-v1",
+        "missing_fields": [],
+        "reported_suspect": false,
+        "status": "within_technical_bounds",
+        "calibration_verified": false,
+        "hourly_eligible": false
+      },
+      "available_at": "2026-11-01T00:50:00+00:00"
+    }
+  ],
+  "training_approved": false,
+  "hourly_aggregation_performed": false,
+  "limits": [
+    "Declared source/instrument, calibration not verified",
+    "Point wetness does not establish wet duration",
+    "Empty stream does not establish coverage"
+  ],
+  "bundle_sha256": "da833ef141218380c0cb6af15f6bbb5a426385b090de653e330cb1007a2ea14e"
+}

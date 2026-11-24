@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+instance/
+checks/tools/
+postman/fixtures/*.jpg
+postman/fixtures/*.bin
+postman/*local*.json
+postman/reports/
+checks/*_run.log
+
+# Private storage/config even if a new development entry point uses these names
+uploads/
+backups/
+.env.*
+!.env.example
