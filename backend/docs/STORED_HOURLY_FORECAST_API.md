@@ -1,6 +1,6 @@
 # Dự báo từ nguồn hourly đã lưu T05
 
-**Cập nhật T09 ngày08/11/2026:** nhánh nguồn đã lưu và scheduler chuyển sang FM-03 weather sau acceptance5seed. Đủ120giờ temp/RH và biết tuổi lúa có thể trả forecast_ready khi wetness=null. [Contract và hành vi hiện tại](RAW_WEATHER_FORECAST_T09.md). Phần T05 dưới đây ghi cơ chế và bằng chứng tại thời điểm bàn giao FM-02.
+**Cập nhật T09 ngày 08/11/2026:** nhánh nguồn đã lưu và scheduler chuyển sang FM-03 weather sau acceptance5seed. Đủ 120 giờ temp/RH và biết tuổi lúa có thể trả forecast_ready khi wetness=null. [Contract và hành vi hiện tại](RAW_WEATHER_FORECAST_T09.md). Phần T05 dưới đây ghi cơ chế và bằng chứng tại thời điểm bàn giao FM-02.
 
 T05 nối nguồn hourly T04 vào worker FM-02 và lịch sử forecast hiện hành. Lời gọi mở rộng scenario hourly tại `POST /api/farm/seasons/{season_id}/forecasts`. Backend lấy nguồn và hồ sơ canh tác từ kho theo Bearer owner.
 
@@ -24,7 +24,7 @@ Backend kiểm owner, season, liên kết stream, plot và hash output/input ngu
 
 Profile cultivation được chọn theo revision mới nhất đã created_at<=issued_at và cùng owner/season. Profile hash được kiểm trước khi chuyển sang context_revisions. Chưa có profile tại issued_at thì gửi danh sách rỗng, feature preparation thể hiện unknown_calendar_crop_age. Input model giữ snapshot profile đã chọn, tránh việc hồ sơ tới muộn thay đổi forecast quá khứ.
 
-Projection tái dùng hàm project_feature_input trong adapter. Nhiệt/RH lấy từ numeric value đã qua QC/coverage, whole-hour leaf_wet vẫn null. Worker hiện hành vì vậy trả insufficient_data và score/predicted_event=null. Backend kiểm trạng thái này và đối chiếu input_snapshot/input_sha256/issued_at do worker trả với chính payload đã chuẩn bị. Kết quả sai nguồn hoặc sai snapshot trả502.
+Projection tái dùng hàm project_feature_input trong adapter. Nhiệt/RH lấy từ numeric value đã qua QC/coverage, whole-hour leaf_wet vẫn null. Worker hiện hành vì vậy trả insufficient_data và score/predicted_event=null. Backend kiểm trạng thái này và đối chiếu input_snapshot/input_sha256/issued_at do worker trả với chính payload đã chuẩn bị. Kết quả sai nguồn hoặc sai snapshot trả 502.
 
 Positive control ready riêng trong kiểm thử gọi pipeline Logistic Regression thật để xác nhận model nạp được và predict chạy được. Trong luồng raw point, kết quả thiếu dữ liệu là hành vi abstention của feature pipeline; chưa có score dự báo bệnh từ nguồn này.
 
@@ -36,11 +36,11 @@ Forecast, input model và liên kết source được ghi trong cùng transactio
 
 Replay identity của lời gọi này bao gồm model pin, hash input model và provenance source. Vì vậy hai source revision có cùng input worker vẫn lưu forecast riêng và giữ đúng lineage. Cột input_hash phục vụ khóa dedup trong bảng forecast chứa hash identity tổng hợp cho dạng request này; result.input_sha256 tiếp tục là hash chính xác của input model.
 
-Request retry có thể đọc lại forecast đã lưu trước khi gọi worker, nên worker ngừng vẫn replay được. Request mới trong lúc worker ngừng trả503 và chưa tạo forecast. GET lịch sử, detail và input hoạt động độc lập với worker.
+Request retry có thể đọc lại forecast đã lưu trước khi gọi worker, nên worker ngừng vẫn replay được. Request mới trong lúc worker ngừng trả 503 và chưa tạo forecast. GET lịch sử, detail và input hoạt động độc lập với worker.
 
 ## Response và quyền
 
-Tạo mới trả201 với success/item/replayed=false. Retry trả200 cùng item và replayed=true. Đọc qua các endpoint forecast hiện có.
+Tạo mới trả 201 với success/item/replayed=false. Retry trả 200 cùng item và replayed=true. Đọc qua các endpoint forecast hiện có.
 
 | Endpoint | Nội dung |
 |---|---|

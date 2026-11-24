@@ -14,7 +14,7 @@ cho mobile, chưa thay UI/native của nhóm. Ba loại bằng chứng này ph�
 
 ## 2. Ma trận yêu cầu → module → kiểm thử → bằng chứng
 
-“Đã có” chỉ áp dụng phần kỹ thuật ghi ở từng dòng. Evidence E01 (300 tests) là phiên H2 ngày28/10,
+“Đã có” chỉ áp dụng phần kỹ thuật ghi ở từng dòng. Evidence E01 (300 tests) là phiên H2 ngày 28/10,
 không phải toàn bộ test vừa chạy lại ở H6. Demo D01–D08 là checkpoint phần mềm, không mẫu thực địa.
 
 | ID / yêu cầu | Trạng thái | Source/contract | Test tham chiếu | Evidence / demo |
@@ -59,7 +59,7 @@ không phải toàn bộ test vừa chạy lại ở H6. Demo D01–D08 là chec
 | R13 | Backup/restore7DB, hash/lease/integrity/owner chain đã kiểm trên temp. | Không production recovery, encryption/off-device hay retention đã áp dụng. | RPO/RTO/quyền/retention cần quyết định vận hành. |
 | R14 | Request ID, retry và giới hạn phần mềm đã có kiểm thử. | Không benchmark tải/SLA/production security. | Môi trường nhiều process/proxy cần cấu hình và kiểm riêng. |
 | R15 | Phiên4h chạy lại completed; phiên trước stopped được giữ riêng. | 168h mô phỏng không uptime7ngày;4h không SLA/memory-leak proof. | H5 chỉ chọn failure case có nhu cầu; không chạy soak mới trong H6. |
-| R16 | V4 source-validation mAP/F1 lịch sử và paired3seed được truy vết; giữ V4. | mAP không accuracy;3seed không là V4 đối chứng; không generalization thực địa. | Thiếu healthy/OOD, chuyên gia, calibration và holdout độc lập. |
+| R16 | V4 source-validation mAP/F1 lịch sử và paired3seed được truy vết; giữ V4. | mAP không accuracy;3 seed không là V4 đối chứng; không generalization thực địa. | Thiếu healthy/OOD, chuyên gia, calibration và holdout độc lập. |
 | R17 | H1/H2 clean source copy, manifest và CPU regression đã có. | Không đồng nghĩa clean clone/publish/clean dependency install. | Provision runtime/model theo hash và dependency install máy nhận cần kiểm. |
 | R18 | Có bằng chứng client HTTP/export lịch sử; H2 là API slice. | Bundle export không APK, chưa chứng minh camera/SecureStore/native followup. | Nhóm mobile kiểm/tích hợp; người dùng vẫn tập trung AI/ML–Backend. |
 | R19 | Đã chuẩn bị protocol/source role/intake; dự kiến khay, chưa người xác minh. | Mẫu form/permission reference không phải chấp thuận hoặc nhãn thật. | Cần nguồn/quyền/SOP/lịch/chuyên môn và cụm độc lập có bằng chứng. |
@@ -89,7 +89,7 @@ Confidence không là xác suất bệnh hiệu chuẩn. Xem E03–E06/E14 để
 
 ## 5. Vận hành và nghiên cứu — đọc đúng đơn vị
 
-| Phiên soak lịch sử | Trạng thái | Thời lượng thực gồm lifecycle (giây) | Đủ14400giây yêu cầu? | HTTP / resource samples |
+| Phiên soak lịch sử | Trạng thái | Thời lượng thực gồm lifecycle (giây) | Đủ 14400 giây yêu cầu? | HTTP / resource samples |
 |---|---|---:|---|---|
 | soak_four_hours | stopped | 5949.750 | False | 3499 / 1163 |
 | soak_four_hours_restart_20261026_074411 | completed | 14407.469 | True | 8439 / 2799 |
@@ -120,7 +120,7 @@ File curate E14 là metadata chọn lọc, không thay raw evidence/permission. 
 | E06 | [VERIFICATION.md](../handoff_20261024/VERIFICATION.md) / `29e5d004e7703b20889572619e09e4ef5808a4d4572ef868ea270ebf1fc88884` | 2026-10-24 / local_historical | Historical real V4 HTTP và contract rehearsal, không field performance |
 | E07 | [REVIEW_VI.md](../task08_leakage_audit_20261027/REVIEW_VI.md) / `1c2447aaa3c7ede3a9590c9902abe3a5a0f3bab9cbb6c7a79ed92c05576c860f` | 2026-10-27 / local_historical | Mutation as-of synthetic; không chứng minh mọi leakage path |
 | E08 | [REVIEW_VI.md](../task17_backup_restore_20261028/REVIEW_VI.md) / `d7de584dda53332129901f4670c0a60fd5d14af2946271d893caa8f692b98bb7` | 2026-10-28 / local_historical | Backup/restore bảy DB trên kho tạm |
-| E09 | [RESULT.json](../late_assessment_20261025/soak_four_hours/RESULT.json) / `c4045ebccd2d07e8a77293854991937d4ff27b90cb064a2f352d9916eb479dc7` | 2026-10-25 / local_historical | Soak stopped, chưa đủ4h; không gộp với phiên sau |
+| E09 | [RESULT.json](../late_assessment_20261025/soak_four_hours/RESULT.json) / `c4045ebccd2d07e8a77293854991937d4ff27b90cb064a2f352d9916eb479dc7` | 2026-10-25 / local_historical | Soak stopped, chưa đủ 4h; không gộp với phiên sau |
 | E10 | [RESULT.json](../late_assessment_20261025/soak_four_hours_restart_20261026_074411/RESULT.json) / `9c55254eab29f56079c3715a748b18c539d4d646905dd888d0fac5cad5c86e82` | 2026-10-26 / local_historical | Phiên chạy lại completed4h mock; không SLA |
 | E11 | [MOBILE_VERIFICATION_20261025.md](MOBILE_VERIFICATION_20261025.md) / `29fd2e7e0c7648e20d97fd4471c33dc2012e0c9af69e525f4bac04646577730e` | 2026-10-25 / bundled_historical | Client HTTP/export lịch sử; chưa native camera/SecureStore |
 | E12 | [RESEARCH_PROTOCOL_v0.2_DRAFT.md](../../AEGIS-AI/temporal_warning/RESEARCH_PROTOCOL_v0.2_DRAFT.md) / `df7d303039a15d6e9b3a9767507ff7b135a26f18df981dfdd89e0b1ff21794e5` | 2026-10-27 / source_document | Protocol dự thảo, không empirical evaluation |
@@ -130,7 +130,7 @@ File curate E14 là metadata chọn lọc, không thay raw evidence/permission. 
 ## 7. Kiểm chứng và cập nhật hồ sơ
 
 `tools/check_thesis_evidence.py` kiểm20 ID, refs source/test/contract, hash curated/bundled; thêm
-`--local-evidence` mới đối chiếu cả14 evidence gốc. Nếu thiếu file, báo thiếu chứ không gán verified.
+`--local-evidence` mới đối chiếu cả 14 evidence gốc. Nếu thiếu file, báo thiếu chứ không gán verified.
 Kết quả checker không chạy lại inference/test/soak lịch sử. Mọi bản sửa kết luận/số liệu phải giữ ngày,
 scope, nguồn và giới hạn; không tự sửa artifact cũ. Các yêu cầu nghiệm thu học thuật cần nhóm/giảng viên
 xác nhận riêng khi có rubric. H6 không xuất slide/PDF hoặc công bố dữ liệu lên dịch vụ ngoài.

@@ -1,4 +1,4 @@
-"""Idempotent MySQL outbox delivery. A failed Mongo write remains retryable."""
+"""Idempotent MySQL outbox delivery to Mongo, off the API request path (BE-02)."""
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
@@ -19,35 +19,135 @@ def enqueue(repo, collection, key, document):
                  (key,collection,payload,digest))
 
 
+MAX_ATTEMPTS = 8
+BACKOFF_BASE_SECONDS = 5
+BACKOFF_MAX_SECONDS = 3600
+
+
+def backoff_seconds(attempts):
+    """Delay before the next try after `attempts` failed tries (1-based)."""
+    return min(BACKOFF_MAX_SECONDS, BACKOFF_BASE_SECONDS * 2 ** max(0, attempts - 1))
+
+
 def deliver(config, limit=100):
+    """Deliver due outbox events to Mongo, one short MySQL transaction per event.
+
+    Runs outside API requests and never takes the global runtime_lock: each
+    event row is claimed with FOR UPDATE SKIP LOCKED under READ COMMITTED, so
+    business transactions and other dispatchers are not blocked by Mongo I/O.
+    - Mongo unreachable: record the attempt and stop the batch (no backoff;
+      the outage is not the event's fault).
+    - Payload conflict/corrupt document: park as 'failed' immediately.
+    - Other Mongo errors: exponential backoff; park as 'failed' after
+      MAX_ATTEMPTS. Parked events never block later events.
+    """
     from pymongo import MongoClient
     from bson import json_util
-    from .repositories.mysql import mysql_repository
-    from pymongo.errors import PyMongoError
-    options=dict(config['MONGO']); database=options.pop('database')
-    sent=failed=0
-    with MongoClient(**options,serverSelectionTimeoutMS=3000,connectTimeoutMS=3000,socketTimeoutMS=5000) as client:
-        for _ in range(limit):
-            with mysql_repository(config) as repo:
-                row=repo.one("SELECT * FROM mongo_outbox WHERE status='pending' ORDER BY created_at,event_key LIMIT 1 FOR UPDATE")
-                if row is None: break
-                try:
-                    document=json_util.loads(row['document_json'])
-                    target=client[database][row['collection_name']]
-                    existing=target.find_one({'_id':document['_id']})
-                    if existing is not None:
-                        if json_util.dumps(existing,json_options=json_util.CANONICAL_JSON_OPTIONS,sort_keys=True) != row['document_json']:
-                            raise ValueError('Mongo immutable payload conflict')
-                    else:
-                        target.insert_one(document)
-                    repo.execute("UPDATE mongo_outbox SET status='delivered',attempts=attempts+1,last_error=NULL,delivered_at=UTC_TIMESTAMP(6) WHERE event_key=%s",(row['event_key'],))
-                    sent+=1
-                except (PyMongoError,ValueError) as exc:
-                    # Store the error type only; server errors can contain payloads/secrets.
-                    repo.execute('UPDATE mongo_outbox SET attempts=attempts+1,last_error=%s WHERE event_key=%s',(type(exc).__name__,row['event_key']))
-                    failed+=1
-            if failed: break
-    return {'delivered':sent,'failed':failed}
+    from bson.errors import BSONError
+    from pymongo.errors import ConnectionFailure, PyMongoError
+    from .repositories.mysql import open_connection
+    options = dict(config['MONGO']); database = options.pop('database')
+    sent = failed = parked = 0
+    connection = open_connection(config)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED')
+        with MongoClient(**options, serverSelectionTimeoutMS=3000, connectTimeoutMS=3000,
+                         socketTimeoutMS=5000) as client:
+            for _ in range(limit):
+                connection.begin()
+                with connection.cursor() as cursor:
+                    cursor.execute("""SELECT event_key,collection_name,document_json,attempts FROM mongo_outbox
+                        WHERE status='pending' AND next_attempt_at<=UTC_TIMESTAMP(6)
+                        ORDER BY next_attempt_at,created_at,event_key LIMIT 1 FOR UPDATE SKIP LOCKED""")
+                    row = cursor.fetchone()
+                    if row is None:
+                        connection.commit()
+                        break
+                    key = row['event_key']
+                    stop = False
+                    try:
+                        document = json_util.loads(row['document_json'])
+                        target = client[database][row['collection_name']]
+                        existing = target.find_one({'_id': document['_id']})
+                        if existing is not None:
+                            if json_util.dumps(existing, json_options=json_util.CANONICAL_JSON_OPTIONS,
+                                               sort_keys=True) != row['document_json']:
+                                raise ValueError('Mongo immutable payload conflict')
+                        else:
+                            target.insert_one(document)
+                        cursor.execute("""UPDATE mongo_outbox SET status='delivered',attempts=attempts+1,last_error=NULL,
+                            last_attempt_at=UTC_TIMESTAMP(6),delivered_at=UTC_TIMESTAMP(6) WHERE event_key=%s""", (key,))
+                        sent += 1
+                    except ConnectionFailure as exc:
+                        # Store the error type only; server errors can contain payloads/secrets.
+                        cursor.execute("""UPDATE mongo_outbox SET attempts=attempts+1,last_error=%s,
+                            last_attempt_at=UTC_TIMESTAMP(6) WHERE event_key=%s""", (type(exc).__name__, key))
+                        failed += 1; stop = True
+                    except (ValueError, KeyError, BSONError) as exc:
+                        cursor.execute("""UPDATE mongo_outbox SET status='failed',attempts=attempts+1,last_error=%s,
+                            last_attempt_at=UTC_TIMESTAMP(6) WHERE event_key=%s""", (type(exc).__name__, key))
+                        failed += 1; parked += 1
+                    except PyMongoError as exc:
+                        attempts = row['attempts'] + 1
+                        if attempts >= MAX_ATTEMPTS:
+                            cursor.execute("""UPDATE mongo_outbox SET status='failed',attempts=%s,last_error=%s,
+                                last_attempt_at=UTC_TIMESTAMP(6) WHERE event_key=%s""", (attempts, type(exc).__name__, key))
+                            parked += 1
+                        else:
+                            cursor.execute("""UPDATE mongo_outbox SET attempts=%s,last_error=%s,last_attempt_at=UTC_TIMESTAMP(6),
+                                next_attempt_at=UTC_TIMESTAMP(6)+INTERVAL %s SECOND WHERE event_key=%s""",
+                                (attempts, type(exc).__name__, backoff_seconds(attempts), key))
+                        failed += 1
+                connection.commit()
+                if stop:
+                    break
+    except BaseException:
+        try:
+            connection.rollback()
+        except Exception:
+            pass
+        raise
+    finally:
+        connection.close()
+    return {'delivered': sent, 'failed': failed, 'parked': parked}
+
+
+def outbox_status(config):
+    """Queue health for monitoring: counts per status and oldest due-pending age."""
+    from .repositories.mysql import open_connection
+    connection = open_connection(config)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT status,COUNT(*) n FROM mongo_outbox GROUP BY status')
+            counts = {row['status']: row['n'] for row in cursor.fetchall()}
+            cursor.execute("""SELECT TIMESTAMPDIFF(SECOND,MIN(created_at),UTC_TIMESTAMP(6)) age
+                FROM mongo_outbox WHERE status='pending'""")
+            age = cursor.fetchone()['age']
+        connection.commit()
+    finally:
+        connection.close()
+    return {'pending': counts.get('pending', 0), 'delivered': counts.get('delivered', 0),
+            'failed': counts.get('failed', 0), 'oldest_pending_age_seconds': age}
+
+
+def retry_failed(config, event_keys=None):
+    """Return parked events to the queue after the cause was fixed (operator action)."""
+    from .repositories.mysql import open_connection
+    connection = open_connection(config)
+    try:
+        with connection.cursor() as cursor:
+            sql = """UPDATE mongo_outbox SET status='pending',attempts=0,next_attempt_at=UTC_TIMESTAMP(6)
+                WHERE status='failed'"""
+            if event_keys:
+                cursor.execute(sql + ' AND event_key IN (' + ','.join(['%s'] * len(event_keys)) + ')', tuple(event_keys))
+            else:
+                cursor.execute(sql)
+            count = cursor.rowcount
+        connection.commit()
+    finally:
+        connection.close()
+    return count
 
 
 def inference_event(repo, analysis, result):

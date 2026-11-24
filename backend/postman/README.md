@@ -2,11 +2,11 @@
 
 ## Current pilot raw contract — 28/10/2026
 
-[AEGIS-Pilot-Raw.postman_collection.json](D:/AEGIS/backend/postman/AEGIS-Pilot-Raw.postman_collection.json)
+[AEGIS-Pilot-Raw.postman_collection.json](AEGIS-Pilot-Raw.postman_collection.json)
 là collection riêng22 request cho raw pilot có controlled opt-in: create/retry/
 conflict, filter, sample, owner scope và logout401. Chỉ software fixture, không
 detect/AI/checkpoint hoặc quyền/giấy phép thật. Không chạy trên kho thật. Xem
-[runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md) và [contract](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md).
+[runbook](../../docs/CURRENT_RUNBOOK.md) và [contract](../../frontend/CONTROLLED_EXPERIMENT_RAW.md).
 
 Builder build_pilot_raw_postman.py chỉ ghi output mới, không regenerate các
 collection ảnh/farm/cultivation lịch sử. Runner run_pilot_raw_postman.cjs dùng

@@ -1,6 +1,6 @@
 # Nghiệm thu adapter hourly và feature preparation T03
 
-Ngày 07/11/2026, Asia/Bangkok. T03 đạt phạm vi nghiệm thu offline. Luồng thực chạy gồm720điểm synthetic →120bucket hourly →feature input v1 →feature preparation. Coverage cuối cùng là temp120, rh120, wet0. Feature trả insufficient_data với predictors=null và lý do thiếu120giờ whole-hour wetness, phù hợp quyết định T01.
+Ngày 07/11/2026, Asia/Bangkok. T03 đạt phạm vi nghiệm thu offline. Luồng thực chạy gồm720 điểm synthetic →120 bucket hourly →feature input v1 →feature preparation. Coverage cuối cùng là temp120, rh120, wet0. Feature trả insufficient_data với predictors=null và lý do thiếu120giờ whole-hour wetness, phù hợp quyết định T01.
 
 ## Đường tích hợp
 
@@ -8,7 +8,7 @@ Thêm `prepare_feature_input(raw_bundle, policy, request, plot_id, context_revis
 
 Caller cấp plot_id và lịch sử cultivation của mùa vụ. season_id lấy từ raw bundle. V1 dùng stream_id làm định danh series device logic để giữ một nguồn đo trong một series. T04 cần xác minh liên kết owner/plot/season/stream tại Backend khi lấy dữ liệu thật từ kho. UUID stream khác với định danh phần cứng sẽ được giữ riêng nếu triển khai registry thiết bị.
 
-Runtime feature được gọi thực tế từ `forecast_demo/runtime`. Bài CLI cũng chạy `D:/AEGIS-AI/temporal_warning/feature_preparation.py` khi workspace này hiện diện và đối chiếu toàn response. Trong lượt này cả hai đường đã chạy và kết quả trùng nhau. Positive control dùng fixture whole-hour ready hiện có và trả đủ61predictor. Raw point fixture trả insufficient_data do thiếu wet semantics.
+Runtime feature được gọi thực tế từ `forecast_demo/runtime`. Bài CLI cũng chạy `D:/AEGIS-AI/temporal_warning/feature_preparation.py` khi workspace này hiện diện và đối chiếu toàn response. Trong lượt này cả hai đường đã chạy và kết quả trùng nhau. Positive control dùng fixture whole-hour ready hiện có và trả đủ 61 predictor. Raw point fixture trả insufficient_data do thiếu wet semantics.
 
 ## Ma trận T01
 
@@ -16,8 +16,8 @@ Tên test dưới thuộc `frontend/test_hourly_aggregation.py`, trừ các tên
 
 | Ca | Hành vi đã kiểm | Test |
 |---|---|---|
-| A | Sáu slot, mean25/65, lineage/hash, wet null | test_complete_mean_lineage_hash_and_immutable_inputs |
-| B |5/6slot đạt coverage, mean24/64 | test_five_slots_pass_four_fail |
+| A | Sáu slot, mean 25/65, lineage/hash, wet null | test_complete_mean_lineage_hash_and_immutable_inputs |
+| B |5/6slot đạt coverage, mean 24/64 | test_five_slots_pass_four_fail |
 | C |4/6slot thiếu coverage, values null | test_five_slots_pass_four_fail |
 | D | RH thiếu riêng, T giữ giá trị | test_per_variable_null_and_pending_boundary; test_hourly_features.test_partial_numeric_hour_keeps_other_variable |
 | E | Trước closure pending; equality đóng bucket | test_per_variable_null_and_pending_boundary; test_hourly_features.test_pending_final_hour_is_missing_at_feature_boundary |
@@ -39,8 +39,8 @@ Các kiểm bổ sung gồm tolerance equality, đúng nửa interval bị off_s
 
 | Bộ kiểm | Kết quả | Log |
 |---|---|---|
-| Hourly adapter + feature acceptance + raw audit/monitor |42bài đạt, gồm8bài integration mới | hourly_contract_v1/t03_checks.log |
-| Feature preparation + temporal pipeline nghiên cứu |34bài đạt | hourly_contract_v1/t03_temporal_checks.log |
+| Hourly adapter + feature acceptance + raw audit/monitor |42 bài đạt, gồm8bài integration mới | hourly_contract_v1/t03_checks.log |
+| Feature preparation + temporal pipeline nghiên cứu |34 bài đạt | hourly_contract_v1/t03_temporal_checks.log |
 
 Tổng76bài đạt. Output CLI/library trên120giờ đã được lưu tại [feature input](../hourly_contract_v1/t03_feature_input.synthetic.json), [feature output](../hourly_contract_v1/t03_features.synthetic.json) và [summary có source/hash](../hourly_contract_v1/t03_summary.json).
 

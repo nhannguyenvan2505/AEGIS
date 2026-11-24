@@ -9,11 +9,11 @@ Xem [contract JWT/admin và cách cấp admin đầu tiên](JWT_RBAC.md).
 mô tả nguồn hourly có revision, create/list/detail/input và tổng quan theo
 owner. Chạy qua launcher/kho pilot; không thay API ảnh hoặc core mặc định.
 
-Cập nhật28/10/2026: đây là contract **Backend core**, không tự bật pilot.
-[Chỉ mục hiện hành](D:/AEGIS/docs/CURRENT_HANDOFF.md) và
-[raw controlled opt-in](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md) phân
+Cập nhật 28/10/2026: đây là contract **Backend core**, không tự bật pilot.
+[Chỉ mục hiện hành](../../docs/CURRENT_HANDOFF.md) và
+[raw controlled opt-in](../../frontend/CONTROLLED_EXPERIMENT_RAW.md) phân
 biệt entry point/source/schema. Pilot có collection raw riêng, không thay
-collection ảnh V4; forecast synthetic pilot được bổ sung ở mốc05/11 bên trên.
+collection ảnh V4; forecast synthetic pilot được bổ sung ở mốc 05/11 bên trên.
 
 API nghiệp vụ/cảnh báo mock đã tích hợp: [FARM_WARNING_API.md](FARM_WARNING_API.md).
 Ruộng → mùa vụ → thiết bị → telemetry → assessment/history → liên kết analysis;
@@ -24,7 +24,7 @@ Mobile chỉ gọi Backend. AI tại port 8000 là service nội bộ, không ph
 
 Mọi response có `X-Request-ID` và `X-Processing-Time-Ms`. Error JSON thêm
 `request_id` trùng header. POST detect, detail và item history thêm request_id
-của lần nhận diện gốc, model_sha256 và timings {ai_processing_ms,ai_roundtrip_ms}.
+của lần nhận diện gốc, model_sha256 và timings {ai_processing_ms, ai_roundtrip_ms}.
 GET có header ID riêng; không nhầm với origin ID trong analysis. Metadata bản ghi
 cũ có thể null. Xem [phạm vi timing và migration](OBSERVABILITY.md).
 Quota và admission: xem [RESOURCE_LIMITS.md](RESOURCE_LIMITS.md). Response 429/503
@@ -35,7 +35,7 @@ do giới hạn có header Retry-After; không retry POST liên tục.
 | Method / path | Body | Thành công |
 |---|---|---|
 | GET /health | Không | 200: success, service, status |
-| POST /api/auth/register | JSON: email, password | 201: success, user {id,email} |
+| POST /api/auth/register | JSON: email, password | 201: success, user {id, email} |
 | POST /api/auth/login | JSON: email, password | 200: success, access_token, token_type, expires_at, user |
 | GET /api/auth/me | Không | 200: success, user |
 | POST /api/auth/logout | Không | 200: success |
@@ -119,7 +119,7 @@ Tham số lặp/sai định dạng/vượt giới hạn trả 400. Trang trống
 Khi total=0 thì total_pages=0. Offset pages có thể dịch chuyển khi có bản ghi mới.
 
 Mỗi item gồm analysis_id, created_at, model_version, status, detection_count,
-image {width,height,orientation}, image_url. Không gồm toàn bộ detections;
+image {width, height, orientation}, image_url. Không gồm toàn bộ detections;
 lấy endpoint chi tiết để xem danh sách box.
 
 ```json

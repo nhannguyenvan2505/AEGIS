@@ -1,9 +1,9 @@
 # Quản lý source và bàn giao chọn lọc — TASK-20
 
-**Cập nhật07/11/2026:** người dùng đã yêu cầu chuyển source để thành viên
+**Cập nhật 07/11/2026:** người dùng đã yêu cầu chuyển source để thành viên
 frontend clone và demo. Nhánh `codex/portable-forecast-demo` chứa source demo
 đã curate; các đoạn “không stage/commit/push” dưới đây giữ lại như chính sách
-và trạng thái của TASK-20 ngày28/10, không còn mô tả nhánh mới. Dataset, weights,
+và trạng thái của TASK-20 ngày 28/10, không còn mô tả nhánh mới. Dataset, weights,
 database, logs và thư mục evidence riêng vẫn không được đưa vào Git.
 
 **Bổ sung H1, 28/10/2026:** các nhận định “chưa port/chưa đóng gói” bên dưới là
@@ -13,13 +13,13 @@ Không suy ra đã stage/commit/publish hoặc clean install GPU từ bổ sung 
 
 28/10/2026, Asia/Bangkok (UTC+7). Đây là danh mục/review guide cho workspace
 local, không phải script stage/commit hoặc chứng nhận clean clone/secret-free.
-[Chỉ mục chức năng](D:/AEGIS/docs/CURRENT_HANDOFF.md),
-[runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md),
-[bằng chứng TASK-20](D:/AEGIS/task20_source_management_20261028/REVIEW_VI.md).
+[Chỉ mục chức năng](CURRENT_HANDOFF.md),
+[runbook](CURRENT_RUNBOOK.md),
+[bằng chứng TASK-20](../task20_source_management_20261028/REVIEW_VI.md).
 
 ## 1. Hiện trạng và nguyên tắc giữ nguyên
 
-D:/AEGIS có Git, checkout feat/3-mobile-integration và109 file tracked ở snapshot
+D:/AEGIS có Git, checkout feat/3-mobile-integration và 109 file tracked ở snapshot
 Task20. Đã có thay đổi chưa commit từ Task19; không reset/checkout/stash để làm
 working tree “sạch”. Không thay index/staged diff/HEAD/branch hoặc add/commit/
 push. D:/AEGIS-AI chưa là Git repo; thêm .gitignore để chuẩn bị boundary tương
@@ -50,7 +50,7 @@ hoặc chuyển lên Git. Không dùng git add . / add -A / add -f để vượt
 | Status đầy đủ, intake đã điền, ảnh chụp/log | Nội bộ/curate riêng, không mặc định source | Quét quyền/PII/secrets; source guide/current summary thay dump lịch sử vào PR |
 
 Danh mục từng file, size, tracked/ignored/category ở
-[source_inventory.json](D:/AEGIS/task20_source_management_20261028/run03/source_inventory.json).
+[source_inventory.json](../task20_source_management_20261028/run03/source_inventory.json).
 Candidate chưa đồng nghĩa file đã được duyệt để stage. Rule không ignore *.png/
 *.jpg hoặc *.json toàn cục: mobile assets và source schema/config vẫn cần Git;
 private uploads/dataset/artifact chặn theo vị trí/loại phù hợp.

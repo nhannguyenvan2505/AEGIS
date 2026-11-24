@@ -15,6 +15,11 @@ def main():
     if status.stdout.strip()!='complete':
         result=run('mysql',MYSQL,(Path(__file__).parent/'mysql'/'004_api_semantics.sql').read_text(encoding='utf-8'))
         if result.returncode: raise RuntimeError(result.stderr)
+    status=run('mysql',MYSQL,'SELECT status FROM schema_versions WHERE version=6;')
+    if status.returncode or status.stdout.strip()=='running': raise RuntimeError('Inspect partial migration 6 before proceeding')
+    if status.stdout.strip()!='complete':
+        result=run('mysql',MYSQL,(Path(__file__).parent/'mysql'/'006_outbox_delivery.sql').read_text(encoding='utf-8'))
+        if result.returncode: raise RuntimeError(result.stderr)
     script="""
 for (const name of ['telemetry_readings','sensor_raw_events','ai_inference_logs']) {
  const options=db.getCollectionInfos({name})[0].options;
@@ -26,7 +31,7 @@ print('MongoDB validators upgraded');
 """
     result=run('mongo',['sh','-c','exec mongosh --quiet -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin aegis'],script)
     if result.returncode or 'MongoDB validators upgraded' not in result.stdout: raise RuntimeError('Mongo validator upgrade failed')
-    print('Hybrid schema versions 3/4 and Mongo validators ready')
+    print('Hybrid schema versions 3/4/6 and Mongo validators ready (version 5: apply_farm_hierarchy.py)')
 
 
 if __name__=='__main__': main()

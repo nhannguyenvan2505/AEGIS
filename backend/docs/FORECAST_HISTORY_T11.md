@@ -10,12 +10,12 @@ Query tùy chọn:
 
 | Query | Hành vi |
 |---|---|
-| page / page_size | Mặc định1/20, tối đa100item/trang, giữ pagination chuẩn |
+| page / page_size | Mặc định 1/20, tối đa100item/trang, giữ pagination chuẩn |
 | model_pin | SHA25664ký tự hex thường, lọc đúng pin lịch sử; không chọn model để inference |
 | horizon_hours | Số nguyên1–744, lọc horizon đã lưu; không tạo forecast horizon mới |
 | from / to | Khoảng issue time inclusive, ISO8601 có timezone; chuẩn hóa UTC và so chính xác microsecond |
 
-Không nhận query lạ, duplicate key hoặc from>to. Auth401, khác owner/không có season404, query sai400. Snapshot/hash hoặc dữ liệu lưu hỏng trả500 forecast_storage_error. Không gọi worker khi đọc trend.
+Không nhận query lạ, duplicate key hoặc from>to. Auth401, khác owner/không có season404, query sai400. Snapshot/hash hoặc dữ liệu lưu hỏng trả 500 forecast_storage_error. Không gọi worker khi đọc trend.
 
 Response có `schema_version=aegis-forecast-trend-v1`, `items`, `pagination`, `series`, `comparison_scope=returned_page`. Items sắp xếp issue time giảm dần, tie theo created_at rồi id, không sắp theo lúc tạo record thay cho issue time.
 
@@ -54,7 +54,7 @@ Response explained có schema `aegis-forecast-explanation-v1` và:
 | feature_space / contribution_units | transformed_model_inputs / logit |
 | interpretation | model_contributions_not_disease_causes |
 
-Công thức: `contribution_j = coefficient_j * transformed_value_j`; `logit = intercept + sum(contribution_j)`; `score = sigmoid(logit)`. Worker kiểm với decision_function/predict_proba. Backend kiểm pin, identity, feature contract, thứ tự41feature weather, phép nhân, tổng/logit/sigmoid và score đã lưu. Các term có tên trùng, sai thứ tự weather, non-finite hoặc không khớp bị từ chối502 forecast_explanation_invalid.
+Công thức: `contribution_j = coefficient_j * transformed_value_j`; `logit = intercept + sum(contribution_j)`; `score = sigmoid(logit)`. Worker kiểm với decision_function/predict_proba. Backend kiểm pin, identity, feature contract, thứ tự 41 feature weather, phép nhân, tổng/logit/sigmoid và score đã lưu. Các term có tên trùng, sai thứ tự weather, non-finite hoặc không khớp bị từ chối502 forecast_explanation_invalid.
 
 Đóng góp dương/âm tăng/giảm logit tương ứng trong phép phân rã của model. Intercept là mốc toán học ở feature space đã biến đổi, không phải prior bệnh ngoài ruộng. Nhiều cửa sổ feature tương quan; không cộng term như các nguyên nhân độc lập hoặc phần trăm xác suất. Score hiện vẫn synthetic/uncalibrated, field_validated=false.
 
@@ -66,7 +66,7 @@ Công thức: `contribution_j = coefficient_j * transformed_value_j`; `logit = i
 - Artifact đúng pin không sẵn sàng/worker tắt:503 model_unavailable; timeout504. Forecast đã lưu không bị sửa.
 - Snapshot đã lưu sai hash/identity:500 forecast_storage_error trước khi gọi worker.
 
-Cả hai endpoint có Cache-Control private,no-store và Vary Authorization. GET không tạo forecast, source, job hoặc rewrite score/context. Hồ sơ canh tác mới không thay snapshot lịch sử.
+Cả hai endpoint có Cache-Control private, no-store và Vary Authorization. GET không tạo forecast, source, job hoặc rewrite score/context. Hồ sơ canh tác mới không thay snapshot lịch sử.
 
 ## Ví dụ và kiểm thử
 
@@ -83,4 +83,4 @@ $env:PYTHONPATH = 'D:\AEGIS\backend;D:\AEGIS\frontend'
 
 Chọn output mới. T11 không train lại hoặc thay model manifest pin, không mở worker cho dữ liệu thực, không thêm horizon mới và không sửa UI. Thành viên frontend có thể dùng hai contract trên để xây màn lịch sử/giải thích.
 
-Ngày08/11/2026:26test ML,226test pilot và120test Backend đạt. Trong đó4test ML mới và8test lịch sử/API mới đã nằm trong các suite tương ứng; không cộng lại thành lượt độc lập. Log và summary ở `forecast_history_t11/`. Rehearsal HTTP thật tái dựng41term FM-03 với reconstruction_error=0 trong ví dụ, giữ nguyên forecast gốc và tách hai model series. Guard chấp nhận sai số tối đa1e-12 cho các input khác.
+Ngày 08/11/2026:26test ML,226 test pilot và 120 test Backend đạt. Trong đó 4 test ML mới và 8 test lịch sử/API mới đã nằm trong các suite tương ứng; không cộng lại thành lượt độc lập. Log và summary ở `forecast_history_t11/`. Rehearsal HTTP thật tái dựng41term FM-03 với reconstruction_error=0 trong ví dụ, giữ nguyên forecast gốc và tách hai model series. Guard chấp nhận sai số tối đa1e-12 cho các input khác.

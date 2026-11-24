@@ -2,10 +2,10 @@
 
 02/11/2026, UTC+7. Áp dụng subset follow-up của
 [contract hiện tại](MOBILE_FOLLOWUP_API.md), version `aegis-mobile-followup-v1`.
-Đây là hướng dẫn tích hợp và acceptance Backend. Mốc02/11 chưa triển khai client;
-BE-03 ngày04/11 đã đối chiếu client follow-up local, chưa nghiệm thu native:
+Đây là hướng dẫn tích hợp và acceptance Backend. Mốc 02/11 chưa triển khai client;
+BE-03 ngày 04/11 đã đối chiếu client follow-up local, chưa nghiệm thu native:
 [ma trận hành vi từng màn](../../docs/BE03_MOBILE_API_HANDOFF_20261104.md).
-Không áp dụng kết luận xử lý401/429 của follow-up cho mọi màn core chưa có guard đó.
+Không áp dụng kết luận xử lý 401/429 của follow-up cho mọi màn core chưa có guard đó.
 Không thêm endpoint, error code, field hoặc cơ chế retry vào sản phẩm.
 
 ## Bắt đầu phiên và refresh
@@ -62,7 +62,7 @@ response đầy đủ hoặc actions DTO mới:
 ```
 
 Replay trả event gốc nhưng item có thể là state hiện tại sau các hành động khác.
-Không gán version/state của event cũ lên case hoặc suy needs_recheck=false từ200.
+Không gán version/state của event cũ lên case hoặc suy needs_recheck=false từ 200.
 Refresh và đọc `check_status`, `required/current`; không tự force-close.
 
 ## Phân biệt ba tình huống
@@ -153,10 +153,10 @@ thay nghĩa vụ xóa state/cache của app khi đổi tài khoản.
 Test tạo tài khoản/store synthetic mới, mở HTTPloopback randomport, rồi dừng
 server/dọn store. Không dùng DB thật, AI, weights hoặc thiết bị. Timeout được
 tạo bằng Eventbarrier sau commit, không ngủ để đoán race. Expiry và limiter dùng
-clock module cô lập; không sửaTTL/đồnghồOS. Faultintegrity chỉ sửa bảnDBtạm và
+clock module cô lập; không sửaTTL/đồnghồ OS. Faultintegrity chỉ sửa bảnDBtạm và
 khôi phục hash trước cleanup. Đây là acceptanceBackend, chưa chứng minh UX/native.
 
 Các ca: refresh/expiredsnapshot; staleversion; UUIDpayloadconflict; timeout+replay
-với item tiến xa hơn event;429/Retry-After;503khôngfallback;401expiry/relogin/owner404.
+với item tiến xa hơn event;429/Retry-After;503 khôngfallback;401 expiry/relogin/owner404.
 Required/current đổi do assessment mới và recheck được kiểm bằng regression sẵn có.
 Không chạy fullsuite/demo/soak để tăng số bằng chứng.

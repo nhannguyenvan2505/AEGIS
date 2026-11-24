@@ -45,7 +45,7 @@ POST hourly-policies nhận JSON sau. available_at, source, stream_id và revisi
 }
 ```
 
-201 trả success, item có revision/policy/policy_sha256/created_at và replayed=false. Gửi lại nội dung policy hiện hành với base_revision bằng revision hiện hành hoặc revision-1 trả200 cùng policy đã lưu và replayed=true. Nội dung khác cần base_revision bằng revision hiện hành; stale trả409. Thay đổi policy tạo revision tiếp theo. Policy phải phù hợp cadence của stream và source synthetic theo contract T01.
+201 trả success, item có revision/policy/policy_sha256/created_at và replayed=false. Gửi lại nội dung policy hiện hành với base_revision bằng revision hiện hành hoặc revision-1 trả 200 cùng policy đã lưu và replayed=true. Nội dung khác cần base_revision bằng revision hiện hành; stale trả 409. Thay đổi policy tạo revision tiếp theo. Policy phải phù hợp cadence của stream và source synthetic theo contract T01.
 
 ## Tổng hợp và lưu nguồn
 
@@ -61,7 +61,7 @@ POST hourly-sources nhận đúng các trường sau.
 }
 ```
 
-as_of phải <= thời điểm server tiếp nhận, policy phải available tại as_of và cửa sổ phải thuộc mùa vụ. Ngày ví dụ cần thay cho phù hợp nguồn đang dùng. start/end ở biên giờ UTC, cửa sổ1–744giờ. Backend đọc vùng quan sát mở rộng theo tolerance, chọn receipts<=as_of và áp exclusion đúng thời gian. Giới hạn100000mẫu trong một cửa sổ compilation; vượt giới hạn trả400 để caller chia cửa sổ nhỏ hơn.
+as_of phải <= thời điểm server tiếp nhận, policy phải available tại as_of và cửa sổ phải thuộc mùa vụ. Ngày ví dụ cần thay cho phù hợp nguồn đang dùng. start/end ở biên giờ UTC, cửa sổ 1–744 giờ. Backend đọc vùng quan sát mở rộng theo tolerance, chọn receipts<=as_of và áp exclusion đúng thời gian. Giới hạn100000mẫu trong một cửa sổ compilation; vượt giới hạn trả 400 để caller chia cửa sổ nhỏ hơn.
 
 Server dùng snapshot trong cùng transaction SQLite với phép kiểm revision và insert. BEGIN IMMEDIATE tuần tự hóa raw writers và các compilation ghi vào telemetry.sqlite3. Hai lệnh cùng input/base tạo một revision và một replay. Hai lệnh khác input dùng cùng base tạo một thành công và một409. Lỗi validation hoặc ghi sẽ rollback cả transaction.
 

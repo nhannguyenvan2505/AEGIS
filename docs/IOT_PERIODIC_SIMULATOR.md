@@ -56,7 +56,7 @@ cách ly. Virtual sensors gồm nhiệt độ°C, RH% và trạng thái lá ư�
 theo contract raw hiện có; không tự thêm %ẩm đất/ADC/pH/mưa.
 
 Seed tái lập **giá trị** theo index. Timestamp dùng UTC hiện tại, UUID dùng
-namespace run_id mới rồi uuid5(node,index), nên hai lượt không có output giống
+namespace run_id mới rồi uuid5(node, index), nên hai lượt không có output giống
 byte. Trong cùng lượt, retry giữ nguyên UUID, observed_at và payload.
 
 ## Lịch, lỗi và buffer
@@ -68,7 +68,7 @@ byte. Trong cùng lượt, retry giữ nguyên UUID, observed_at và payload.
   Có cả đối soát tick bị lỡ tại cuối cửa sổ thu.
 - Lỗi virtual sensor: ba giá trị null, reported_quality=suspect, vẫn có UUID
   và thời điểm đọc thất bại. Backend giữ raw, QC=incomplete và reported_suspect.
-  Không coi null là0/dry, không sửa thành giá trị gần nhất.
+  Không coi null là 0/dry, không sửa thành giá trị gần nhất.
 - “Offline” ở đây là **gate tạm ngừng gọi HTTP**, còn generator và Backend
   vẫn chạy. Khi mở gate, gửi các hàng cũ theo FIFO, giữ thời điểm đo. Đây không
   phải ngắt Wi-Fi, broker hoặc phép đo downtime thiết bị.
@@ -120,14 +120,14 @@ nếu nhóm có nhu cầu. File archive không phải backup cả hệ thống B
 
 ## Kiểm chứng mới và review
 
-Thêm simulator, `tools/check_iot_periodic.py`,5test trong
+Thêm simulator, `tools/check_iot_periodic.py`,5 test trong
 `tools/test_iot_periodic.py`, tài liệu và roadmap. Sửa nhỏ
 `tools/iot_http_sender.py`: optional `max_records`, trả batch_limit/pending
 đúng khi nhường lượt; defaultNone giữ cách drain cũ. Thêm một test budget và
 validation tương ứng trong test sender. Không đổi Backend runtime, schema,
 model, firmware hoặc mobile.
 
-**15/15unit test đạt**,0,324giây:5test generator/scheduler/config và10test sender
+**15/15unit test đạt**,0,324 giây:5test generator/scheduler/config và 10 test sender
 (gồm9test hồi quy cũ). Kiểm giá trị/UUID tái lập, clock hiện tại, null/suspect,
 missed ticks, gate nửa mở, config hữu hạn và record budget không báo queue rỗng
 sai. Log tại `iot_periodic_20261104/run01/unit_tests.log`.
@@ -137,9 +137,9 @@ sai. Log tại `iot_periodic_20261104/run01/unit_tests.log`.
 
 | Phiên | Kết quả đã quan sát |
 |---|---|
-| normal |12s thật,2s/tick;12raw duy nhất,4raw lỗi sensor/incomplete; pause4–8s, queue lớn nhất3/node rồi drain về0; không tick lỡ |
-| full |3s thật,capacity1,gate đóng;6sample phát sinh,2pending được giữ,4bản mới bị từ chối; raw0; exit3/incomplete đúng kỳ vọng |
-| stopped |STOP sau tick đầu;2raw được lưu, queue0; dừng ở0,172s thay vì20s planned; exit0/stopped |
+| normal |12s thật,2s/tick;12 raw duy nhất,4 raw lỗi sensor/incomplete; pause4–8s, queue lớn nhất3/node rồi drain về 0; không tick lỡ |
+| full |3s thật, capacity1,gate đóng;6 sample phát sinh,2 pending được giữ,4 bản mới bị từ chối; raw0; exit3/incomplete đúng kỳ vọng |
+| stopped |STOP sau tick đầu;2 raw được lưu, queue0; dừng ở 0,172s thay vì 20s planned; exit0/stopped |
 
 Cả ba Backend exit0, không forced stop, kho tạm được dọn. Kiểm raw trùng
 payload/thời điểm ban đầu, timestamp nằm trong phiên hiện tại, nguồn synthetic,

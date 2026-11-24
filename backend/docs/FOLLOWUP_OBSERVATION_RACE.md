@@ -22,7 +22,7 @@ Source hiện có xử lý case này đúng trong kiểm chứng mới, không c
 | Close trước recheck |409 followup_observation_changed, không tạo event close |
 | Check mới sau refresh, UUID mới/base_version3 |201, event mới chụp revision2/hash2,needs_recheck=false |
 | Close sau recheck, base_version4 |201; event revision1 và assessment gốc vẫn nguyên byte/nội dung |
-| Cùng checkpoint nhưng không sửa quan sát | Event/current đều revision1,needs_recheck=false,close được phép |
+| Cùng checkpoint nhưng không sửa quan sát | Event/current đều revision1,needs_recheck=false, close được phép |
 
 **201 nghĩa là đã ghi check cho evidence mà request đã đọc**, không có nghĩa
 mọi evidence hiện tại đã được kiểm. Workflow state checked, observation revision
@@ -43,7 +43,7 @@ và quan sát hiện tại trước khi người dùng chọn check mới. Retry
 
 Không đổi path/DTO/error code/contract_version, schema/storage/lock policy,
 auth/quota hoặc semantics cũ. Không import YOLO vào Backend, không model/forecast.
-Snapshot/finding synthetic là software fixture,không ground truth bệnh;
+Snapshot/finding synthetic là software fixture, không ground truth bệnh;
 checked/closed không xác nhận khỏe hoặc training approval.
 
 ## Cách kiểm và tái lập
@@ -59,17 +59,17 @@ Expected:2test đạt. Test dùng Threading.Event, không sleep hoặc xác su�
 1. Hook **chỉ trong test** bọc journal_db của module follow-up ở đúng request
    POST check; sau khi route đọc snapshot, hook xác nhận revision1 và đóng reader.
 2. Check bị giữ trước insert; một HTTP PUT khác phải commit và GET lại revision2
-   khi barrier chưa được thả. DB workflow vẫn mới có2event tại checkpoint.
+   khi barrier chưa được thả. DB workflow vẫn mới có 2 event tại checkpoint.
 3. Thả barrier, kiểm response/history/replay/close/recheck và event bytes/hash.
 4. Chạy control cùng hook nhưng không edit để loại trừ false recheck do fixture/
    checkpoint. Mọi hook được restore khi thoát context manager.
 
-Hai HTTP server phiên kiểm dùng loopback/cổng ngẫu nhiên,temporary pilot stores,
+Hai HTTP server phiên kiểm dùng loopback/cổng ngẫu nhiên, temporary pilot stores,
 accounts/observation mock/synthetic. Worker/server join và shutdown trong finally;
 TemporaryDirectory cleanup của fixture. Không mở pilot_data/instance thật hoặc
-đổi SQLite PRAGMA/timeout,không thêm production test hook.
+đổi SQLite PRAGMA/timeout, không thêm production test hook.
 
-Hồi quy được chọn riêng:4EvidenceRecheckTests,full follow-up lifecycle,
+Hồi quy được chọn riêng:4EvidenceRecheckTests, full follow-up lifecycle,
 concurrent workflow actions vàmobile correction/recheck:7test. Không chạy toàn
 bộ CPU suite/demo/soak hoặc thêm các failure case khác để tăng bằng chứng.
 
@@ -80,11 +80,11 @@ và request sửa observation active cùng owner/mùa vụ. Không chứng minh 
 luôn mới tại mọi thời điểm hoặc concurrency nhiều process/deployment.
 
 Chưa kiểm thay đổi sau projection-read/before response hoặc race đang close,
-void/delete,logout/owner/season/profile/assessment requirement đổi. Mỗi case đó
+void/delete, logout/owner/season/profile/assessment requirement đổi. Mỗi case đó
 cần chọn riêng; không đưa chúng thành thiếu sót khiến case check này không đóng.
 Đặc biệt đây không là cơ chế hủy HTTP request hoặc xóa cache UI native.
 
 Rollback sản phẩm không cần vì implementation không đổi. Test chỉ ghi store tạm
 và dọn sau khi join request/server; không xóa DB/lock/WAL hoặc thư mục lịch sử
-để vượt lỗi. Nếu test timeout/lỗi,đọc log và kiểm tài nguyên do đúng phiên tạo,
+để vượt lỗi. Nếu test timeout/lỗi, đọc log và kiểm tài nguyên do đúng phiên tạo,
 không kết luận race đã đạt hoặc tự chuyển sang một tính năng khác.
