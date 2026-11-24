@@ -11,6 +11,11 @@ def reserve(config, user_id, key, payload):
     return key_hash, state, analysis_id
 
 
+def release(config, user_id, key_hash):
+    with connect(config) as db:
+        db.release(user_id, key_hash)
+
+
 def mark_uncertain(config, user_id, key_hash):
     with connect(config) as db:
         db.mark_uncertain(user_id, key_hash)

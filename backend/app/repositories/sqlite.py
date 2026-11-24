@@ -68,6 +68,9 @@ class SQLiteRepository:
         self.db.execute("INSERT INTO inference_requests VALUES (?,?,?,'running',NULL)", (user_id,key_hash,payload_hash))
         return 'new',None
 
+    def release(self, user_id, key_hash):
+        self.db.execute("DELETE FROM inference_requests WHERE user_id=? AND key_hash=? AND state='running' AND analysis_id IS NULL", (user_id,key_hash))
+
     def mark_uncertain(self, user_id, key_hash):
         self.db.execute("UPDATE inference_requests SET state='uncertain' WHERE user_id=? AND key_hash=? AND state='running'", (user_id,key_hash))
 

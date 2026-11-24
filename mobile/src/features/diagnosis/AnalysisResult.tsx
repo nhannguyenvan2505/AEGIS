@@ -3,7 +3,23 @@ import { Icon } from '../../components/Design';
 import { s } from '../../styles/generated/styles';
 import type { Analysis } from '../../types/domain';
 import { scanColors, scanDate, summarizeDetections } from './scanHelpers';
+const rejectionTitles: Record<string, string> = {
+  rejected_non_rice: 'Đây không phải ảnh cây lúa',
+  rejected_poor_quality: 'Ảnh chưa đủ chất lượng để phân tích',
+  rejected_uncertain_scope: 'Chưa chắc đây là cây lúa',
+};
+function RejectionResult({ result }: { result: Analysis }) {
+  return <View style={s.scanResult} accessibilityLiveRegion="polite">
+    <View style={s.scanResultTop}>
+      <View style={s.scanAiBadge}><Icon name="alert-triangle" size={17} color="#8a4b08" /><Text style={s.scanAiBadgeText}>Chưa phân tích bệnh</Text></View>
+    </View>
+    <Text accessibilityRole="header" style={s.scanResultTitle}>{rejectionTitles[result.status] ?? 'Không phân tích được ảnh'}</Text>
+    <Text style={s.scanBody}>{result.message || 'Hãy chụp lại ảnh lá lúa rõ nét, đủ sáng.'}</Text>
+    <Text style={s.scanFootnote}>Ảnh này không được lưu vào lịch sử và không có kết quả chẩn đoán bệnh.</Text>
+  </View>;
+}
 export function AnalysisResult({ result }: { result: Analysis }) {
+  if (result.rejected) return <RejectionResult result={result} />;
   const groups = summarizeDetections(result);
   return <View style={s.scanResult} accessibilityLiveRegion="polite">
     <View style={s.scanResultTop}>

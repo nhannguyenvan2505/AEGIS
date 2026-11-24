@@ -5,7 +5,7 @@ from pathlib import Path
 from flask import Blueprint, current_app, g, jsonify, request, send_file
 from .auth import require_auth
 from .limits import limit_detection
-from .idempotency import reserve, mark_uncertain
+from .idempotency import reserve, mark_uncertain, release
 
 from .ai_service import AIServiceError, predict_image
 from .storage import save_analysis, get_analysis, list_analyses, get_image_record
@@ -51,11 +51,18 @@ def detect():
                 return jsonify(success=False, error={'code': codes[state], 'message': 'Khóa đã được dùng. Kiểm tra lịch sử trước khi gửi một tác vụ mới.'}), 409
         result = predict_image(payload, current_app.config, g.request_id)
         result['request_id'] = g.request_id
+        if result.get('rejected'):  # not rice / unusable image: a normal answer, never stored
+            if key_hash is not None:
+                release(current_app.config, g.user['id'], key_hash)
+            g.model_sha256 = result['model_sha256']
+            return jsonify(result)
         if key_hash is None:
             stored = save_analysis(payload, result, current_app.config, g.user['id'])
         else:
             stored = save_analysis(payload, result, current_app.config, g.user['id'], key_hash=key_hash)
         g.analysis_id, g.model_sha256 = stored['analysis_id'], stored['model_sha256']
+        if result.get('ai_status'):
+            stored = {**stored, 'diagnosis': {'status': result['ai_status'], 'is_rice': result.get('is_rice'), 'message': result.get('ai_message')}}
         return jsonify(stored)
     except AIServiceError as error:
         if key_hash is not None:

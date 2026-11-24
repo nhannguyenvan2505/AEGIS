@@ -1,8 +1,7 @@
 # AEGIS AI pipeline v2 — Gatekeeper → Lesion Detector
 
-Trạng thái: **code + hợp đồng API đã có; checkpoint gatekeeper CHƯA được huấn luyện**.
-Chưa có số liệu độ chính xác nào cho v2. Không dùng v2 cho demo "chống ảnh ngoài miền"
-cho tới khi §5 đạt ngưỡng trên tập test thật.
+Trạng thái (24/11/2026): **gatekeeper `gate_v1b` đã huấn luyện và chạy được qua `run_ai_service.ps1`; chưa kiểm chứng trên ảnh thực địa (xem §5)**.
+Số liệu trong §5 chỉ đo trên ảnh lá cận cảnh; không tuyên bố hiệu năng ngoài ruộng cho tới khi có ảnh thực địa.
 
 ## 1. Kiến trúc
 
@@ -97,11 +96,21 @@ Huấn luyện YOLO11n-cls, 224 px, dừng sớm ở epoch 26/40. Tập test `ga
 - Rice và non_rice đến từ các bộ dữ liệu khác nhau, nên gate có thể một phần học phong cách nguồn ảnh; kết quả gần 100% là dấu hiệu cần dè dặt, không phải bằng chứng.
 - Ảnh cỏ Dryad bổ sung cùng nguồn với dữ liệu train nên không độc lập hoàn toàn.
 - Nhiều ảnh rice trùng lá (chụp liên tiếp), số mẫu độc lập ít hơn số ảnh; ảnh `val/brown_spot__brown_spot_2163.jpg` nghi gán nhãn sai (chưa xử lý).
-- Vì vậy `AEGIS_GATE_WEIGHTS` chưa được đặt; `/v2/health` giữ `production_ready:false`. Khi viết báo cáo: "kiểm thử trên ảnh lá lúa cận cảnh có nền ngoài ruộng; chưa kiểm thử trên ảnh chụp xa hoặc ảnh tự chụp".
+- `run_ai_service.ps1` đặt `AEGIS_GATE_WEIGHTS` cho bản chạy thử/demo; không coi là sẵn sàng sản xuất khi chưa có ảnh thực địa. Khi viết báo cáo: "kiểm thử trên ảnh lá lúa cận cảnh có nền ngoài ruộng; chưa kiểm thử trên ảnh chụp xa hoặc ảnh tự chụp".
 - Cần làm lại khi có ảnh thực địa: đo recall, chốt `rice_accept_min`/entropy, xem lại nhãn đáng ngờ.
+
+### Kết quả detector (S2) trên test v4 — 24/11/2026
+`baseline_v4_50epochs/weights/best.pt`, 520 ảnh / 1.601 vùng, conf 0,001: mAP@0,5 = 0,727; mAP@0,5:0,95 = 0,337; P = 0,690; R = 0,670. Theo lớp (P / R / F1 / AP50): rice_blast 0,687 / 0,615 / 0,649 / 0,681; brown_spot 0,733 / 0,704 / 0,718 / 0,775; sheath_blight 0,650 / 0,692 / 0,670 / 0,725. Ảnh test cùng nguồn RiceLeafDiseaseBD, chưa phải ảnh ngoài ruộng. Lúa khỏe/Tungro/Leaf smut vẫn bị trả một trong ba bệnh vì detector chỉ có 3 lớp.
+
+### Chạy chức năng nhận diện lúa / không phải lúa
+```powershell
+cd D:\AEGIS\ai_service
+.\run_ai_service.ps1            # bật gatekeeper gate_v1b (trọng số: ai_service\experiments\gatekeeper\gate_v1b\best.pt, git-ignore)
+```
+Backend gọi `POST /v2/diagnose` (mặc định `AEGIS_AI_API_VERSION=v2`; đặt `v1` để quay về `/predict`). `rejected_non_rice`, `rejected_poor_quality`, `rejected_uncertain_scope` trả HTTP 200 với `rejected: true`, không lưu ảnh hay analysis; mobile hiển thị thông báo tương ứng. `healthy`/`uncertain_lesion` lưu như `no_detection` kèm `diagnosis.status`. Không cần migration DB.
 
 ## 6. Việc còn lại (thứ tự)
 1. Thu thập/gán nhãn tập gatekeeper + hard negatives → `train_gatekeeper.py` → `eval_gatekeeper.py` → đặt ngưỡng.
 2. Thêm ảnh lúa khỏe có nhãn để xác thực nhánh `healthy`.
-3. Migration backend cho status mới; mobile/frontend hiển thị `rejected_*`.
+3. ~~Backend/mobile cho `rejected_*`~~ đã xong (24/11/2026, không cần migration); còn lưu `healthy`/`uncertain_lesion` thành status riêng trong DB nếu cần thống kê.
 4. (Tùy chọn) chuyển S2 sang YOLO11-seg khi đủ polygon.
