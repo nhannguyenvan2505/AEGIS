@@ -89,6 +89,11 @@ service-account*.json
 /*_20??????/
 /frontend/evidence/
 /backend/postman/reports/
+/backend/mongo-instance/
+/backend/.native-db-paused
+/backend/.native-db-supervisor.lock
+/backend/native-db-supervisor.log
+=======
 
 # Text extracts of course documents (C1SE.21); contain members' phone numbers and emails.
 /_doc_review/
