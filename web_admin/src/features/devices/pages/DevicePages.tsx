@@ -16,7 +16,7 @@ import { useAction } from '../../../shared/hooks/useAction';
 import { usePagedQuery } from '../../../shared/hooks/usePagedQuery';
 import { useUrlFilters } from '../../../shared/hooks/useUrlFilters';
 import { RegisterDeviceDialog } from '../components/RegisterDeviceDialog';
-import type { Device, TelemetryPoint } from '../types';
+import type { Device, Esp32TelemetryResponse, TelemetryPoint } from '../types';
 
 const KEYS = ['user', 'q', 'sensor_type', 'status', 'source'] as const;
 const STATUS = [['online', 'Online'], ['offline', 'Offline'], ['maintenance', 'Bảo trì'], ['inactive', 'Ngừng']].map(([value, label]) => ({ value, label }));
@@ -26,13 +26,43 @@ export function DeviceListPage() {
   const { can } = useAuth();
   const { filters, page, setFilter, setPage } = useUrlFilters(KEYS);
   const query = usePagedQuery<Device>('devices', '/devices', filters, page);
+  const esp32 = useQuery({
+    queryKey: ['devices', 'esp32'],
+    queryFn: ({ signal }) => api<Esp32TelemetryResponse>('/iot/readings', { params: { limit: 24 }, signal }),
+    refetchInterval: 5000,
+  });
   const [creating, setCreating] = useState(false);
   const create = useAction((body: Record<string, unknown>) => api('/devices', { method: 'POST', body }),
     { invalidate: ['devices', 'stats', 'farms'], success: 'Đã đăng ký thiết bị.' });
+  const espSeries = [...(esp32.data?.items ?? [])].reverse().map((p) => ({
+    time: formatDateTime(p.observed_at).slice(0, 17),
+    temp: p.temperature,
+    humidity: p.humidity,
+  }));
   return (
     <>
       <PageHeader title="Thiết bị IoT" actions={can('admin') && <button className="btn" onClick={() => setCreating(true)}>Đăng ký thiết bị</button>} />
-      <SimulatedDataBanner>Thiết bị và telemetry nguồn mock/synthetic là dữ liệu mô phỏng.</SimulatedDataBanner>
+      <Card title="Dữ liệu cảm biến ESP32 thực tế (MQTT)">
+        {esp32.isLoading && <LoadingState rows={2} />}
+        {esp32.isError && <ErrorState error={esp32.error} onRetry={() => void esp32.refetch()} />}
+        {esp32.data && (
+          <>
+            <KeyValue rows={[
+              ['Broker MQTT', `${esp32.data.mqtt.broker}:${esp32.data.mqtt.port} (${esp32.data.mqtt.topic})`],
+              ['Trạng thái kết nối', esp32.data.mqtt.connected ? 'Đã kết nối' : 'Chưa kết nối'],
+              ['Số gói tin đã nhận', String(esp32.data.mqtt.received_count)],
+              ['Thiết bị ESP32 mới nhất', esp32.data.item ? `${esp32.data.item.device_uid} · ${esp32.data.item.temperature} °C · ${esp32.data.item.humidity}% (${esp32.data.item.alert.title})` : 'Chưa có gói tin từ ESP32'],
+            ]} />
+            {espSeries.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <MultiLine data={espSeries} x="time" label="Nhiệt độ và độ ẩm ESP32 thực tế"
+                  lines={[{ key: 'temp', name: 'Nhiệt độ (°C)', color: '#d98b1b' }, { key: 'humidity', name: 'Độ ẩm (%)', color: '#1d5fa8' }]} />
+              </div>
+            )}
+          </>
+        )}
+      </Card>
+      <SimulatedDataBanner>Danh sách thiết bị và telemetry nguồn mock/synthetic bên dưới là dữ liệu mô phỏng.</SimulatedDataBanner>
       <Card>
         <FilterBar values={filters} onChange={setFilter} defs={[
           { name: 'user', label: 'Người dùng', placeholder: 'Tên hoặc email' },

@@ -5,7 +5,7 @@ Thêm feature mới: tạo thư mục có routes.py định nghĩa `bp`, rồi t
 from importlib import import_module
 
 FEATURES = ('auth', 'stats', 'users', 'farms', 'devices', 'detections', 'alerts',
-            'thresholds', 'knowledge', 'models', 'system')
+            'thresholds', 'knowledge', 'models', 'system', 'iot')
 
 
 def register_features(app):
