@@ -129,8 +129,12 @@ def main():
                 and len(p.relative_to(a.src).parts) >= 3 and p.relative_to(a.src).parts[0] != "blurry"]
         if not srcs:
             raise SystemExit("no source images found under --src (expected <category>/<source>/file)")
+        by_cat = {}
+        for p in srcs:
+            by_cat.setdefault(p.relative_to(a.src).parts[0], []).append(p)
+        cats = sorted(by_cat)  # pick category first, then image: a huge category cannot dominate the blurry set
         for i in range(a.blurry):
-            p = rng.choice(srcs)
+            p = rng.choice(by_cat[rng.choice(cats)])
             source = p.relative_to(a.src).parts[1]
             dst = out / "blurry" / source
             dst.mkdir(parents=True, exist_ok=True)

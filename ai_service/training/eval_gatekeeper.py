@@ -30,11 +30,20 @@ def main():
     ap.add_argument("--data", required=True)
     ap.add_argument("--max-fpr", type=float, default=0.01)
     ap.add_argument("--entropy-max", type=float, default=0.60)
+    ap.add_argument("--neg-root", help="non_rice_raw root (<category>/<source>/file): enables per-category report")
+    ap.add_argument("--report-thr", type=float, default=0.80, help="rice_accept_min used for the per-category report")
     a = ap.parse_args()
     gate = YoloClsGatekeeper(a.weights)
     items = collect(a.data, "rice") + collect(a.data, "non_rice")
-    y, p, h = [], [], []
+    cat_of = {}
+    if a.neg_root:  # gate_v1 file name is "<source>__<original name>" with spaces -> "_"
+        for f in Path(a.neg_root).rglob("*"):
+            r = f.relative_to(a.neg_root).parts
+            if f.suffix.lower() in EXT and len(r) >= 3:
+                cat_of[f"{r[1]}__{f.name}".replace(" ", "_")] = r[0]
+    y, p, h, names = [], [], [], []
     for path, label in items:
+        names.append((path, label))
         out = gate.classify(np.asarray(Image.open(path).convert("RGB")))
         y.append(label == "rice"); p.append(out["rice_probability"]); h.append(normalized_entropy(out["probabilities"]))
     y, p, h = np.array(y), np.array(p), np.array(h)
@@ -50,6 +59,21 @@ def main():
         print(f"{thr:.2f}  {fpr:8.4f}               {1 - fpr:8.4f}        {prec:8.4f}        {rec:8.4f}")
         if chosen is None and fpr <= a.max_fpr:
             chosen = round(float(thr), 2)
+    if a.neg_root:
+        acc = (p >= a.report_thr) & (h <= a.entropy_max)
+        cats = {}
+        for (path, label), ok, pr in zip(names, acc, p):
+            if label == "non_rice":
+                cats.setdefault(cat_of.get(path.name, "unknown"), []).append((bool(ok), float(pr)))
+        print(f"\nper-category non_rice at rice_accept_min={a.report_thr} (false accept = wrongly accepted as rice)")
+        print(f"{'category':16s}{'n':>6s}{'false_accept':>14s}{'FPR':>8s}{'max P(rice)':>13s}{'mean P(rice)':>14s}")
+        for c, v in sorted(cats.items()):
+            fa = sum(o for o, _ in v)
+            print(f"{c:16s}{len(v):6d}{fa:14d}{fa / len(v):8.4f}{max(q for _, q in v):13.3f}{np.mean([q for _, q in v]):14.3f}")
+        miss = [(float(pr), path.name) for (path, label), ok, pr in zip(names, acc, p) if label == "rice" and not ok]
+        print(f"\nrice rejected at this threshold: {len(miss)}/{n_pos}")
+        for pr, n in sorted(miss)[:10]:
+            print(f"  P(rice)={pr:.3f}  {n}")
     print(f"\nlowest threshold with FPR <= {a.max_fpr}: {chosen}  (set rice_accept_min)" if chosen else "\nNO threshold meets target FPR: improve hard negatives / retrain")
 
 

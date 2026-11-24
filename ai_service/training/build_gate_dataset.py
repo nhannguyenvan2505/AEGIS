@@ -120,19 +120,40 @@ def gather_rice_grouped(raw_root, manifest_path, excluded_path, max_hamming=5):
 GROUP_STATS = Counter()
 
 
-def gather(rice_root, neg_root, grouped=None):
+def cap_per_category(items, cap):
+    """Round-robin across sources so every source (hence the split balance) stays represented."""
+    by_cat = defaultdict(lambda: defaultdict(list))
+    for it in items:
+        by_cat[it[3]][it[4]].append(it)
+    kept = []
+    for cat, srcs in by_cat.items():
+        total = sum(len(v) for v in srcs.values())
+        if total <= cap:
+            kept += [i for v in srcs.values() for i in v]; continue
+        queues = [sorted(v, key=lambda t: hashlib.sha256(str(t[0]).encode()).hexdigest()) for _, v in sorted(srcs.items())]
+        taken = 0
+        while taken < cap and any(queues):
+            for q in queues:
+                if q and taken < cap:
+                    kept.append(q.pop(0)); taken += 1
+    return kept
+
+
+def gather(rice_root, neg_root, grouped=None, max_per_category=None):
     items = list(grouped) if grouped is not None else []  # (path, label, split, category, source)
     for split in ("train", "val", "test") if grouped is None else ():
         for p in sorted((Path(rice_root) / split).glob("*")):
             if p.suffix.lower() in EXT:
                 items.append((p, "rice", split, "rice", p.stem.split("__")[0]))
+    negs = []
     for p in sorted(Path(neg_root).rglob("*")):
         if p.suffix.lower() not in EXT:
             continue
         rel = p.relative_to(neg_root).parts
         if len(rel) < 3:
             raise SystemExit(f"{p}: expected NEG/<category>/<source>/file, got depth {len(rel)}")
-        items.append((p, "non_rice", split_for(f"{rel[0]}/{rel[1]}"), rel[0], rel[1]))
+        negs.append((p, "non_rice", split_for(rel[1]), rel[0], rel[1]))
+    items += cap_per_category(negs, max_per_category) if max_per_category else negs
     return items
 
 
@@ -145,6 +166,7 @@ def main():
     ap.add_argument("--neg", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--copy", action="store_true")
+    ap.add_argument("--max-per-category", type=int, help="cap non_rice images per category (round-robin over sources); stops one big dataset (e.g. DeepWeeds) dominating")
     a = ap.parse_args()
 
     if bool(a.rice) == bool(a.raw_originals):
@@ -152,7 +174,7 @@ def main():
     if a.raw_originals and not a.v4_manifest:
         raise SystemExit("--raw-originals needs --v4-manifest to inherit v4 splits")
     grouped = gather_rice_grouped(a.raw_originals, a.v4_manifest, a.v4_excluded) if a.raw_originals else None
-    items, seen_sha, hashes, kept, dropped = gather(a.rice, a.neg, grouped), set(), [], [], Counter()
+    items, seen_sha, hashes, kept, dropped = gather(a.rice, a.neg, grouped, a.max_per_category), set(), [], [], Counter()
     for path, label, split, cat, src in items:
         try:
             sha = hashlib.sha256(path.read_bytes()).hexdigest()

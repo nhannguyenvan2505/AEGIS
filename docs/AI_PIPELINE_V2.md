@@ -88,6 +88,18 @@ Lớp `rice` của gatekeeper nên dựng từ toàn bộ ảnh gốc RiceLeafDi
 `build_gate_dataset.py --raw-originals "<...>/Original images" --v4-manifest <v4>/manifest.json --v4-excluded <v4>/excluded.json`
 (dry-run 22/11/2026: 9.290/9.769 ảnh giữ lại; 479 ảnh bị loại do xung đột split hoặc nằm trong excluded của v4).
 
+### Kết quả gatekeeper `gate_v1b` và hạn chế đã biết (24/11/2026)
+Huấn luyện YOLO11n-cls, 224 px, dừng sớm ở epoch 26/40. Tập test `gate_v1` (1.160 rice, 804 non_rice): FPR non-rice 0,0000 ở mọi ngưỡng 0,50–0,95; precision rice 1,0000; recall rice 0,9983 (bỏ sót 2/1.160). Theo nhóm (ngưỡng 0,80) không nhóm nào bị nhận nhầm; `other_crops` sát nhất (P(rice) tối đa 0,829). Thêm 576 ảnh cỏ Dryad chưa dùng để train: 0 nhận nhầm.
+
+**Không được diễn giải các số trên là hiệu năng ngoài ruộng.**
+- Chưa kiểm thử trên ảnh lúa tự chụp ngoài ruộng (`field_evaluation_v1` trống; chưa đến mùa vụ).
+- Ảnh rice trong `gate_v1` đều là lá cận cảnh (đã rà 48 ảnh có nền phức tạp nhất của val/test: không có ảnh chụp xa hay toàn cảnh ruộng). Recall với ảnh chụp xa/toàn cảnh chưa biết.
+- Rice và non_rice đến từ các bộ dữ liệu khác nhau, nên gate có thể một phần học phong cách nguồn ảnh; kết quả gần 100% là dấu hiệu cần dè dặt, không phải bằng chứng.
+- Ảnh cỏ Dryad bổ sung cùng nguồn với dữ liệu train nên không độc lập hoàn toàn.
+- Nhiều ảnh rice trùng lá (chụp liên tiếp), số mẫu độc lập ít hơn số ảnh; ảnh `val/brown_spot__brown_spot_2163.jpg` nghi gán nhãn sai (chưa xử lý).
+- Vì vậy `AEGIS_GATE_WEIGHTS` chưa được đặt; `/v2/health` giữ `production_ready:false`. Khi viết báo cáo: "kiểm thử trên ảnh lá lúa cận cảnh có nền ngoài ruộng; chưa kiểm thử trên ảnh chụp xa hoặc ảnh tự chụp".
+- Cần làm lại khi có ảnh thực địa: đo recall, chốt `rice_accept_min`/entropy, xem lại nhãn đáng ngờ.
+
 ## 6. Việc còn lại (thứ tự)
 1. Thu thập/gán nhãn tập gatekeeper + hard negatives → `train_gatekeeper.py` → `eval_gatekeeper.py` → đặt ngưỡng.
 2. Thêm ảnh lúa khỏe có nhãn để xác thực nhánh `healthy`.

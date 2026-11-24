@@ -19,13 +19,17 @@ def main():
     ap.add_argument("--imgsz", type=int, default=224)
     ap.add_argument("--project", default="experiments/gatekeeper")
     ap.add_argument("--name", default="gate_v1")
+    # Windows spawns each dataloader worker as a full Python+torch process; on a ~7 GB machine the default
+    # (8 workers) exhausts the commit limit (WinError 1455). Keep workers small.
+    ap.add_argument("--workers", type=int, default=2)
+    ap.add_argument("--batch", type=int, default=64)
     a = ap.parse_args()
     YOLO(a.model).train(
         data=a.data, epochs=a.epochs, imgsz=a.imgsz, project=a.project, name=a.name, seed=0,
         label_smoothing=0.1,            # softer logits -> better-behaved OOD entropy
         hsv_h=0.015, hsv_s=0.5, hsv_v=0.4,  # controlled lighting variation
         degrees=15, fliplr=0.5, flipud=0.0, scale=0.4, translate=0.1, erasing=0.3,
-        patience=15,
+        patience=15, workers=a.workers, batch=a.batch,
     )
 
 
