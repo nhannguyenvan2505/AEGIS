@@ -210,6 +210,9 @@ class MySQLRepository:
         self.execute("INSERT INTO inference_requests VALUES (%s,%s,%s,'running',NULL)", (numeric,key_hash,payload_hash))
         return 'new',None
 
+    def release(self, user_id, key_hash):
+        self.execute("DELETE FROM inference_requests WHERE user_id=%s AND key_hash=%s AND state='running' AND analysis_id IS NULL", (self.uid(user_id),key_hash))
+
     def mark_uncertain(self, user_id, key_hash):
         self.execute("UPDATE inference_requests SET state='uncertain' WHERE user_id=%s AND key_hash=%s AND state='running'", (self.uid(user_id),key_hash))
 

@@ -70,6 +70,19 @@ giấy phép nguồn chính là “không xác định”. Việc lưu attributi
 bản/ngày tải và đối chiếu archive cục bộ vẫn cần hoàn thiện riêng. Lượt này
 không tải lại dataset, sửa nhãn, gộp nguồn, train hoặc thay model.
 
+## Bản ghi chạy `gate_v1` — 24/11/2026
+Số ảnh đã nhập vào `non_rice_raw` (trước khử trùng lặp; sau khử trùng lặp non_rice còn 5.456 ảnh trong `gate_v1`). Ảnh giữ nguyên byte, chỉ ghi nguồn vào `ATTRIBUTION.csv` (22.847 dòng ghi nguồn, gồm cả ảnh DeepWeeds/Dryad/PlantDoc/Open Images).
+
+| Thư mục | Số ảnh | Nguồn | Giấy phép | Ghi chú |
+|---|---|---|---|---|
+| other_crops | 2.574 | PlantDoc (github.com/pratikkayal/PlantDoc-Dataset) | CC BY 4.0 | tải ngày 23/11/2026, bản zip master |
+| weeds | 17.509 + 900 | DeepWeeds (github.com/AlexOlsen/DeepWeeds); Dryad Weedling (doi:10.5061/dryad.gtht76hhz, Beck et al.) | CC BY 4.0; CC0 | Dryad chỉ lấy 3 loài cỏ (BarnyardGrass, YellowFoxtail, WildOat), 300 ảnh/loài chia đều theo ngày chụp |
+| people_objects, soil_water, text_screens (thật) | 895 / 503 / 466 | Open Images (qua `fetch_open_images.py`) | chỉ CC BY | đã loại nhãn thực vật; tác giả và URL trong `ATTRIBUTION.csv` |
+| text_screens (tổng hợp) | 300 | `synth_negatives.py` | tự tạo | không cần ghi nguồn |
+| blurry | 500 | bản làm mờ từ ảnh non_rice thật (`synth_negatives.py --src`) | theo ảnh gốc | cùng nguồn/split với ảnh gốc |
+
+Ảnh lúa: RiceLeafDiseaseBD V3 (CC BY 4.0). Chưa ghi nhận: checksum archive, ngày tải và ảnh chụp trang giấy phép cho từng nguồn; **cần bổ sung trước khi công bố hoặc thương mại hóa**. Kaggle "Rice Leafs Disease Dataset" chưa xác minh giấy phép nên không được dùng.
+
 ## Mẫu bản ghi (điền cho mỗi nguồn trước khi tải)
 ```
 Nguồn: <tên>   URL gốc: <...>   DOI: <...>

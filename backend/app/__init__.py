@@ -20,6 +20,7 @@ def create_app(config=None):
     default_backend='sqlite' if config and config.get('TESTING') else 'mysql'
     app.config.from_mapping(
         AI_API_URL=os.environ.get('AEGIS_AI_URL', 'http://127.0.0.1:8000'),
+        AI_API_VERSION=os.environ.get('AEGIS_AI_API_VERSION', 'v2'),  # v2 = gatekeeper + detector (/v2/diagnose); v1 = detector only (/predict)
         AI_CONNECT_TIMEOUT=3,
         AI_READ_TIMEOUT=60,
         MAX_IMAGE_BYTES=8 * 1024 * 1024,
