@@ -88,10 +88,10 @@ Từ 20/11/2026, máy của Nhân chạy cả hai DB không qua Docker:
 Cổng và mật khẩu giữ nguyên trong `backend/database/.env`, nên backend và các script không cần đổi cấu hình. Service MySQL80 có sẵn trên máy (cổng 3306) không bị đụng tới. Outbox gửi sang MongoDB vẫn bật.
 
 ```powershell
-& .ackend\.venv\Scripts\python.exe backend/database/native_db.py status   # trạng thái, số bảng, schema version, outbox
-& .ackend\.venv\Scripts\python.exe backend/database/native_db.py start    # bật cả hai (sau khi khởi động lại máy)
-& .ackend\.venv\Scripts\python.exe backend/database/native_db.py stop     # tắt an toàn cả hai
-& .ackend\.venv\Scripts\python.exe backend/database/native_db.py start --only mysql
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py status   # trạng thái, số bảng, schema version, outbox
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py start    # bật cả hai (sau khi khởi động lại máy)
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py stop     # tắt an toàn cả hai
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py start --only mysql
 ```
 
 Không bật song song Docker Compose của dự án: hai bên dùng chung cổng 3307 và 27018.
@@ -102,7 +102,7 @@ Sao lưu thủ công:
 
 ```powershell
 $env:MYSQL_PWD = (Select-String -Path backend/database/.env -Pattern '^AEGIS_MYSQL_ROOT_PASSWORD=').Line.Split('=',2)[1]
-& 'C:\Program Files\MySQL\MySQL Server 8.0in\mysqldump.exe' --no-defaults -h127.0.0.1 -P3307 -uroot --single-transaction --routines --triggers --databases aegis > backup.sql
+& 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe' --no-defaults -h127.0.0.1 -P3307 -uroot --single-transaction --routines --triggers --databases aegis > backup.sql
 Remove-Item Env:\MYSQL_PWD
 ```
 
