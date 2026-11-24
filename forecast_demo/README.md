@@ -1,5 +1,13 @@
 # Portable synthetic forecast demo runtime
 
+T09 (2026-11-08) adds the separately pinned `weather_bundle/` and
+`runtime/weather_forecast.py` for stored raw hourly sources and scheduler jobs.
+FM-03 uses temperature/RH and crop age with 120 complete available numeric hours;
+whole-hour wetness may be null. Legacy demo scenarios and directly supplied
+hourly/source histories retain FM-02. Both models use synthetic data and
+uncalibrated scores. See [FM-03 API and operation](../backend/docs/RAW_WEATHER_FORECAST_T09.md)
+and [validation evidence](../docs/RAW_FORECAST_VALIDATION_T09.md).
+
 This folder is a small, self-contained forecast runtime for the AEGIS mobile
 midterm. It lets a teammate clone the AEGIS repository and run the same
 source → synthetic hourly input → Logistic Regression → persisted forecast

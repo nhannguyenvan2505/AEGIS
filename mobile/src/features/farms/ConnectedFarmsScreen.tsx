@@ -53,9 +53,9 @@ function SeasonManager({ farm, token }: {farm: Farm; token: string}) {
     {data && <><Button secondary title="Trang trước" disabled={busy || data.pagination.page <= 1} onPress={() => void load(data.pagination.page-1)} />
       <Button secondary title="Trang sau" disabled={busy || !data.pagination.has_next} onPress={() => void load(data.pagination.page+1)} /></>}
     <Text style={s.heading}>Thêm mùa vụ</Text>
-    <TextInput style={s.input} accessibilityLabel="Tên mùa vụ" placeholder="Tên mùa vụ" value={name} onChangeText={setName} maxLength={120} editable={!busy} />
-    <TextInput style={s.input} accessibilityLabel="Ngày bắt đầu mùa vụ" placeholder="Ngày bắt đầu YYYY-MM-DD" value={start} onChangeText={setStart} maxLength={10} editable={!busy} />
-    <TextInput style={s.input} accessibilityLabel="Ngày kết thúc mùa vụ" placeholder="Ngày kết thúc YYYY-MM-DD (tùy chọn)" value={end} onChangeText={setEnd} maxLength={10} editable={!busy} />
+    <TextInput style={s.input} accessibilityLabel="Tên mùa vụ" placeholder="Tên mùa vụ" value={name} onChangeText={setName} autoCorrect={false} autoCapitalize="none" maxLength={120} editable={!busy} />
+    <TextInput style={s.input} accessibilityLabel="Ngày bắt đầu mùa vụ" placeholder="Bắt đầu YYYY-MM-DD" value={start} onChangeText={setStart} maxLength={10} editable={!busy} />
+    <TextInput style={s.input} accessibilityLabel="Ngày kết thúc mùa vụ" placeholder="Kết thúc YYYY-MM-DD nếu có" value={end} onChangeText={setEnd} maxLength={10} editable={!busy} />
     <Button title="Lưu mùa vụ lên Backend" disabled={busy || !name.trim() || !start.trim()} onPress={() => void save()} />
     <Text style={s.label}>Mùa vụ mới cần nguồn hourly trước khi dự báo. Dữ liệu mô phỏng được chuẩn bị bằng công cụ demo.</Text>
   </Card>;
@@ -83,6 +83,6 @@ export function ConnectedFarmsScreen() {
     {data?.items.length === 0 && <Text>Chưa có ruộng.</Text>}
     {data?.items.map(item => <Card key={item.id} title={item.name}><Text>{item.location_text || 'Chưa có vị trí'}</Text><Button secondary title="Quản lý mùa vụ" disabled={busy} onPress={() => setSelected(item)} /></Card>)}
     {data && <><Button title="Trang trước" secondary disabled={busy || data.pagination.page <= 1} onPress={() => void load(data.pagination.page - 1)} /><Button title="Trang sau" secondary disabled={busy || !data.pagination.has_next} onPress={() => void load(data.pagination.page + 1)} /></>}
-    <Card title="Thêm ruộng"><TextInput style={s.input} accessibilityLabel="Tên ruộng" placeholder="Tên ruộng" maxLength={120} value={name} onChangeText={setName} /><TextInput style={s.input} accessibilityLabel="Vị trí" placeholder="Vị trí (tùy chọn)" maxLength={500} value={location} onChangeText={setLocation} /><Button title={busy ? 'Đang xử lý…' : 'Lưu lên Backend'} disabled={busy || !name.trim()} onPress={() => void save()} /></Card>
+    <Card title="Thêm ruộng"><TextInput style={s.input} accessibilityLabel="Tên ruộng" placeholder="Tên ruộng" maxLength={120} value={name} onChangeText={setName} autoCorrect={false} autoCapitalize="none" /><TextInput style={s.input} accessibilityLabel="Vị trí" placeholder="Vị trí (tùy chọn)" maxLength={500} value={location} onChangeText={setLocation} autoCorrect={false} autoCapitalize="none" /><Button title={busy ? 'Đang xử lý…' : 'Lưu lên Backend'} disabled={busy || !name.trim()} onPress={() => void save()} /></Card>
   </>;
 }

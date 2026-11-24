@@ -138,7 +138,8 @@ def main():
                 '--worker-port', str(worker_port), '--stop', str(run/'BACKEND_STOP')], log)
             processes.append(backend)
             base = 'http://127.0.0.1:'+str(read_port(backend))
-            result.update(regions=seed(base, args.email, password), base_url=base, success=True)
+            result.update(regions=seed(base, args.email, password), base_url=base,
+                          forecast_worker_port=worker_port, success=True)
             with (run/'ready.json').open('x', encoding='utf-8') as output:
                 json.dump(result, output, indent=2)
             print('Shared demo ready. Mobile API URL '+base+'/api', flush=True)

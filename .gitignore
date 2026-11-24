@@ -44,7 +44,15 @@ instance/
 /ai/weights/
 /frontend/runs/
 /backend/mobile-instance/
+/backend/mysql-instance/
+/backend/database/latest-backup.txt
+/backend/database/cutover_report.json
+/backend/database/pilot_acceptance_report.json
 /fe-source-import/
+/ai_service/experiments/
+/ai_service/datasets/
+/ai_service/weights/
+/demo_runs/
 
 # TASK-20: private/raw storage independent of its current launcher location
 uploads/

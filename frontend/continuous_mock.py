@@ -11,6 +11,7 @@ import ctypes,hashlib,json,math,os,queue,sqlite3,subprocess,tempfile,threading,t
 from pathlib import Path
 from soak_warning import DBS,PYTHON,Evidence,distribution,inspect_store
 from server import build_app
+from pilot_mysql_tools import open_readonly
 
 KINDS=['continuous','dry','intermittent','outage','late','paused']
 def utc():return datetime.now(timezone.utc)
@@ -142,12 +143,12 @@ def execute(out,seconds,restart_seconds,require_boundary,ev,stores=None):
             return r
         def snapshot_audit():
             import hashlib
-            with closing(sqlite3.connect(storage/'demo.db')) as db:
+            with closing(open_readonly(storage/'demo.db')) as db:
                 for id,snapshot in db.execute('SELECT id,snapshot_json FROM farm_assessments'):
                     sha=hashlib.sha256(snapshot.encode()).hexdigest()
                     if id in snapshot_hashes:ev.check('snapshot_immutable',snapshot_hashes[id]==sha)
                     else:snapshot_hashes[id]=sha
-            with closing(sqlite3.connect(storage/'followup.sqlite3')) as db:
+            with closing(open_readonly(storage/'followup.sqlite3')) as db:
                 for id,snapshot in db.execute('SELECT id,snapshot_json FROM assessment_versions'):
                     key='version:'+id;sha=hashlib.sha256(snapshot.encode()).hexdigest()
                     if key in snapshot_hashes:ev.check('version_snapshot_immutable',snapshot_hashes[key]==sha)
@@ -169,7 +170,7 @@ def execute(out,seconds,restart_seconds,require_boundary,ev,stores=None):
                 elapsed=time.monotonic()-started
                 if elapsed-last_sample>=5:
                     worker=call('/api/farm/automation/status').json()['automation'];ev.check('worker_running',worker['worker_running'])
-                    sample=dict(at_utc=utc().isoformat(),elapsed_seconds=elapsed,launcher_pid=process.pid,backend=process_resources(worker_pid(process.pid)),generator=process_resources(os.getpid()),db_bytes={n:(storage/n).stat().st_size for n in DBS},worker=worker)
+                    sample=dict(at_utc=utc().isoformat(),elapsed_seconds=elapsed,launcher_pid=process.pid,backend=process_resources(worker_pid(process.pid)),generator=process_resources(os.getpid()),db_bytes={n:(storage/n).stat().st_size for n in DBS if (storage/n).is_file()},worker=worker)
                     stats['resource_count']+=1;backend_pids.add(sample['backend']['pid'])
                     for key,field in [('working_set','working_set_bytes'),('private_bytes','private_bytes'),('handles','handle_count')]:stats[key]=max(stats[key],sample['backend'][field])
                     record('resources.jsonl',sample)
@@ -182,9 +183,9 @@ def execute(out,seconds,restart_seconds,require_boundary,ev,stores=None):
             # Drain one timer period so the final observed window is audited.
             threading.Event().wait(6);stop();snapshot_audit();result=inspect_store(storage,ev)
             ev.check('boundary_observed_if_required',not require_boundary or len(observed)>=2)
-            with closing(sqlite3.connect(storage/'demo.db')) as db:
+            with closing(open_readonly(storage/'demo.db')) as db:
                 assessments=[json.loads(r[0]) for r in db.execute('SELECT snapshot_json FROM farm_assessments ORDER BY window_end,device_id')]
-            with closing(sqlite3.connect(storage/'followup.sqlite3')) as db:
+            with closing(open_readonly(storage/'followup.sqlite3')) as db:
                 db.row_factory=sqlite3.Row;revisions=[dict(r) for r in db.execute('SELECT * FROM assessment_versions ORDER BY base_assessment_id,revision')]
                 result['assessment_versions']=len(revisions)
                 result['version_attempt_states']=dict(db.execute('SELECT state,COUNT(*) FROM assessment_version_attempts GROUP BY state'))

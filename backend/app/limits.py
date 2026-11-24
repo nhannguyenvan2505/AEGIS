@@ -1,6 +1,5 @@
-"""SQLite fixed-window limits and process-local admission control."""
+"""Repository-backed fixed-window limits and process-local admission control."""
 import hashlib
-import math
 import sqlite3
 import time
 from functools import wraps
@@ -8,7 +7,7 @@ from threading import BoundedSemaphore
 
 from flask import current_app, g, jsonify, request
 
-from .storage import connect
+from .repositories import repository as connect
 
 
 def rejection(code, message, status, retry_after):
@@ -26,18 +25,7 @@ def consume(config, scope, identity, limit, now=None):
     expires = start + window
     key = hashlib.sha256((scope + '\0' + identity).encode()).hexdigest()
     with connect(config) as db:
-        db.execute('BEGIN IMMEDIATE')
-        db.execute('DELETE FROM rate_limit_buckets WHERE expires_at<=?', (now,))
-        row = db.execute('SELECT request_count FROM rate_limit_buckets WHERE bucket_key=?', (key,)).fetchone()
-        if row and row['request_count'] >= limit:
-            return False, max(1, math.ceil(expires - now))
-        if row:
-            db.execute('UPDATE rate_limit_buckets SET request_count=request_count+1 WHERE bucket_key=?', (key,))
-        else:
-            if db.execute('SELECT COUNT(*) FROM rate_limit_buckets').fetchone()[0] >= config['RATE_MAX_BUCKETS']:
-                raise sqlite3.OperationalError('Rate bucket capacity reached')
-            db.execute('INSERT INTO rate_limit_buckets VALUES (?,?,?,?)', (key,start,1,expires))
-    return True, 0
+        return db.consume_limit(key, start, expires, limit, now, config['RATE_MAX_BUCKETS'])
 
 
 def check_limit(scope, identity, config_key):

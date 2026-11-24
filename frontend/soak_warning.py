@@ -12,6 +12,7 @@ import hashlib,json,logging,math,queue,sqlite3,statistics,subprocess,sys,tempfil
 from pathlib import Path
 from unittest.mock import patch
 from server import build_app
+from pilot_mysql_tools import open_readonly,initialized
 from pilot_store import StoreLease
 
 KINDS=['continuous','dry','intermittent','outage','late','paused']
@@ -68,27 +69,31 @@ def seed(client,owners,job,starts,ev):
 
 
 def inspect_store(store,ev):
-    result={}
-    for name in DBS:
-        with closing(sqlite3.connect(store/name)) as db:
+    hybrid=initialized(store/'journal.sqlite3')
+    if hybrid:
+        from app.hybrid_backup import audit
+        report=audit(store);ev.check('mysql_hybrid_schema_complete',report['kind']=='aegis-hybrid-audit-v1')
+    result=dict(backend='mysql') if hybrid else {}
+    for name in ([] if hybrid else DBS):
+        with closing(open_readonly(store/name)) as db:
             ev.check('sqlite_integrity_ok',db.execute('PRAGMA integrity_check').fetchone()[0]=='ok')
             ev.check('sqlite_no_foreign_key_violation',not db.execute('PRAGMA foreign_key_check').fetchall())
         result[name]=dict(bytes=(store/name).stat().st_size)
-    with closing(sqlite3.connect(store/'automation.sqlite3')) as db:
+    with closing(open_readonly(store/'automation.sqlite3')) as db:
         result['run_states']=dict(db.execute('SELECT status,COUNT(*) FROM runs GROUP BY status'))
         result['attempt_states']=dict(db.execute('SELECT status,COUNT(*) FROM attempts GROUP BY status'))
         result['input_change_rows']=db.execute('SELECT COUNT(*) FROM input_changes').fetchone()[0]
         ev.check('no_failed_or_running_final_runs',db.execute("SELECT COUNT(*) FROM runs WHERE status IN ('failed','running','interrupted')").fetchone()[0]==0)
         ev.check('no_duplicate_run_keys',not db.execute('SELECT 1 FROM runs GROUP BY job_id,window_end,profile_sha256 HAVING COUNT(*)>1').fetchall())
-    with closing(sqlite3.connect(store/'followup.sqlite3')) as db:
+    with closing(open_readonly(store/'followup.sqlite3')) as db:
         result['cases']=db.execute('SELECT COUNT(*) FROM cases').fetchone()[0];result['episodes']=db.execute('SELECT COUNT(*) FROM episodes').fetchone()[0]
         result['members']=db.execute('SELECT COUNT(*) FROM episode_members').fetchone()[0]
         ev.check('no_duplicate_members',not db.execute('SELECT 1 FROM episode_members GROUP BY episode_id,assessment_id HAVING COUNT(*)>1').fetchall())
         ev.check('at_most_one_open_group_per_scope',not db.execute("SELECT 1 FROM episode_heads WHERE state!='closed' GROUP BY user_id,season_id,device_id,profile_sha256,task_kind HAVING COUNT(*)>1").fetchall())
-    with closing(sqlite3.connect(store/'demo.db')) as db:
+    with closing(open_readonly(store/'demo.db')) as db:
         result['assessments']=db.execute('SELECT COUNT(*) FROM farm_assessments').fetchone()[0]
         ev.check('no_duplicate_assessments',not db.execute('SELECT 1 FROM farm_assessments GROUP BY device_id,profile_sha256,window_end HAVING COUNT(*)>1').fetchall())
-        ev.check('core_migrations_unchanged',set(r[0] for r in db.execute('SELECT version FROM schema_migrations'))=={1,2,3,4,5})
+        if not hybrid:ev.check('core_migrations_unchanged',set(r[0] for r in db.execute('SELECT version FROM schema_migrations'))=={1,2,3,4,5})
     return result
 
 
@@ -151,7 +156,7 @@ def replay(store,ev):
                     response=ev.timed('replay_dashboard_test_client',lambda:client.get('/api/farm/seasons/'+owner['season']+'/warning-dashboard',headers=owner['headers']))
                     ev.check('daily_dashboard200',response.status_code==200);ev.check('daily_own_six_devices',response.json['pagination']['total']==6)
                 print(json.dumps(dict(mode='replay',simulated_hours=h+1,assessments=len(snapshots))),flush=True)
-        with closing(sqlite3.connect(store/'demo.db')) as db:
+        with closing(open_readonly(store/'demo.db')) as db:
             for id,snapshot in db.execute('SELECT id,snapshot_json FROM farm_assessments'):ev.check('snapshot_unchanged',digest(json.loads(snapshot))==snapshots[id])
         result=inspect_store(store,ev)
         ev.check('expected_assessment_count',result['assessments']==168*12-24*2)
@@ -220,13 +225,13 @@ def live(store,ev,duration):
         launch('session1')
         deadline=time.monotonic()+20
         while time.monotonic()<deadline:
-            with closing(sqlite3.connect(store/'automation.sqlite3')) as db:n=db.execute("SELECT COUNT(*) FROM runs WHERE status='succeeded'").fetchone()[0]
+            with closing(open_readonly(store/'automation.sqlite3')) as db:n=db.execute("SELECT COUNT(*) FROM runs WHERE status='succeeded'").fetchone()[0]
             if n==10:break
             time.sleep(.2)
         ev.check('timer_recovered_all_ten_initial_jobs',n==10)
         result=inspect_store(store,ev);ev.check('real_crash_interrupted_attempt',result['attempt_states'].get('interrupted')==1)
         initial_snapshots={}
-        with closing(sqlite3.connect(store/'demo.db')) as db:
+        with closing(open_readonly(store/'demo.db')) as db:
             initial_snapshots={id:hashlib.sha256(snapshot.encode()).hexdigest() for id,snapshot in db.execute('SELECT id,snapshot_json FROM farm_assessments')}
         while time.perf_counter()-started<duration:
             elapsed=time.perf_counter()-started
@@ -266,7 +271,7 @@ def live(store,ev,duration):
         ev.check('expected_ten_case_groups',result['cases']==10 and result['episodes']==10)
         ev.check('two_late_input_changes',result['input_change_rows']==2)
         ev.check('quota429_observed',any(r['status']==429 for r in http))
-        with closing(sqlite3.connect(store/'demo.db')) as db:
+        with closing(open_readonly(store/'demo.db')) as db:
             after=dict(db.execute('SELECT id,snapshot_json FROM farm_assessments'))
             ev.check('all_initial_snapshots_unchanged',all(hashlib.sha256(after[id].encode()).hexdigest()==sha for id,sha in initial_snapshots.items()))
         foreign=call('/api/farm/seasons/'+owners[1]['season']+'/warning-dashboard',0,expected=(404,),phase='ownership')

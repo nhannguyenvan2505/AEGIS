@@ -1,5 +1,10 @@
 # Quy trình cộng tác AEGIS
 
+Đối với workspace hiện tại, xem [source/artifact/secret guide TASK-20](D:/AEGIS/docs/SOURCE_HANDOFF_GUIDE.md)
+trước nhập file. Dated evidence mặc định ignored, không dùng add -f cả thư mục;
+candidate manifest chưa là approval để stage. Task20 chỉ audit/ignore/docs,
+không thực hiện chuỗi Git bên dưới hoặc tự xác minh remote/PR mới.
+
 ## Quy tắc áp dụng ngay
 
 Dùng GitHub Flow: issue → branch → commit → Pull Request (PR) → review → squash merge.

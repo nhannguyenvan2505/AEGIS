@@ -88,7 +88,7 @@ def main():
     try:
         pilot=prepare_pilot(args.pilot_dir) if args.pilot_dir else None
         import requests
-        spec=importlib.util.spec_from_file_location('aegis_ui_ai',str(ROOT.parent.parent/'AEGIS-AI/api/app.py'))
+        spec=importlib.util.spec_from_file_location('aegis_ui_ai',str(ROOT.parent/'ai_service/api/app.py'))
         ai=importlib.util.module_from_spec(spec);spec.loader.exec_module(ai)
         detector=ai.Detector()
         if detector.model_sha256!=EXPECTED or detector.model_version!='aegis-yolo11n-v4-50epochs':

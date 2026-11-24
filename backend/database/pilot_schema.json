@@ -1,0 +1,3777 @@
+{
+  "automation.sqlite3": {
+    "objects": [
+      {
+        "type": "table",
+        "name": "automation_meta",
+        "tbl_name": "automation_meta",
+        "sql": "CREATE TABLE automation_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "jobs",
+        "tbl_name": "jobs",
+        "sql": "CREATE TABLE jobs(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,device_id TEXT NOT NULL,\n            name TEXT NOT NULL,profile_json TEXT NOT NULL,profile_sha256 TEXT NOT NULL,enabled INTEGER NOT NULL,\n            version INTEGER NOT NULL,created_at TEXT NOT NULL,UNIQUE(device_id,profile_sha256))"
+      },
+      {
+        "type": "table",
+        "name": "controls",
+        "tbl_name": "controls",
+        "sql": "CREATE TABLE controls(id TEXT PRIMARY KEY,job_id TEXT NOT NULL REFERENCES jobs(id),version INTEGER NOT NULL,\n            command_sha256 TEXT NOT NULL,command_json TEXT NOT NULL,created_at TEXT NOT NULL,request_id TEXT NOT NULL,UNIQUE(job_id,version))"
+      },
+      {
+        "type": "table",
+        "name": "runs",
+        "tbl_name": "runs",
+        "sql": "CREATE TABLE runs(id TEXT PRIMARY KEY,job_id TEXT NOT NULL REFERENCES jobs(id),user_id TEXT NOT NULL,\n            window_end TEXT NOT NULL,profile_sha256 TEXT NOT NULL,status TEXT NOT NULL,attempt_count INTEGER NOT NULL,\n            started_at TEXT NOT NULL,finished_at TEXT,result_json TEXT,error_code TEXT,created_at TEXT NOT NULL,\n            UNIQUE(job_id,window_end,profile_sha256))"
+      },
+      {
+        "type": "table",
+        "name": "attempts",
+        "tbl_name": "attempts",
+        "sql": "CREATE TABLE attempts(id TEXT PRIMARY KEY,run_id TEXT NOT NULL REFERENCES runs(id),number INTEGER NOT NULL,\n            trigger TEXT NOT NULL,status TEXT NOT NULL,started_at TEXT NOT NULL,finished_at TEXT,error_code TEXT,\n            request_id TEXT NOT NULL,job_version INTEGER NOT NULL,UNIQUE(run_id,number))"
+      },
+      {
+        "type": "table",
+        "name": "input_changes",
+        "tbl_name": "input_changes",
+        "sql": "CREATE TABLE input_changes(id TEXT PRIMARY KEY,run_id TEXT NOT NULL REFERENCES runs(id),\n            input_sha256 TEXT NOT NULL,created_at TEXT NOT NULL,UNIQUE(run_id,input_sha256))"
+      },
+      {
+        "type": "index",
+        "name": "idx_automation_owner",
+        "tbl_name": "jobs",
+        "sql": "CREATE INDEX idx_automation_owner ON jobs(user_id,season_id,created_at,id)"
+      },
+      {
+        "type": "index",
+        "name": "idx_runs_owner",
+        "tbl_name": "runs",
+        "sql": "CREATE INDEX idx_runs_owner ON runs(user_id,job_id,created_at,id)"
+      }
+    ],
+    "meta": {
+      "automation_meta": [
+        {
+          "kind": "aegis-local-mock-automation-v1"
+        }
+      ]
+    },
+    "columns": {
+      "automation_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "jobs": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "device_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "name",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "profile_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "profile_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "enabled",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "controls": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "job_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "command_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "command_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "runs": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "job_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "window_end",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "profile_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "attempt_count",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "started_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "finished_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "result_json",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "error_code",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "attempts": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "number",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "trigger",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "started_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "finished_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "error_code",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "job_version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "input_changes": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "run_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "input_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ]
+    },
+    "indexes": {
+      "automation_meta": [],
+      "jobs": [
+        {
+          "seq": 0,
+          "name": "idx_automation_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_jobs_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_jobs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "controls": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_controls_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_controls_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "runs": [
+        {
+          "seq": 0,
+          "name": "idx_runs_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_runs_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_runs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "attempts": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_attempts_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_attempts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "input_changes": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_input_changes_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_input_changes_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  },
+  "followup.sqlite3": {
+    "objects": [
+      {
+        "type": "table",
+        "name": "followup_meta",
+        "tbl_name": "followup_meta",
+        "sql": "CREATE TABLE followup_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "cases",
+        "tbl_name": "cases",
+        "sql": "CREATE TABLE cases(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            assessment_id TEXT NOT NULL UNIQUE,assessment_json TEXT NOT NULL,assessment_sha256 TEXT NOT NULL,\n            created_at TEXT NOT NULL,UNIQUE(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "events",
+        "tbl_name": "events",
+        "sql": "CREATE TABLE events(id TEXT PRIMARY KEY,case_id TEXT NOT NULL,user_id TEXT NOT NULL,\n            version INTEGER NOT NULL,state TEXT NOT NULL,payload_json TEXT NOT NULL,payload_sha256 TEXT NOT NULL,\n            created_at TEXT NOT NULL,request_id TEXT NOT NULL,UNIQUE(case_id,version),\n            FOREIGN KEY(case_id,user_id) REFERENCES cases(id,user_id))"
+      },
+      {
+        "type": "index",
+        "name": "idx_followup_owner",
+        "tbl_name": "cases",
+        "sql": "CREATE INDEX idx_followup_owner ON cases(user_id,season_id,created_at,id)"
+      },
+      {
+        "type": "view",
+        "name": "current_cases",
+        "tbl_name": "current_cases",
+        "sql": "CREATE VIEW current_cases AS SELECT c.*,e.version,e.state,e.created_at AS updated_at FROM cases c\n            JOIN events e ON e.case_id=c.id WHERE e.version=(SELECT MAX(x.version) FROM events x WHERE x.case_id=c.id)"
+      },
+      {
+        "type": "table",
+        "name": "episode_meta",
+        "tbl_name": "episode_meta",
+        "sql": "CREATE TABLE episode_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "episodes",
+        "tbl_name": "episodes",
+        "sql": "CREATE TABLE episodes(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            device_id TEXT NOT NULL,profile_sha256 TEXT NOT NULL,task_kind TEXT NOT NULL,case_id TEXT NOT NULL UNIQUE,\n            created_at TEXT NOT NULL,FOREIGN KEY(case_id,user_id) REFERENCES cases(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "episode_members",
+        "tbl_name": "episode_members",
+        "sql": "CREATE TABLE episode_members(id TEXT PRIMARY KEY,episode_id TEXT NOT NULL REFERENCES episodes(id),\n            assessment_id TEXT NOT NULL,window_end TEXT NOT NULL,status TEXT NOT NULL,snapshot_json TEXT NOT NULL,\n            snapshot_sha256 TEXT NOT NULL,recorded_at TEXT NOT NULL,request_id TEXT NOT NULL,\n            UNIQUE(episode_id,assessment_id))"
+      },
+      {
+        "type": "index",
+        "name": "idx_episode_scope",
+        "tbl_name": "episodes",
+        "sql": "CREATE INDEX idx_episode_scope ON episodes(user_id,season_id,device_id,profile_sha256,task_kind)"
+      },
+      {
+        "type": "view",
+        "name": "episode_heads",
+        "tbl_name": "episode_heads",
+        "sql": "CREATE VIEW episode_heads AS SELECT p.*,c.state,c.version,c.updated_at,\n            (SELECT MIN(window_end) FROM episode_members m WHERE m.episode_id=p.id) first_window,\n            (SELECT MAX(window_end) FROM episode_members m WHERE m.episode_id=p.id) latest_window,\n            (SELECT COUNT(*) FROM episode_members m WHERE m.episode_id=p.id) assessment_count\n            FROM episodes p JOIN current_cases c ON c.id=p.case_id AND c.user_id=p.user_id"
+      },
+      {
+        "type": "table",
+        "name": "assessment_version_meta",
+        "tbl_name": "assessment_version_meta",
+        "sql": "CREATE TABLE assessment_version_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "assessment_versions",
+        "tbl_name": "assessment_versions",
+        "sql": "CREATE TABLE assessment_versions(id TEXT PRIMARY KEY,base_assessment_id TEXT NOT NULL,user_id TEXT NOT NULL,\n            season_id TEXT NOT NULL,device_id TEXT NOT NULL,profile_sha256 TEXT NOT NULL,revision INTEGER NOT NULL,\n            previous_id TEXT NOT NULL,base_sha256 TEXT NOT NULL,input_sha256 TEXT NOT NULL,snapshot_sha256 TEXT NOT NULL,\n            snapshot_json TEXT NOT NULL,created_at TEXT NOT NULL,request_id TEXT NOT NULL,\n            UNIQUE(base_assessment_id,revision),UNIQUE(base_assessment_id,input_sha256))"
+      },
+      {
+        "type": "table",
+        "name": "assessment_version_attempts",
+        "tbl_name": "assessment_version_attempts",
+        "sql": "CREATE TABLE assessment_version_attempts(id TEXT PRIMARY KEY,base_assessment_id TEXT NOT NULL,user_id TEXT NOT NULL,\n            input_sha256 TEXT NOT NULL,state TEXT NOT NULL,created_at TEXT NOT NULL,finished_at TEXT,error_code TEXT,\n            request_id TEXT NOT NULL,version_id TEXT)"
+      },
+      {
+        "type": "index",
+        "name": "idx_version_owner",
+        "tbl_name": "assessment_versions",
+        "sql": "CREATE INDEX idx_version_owner ON assessment_versions(user_id,season_id,base_assessment_id,revision)"
+      },
+      {
+        "type": "index",
+        "name": "idx_version_attempt",
+        "tbl_name": "assessment_version_attempts",
+        "sql": "CREATE INDEX idx_version_attempt ON assessment_version_attempts(base_assessment_id,input_sha256,created_at)"
+      }
+    ],
+    "meta": {
+      "followup_meta": [
+        {
+          "kind": "aegis-pilot-followup-v1"
+        }
+      ],
+      "episode_meta": [
+        {
+          "kind": "aegis-mock-episodes-v1"
+        }
+      ],
+      "assessment_version_meta": [
+        {
+          "kind": "aegis-assessment-versions-v1"
+        }
+      ]
+    },
+    "columns": {
+      "followup_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "cases": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "assessment_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "assessment_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "assessment_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "events": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "case_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "state",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "episode_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "episodes": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "device_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "profile_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "task_kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "case_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "episode_members": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "episode_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "assessment_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "window_end",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "snapshot_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "snapshot_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "recorded_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "assessment_version_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "assessment_versions": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "base_assessment_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "device_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "profile_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "previous_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "base_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "input_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "snapshot_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "snapshot_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "assessment_version_attempts": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "base_assessment_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "input_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "state",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "finished_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "error_code",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "version_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ]
+    },
+    "indexes": {
+      "followup_meta": [],
+      "cases": [
+        {
+          "seq": 0,
+          "name": "idx_followup_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_cases_3",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_cases_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_cases_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "events": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_events_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_events_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "episode_meta": [],
+      "episodes": [
+        {
+          "seq": 0,
+          "name": "idx_episode_scope",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_episodes_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_episodes_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "episode_members": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_episode_members_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_episode_members_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "assessment_version_meta": [],
+      "assessment_versions": [
+        {
+          "seq": 0,
+          "name": "idx_version_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_assessment_versions_3",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_assessment_versions_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_assessment_versions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "assessment_version_attempts": [
+        {
+          "seq": 0,
+          "name": "idx_version_attempt",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_assessment_version_attempts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  },
+  "journal.sqlite3": {
+    "objects": [
+      {
+        "type": "table",
+        "name": "journal_meta",
+        "tbl_name": "journal_meta",
+        "sql": "CREATE TABLE journal_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "visits",
+        "tbl_name": "visits",
+        "sql": "CREATE TABLE visits(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            source TEXT NOT NULL CHECK(source IN ('synthetic','field_observed')),observed_at TEXT NOT NULL,\n            scheduled INTEGER NOT NULL CHECK(scheduled IN (0,1)),created_at TEXT NOT NULL,UNIQUE(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "revisions",
+        "tbl_name": "revisions",
+        "sql": "CREATE TABLE revisions(id TEXT PRIMARY KEY,visit_id TEXT NOT NULL,user_id TEXT NOT NULL,\n            revision INTEGER NOT NULL CHECK(revision>=1),payload_json TEXT NOT NULL,payload_sha256 TEXT NOT NULL,\n            change_reason TEXT NOT NULL,created_at TEXT NOT NULL,request_id TEXT NOT NULL,\n            UNIQUE(visit_id,revision),FOREIGN KEY(visit_id,user_id) REFERENCES visits(id,user_id))"
+      },
+      {
+        "type": "index",
+        "name": "idx_journal_owner",
+        "tbl_name": "visits",
+        "sql": "CREATE INDEX idx_journal_owner ON visits(user_id,season_id,observed_at,id)"
+      },
+      {
+        "type": "view",
+        "name": "history",
+        "tbl_name": "history",
+        "sql": "CREATE VIEW history AS SELECT r.*,v.season_id,v.source,v.observed_at,v.scheduled\n            FROM revisions r JOIN visits v ON v.id=r.visit_id AND v.user_id=r.user_id"
+      },
+      {
+        "type": "view",
+        "name": "current_records",
+        "tbl_name": "current_records",
+        "sql": "CREATE VIEW current_records AS SELECT h.* FROM history h WHERE\n            h.revision=(SELECT MAX(x.revision) FROM revisions x WHERE x.visit_id=h.visit_id)"
+      }
+    ],
+    "meta": {
+      "journal_meta": [
+        {
+          "kind": "aegis-pilot-journal-v1"
+        }
+      ]
+    },
+    "columns": {
+      "journal_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "visits": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "source",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "observed_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "scheduled",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "revisions": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "visit_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "change_reason",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ]
+    },
+    "indexes": {
+      "journal_meta": [],
+      "visits": [
+        {
+          "seq": 0,
+          "name": "idx_journal_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_visits_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_visits_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "revisions": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_revisions_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_revisions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  },
+  "management.sqlite3": {
+    "objects": [
+      {
+        "type": "table",
+        "name": "management_meta",
+        "tbl_name": "management_meta",
+        "sql": "CREATE TABLE management_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "interventions",
+        "tbl_name": "interventions",
+        "sql": "CREATE TABLE interventions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            source TEXT NOT NULL CHECK(source IN ('synthetic','field_observed')),at TEXT NOT NULL,\n            created_at TEXT NOT NULL,UNIQUE(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "intervention_revisions",
+        "tbl_name": "intervention_revisions",
+        "sql": "CREATE TABLE intervention_revisions(id TEXT PRIMARY KEY,intervention_id TEXT NOT NULL,\n            user_id TEXT NOT NULL,revision INTEGER NOT NULL CHECK(revision>=1),payload_json TEXT NOT NULL,\n            payload_sha256 TEXT NOT NULL,change_reason TEXT NOT NULL,created_at TEXT NOT NULL,request_id TEXT NOT NULL,\n            UNIQUE(intervention_id,revision),FOREIGN KEY(intervention_id,user_id) REFERENCES interventions(id,user_id))"
+      },
+      {
+        "type": "index",
+        "name": "idx_management_owner",
+        "tbl_name": "interventions",
+        "sql": "CREATE INDEX idx_management_owner ON interventions(user_id,season_id,at,id)"
+      },
+      {
+        "type": "view",
+        "name": "management_history",
+        "tbl_name": "management_history",
+        "sql": "CREATE VIEW management_history AS SELECT r.*,i.season_id,i.source,i.at\n            FROM intervention_revisions r JOIN interventions i ON i.id=r.intervention_id AND i.user_id=r.user_id"
+      },
+      {
+        "type": "view",
+        "name": "management_current",
+        "tbl_name": "management_current",
+        "sql": "CREATE VIEW management_current AS SELECT h.* FROM management_history h WHERE\n            h.revision=(SELECT MAX(x.revision) FROM intervention_revisions x WHERE x.intervention_id=h.intervention_id)"
+      }
+    ],
+    "meta": {
+      "management_meta": [
+        {
+          "kind": "aegis-pilot-management-v1"
+        }
+      ]
+    },
+    "columns": {
+      "management_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "interventions": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "source",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "intervention_revisions": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "intervention_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "change_reason",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ]
+    },
+    "indexes": {
+      "management_meta": [],
+      "interventions": [
+        {
+          "seq": 0,
+          "name": "idx_management_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_interventions_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_interventions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "intervention_revisions": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_intervention_revisions_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_intervention_revisions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  },
+  "research.sqlite3": {
+    "objects": [
+      {
+        "type": "table",
+        "name": "research_meta",
+        "tbl_name": "research_meta",
+        "sql": "CREATE TABLE research_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "records",
+        "tbl_name": "records",
+        "sql": "CREATE TABLE records(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            kind TEXT NOT NULL,payload_json TEXT NOT NULL,payload_sha256 TEXT NOT NULL,created_at TEXT NOT NULL,request_id TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "events",
+        "tbl_name": "events",
+        "sql": "CREATE TABLE events(id TEXT PRIMARY KEY,record_id TEXT NOT NULL REFERENCES records(id),\n            version INTEGER NOT NULL,actor_id TEXT NOT NULL,state TEXT NOT NULL,command_json TEXT NOT NULL,\n            command_sha256 TEXT NOT NULL,data_json TEXT NOT NULL,data_sha256 TEXT NOT NULL,created_at TEXT NOT NULL,\n            request_id TEXT NOT NULL,UNIQUE(record_id,version))"
+      },
+      {
+        "type": "index",
+        "name": "idx_research_owner",
+        "tbl_name": "records",
+        "sql": "CREATE INDEX idx_research_owner ON records(user_id,season_id,kind,created_at,id)"
+      },
+      {
+        "type": "view",
+        "name": "current_records",
+        "tbl_name": "current_records",
+        "sql": "CREATE VIEW current_records AS SELECT r.*,e.version,e.state,e.data_json AS current_data_json,\n            e.created_at AS updated_at FROM records r JOIN events e ON e.record_id=r.id\n            WHERE e.version=(SELECT MAX(x.version) FROM events x WHERE x.record_id=r.id)"
+      }
+    ],
+    "meta": {
+      "research_meta": [
+        {
+          "kind": "aegis-pilot-research-v1"
+        }
+      ]
+    },
+    "columns": {
+      "research_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "records": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "events": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "record_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "actor_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "state",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "command_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "command_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "data_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "data_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ]
+    },
+    "indexes": {
+      "research_meta": [],
+      "records": [
+        {
+          "seq": 0,
+          "name": "idx_research_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_records_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "events": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_events_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_events_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  },
+  "telemetry.sqlite3": {
+    "objects": [
+      {
+        "type": "table",
+        "name": "telemetry_meta",
+        "tbl_name": "telemetry_meta",
+        "sql": "CREATE TABLE telemetry_meta(kind TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "streams",
+        "tbl_name": "streams",
+        "sql": "CREATE TABLE streams(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            client_stream_id TEXT NOT NULL,metadata_json TEXT NOT NULL,metadata_sha256 TEXT NOT NULL,\n            created_at TEXT NOT NULL,request_id TEXT NOT NULL,UNIQUE(id,user_id),UNIQUE(user_id,client_stream_id))"
+      },
+      {
+        "type": "table",
+        "name": "samples",
+        "tbl_name": "samples",
+        "sql": "CREATE TABLE samples(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,stream_id TEXT NOT NULL,\n            observed_at TEXT NOT NULL,payload_json TEXT NOT NULL,payload_sha256 TEXT NOT NULL,\n            qc_json TEXT NOT NULL,received_at TEXT NOT NULL,request_id TEXT NOT NULL,\n            UNIQUE(stream_id,observed_at),UNIQUE(id,user_id),\n            FOREIGN KEY(stream_id,user_id) REFERENCES streams(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "exclusions",
+        "tbl_name": "exclusions",
+        "sql": "CREATE TABLE exclusions(sample_id TEXT PRIMARY KEY,user_id TEXT NOT NULL,\n            reason TEXT NOT NULL,recorded_at TEXT NOT NULL,request_id TEXT NOT NULL,\n            FOREIGN KEY(sample_id,user_id) REFERENCES samples(id,user_id))"
+      },
+      {
+        "type": "index",
+        "name": "idx_raw_owner",
+        "tbl_name": "samples",
+        "sql": "CREATE INDEX idx_raw_owner ON samples(user_id,stream_id,observed_at,id)"
+      },
+      {
+        "type": "index",
+        "name": "idx_stream_owner",
+        "tbl_name": "streams",
+        "sql": "CREATE INDEX idx_stream_owner ON streams(user_id,season_id,created_at,id)"
+      },
+      {
+        "type": "view",
+        "name": "raw_records",
+        "tbl_name": "raw_records",
+        "sql": "CREATE VIEW raw_records AS SELECT s.*,e.reason AS exclusion_reason,e.recorded_at AS excluded_at,\n            e.request_id AS exclusion_request_id FROM samples s LEFT JOIN exclusions e ON e.sample_id=s.id"
+      },
+      {
+        "type": "table",
+        "name": "hourly_policies",
+        "tbl_name": "hourly_policies",
+        "sql": "CREATE TABLE hourly_policies(\n            stream_id TEXT NOT NULL, user_id TEXT NOT NULL, revision INTEGER NOT NULL,\n            created_at TEXT NOT NULL, payload_json TEXT NOT NULL, payload_sha256 TEXT NOT NULL,\n            PRIMARY KEY(stream_id,user_id,revision),\n            FOREIGN KEY(stream_id,user_id) REFERENCES streams(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "hourly_sources",
+        "tbl_name": "hourly_sources",
+        "sql": "CREATE TABLE hourly_sources(\n            id TEXT PRIMARY KEY, stream_id TEXT NOT NULL, user_id TEXT NOT NULL,\n            season_id TEXT NOT NULL, revision INTEGER NOT NULL, policy_revision INTEGER NOT NULL,\n            compile_key TEXT NOT NULL, created_at TEXT NOT NULL,\n            snapshot_json TEXT NOT NULL, snapshot_sha256 TEXT NOT NULL,\n            payload_json TEXT NOT NULL, payload_sha256 TEXT NOT NULL,\n            UNIQUE(stream_id,user_id,revision), UNIQUE(stream_id,user_id,compile_key),\n            FOREIGN KEY(stream_id,user_id,policy_revision)\n                REFERENCES hourly_policies(stream_id,user_id,revision))"
+      },
+      {
+        "type": "index",
+        "name": "hourly_sources_owner",
+        "tbl_name": "hourly_sources",
+        "sql": "CREATE INDEX hourly_sources_owner ON hourly_sources(user_id,stream_id,created_at,id)"
+      },
+      {
+        "type": "table",
+        "name": "synthetic_forecasts",
+        "tbl_name": "synthetic_forecasts",
+        "sql": "CREATE TABLE synthetic_forecasts(\n            id TEXT PRIMARY KEY, user_id TEXT NOT NULL, season_id TEXT NOT NULL,\n            scenario TEXT NOT NULL, model_pin TEXT NOT NULL, input_hash TEXT NOT NULL,\n            created_at TEXT NOT NULL, result_json TEXT NOT NULL,\n            UNIQUE(user_id,season_id,scenario,model_pin,input_hash))"
+      },
+      {
+        "type": "table",
+        "name": "synthetic_forecast_inputs",
+        "tbl_name": "synthetic_forecast_inputs",
+        "sql": "CREATE TABLE synthetic_forecast_inputs(\n            forecast_id TEXT PRIMARY KEY REFERENCES synthetic_forecasts(id), input_json TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "synthetic_hourly_sources",
+        "tbl_name": "synthetic_hourly_sources",
+        "sql": "CREATE TABLE synthetic_hourly_sources(\n            season_id TEXT NOT NULL, user_id TEXT NOT NULL, revision INTEGER NOT NULL,\n            input_hash TEXT NOT NULL, hourly_json TEXT NOT NULL, created_at TEXT NOT NULL,\n            PRIMARY KEY(season_id,user_id,revision))"
+      },
+      {
+        "type": "table",
+        "name": "synthetic_forecast_hourly_sources",
+        "tbl_name": "synthetic_forecast_hourly_sources",
+        "sql": "CREATE TABLE synthetic_forecast_hourly_sources(\n            forecast_id TEXT PRIMARY KEY REFERENCES synthetic_forecasts(id),\n            hourly_source_id TEXT NOT NULL REFERENCES hourly_sources(id))"
+      },
+      {
+        "type": "table",
+        "name": "forecast_alert_policies",
+        "tbl_name": "forecast_alert_policies",
+        "sql": "CREATE TABLE forecast_alert_policies(\n            version TEXT PRIMARY KEY,payload_json TEXT NOT NULL,payload_sha256 TEXT NOT NULL)"
+      },
+      {
+        "type": "table",
+        "name": "forecast_alerts",
+        "tbl_name": "forecast_alerts",
+        "sql": "CREATE TABLE forecast_alerts(\n            id TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            forecast_id TEXT NOT NULL REFERENCES synthetic_forecasts(id),scope_key TEXT NOT NULL,\n            policy_version TEXT NOT NULL REFERENCES forecast_alert_policies(version),\n            kind TEXT NOT NULL CHECK(kind IN ('score_threshold','data_quality')),\n            issued_at TEXT NOT NULL,target_window_end TEXT NOT NULL,payload_json TEXT NOT NULL,\n            payload_sha256 TEXT NOT NULL,state TEXT NOT NULL CHECK(state IN ('unread','acknowledged')),\n            version INTEGER NOT NULL CHECK(version IN (1,2)),created_at TEXT NOT NULL,acknowledged_at TEXT,\n            UNIQUE(forecast_id,policy_version))"
+      },
+      {
+        "type": "index",
+        "name": "idx_forecast_alert_owner",
+        "tbl_name": "forecast_alerts",
+        "sql": "CREATE INDEX idx_forecast_alert_owner\n            ON forecast_alerts(user_id,season_id,created_at,id)"
+      },
+      {
+        "type": "table",
+        "name": "forecast_alert_evaluations",
+        "tbl_name": "forecast_alert_evaluations",
+        "sql": "CREATE TABLE forecast_alert_evaluations(\n            forecast_id TEXT NOT NULL REFERENCES synthetic_forecasts(id),\n            policy_version TEXT NOT NULL REFERENCES forecast_alert_policies(version),user_id TEXT NOT NULL,\n            scope_key TEXT NOT NULL,outcome TEXT NOT NULL,kind TEXT,\n            alert_id TEXT REFERENCES forecast_alerts(id),evaluated_at TEXT NOT NULL,\n            payload_json TEXT NOT NULL,payload_sha256 TEXT NOT NULL,PRIMARY KEY(forecast_id,policy_version))"
+      },
+      {
+        "type": "table",
+        "name": "forecast_alert_states",
+        "tbl_name": "forecast_alert_states",
+        "sql": "CREATE TABLE forecast_alert_states(\n            scope_key TEXT PRIMARY KEY,user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            latest_issue_us INTEGER NOT NULL,latest_forecast_id TEXT NOT NULL REFERENCES synthetic_forecasts(id),\n            score_alert_id TEXT REFERENCES forecast_alerts(id),data_alert_id TEXT REFERENCES forecast_alerts(id))"
+      },
+      {
+        "type": "table",
+        "name": "forecast_alert_actions",
+        "tbl_name": "forecast_alert_actions",
+        "sql": "CREATE TABLE forecast_alert_actions(\n            id TEXT PRIMARY KEY,alert_id TEXT NOT NULL REFERENCES forecast_alerts(id),user_id TEXT NOT NULL,\n            action TEXT NOT NULL CHECK(action='acknowledge'),base_version INTEGER NOT NULL,\n            created_at TEXT NOT NULL,UNIQUE(alert_id,action))"
+      },
+      {
+        "type": "table",
+        "name": "forecast_outcome_links",
+        "tbl_name": "forecast_outcome_links",
+        "sql": "CREATE TABLE forecast_outcome_links(\n            id TEXT PRIMARY KEY, user_id TEXT NOT NULL,season_id TEXT NOT NULL,\n            forecast_id TEXT NOT NULL REFERENCES synthetic_forecasts(id),kind TEXT NOT NULL CHECK(kind IN ('observation','followup')),\n            reference_id TEXT NOT NULL,reference_revision INTEGER NOT NULL,\n            command_json TEXT NOT NULL,command_sha256 TEXT NOT NULL,\n            snapshot_json TEXT NOT NULL,snapshot_sha256 TEXT NOT NULL,\n            created_at TEXT NOT NULL,state TEXT NOT NULL CHECK(state IN ('active','retracted')),\n            version INTEGER NOT NULL CHECK(version IN (1,2)),retracted_at TEXT)"
+      },
+      {
+        "type": "index",
+        "name": "idx_forecast_outcome_active",
+        "tbl_name": "forecast_outcome_links",
+        "sql": "CREATE UNIQUE INDEX idx_forecast_outcome_active\n            ON forecast_outcome_links(forecast_id,kind,reference_id,reference_revision) WHERE state='active' "
+      },
+      {
+        "type": "index",
+        "name": "idx_forecast_outcome_owner",
+        "tbl_name": "forecast_outcome_links",
+        "sql": "CREATE INDEX idx_forecast_outcome_owner\n            ON forecast_outcome_links(user_id,forecast_id,created_at,id)"
+      },
+      {
+        "type": "table",
+        "name": "forecast_outcome_actions",
+        "tbl_name": "forecast_outcome_actions",
+        "sql": "CREATE TABLE forecast_outcome_actions(\n            id TEXT PRIMARY KEY,link_id TEXT NOT NULL REFERENCES forecast_outcome_links(id),user_id TEXT NOT NULL,\n            action TEXT NOT NULL CHECK(action='retract'),base_version INTEGER NOT NULL,reason TEXT NOT NULL,\n            created_at TEXT NOT NULL,UNIQUE(link_id,action))"
+      },
+      {
+        "type": "table",
+        "name": "forecast_jobs",
+        "tbl_name": "forecast_jobs",
+        "sql": "CREATE TABLE forecast_jobs(\n            id TEXT PRIMARY KEY, user_id TEXT NOT NULL, season_id TEXT NOT NULL,\n            stream_id TEXT NOT NULL, name TEXT NOT NULL, interval_seconds INTEGER NOT NULL,\n            enabled INTEGER NOT NULL, version INTEGER NOT NULL, next_run_at TEXT NOT NULL,\n            created_at TEXT NOT NULL, command_json TEXT NOT NULL, command_sha256 TEXT NOT NULL,\n            UNIQUE(user_id,stream_id), FOREIGN KEY(stream_id,user_id) REFERENCES streams(id,user_id))"
+      },
+      {
+        "type": "table",
+        "name": "forecast_runs",
+        "tbl_name": "forecast_runs",
+        "sql": "CREATE TABLE forecast_runs(\n            id TEXT PRIMARY KEY, forecast_job_id TEXT NOT NULL REFERENCES forecast_jobs(id),\n            user_id TEXT NOT NULL, season_id TEXT NOT NULL, job_version INTEGER NOT NULL,\n            scheduled_at TEXT NOT NULL, issued_at TEXT NOT NULL,\n            hourly_source_id TEXT REFERENCES hourly_sources(id), model_pin TEXT NOT NULL,\n            status TEXT NOT NULL, attempt_count INTEGER NOT NULL, next_attempt_at TEXT NOT NULL,\n            forecast_id TEXT REFERENCES synthetic_forecasts(id), error_code TEXT,\n            created_at TEXT NOT NULL, finished_at TEXT, UNIQUE(forecast_job_id,scheduled_at,job_version))"
+      },
+      {
+        "type": "index",
+        "name": "forecast_one_active_run",
+        "tbl_name": "forecast_runs",
+        "sql": "CREATE UNIQUE INDEX forecast_one_active_run\n            ON forecast_runs(forecast_job_id) WHERE status IN ('pending','retry','running')"
+      },
+      {
+        "type": "table",
+        "name": "forecast_attempts",
+        "tbl_name": "forecast_attempts",
+        "sql": "CREATE TABLE forecast_attempts(\n            id TEXT PRIMARY KEY, forecast_run_id TEXT NOT NULL REFERENCES forecast_runs(id),\n            number INTEGER NOT NULL, status TEXT NOT NULL, started_at TEXT NOT NULL,\n            finished_at TEXT, error_code TEXT, UNIQUE(forecast_run_id,number))"
+      },
+      {
+        "type": "index",
+        "name": "forecast_runs_owner",
+        "tbl_name": "forecast_runs",
+        "sql": "CREATE INDEX forecast_runs_owner ON forecast_runs(user_id,forecast_job_id,created_at,id)"
+      }
+    ],
+    "meta": {
+      "telemetry_meta": [
+        {
+          "kind": "aegis-pilot-telemetry-v1"
+        }
+      ]
+    },
+    "columns": {
+      "telemetry_meta": [
+        {
+          "cid": 0,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "streams": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "client_stream_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "metadata_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "metadata_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "samples": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "stream_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "observed_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "qc_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "received_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "exclusions": [
+        {
+          "cid": 0,
+          "name": "sample_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "reason",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "recorded_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "request_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "hourly_policies": [
+        {
+          "cid": 0,
+          "name": "stream_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 3
+        },
+        {
+          "cid": 3,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "hourly_sources": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "stream_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "policy_revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "compile_key",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "snapshot_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "snapshot_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "synthetic_forecasts": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "scenario",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "model_pin",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "input_hash",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "result_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "synthetic_forecast_inputs": [
+        {
+          "cid": 0,
+          "name": "forecast_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "input_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "synthetic_hourly_sources": [
+        {
+          "cid": 0,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 3
+        },
+        {
+          "cid": 3,
+          "name": "input_hash",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "hourly_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "synthetic_forecast_hourly_sources": [
+        {
+          "cid": 0,
+          "name": "forecast_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "hourly_source_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_alert_policies": [
+        {
+          "cid": 0,
+          "name": "version",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_alerts": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "forecast_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "scope_key",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "policy_version",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "issued_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "target_window_end",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "state",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "acknowledged_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_alert_evaluations": [
+        {
+          "cid": 0,
+          "name": "forecast_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "policy_version",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 2
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "scope_key",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "outcome",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "alert_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "evaluated_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "payload_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "payload_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_alert_states": [
+        {
+          "cid": 0,
+          "name": "scope_key",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "latest_issue_us",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "latest_forecast_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "score_alert_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "data_alert_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_alert_actions": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "alert_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "action",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "base_version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_outcome_links": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "forecast_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "kind",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "reference_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "reference_revision",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "command_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "command_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "snapshot_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "snapshot_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "state",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "retracted_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_outcome_actions": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "link_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "action",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "base_version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "reason",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_jobs": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "stream_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "name",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "interval_seconds",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "enabled",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "next_run_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "command_json",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "command_sha256",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_runs": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "forecast_job_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "user_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "season_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "job_version",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "scheduled_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "issued_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 7,
+          "name": "hourly_source_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 8,
+          "name": "model_pin",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 9,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 10,
+          "name": "attempt_count",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 11,
+          "name": "next_attempt_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 12,
+          "name": "forecast_id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 13,
+          "name": "error_code",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 14,
+          "name": "created_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 15,
+          "name": "finished_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ],
+      "forecast_attempts": [
+        {
+          "cid": 0,
+          "name": "id",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 1
+        },
+        {
+          "cid": 1,
+          "name": "forecast_run_id",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 2,
+          "name": "number",
+          "type": "INTEGER",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 3,
+          "name": "status",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 4,
+          "name": "started_at",
+          "type": "TEXT",
+          "notnull": 1,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 5,
+          "name": "finished_at",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        },
+        {
+          "cid": 6,
+          "name": "error_code",
+          "type": "TEXT",
+          "notnull": 0,
+          "dflt_value": null,
+          "pk": 0
+        }
+      ]
+    },
+    "indexes": {
+      "telemetry_meta": [],
+      "streams": [
+        {
+          "seq": 0,
+          "name": "idx_stream_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_streams_3",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_streams_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_streams_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "samples": [
+        {
+          "seq": 0,
+          "name": "idx_raw_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_samples_3",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_samples_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_samples_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "exclusions": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_exclusions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "hourly_policies": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_hourly_policies_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "hourly_sources": [
+        {
+          "seq": 0,
+          "name": "hourly_sources_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_hourly_sources_3",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_hourly_sources_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_hourly_sources_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "synthetic_forecasts": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_synthetic_forecasts_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_synthetic_forecasts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "synthetic_forecast_inputs": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_synthetic_forecast_inputs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "synthetic_hourly_sources": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_synthetic_hourly_sources_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "synthetic_forecast_hourly_sources": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_synthetic_forecast_hourly_sources_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_alert_policies": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_alert_policies_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_alerts": [
+        {
+          "seq": 0,
+          "name": "idx_forecast_alert_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_forecast_alerts_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_forecast_alerts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_alert_evaluations": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_alert_evaluations_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_alert_states": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_alert_states_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_alert_actions": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_alert_actions_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_forecast_alert_actions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_outcome_links": [
+        {
+          "seq": 0,
+          "name": "idx_forecast_outcome_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "idx_forecast_outcome_active",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_forecast_outcome_links_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_outcome_actions": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_outcome_actions_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_forecast_outcome_actions_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_jobs": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_jobs_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_forecast_jobs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_runs": [
+        {
+          "seq": 0,
+          "name": "forecast_runs_owner",
+          "unique": 0,
+          "origin": "c",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "forecast_one_active_run",
+          "unique": 1,
+          "origin": "c",
+          "partial": 1
+        },
+        {
+          "seq": 2,
+          "name": "sqlite_autoindex_forecast_runs_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 3,
+          "name": "sqlite_autoindex_forecast_runs_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ],
+      "forecast_attempts": [
+        {
+          "seq": 0,
+          "name": "sqlite_autoindex_forecast_attempts_2",
+          "unique": 1,
+          "origin": "u",
+          "partial": 0
+        },
+        {
+          "seq": 1,
+          "name": "sqlite_autoindex_forecast_attempts_1",
+          "unique": 1,
+          "origin": "pk",
+          "partial": 0
+        }
+      ]
+    }
+  }
+}

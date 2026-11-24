@@ -1,0 +1,2119 @@
+{
+  "info": {
+    "name": "AEGIS Cultivation Context (mock + real V4)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Isolated local DB only. Versioned user-declared context; does not change warning rules."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "type": "string",
+        "value": "{{access_token}}"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/health",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Backend alive\", () => pm.expect(pm.response.json().service).to.eql(\"aegis-backend\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Register owner (fresh account each run)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id=pm.variables.replaceIn('{{$guid}}');",
+              "pm.environment.set('email', 'postman-'+id+'@example.test');",
+              "pm.environment.set('password', 'Test-'+id);",
+              "['access_token','user_id','analysis_id','image_url','other_token','other_user_id','detection_request_id','model_sha256'].forEach(k=>pm.environment.unset(k));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.environment.set(\"user_id\",pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Duplicate email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"email_exists\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Invalid registration",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"invalid\", \"password\": \"short\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_credentials\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Wrong password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"Wrong-password-123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_login\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Login owner",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{email}}\", \"password\": \"{{password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const d=pm.response.json();",
+              "pm.test('Bearer session',()=>{pm.expect(d.token_type).to.eql('Bearer'); pm.expect(d.access_token).to.be.a('string').and.not.empty; pm.expect(d.expires_at).to.be.above(Date.now()/1000);});",
+              "if(pm.response.code===200) pm.environment.set('access_token',d.access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Current user",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Owner identity\",()=>pm.expect(pm.response.json().user.id).to.eql(pm.environment.get(\"user_id\")));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F01 Create owned plot",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/plots",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Ru\\u1ed9ng demo c\\u1ea3nh b\\u00e1o\", \"location_text\": \"D\\u1eef li\\u1ec7u m\\u00f4 ph\\u1ecfng\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.environment.set('plot_id',pm.response.json().item.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F02 Create rice season",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/plots/{{plot_id}}/seasons",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"M\\u00f9a v\\u1ee5 mock\", \"start_date\": \"2026-10-01\", \"end_date\": \"2026-12-31\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.environment.set('season_id',pm.response.json().item.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C01 Legacy context is unknown",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('No invented planting date',()=>{pm.expect(pm.response.json().item).to.eql(null);pm.expect(pm.response.json().context_check.status).to.eql('incomplete');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C02 Record cultivation revision1",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"base_revision\": 0, \"profile\": {\"region\": \"central\", \"province_or_city\": \"Tỉnh demo\", \"locality\": \"Địa bàn mô phỏng\", \"rice_variety\": \"Giống demo\", \"planting_method\": \"transplanted\", \"sown_on\": \"2026-09-20\", \"transplanted_on\": \"2026-10-05\", \"season_status\": \"active\"}, \"change_reason\": \"Khai báo ban đầu\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('Revision and context only',()=>{const d=pm.response.json();pm.expect(d.item.revision).to.eql(1);pm.expect(d.context_check.status).to.eql('complete');pm.expect(d.context_check.agronomically_verified).to.eql(false);pm.expect(d.context_check.changes_warning_rule).to.eql(false);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C03 Read cultivation profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Transplant date is explicit',()=>pm.expect(pm.response.json().item.profile.transplanted_on).to.eql('2026-10-05'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C04 Retry same save",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"base_revision\": 0, \"profile\": {\"region\": \"central\", \"province_or_city\": \"Tỉnh demo\", \"locality\": \"Địa bàn mô phỏng\", \"rice_variety\": \"Giống demo\", \"planting_method\": \"transplanted\", \"sown_on\": \"2026-09-20\", \"transplanted_on\": \"2026-10-05\", \"season_status\": \"active\"}, \"change_reason\": \"Khai báo ban đầu\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('No duplicate revision',()=>{pm.expect(pm.response.json().item.revision).to.eql(1);pm.expect(pm.response.headers.get('Idempotency-Replayed')).to.eql('true');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C05 Correct declared variety",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"base_revision\": 1, \"profile\": {\"region\": \"central\", \"province_or_city\": \"Tỉnh demo\", \"locality\": \"Địa bàn mô phỏng\", \"rice_variety\": \"Giống đã đối chiếu sổ\", \"planting_method\": \"transplanted\", \"sown_on\": \"2026-09-20\", \"transplanted_on\": \"2026-10-05\", \"season_status\": \"active\"}, \"change_reason\": \"Đối chiếu sổ ghi chép\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('Revision2',()=>pm.expect(pm.response.json().item.revision).to.eql(2));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C06 Reject stale edit",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"base_revision\": 1, \"profile\": {\"region\": \"central\", \"province_or_city\": \"Tỉnh demo\", \"locality\": \"Địa bàn mô phỏng\", \"rice_variety\": \"Ghi đè sai\", \"planting_method\": \"transplanted\", \"sown_on\": \"2026-09-20\", \"transplanted_on\": \"2026-10-05\", \"season_status\": \"active\"}, \"change_reason\": \"Bản cũ\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409',()=>pm.response.to.have.status(409));",
+              "pm.test('Conflict code',()=>pm.expect(pm.response.json().error.code).to.eql('cultivation_revision_conflict'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C07 Cultivation history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile/revisions"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Descending immutable revisions',()=>{const d=pm.response.json();pm.expect(d.pagination.total).to.eql(2);pm.expect(d.items.map(x=>x.revision)).to.eql([2,1]);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F03 Register mock device",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/devices",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Thi\\u1ebft b\\u1ecb mock\", \"device_code\": \"DEMO1\", \"source\": \"mock\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.environment.set('device_id',pm.response.json().item.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F04 Upload 24 hourly mock buckets",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/telemetry",
+        "body": {
+          "mode": "raw",
+          "raw": "{{telemetry_body}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const end=Date.parse('2026-10-24T00:00:00Z');",
+              "const records=Array.from({length:24},(_,i)=>({start_at:new Date(end-(24-i)*3600000).toISOString(),air_temperature_c:26,relative_humidity_pct:i>=18?95:70,leaf_wet:i>=18}));",
+              "pm.environment.set('telemetry_body',JSON.stringify({source:'mock',records}));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('24 inserted',()=>pm.expect(pm.response.json().inserted).to.eql(24));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F05 Replay telemetry",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/telemetry",
+        "body": {
+          "mode": "raw",
+          "raw": "{{telemetry_body}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Replay without new rows',()=>{pm.expect(pm.response.json().inserted).to.eql(0);pm.expect(pm.response.json().replayed).to.eql(24);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F06 Assess completed mock window",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/assessments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"as_of\": \"2026-10-24T00:00:00Z\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.environment.set('assessment_id',pm.response.json().item.id);",
+              "const a=pm.response.json().item;",
+              "pm.environment.set('assessment_snapshot',JSON.stringify(a));",
+              "pm.test('Explainable mock advisory',()=>{",
+              " pm.expect(a.result.status).to.eql('advisory');pm.expect(a.result.longest_matching_run_hours).to.eql(6);",
+              " pm.expect(a.result.is_mock).to.eql(true);pm.expect(a.result.field_validated).to.eql(false);",
+              " pm.expect(a.result.forecast_horizon_hours).to.eql(null);pm.expect(a.result).not.to.have.property('probability');",
+              " pm.expect(a.profile.duration_basis).to.include('demo assumption');",
+              " pm.expect(a.plot_id).to.eql(pm.environment.get('plot_id'));pm.expect(a.season_id).to.eql(pm.environment.get('season_id'));",
+              " pm.expect(a.result.profile_sha256).to.match(/^[0-9a-f]{64}$/);pm.expect(a.result.input_sha256).to.match(/^[0-9a-f]{64}$/);",
+              " pm.expect(a.request_id).to.eql(pm.response.headers.get('X-Request-ID'));",
+              "});",
+              "pm.test('Frozen cultivation revision2 and correct age basis',()=>{const c=pm.response.json().item.cultivation_context;pm.expect(c.item.revision).to.eql(2);pm.expect(c.crop_age_days).to.eql(19);pm.expect(c.crop_age_basis).to.eql('transplanted_on');pm.expect(c.recorded_after_window_end).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C08 Update context after assessment",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"base_revision\": 2, \"profile\": {\"region\": \"central\", \"province_or_city\": \"Tỉnh demo\", \"locality\": \"Địa bàn mô phỏng\", \"rice_variety\": \"Giống sửa sau đánh giá\", \"planting_method\": \"transplanted\", \"sown_on\": \"2026-09-20\", \"transplanted_on\": \"2026-10-05\", \"season_status\": \"active\"}, \"change_reason\": \"Bổ sung sau snapshot\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('Revision3',()=>pm.expect(pm.response.json().item.revision).to.eql(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C09 Read current revision3",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Current context differs from frozen assessment',()=>{pm.expect(pm.response.json().item.revision).to.eql(3);pm.expect(JSON.parse(pm.environment.get('assessment_snapshot')).cultivation_context.item.revision).to.eql(2);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F07 Replay immutable assessment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/assessments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"as_of\": \"2026-10-24T00:00:00Z\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Same snapshot and replay header',()=>{pm.expect(pm.response.json().item).to.eql(JSON.parse(pm.environment.get('assessment_snapshot')));pm.expect(pm.response.headers.get('Idempotency-Replayed')).to.eql('true');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F08 Assessment detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Stored snapshot',()=>pm.expect(pm.response.json().item).to.eql(JSON.parse(pm.environment.get('assessment_snapshot'))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F09 Assessment history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/assessments"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('One history item',()=>pm.expect(pm.response.json().pagination.total).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F10 Missing data is not low risk",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/assessments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"as_of\": \"2026-10-23T23:00:00Z\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('Missing first hour',()=>{const d=pm.response.json().item.result;pm.expect(d.status).to.eql('insufficient_data');pm.expect(d.completeness.missing_buckets).to.have.length(1);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F11 Reject modified existing bucket",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/telemetry",
+        "body": {
+          "mode": "raw",
+          "raw": "{{conflict_body}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d=JSON.parse(pm.environment.get('telemetry_body'));d.records=d.records.slice(0,1);d.records[0].air_temperature_c=27;pm.environment.set('conflict_body',JSON.stringify(d));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409',()=>pm.response.to.have.status(409));",
+              "pm.test('Conflict',()=>pm.expect(pm.response.json().error.code).to.eql('telemetry_conflict'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F12 Telemetry history",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/telemetry?page_size=100"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('24 synthetic records',()=>{pm.expect(pm.response.json().pagination.total).to.eql(24);pm.response.json().items.forEach(x=>pm.expect(x.quality).to.eql('synthetic'));});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F13 Plot detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/plots/{{plot_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F14 Season detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F15 Device detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Detection needs token",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"unauthorized\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Missing image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"missing_or_multiple_images\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Empty image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/empty.bin"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"empty_image\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Invalid image bytes",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/invalid.txt"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_image\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Oversized image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/too-large.bin"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 413\", () => pm.response.to.have.status(413));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"upload_too_large\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Detect real image and save",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/sample.jpg"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.environment.set('idempotency_key',pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const d=pm.response.json();",
+              "pm.test('Detection contract',()=>{",
+              " pm.expect(d.success).to.eql(true); pm.expect(d.user_id).to.eql(pm.environment.get('user_id'));",
+              " pm.expect(d.analysis_id).to.be.a('string').and.not.empty;",
+              " pm.expect(d.model_version).to.be.a('string').and.not.empty;",
+              " pm.expect(d.status).to.be.oneOf(['detection_found','no_detection']);",
+              " pm.expect(d.image.orientation).to.eql('exif_corrected');",
+              " pm.expect(d.detections).to.be.an('array');",
+              " d.detections.forEach(x=>{",
+              "  pm.expect(x.detection_id).to.be.a('string');",
+              "  pm.expect(['rice_blast','brown_spot','sheath_blight'][x.class_id]).to.eql(x.disease);",
+              "  pm.expect(x.confidence).to.be.within(0,1);",
+              "  pm.expect(x.bbox.x1).to.be.at.least(0); pm.expect(x.bbox.x2).to.be.above(x.bbox.x1).and.at.most(d.image.width);",
+              "  pm.expect(x.bbox.y1).to.be.at.least(0); pm.expect(x.bbox.y2).to.be.above(x.bbox.y1).and.at.most(d.image.height);",
+              " });",
+              "});",
+              "pm.test('Origin trace and artifact',()=>{",
+              " pm.expect(d.request_id).to.eql(pm.response.headers.get('X-Request-ID'));",
+              " pm.expect(d.model_sha256).to.match(/^[0-9a-f]{64}$/);",
+              " pm.expect(d.timings.ai_processing_ms).to.be.at.least(0);pm.expect(d.timings.ai_roundtrip_ms).to.be.at.least(0);",
+              "});",
+              "if(pm.response.code===200){pm.environment.set('analysis_id',d.analysis_id);pm.environment.set('image_url',d.image_url);pm.environment.set('detection_request_id',d.request_id);pm.environment.set('model_sha256',d.model_sha256);}",
+              "if(pm.response.code===200)pm.environment.set('origin_result',JSON.stringify(pm.response.json()));",
+              "pm.test('V4 is still default',()=>{const d=pm.response.json();pm.expect(d.model_version).to.eql('aegis-yolo11n-v4-50epochs');pm.expect(d.model_sha256).to.eql('1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13a Replay same image and key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/sample.jpg"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('Replay preserves complete result',()=>{",
+              "pm.expect(pm.response.headers.get('Idempotency-Replayed')).to.eql('true');",
+              "pm.expect(pm.response.json()).to.deep.eql(JSON.parse(pm.environment.get('origin_result')));",
+              "pm.expect(pm.response.headers.get('X-Request-ID')).not.to.eql(pm.response.json().request_id);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13b Same key different bytes",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/invalid.txt"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"idempotency_conflict\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13c Invalid key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "invalid key"
+          }
+        ],
+        "url": "{{base_url}}/api/disease/detect",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "fixtures/sample.jpg"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_idempotency_key\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 Read persisted detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses/{{analysis_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Persisted owner and origin trace\",()=>{const d=pm.response.json();pm.expect(d.analysis_id).to.eql(pm.environment.get(\"analysis_id\"));pm.expect(d.user_id).to.eql(pm.environment.get(\"user_id\"));pm.expect(d.request_id).to.eql(pm.environment.get(\"detection_request_id\"));pm.expect(d.model_sha256).to.eql(pm.environment.get(\"model_sha256\"));pm.expect(pm.response.headers.get(\"X-Request-ID\")).not.to.eql(d.request_id);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F16 Link V4 image check to warning",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}/analyses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"analysis_id\": \"{{analysis_id}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F17 Replay image link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}/analyses",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"analysis_id\": \"{{analysis_id}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F18 Linked image analyses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}/analyses"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Same V4 analysis',()=>{const x=pm.response.json();pm.expect(x.pagination.total).to.eql(1);pm.expect(x.items[0].analysis_id).to.eql(pm.environment.get('analysis_id'));pm.expect(x.items[0].model_sha256).to.eql(pm.environment.get('model_sha256'));});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F19 Warning snapshot remains intact",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Image does not rewrite warning',()=>pm.expect(pm.response.json().item).to.eql(JSON.parse(pm.environment.get('assessment_snapshot'))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 History page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses?page=1&page_size=20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('History includes saved result',()=>{const d=pm.response.json();pm.expect(d.pagination.total).to.eql(1);pm.expect(d.items[0].analysis_id).to.eql(pm.environment.get('analysis_id'));});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 Invalid pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses?page=0"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"invalid_pagination\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 View private image",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}{{image_url}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test('Image headers',()=>{pm.expect(pm.response.headers.get('Content-Type')).to.match(/^image\\/(jpeg|png|webp)/);pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store');pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Image needs token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}{{image_url}}",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"unauthorized\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Register other user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{other_email}}\", \"password\": \"{{other_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const id=pm.variables.replaceIn('{{$guid}}');pm.environment.set('other_email','postman-other-'+id+'@example.test');pm.environment.set('other_password','Test-'+id);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.environment.set(\"other_user_id\",pm.response.json().user.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 Login other user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{other_email}}\", \"password\": \"{{other_password}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "if(pm.response.code===200)pm.environment.set(\"other_token\",pm.response.json().access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F20 Other user plot list empty",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/plots",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('No foreign plots',()=>pm.expect(pm.response.json().items).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C10 Other user cannot read context",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C11 Other user cannot read revisions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile/revisions",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "C12 Other user cannot edit context",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}/cultivation-profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"base_revision\": 3, \"profile\": {\"region\": \"central\", \"province_or_city\": \"Tỉnh demo\", \"locality\": \"Địa bàn mô phỏng\", \"rice_variety\": \"Foreign\", \"planting_method\": \"transplanted\", \"sown_on\": \"2026-09-20\", \"transplanted_on\": \"2026-10-05\", \"season_status\": \"active\"}, \"change_reason\": \"Not owner\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F21 Other user denied /plots/{{plot_id}}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/plots/{{plot_id}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F22 Other user denied /seasons/{{season_id}}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/seasons/{{season_id}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F23 Other user denied /devices/{{device_id}}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F24 Other user denied /devices/{{device_id}}/telemetry",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/telemetry",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F25 Other user denied /devices/{{device_id}}/assessments",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/assessments",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F26 Other user denied /assessments/{{assessment_id}}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F27 Other user denied /assessments/{{assessment_id}}/analyses",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/farm/assessments/{{assessment_id}}/analyses",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "F28 Other user cannot evaluate",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/farm/devices/{{device_id}}/assessments",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21 Other user cannot read detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses/{{analysis_id}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"analysis_not_found\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "22 Other user cannot view image",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}{{image_url}}",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"analysis_not_found\");});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 Other user history is empty",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/disease/analyses",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Isolated history\",()=>{pm.expect(pm.response.json().pagination.total).to.eql(0);pm.expect(pm.response.json().items).to.eql([]);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 Logout other user",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/auth/logout",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "type": "string",
+              "value": "{{other_token}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.environment.unset(\"other_token\");pm.environment.unset(\"other_password\");"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "25 Logout owner",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/auth/logout"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "26 Revoked token is rejected",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "pm.test(\"Error contract\", () => {const d=pm.response.json(); pm.expect(d.success).to.eql(false); pm.expect(d.error.code).to.eql(\"unauthorized\");});",
+              "pm.environment.unset(\"access_token\");pm.environment.unset(\"password\");"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Current request headers',()=>{",
+          " pm.expect(pm.response.headers.get('X-Request-ID')).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);",
+          " pm.expect(Number(pm.response.headers.get('X-Processing-Time-Ms'))).to.be.at.least(0);",
+          "});",
+          "if(pm.response.code>=400)pm.test('Error request ID',()=>pm.expect(pm.response.json().request_id).to.eql(pm.response.headers.get('X-Request-ID')));"
+        ]
+      }
+    }
+  ]
+}

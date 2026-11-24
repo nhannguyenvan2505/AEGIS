@@ -1,0 +1,20 @@
+{
+  "schema_version": "aegis-synthetic-endpoint-protocol-v1",
+  "protocol_id": "t15-first-simulated-leaf-symptom-v1",
+  "source": "synthetic",
+  "disease": "leaf_blast",
+  "plant_part": "leaf",
+  "target": "first_simulator_attested_leaf_symptom_event_interval",
+  "horizon_hours": 72,
+  "baseline_window_hours": 24,
+  "planned_followup_hours": [24, 48, 72],
+  "max_survey_gap_hours": 24,
+  "negative_requires_all_planned_visits": true,
+  "binary_requires_mature_window": true,
+  "baseline_must_be_available_at_issue": true,
+  "intervention_policy": "exclude_known_intervention_in_target_window",
+  "review_origin": "simulator_attestation",
+  "latent_generator_truth_used_as_label": false,
+  "training_approved": false,
+  "field_validated": false
+}

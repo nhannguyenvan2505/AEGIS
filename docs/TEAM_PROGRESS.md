@@ -1,5 +1,15 @@
 # Tiến độ Git/GitHub AEGIS
 
+**Cập nhật07/11/2026:** đã push nhánh `codex/portable-forecast-demo`
+(commit đầu `aaffdb4`) cho thành viên clone. Xem [hướng dẫn demo toàn dự án](../CLONE_DEMO.md).
+Các dòng bên dưới là nhật ký TASK-19 ngày28/10, không phải trạng thái mới.
+
+Ghi chú TASK-19,28/10/2026: đây là nhật ký Git theo mốc cũ, không là dashboard
+remote hiện hành. [Chỉ mục local](D:/AEGIS/docs/CURRENT_HANDOFF.md) ghi phần mềm/
+contract mới. Checkout có core/mobile nhưng pilot vẫn untracked; chưa kiểm lại
+PR/merge/invite/branch protection ở task này. Các dòng lịch sử dưới giữ nguyên,
+không xem là vừa xác minh lại.
+
 ## Đã xác minh
 
 - Git 2.46.0.windows.1; PowerShell; GitHub CLI đăng nhập nhannguyenvan2505.

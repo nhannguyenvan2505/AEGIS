@@ -97,12 +97,18 @@ try {
         if ((Get-Date) -gt $bootDeadline) { throw "Emulator $DeviceId did not finish booting." }
     } while (($bootComplete -join '').Trim() -ne '1')
 
+    # The bundled app still uses the local Backend, independently of Metro/Expo Go.
+    & $adb -s $DeviceId reverse tcp:5000 tcp:5000
+    if ($LASTEXITCODE -ne 0) { throw 'Could not forward the local Backend port to the emulator.' }
+
     $apkPath = Join-Path $projectRoot 'android\app\build\outputs\apk\release\app-release.apk'
     & $adb -s $DeviceId install -r $apkPath
     if ($LASTEXITCODE -ne 0) { throw 'APK installation failed. Existing app data was preserved.' }
     & $adb -s $DeviceId shell am start -W -n 'com.aegis.mobile/.MainActivity'
     if ($LASTEXITCODE -ne 0) { throw 'Could not launch Farmer App.' }
     Write-Output 'Farmer App is installed and running on the emulator.'
+    Write-Output "Standalone x86_64 APK: $apkPath"
+    Write-Output 'Metro and Expo Go are not required. Keep the local Backend running for API features.'
 } finally {
     Pop-Location
 }

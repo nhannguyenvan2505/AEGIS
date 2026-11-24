@@ -97,6 +97,8 @@ def ensure_case(db,owner,a,reason,request_id,at,origin=None):
 
 
 def initialize(path):
+    from app.hybrid_pilot import initialized
+    if initialized(path): return
     existed=path.exists()
     with journal_db(path) as db:
         if existed:

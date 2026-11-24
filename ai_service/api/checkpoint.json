@@ -1,0 +1,10 @@
+{
+  "repository": "nhannguyenvan2505/AEGIS",
+  "release": "midterm-models-2026-11-09",
+  "asset": "best.pt",
+  "target": "ai_service/experiments/yolo/baseline_v4_50epochs/weights/best.pt",
+  "sha256": "1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a",
+  "size_bytes": 5509466,
+  "classes": {"0": "rice_blast", "1": "brown_spot", "2": "sheath_blight"},
+  "purpose": "YOLO11n V4 image inference for the private team midterm demo"
+}

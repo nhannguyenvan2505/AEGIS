@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 from .farm_schema import apply_farm_migration
 from .cultivation import apply_cultivation_migration
+from .farm_hierarchy import apply_farm_hierarchy_migration
 
 TRACE_COLUMNS = {'request_id': 'TEXT', 'model_sha256': 'TEXT',
                  'ai_processing_ms': 'REAL', 'ai_roundtrip_ms': 'REAL'}
@@ -40,3 +41,4 @@ def apply_migrations(db):
                    ('inference_idempotency', datetime.now(timezone.utc).isoformat()))
     apply_farm_migration(db)
     apply_cultivation_migration(db)
+    apply_farm_hierarchy_migration(db)

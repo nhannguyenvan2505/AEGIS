@@ -1,0 +1,19 @@
+{
+  "version": "aegis-forecast-alert-policy-v1",
+  "source": "synthetic",
+  "field_validated": false,
+  "eligible_input": "stored_raw_hourly",
+  "eligible_model_pin": "2961f7e30e93355fa0c498069a06c4dfd44b6f08567241268a06cd24180a2b6f",
+  "score_semantics": "uncalibrated_model_score",
+  "threshold": 0.5,
+  "cooldown_seconds": 21600,
+  "maximum_forecast_age_seconds": 3600,
+  "cooldown_clock": "forecast_issued_at",
+  "ordering": "strictly_increasing_issue_time_per_scope; first_evaluation_wins_same_issue",
+  "scope": "owner/season/stream/model/feature_contract/horizon/hourly_policy_revision/alert_policy",
+  "kinds": ["score_threshold", "data_quality"],
+  "acknowledgement": "does_not_reset_cooldown_or_confirm_disease",
+  "delivery": "persisted_in_app_only",
+  "interpretation": "synthetic_model_and_data_quality_notifications_not_confirmed_disease",
+  "limits": "Engineering demonstration policy; no field calibration, prescription, SMS, email or push delivery"
+}

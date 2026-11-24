@@ -1,0 +1,89 @@
+{
+  "at_utc7": "2026-10-24T16:04:51.801548+07:00",
+  "files": [
+    {
+      "path": "D:\\AEGIS\\frontend\\.gitignore",
+      "sha256": "e5cefd046795d6750f9d32a85ef5e0313f17383ed182f771dcd892c15c66e3b6"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\checks\\blank_technical.png",
+      "sha256": "df43710cdc7477a2e85a02cbdb383e85fbaf56e036e6fdd0f2c449be0fd00662"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\checks\\exif_orientation_6.jpg",
+      "sha256": "959b20fc346ac0b83008fcc20093483cbdef0f51705e778aef18bb4ea88c8572"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\evidence\\database_evidence.json",
+      "sha256": "772fb2e5b3d5febee0a778931274d0f093ed2cba8d15f51dfbfc1e6f6e44fff1"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\evidence\\desktop.jpg",
+      "sha256": "b4dfc97713466115aa6fe1a88f8d568728f78bf5ffbb7d28d28cfb2f87ce6444"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\evidence\\desktop_overview.jpg",
+      "sha256": "8eda79ef731becdae669ae3602682315303f1170c16627e79ea79964dfa5ec7f"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\evidence\\mobile.jpg",
+      "sha256": "8d482aa77293478a7b50964d20c3f7ef5d53d2e62588e9065f8944c11cd149d4"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\evidence\\server_tests.log",
+      "sha256": "596ef520b502ecd7cc9786910e659ff5eb66273e4293dd066c9287a0713107c8"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\evidence\\verification.json",
+      "sha256": "2db55b21bd722f501ddf740fc5fa927866110439c825373f25237e69f12020be"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\README.md",
+      "sha256": "de41d50be7de03920ecf3870f7dbecdda92e4ea3ce6aa38440ea1332c21258b5"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\runs\\verification_01\\backend.log",
+      "sha256": "fae729b5932d3dfcc424d06cbce951fe6410e95de4f4329dce7deeb4e0fd6bf5"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\runs\\verification_01\\cleanup.json",
+      "sha256": "c4da68dd20415feeecc285699d7d640d4b25f2f43276fd45d5ea8c213f60ae40"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\runs\\verification_01\\model_info.json",
+      "sha256": "05aa5070cbd4f4d790524020f3b6990f536328c78e5c2053236d7f0ad7f9e725"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\runs\\verification_01\\ready.json",
+      "sha256": "b85051b92c8d105f035e3140b090c6a0e9d9cfc2e4f3b5ed5a7792e6e69d76ba"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\runs\\verification_01\\STOP",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\server.py",
+      "sha256": "c46b1656951610306ec25c2080e6a1977400f985fb1d8cc615eddaf826fb2250"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\static\\app.js",
+      "sha256": "a0c1ef0179ce98da81d05eac8969857614af3556301c12712b2ec25503a11f09"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\static\\index.html",
+      "sha256": "065b36480d556bdc0cad5d8384302a04781c4366e87accff157740a2397f31d1"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\static\\style.css",
+      "sha256": "a63af5ec198d5686b390ed655c260ebc20ad9a8f979f45e7db1af45f41737f9f"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\test_server.py",
+      "sha256": "92bb30e5acff1f1abb70842ea962c25490f300dec1564e262ea59e847f898471"
+    },
+    {
+      "path": "D:\\AEGIS\\frontend\\VERIFICATION.md",
+      "sha256": "5e6b0fad56f7123a139a8f233aa4fdd883c3b9387d59f6122da7d47c0c9ad0d8"
+    }
+  ]
+}
