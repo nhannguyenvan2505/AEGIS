@@ -90,3 +90,6 @@ service-account*.json
 /frontend/evidence/
 /backend/postman/reports/
 /backend/mongo-instance/
+/backend/.native-db-paused
+/backend/.native-db-supervisor.lock
+/backend/native-db-supervisor.log
