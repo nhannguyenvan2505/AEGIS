@@ -96,6 +96,8 @@ def predict_image(payload, config, request_id):
             body = response.json()
         except ValueError:
             body = None
+        if isinstance(body, dict) and isinstance(body.get('error'), dict) and body['error'].get('code') == 'gatekeeper_unavailable':
+            raise AIServiceError('ai_gatekeeper_unavailable', 'Dịch vụ AI chưa được cài mô hình nhận diện cây lúa. Liên hệ quản trị.', 503)
         if isinstance(body, dict) and isinstance(body.get('error'), dict) and body['error'].get('code') == 'ai_busy':
             raise AIServiceError('ai_busy', 'Dịch vụ AI đang bận; vui lòng thử lại.', 503, retry_after=1)
     if response.status_code != 200:

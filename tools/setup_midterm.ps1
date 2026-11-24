@@ -56,7 +56,7 @@ try {
     Invoke-Checked -Executable $backendPython -TaskArguments @('backend/database/apply_farm_hierarchy.py')
     if ($IncludeImageAI) {
         $modelArguments = @('tools/provision_midterm_model.py')
-        if ($CheckpointPath) { $modelArguments += @('--source',$CheckpointPath) }
+        if ($CheckpointPath) { $modelArguments += @('--artifact','detector','--source',$CheckpointPath) }
         Invoke-Checked -Executable $backendPython -TaskArguments $modelArguments
     }
     Write-Host 'Database and midterm environments are ready.'

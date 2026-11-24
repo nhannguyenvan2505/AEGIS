@@ -175,14 +175,19 @@ def create_app(detector=None, max_inflight=None, gatekeeper=None):
 
     pipeline = DiagnosisPipeline(service, gatekeeper if gatekeeper is not None else build_gatekeeper())
 
+    def gate_ready():
+        return pipeline.gatekeeper.method != "heuristic_fallback"
+
     @app.get("/v2/health")
     def health_v2():
-        return jsonify({"status": "ready", "schema_version": "2.0", **pipeline.describe()})
+        return jsonify({"status": "ready" if gate_ready() else "degraded", "schema_version": "2.0", **pipeline.describe()})
 
     @app.post("/v2/diagnose")
     @admit_prediction
     def diagnose():
         """Two-stage pipeline. Domain rejections are HTTP 200 with status=rejected_*."""
+        if not gate_ready():  # the heuristic fallback rejects everything; say so instead of calling rice "not rice"
+            return error_response("gatekeeper_unavailable", "Chưa cài trọng số gatekeeper nên chưa phân biệt được ảnh lúa. Chạy tools/provision_midterm_model.py rồi khởi động lại dịch vụ AI.", 503)
         if "image" not in request.files:
             return error_response("missing_image", "Gửi ảnh bằng multipart/form-data với trường image.", 400)
         payload = request.files["image"].stream.read(MAX_UPLOAD_BYTES + 1)
