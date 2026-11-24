@@ -101,7 +101,7 @@ Tài liệu kỹ thuật: [MySQL CHECK constraints](https://dev.mysql.com/doc/re
 `telemetry_readings` nhận trường `leaf_wet` (bool), được chép từ mẫu raw cùng nhiệt độ và độ ẩm (quyết định D-03). DB mới có sẵn qua `mongo/001_design.js`. Với DB đang có (Docker hoặc native), chạy một lần:
 
 ```powershell
-& .ackend\.venv\Scripts\python.exe backend/database/apply_mongo_leaf_wetness.py
+& .\backend\.venv\Scripts\python.exe backend/database/apply_mongo_leaf_wetness.py
 ```
 
 Script dùng tài khoản `aegis_root` trong `.env`, chạy lại nhiều lần vẫn an toàn. Document gửi trước khi sửa không có `leaf_wet`; giá trị gốc vẫn nằm trong MySQL và `sensor_raw_events`.
