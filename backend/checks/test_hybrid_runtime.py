@@ -105,6 +105,9 @@ db.grantRolesToUser('aegis_app',[{{role:'readWrite',db:'{cls.mongo_database}'}}]
             target=client[database]
             self.assertEqual(target.telemetry_readings.count_documents({'provenance.sample_id':sample['client_sample_id']}),1)
             self.assertEqual(target.sensor_raw_events.count_documents({'provenance.sample_id':sample['client_sample_id']}),1)
+            reading=target.telemetry_readings.find_one({'provenance.sample_id':sample['client_sample_id']})
+            self.assertIs(reading['leaf_wet'],True)
+            self.assertEqual((reading['temperature_c'],reading['air_humidity_pct']),(26.0,90.0))
             raw=target.sensor_raw_events.find_one({'provenance.sample_id':sample['client_sample_id']})
             self.assertEqual(raw['payload'],dict(records=[sample]))
             import base64

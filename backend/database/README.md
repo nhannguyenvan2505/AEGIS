@@ -95,3 +95,13 @@ Remove-Item Env:\AEGIS_RUN_MYSQL_TESTS
 Các test bao gồm UUID/response compatibility, restart/session, owner scope/FK, cultivation revision/replay, telemetry/snapshot/link, lịch sử/ảnh/detection precision, rollback khi lưu thất bại, reservation/rate-limit đồng thời, HTTP duplicate và launcher MySQL.
 
 Tài liệu kỹ thuật: [MySQL CHECK constraints](https://dev.mysql.com/doc/refman/8.4/en/create-table-check-constraints.html), [MongoDB JSON Schema validation](https://www.mongodb.com/docs/manual/core/schema-validation/specify-json-schema/), [PyMySQL connection API](https://pymysql.readthedocs.io/en/latest/modules/connections.html), [InnoDB locking reads](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html).
+
+## Leaf wetness trong MongoDB (20/11/2026)
+
+`telemetry_readings` nhận trường `leaf_wet` (bool), được chép từ mẫu raw cùng nhiệt độ và độ ẩm (quyết định D-03). DB mới có sẵn qua `mongo/001_design.js`. Với DB đang có (Docker hoặc native), chạy một lần:
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend/database/apply_mongo_leaf_wetness.py
+```
+
+Script dùng tài khoản `aegis_root` trong `.env`, chạy lại nhiều lần vẫn an toàn. Document gửi trước khi sửa không có `leaf_wet`; giá trị gốc vẫn nằm trong MySQL và `sensor_raw_events`.

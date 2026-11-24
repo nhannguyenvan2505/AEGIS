@@ -221,4 +221,6 @@ def telemetry_event(connection,identifier):
                   quality_flags=[qc.get('status','unknown')])
     for old,new in [('air_temperature_c','temperature_c'),('relative_humidity_pct','air_humidity_pct')]:
         if payload.get(old) is not None: document[new]=float(payload[old])
+    # Leaf wetness drives the forecast model (decision D-03); keep it in telemetry.
+    if payload.get('leaf_wet') is not None: document['leaf_wet']=bool(payload['leaf_wet'])
     enqueue(repo,'telemetry_readings',key+':reading',document)

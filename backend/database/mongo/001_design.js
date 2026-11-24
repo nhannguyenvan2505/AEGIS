@@ -18,6 +18,7 @@ const definitions = {
       ...common, device_id: identifier, field_id: identifier, timestamp, received_at: timestamp,
       temperature_c: {...numeric, minimum: -50, maximum: 60},
       air_humidity_pct: {...numeric, minimum: 0, maximum: 100},
+      leaf_wet: {bsonType: 'bool'},
       soil_moisture_pct: {...numeric, minimum: 0, maximum: 100},
       soil_ph: {...numeric, minimum: 0, maximum: 14},
       battery_voltage: {...numeric, minimum: 0},
