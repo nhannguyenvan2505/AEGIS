@@ -66,10 +66,10 @@ class IotMqttTests(unittest.TestCase):
         saved = save_esp32_reading(self.app.config, {'device_uid': 'ESP32-SHT30-A', 'temperature': 25.0, 'humidity': 89.0})
         self.assertEqual(saved['alert']['disease'], 'rice_blast')
 
-        # Unbound plot1 falls back to global ESP32 reading.
+        # A reading from an unbound device belongs to nobody, so it is not shown.
         latest1 = self.client.get(f"/api/iot/latest?plot_id={plot1['id']}", headers=headers).get_json()
-        self.assertEqual(latest1['item']['device_uid'], 'ESP32-SHT30-A')
-        self.assertEqual(latest1['binding_scope'], 'global')
+        self.assertIsNone(latest1['item'])
+        self.assertEqual(latest1['devices'], [])
 
         # Bind ESP32-SHT30-B to plot2 and ingest a reading for it.
         bind = self.client.put('/api/iot/bindings', headers=headers, json={'device_uid': 'ESP32-SHT30-B', 'plot_id': plot2['id']})
@@ -81,6 +81,49 @@ class IotMqttTests(unittest.TestCase):
         self.assertEqual(latest2['binding_scope'], 'plot')
         self.assertEqual(latest2['item']['device_uid'], 'ESP32-SHT30-B')
         self.assertEqual(latest2['item']['alert']['disease'], 'sheath_blight')
+
+    def _plot(self, headers, name):
+        farm = self.client.post('/api/farm/farms', headers=headers, json={'name': 'Farm ' + name, 'address': 'Cần Thơ'}).get_json()['item']
+        return self.client.post(f"/api/farm/farms/{farm['id']}/plots", headers=headers, json={'name': name}).get_json()['item']
+
+    def test_users_cannot_read_or_use_each_others_devices(self):
+        owner, other = self._auth_header('owner@example.test'), self._auth_header('other@example.test')
+        plot = self._plot(owner, 'Owner plot')
+        other_plot = self._plot(other, 'Other plot')
+        self.assertEqual(self.client.put('/api/iot/bindings', headers=owner,
+                                         json={'device_uid': 'ESP32-OWN', 'plot_id': plot['id']}).status_code, 200)
+        self.assertEqual(self.client.post('/api/iot/ingest', headers=owner,
+                                          json={'device_uid': 'ESP32-OWN', 'temperature': 27.0, 'humidity': 80.0}).status_code, 201)
+        # Unbound device readings (e.g. from MQTT) are private to everyone.
+        save_esp32_reading(self.app.config, {'device_uid': 'ESP32-LOOSE', 'temperature': 26.0, 'humidity': 70.0})
+
+        mine = self.client.get('/api/iot/latest?device_uid=ESP32-OWN', headers=owner).get_json()
+        self.assertEqual(mine['item']['device_uid'], 'ESP32-OWN')
+        self.assertEqual([d['device_uid'] for d in mine['devices']], ['ESP32-OWN'])
+
+        for path in ('/api/iot/latest?device_uid=ESP32-OWN', '/api/iot/readings?device_uid=ESP32-OWN',
+                     '/api/iot/latest', '/api/iot/readings?device_uid=ESP32-LOOSE'):
+            seen = self.client.get(path, headers=other).get_json()
+            self.assertEqual((seen['items'], seen['devices']), ([], []), path)
+        self.assertEqual(self.client.get(f"/api/iot/latest?plot_id={plot['id']}", headers=other).status_code, 404)
+
+        stolen = self.client.put('/api/iot/bindings', headers=other,
+                                 json={'device_uid': 'ESP32-OWN', 'plot_id': other_plot['id']})
+        self.assertEqual((stolen.status_code, stolen.get_json()['error']['code']), (409, 'device_already_bound'))
+        spoof = self.client.post('/api/iot/ingest', headers=other,
+                                 json={'device_uid': 'ESP32-OWN', 'temperature': 40.0, 'humidity': 99.0})
+        self.assertEqual(spoof.status_code, 404)
+        unknown = self.client.post('/api/iot/ingest', headers=other,
+                                   json={'device_uid': 'ESP32-NEW', 'temperature': 30.0, 'humidity': 60.0})
+        self.assertEqual(unknown.status_code, 404)
+        self.assertEqual(len(self.client.get('/api/iot/latest', headers=owner).get_json()['items']), 1)
+
+    def test_owner_can_move_device_between_own_plots(self):
+        headers = self._auth_header()
+        first, second = self._plot(headers, 'P1'), self._plot(headers, 'P2')
+        for plot in (first, second):
+            self.assertEqual(self.client.put('/api/iot/bindings', headers=headers,
+                                             json={'device_uid': 'ESP32-MOVE', 'plot_id': plot['id']}).status_code, 200)
 
     def test_iot_routes_require_auth(self):
         self.assertEqual(self.client.get('/api/iot/latest').status_code, 401)

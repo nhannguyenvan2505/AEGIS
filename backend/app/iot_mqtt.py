@@ -356,77 +356,78 @@ def bind_device_to_plot(config, device_uid, plot_id, device_name=None):
     return {'device_uid': uid, 'plot_id': plot_uuid, 'device_name': device_name, 'updated_at': updated_at}
 
 
-def query_esp32_telemetry(config, *, plot_id=None, device_uid=None, limit=24):
-    """Return latest ESP32 readings, per-device summaries, and plot binding scope."""
-    safe_limit = max(1, min(int(limit), 200))
-    with _db_cursor(config) as (cur, is_mysql):
-        scope = 'global'
-        rows = []
-        if device_uid:
-            scope = 'device'
-            cur.execute(
-                _param(
-                    '''SELECT reading_id, device_uid, plot_id, temperature, humidity,
-                              alert_level, alert_disease, alert_message, topic, source,
-                              observed_at, created_at
-                       FROM esp32_telemetry_readings
-                       WHERE device_uid=%s
-                       ORDER BY observed_at DESC, reading_id DESC
-                       LIMIT %s''',
-                    is_mysql,
-                ),
-                (device_uid, safe_limit),
-            )
-            rows = cur.fetchall()
-        elif plot_id:
-            cur.execute(
-                _param(
-                    '''SELECT r.reading_id, r.device_uid, r.plot_id, r.temperature, r.humidity,
-                              r.alert_level, r.alert_disease, r.alert_message, r.topic, r.source,
-                              r.observed_at, r.created_at
-                       FROM esp32_telemetry_readings r
-                       LEFT JOIN esp32_device_bindings b ON b.device_uid=r.device_uid
-                       WHERE r.plot_id=%s OR b.plot_id=%s
-                       ORDER BY r.observed_at DESC, r.reading_id DESC
-                       LIMIT %s''',
-                    is_mysql,
-                ),
-                (plot_id, plot_id, safe_limit),
-            )
-            rows = cur.fetchall()
-            if rows:
-                scope = 'plot'
+def _in_clause(values):
+    return ','.join(['%s'] * len(values))
 
-        if not rows and not device_uid:
-            scope = 'global'
-            cur.execute(
-                _param(
-                    '''SELECT reading_id, device_uid, plot_id, temperature, humidity,
-                              alert_level, alert_disease, alert_message, topic, source,
-                              observed_at, created_at
-                       FROM esp32_telemetry_readings
-                       ORDER BY observed_at DESC, reading_id DESC
-                       LIMIT %s''',
-                    is_mysql,
-                ),
-                (safe_limit,),
-            )
-            rows = cur.fetchall()
+
+def get_device_binding(config, device_uid):
+    """Return the plot_id a device is bound to, or None when it is unbound."""
+    with _db_cursor(config) as (cur, is_mysql):
+        cur.execute(_param('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s', is_mysql), (device_uid,))
+        row = cur.fetchone()
+    return row['plot_id'] if row and row['plot_id'] else None
+
+
+def query_esp32_telemetry(config, *, plot_ids, plot_id=None, device_uid=None, limit=24):
+    """Return the latest ESP32 readings visible to the caller.
+
+    `plot_ids` are the plots the caller owns. A reading is visible only when its own
+    plot or the plot its device is bound to is in that set; nothing else is ever
+    returned, so unbound or foreign devices stay private. Pass `plot_ids=None`
+    explicitly only for administrators, who may see every reading.
+    """
+    safe_limit = max(1, min(int(limit), 200))
+    if plot_ids is None:
+        visible, scope_params = '1=1', ()
+    else:
+        plot_ids = list(plot_ids)
+        if not plot_ids:
+            return {'item': None, 'items': [], 'devices': [], 'binding_scope': None}
+        marks = _in_clause(plot_ids)
+        visible, scope_params = f'(r.plot_id IN ({marks}) OR b.plot_id IN ({marks}))', (*plot_ids, *plot_ids)
+    scope, filters, params = 'user', '', []
+    if device_uid:
+        scope, filters = 'device', ' AND r.device_uid=%s'
+        params.append(device_uid)
+    elif plot_id:
+        scope, filters = 'plot', ' AND (r.plot_id=%s OR b.plot_id=%s)'
+        params.extend([plot_id, plot_id])
+    with _db_cursor(config) as (cur, is_mysql):
+        cur.execute(
+            _param(
+                f'''SELECT r.reading_id, r.device_uid, r.plot_id, r.temperature, r.humidity,
+                          r.alert_level, r.alert_disease, r.alert_message, r.topic, r.source,
+                          r.observed_at, r.created_at
+                   FROM esp32_telemetry_readings r
+                   LEFT JOIN esp32_device_bindings b ON b.device_uid=r.device_uid
+                   WHERE {visible}{filters}
+                   ORDER BY r.observed_at DESC, r.reading_id DESC
+                   LIMIT %s''',
+                is_mysql,
+            ),
+            (*scope_params, *params, safe_limit),
+        )
+        rows = cur.fetchall()
 
         cur.execute(
-            '''SELECT r.device_uid,
-                      COALESCE(b.plot_id, r.plot_id) AS plot_id,
-                      b.device_name,
-                      r.temperature, r.humidity, r.alert_level, r.alert_disease,
-                      r.alert_message, r.observed_at
-               FROM esp32_telemetry_readings r
-               INNER JOIN (
-                   SELECT device_uid, MAX(reading_id) AS max_id
-                   FROM esp32_telemetry_readings
-                   GROUP BY device_uid
-               ) latest ON latest.max_id = r.reading_id
-               LEFT JOIN esp32_device_bindings b ON b.device_uid = r.device_uid
-               ORDER BY r.observed_at DESC, r.reading_id DESC'''
+            _param(
+                f'''SELECT r.device_uid,
+                          COALESCE(b.plot_id, r.plot_id) AS plot_id,
+                          b.device_name,
+                          r.temperature, r.humidity, r.alert_level, r.alert_disease,
+                          r.alert_message, r.observed_at
+                   FROM esp32_telemetry_readings r
+                   INNER JOIN (
+                       SELECT device_uid, MAX(reading_id) AS max_id
+                       FROM esp32_telemetry_readings
+                       GROUP BY device_uid
+                   ) latest ON latest.max_id = r.reading_id
+                   LEFT JOIN esp32_device_bindings b ON b.device_uid = r.device_uid
+                   WHERE {visible}
+                   ORDER BY r.observed_at DESC, r.reading_id DESC''',
+                is_mysql,
+            ),
+            scope_params,
         )
         device_rows = cur.fetchall()
 
@@ -573,6 +574,23 @@ def _parse_limit():
     return value
 
 
+def _user_plot_ids(config):
+    """Plot ids owned by the authenticated user (storage-backend agnostic)."""
+    with connect(config) as db:
+        if isinstance(db, sqlite3.Connection):
+            from .repositories.sqlite import SQLiteRepository
+            db = SQLiteRepository(db)
+        db.begin()
+        return list(db.user_plot_ids(g.user['id']))
+
+
+def _require_device_access(config, device_uid, plot_ids):
+    """A device may be used only when it is bound to one of the caller's plots."""
+    bound = get_device_binding(config, device_uid)
+    if bound is None or bound not in plot_ids:
+        raise FarmError('device_not_found', 'Không tìm thấy thiết bị.', 404)
+
+
 def enable_iot_mqtt(app):
     """Initialize ESP32 telemetry tables, routes and background MQTT subscriber."""
     ensure_iot_schema(app.config)
@@ -605,7 +623,8 @@ def enable_iot_mqtt(app):
                 raise FarmError('invalid_plot_id', 'plot_id phải là UUID hợp lệ.')
             with connect(current_app.config) as db:
                 owned(db, 'plots', plot_id)
-        data = query_esp32_telemetry(current_app.config, plot_id=plot_id, device_uid=device_uid, limit=_parse_limit())
+        data = query_esp32_telemetry(current_app.config, plot_ids=_user_plot_ids(current_app.config),
+                                     plot_id=plot_id, device_uid=device_uid, limit=_parse_limit())
         return jsonify(success=True, mqtt=get_mqtt_status(current_app), **data)
 
     @bp.get('/readings')
@@ -620,7 +639,8 @@ def enable_iot_mqtt(app):
                 raise FarmError('invalid_plot_id', 'plot_id phải là UUID hợp lệ.')
             with connect(current_app.config) as db:
                 owned(db, 'plots', plot_id)
-        data = query_esp32_telemetry(current_app.config, plot_id=plot_id, device_uid=device_uid, limit=_parse_limit())
+        data = query_esp32_telemetry(current_app.config, plot_ids=_user_plot_ids(current_app.config),
+                                     plot_id=plot_id, device_uid=device_uid, limit=_parse_limit())
         return jsonify(success=True, mqtt=get_mqtt_status(current_app), **data)
 
     @bp.post('/ingest')
@@ -636,6 +656,12 @@ def enable_iot_mqtt(app):
             with connect(current_app.config) as db:
                 owned(db, 'plots', plot_id)
             data = dict(data, plot_id=plot_id)
+        device_uid = data.get('device_uid')
+        if device_uid not in (None, ''):
+            # Only a device already bound to one of the caller's plots may be fed over HTTP.
+            _require_device_access(current_app.config, str(device_uid).strip(), _user_plot_ids(current_app.config))
+        elif plot_id is None:
+            raise FarmError('invalid_telemetry', 'Cần device_uid đã gán hoặc plot_id của bạn.')
         try:
             saved = save_esp32_reading(
                 current_app.config,
@@ -657,6 +683,10 @@ def enable_iot_mqtt(app):
             raise FarmError('invalid_plot_id', 'plot_id phải là UUID hợp lệ.')
         with connect(current_app.config) as db:
             owned(db, 'plots', plot_id)
+        current = get_device_binding(current_app.config, str(data['device_uid']).strip())
+        if current is not None and current not in _user_plot_ids(current_app.config):
+            # Do not let one user take over a device that belongs to another user's plot.
+            raise FarmError('device_already_bound', 'Thiết bị đã được gán cho người dùng khác.', 409)
         try:
             binding = bind_device_to_plot(
                 current_app.config,
