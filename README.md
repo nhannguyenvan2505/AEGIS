@@ -41,8 +41,8 @@ See [backend/docs/NATIVE_MYSQL.md](backend/docs/NATIVE_MYSQL.md) for requirement
 
 ```powershell
 # 1. Set up and start MySQL
-.ackend\.venv\Scripts\python.exe backend/database/setup_native_mysql.py
+.\backend\.venv\Scripts\python.exe backend/database/setup_native_mysql.py
 
 # 2. Start the backend
-.ackend\.venv\Scripts\python.exe -u -X utf8 -B backend/serve_mobile.py --pilot-dir pilot_data/forecast-midterm
+.\backend\.venv\Scripts\python.exe -u -X utf8 -B backend/serve_mobile.py --pilot-dir pilot_data/forecast-midterm
 ```
