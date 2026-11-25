@@ -1,0 +1,70 @@
+---
+name: AI container
+
+# Not a required check: it runs only when something that goes into the image changes.
+on:
+  pull_request:
+    paths:
+      - 'ai_service/**'
+      - 'tools/provision_midterm_model.py'
+      - '.github/workflows/ai-container.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ai-container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Used only to download this repository's model Releases.
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build the image
+        run: docker compose -f ai_service/compose.yaml build
+      - name: Weights are not baked into the image
+        run: |
+          docker run --rm --entrypoint python aegis-ai:local -c \
+            "import pathlib, sys; found = list(pathlib.Path('/app').rglob('*.pt')); print(found); sys.exit(bool(found))"
+      - name: Refuse to start without the detector weights
+        run: |
+          set +e
+          output=$(timeout 120 docker run --rm aegis-ai:local 2>&1)
+          code=$?
+          set -e
+          echo "$output" | tail -20
+          test "$code" -ne 0
+          test "$code" -ne 124
+          echo "$output" | grep -q 'Checkpoint missing'
+      - name: Degraded without the gatekeeper weights
+        run: |
+          python tools/provision_midterm_model.py --artifact detector
+          docker compose -f ai_service/compose.yaml up -d
+          python ai_service/smoke_check.py --expect degraded --wait 180
+          docker compose -f ai_service/compose.yaml down
+      - name: Ready with both released models
+        run: |
+          python tools/provision_midterm_model.py --artifact gatekeeper
+          docker compose -f ai_service/compose.yaml up -d --wait --wait-timeout 240
+          python ai_service/smoke_check.py --expect ready
+      - name: Not root, and published on loopback only
+        run: |
+          test "$(docker compose -f ai_service/compose.yaml exec -T ai id -u)" != "0"
+          published=$(docker compose -f ai_service/compose.yaml port ai 8000)
+          echo "$published"
+          case "$published" in 127.0.0.1:*) ;; *) exit 1 ;; esac
+      - name: Report image size and memory use
+        run: |
+          docker image inspect aegis-ai:local --format 'image bytes: {{.Size}}'
+          docker stats --no-stream --format 'memory: {{.MemUsage}}'
+      - name: Service logs
+        if: failure()
+        run: docker compose -f ai_service/compose.yaml logs --tail 200
+      - name: Stop the service
+        if: always()
+        run: docker compose -f ai_service/compose.yaml down

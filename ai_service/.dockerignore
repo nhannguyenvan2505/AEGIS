@@ -1,0 +1,8 @@
+# Allow-list: weights, datasets and local files never enter the build context.
+*
+!api/app.py
+!api/diagnosis.py
+!api/checkpoint.json
+!api/gatekeeper.json
+!api/requirements.txt
+!api/requirements-serve.txt
