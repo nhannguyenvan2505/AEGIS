@@ -1,0 +1,13 @@
+{
+  "status": "draft",
+  "approved_by": null,
+  "approved_on": null,
+  "note": "Proposal only. The owner sets the numbers, then status=approved is committed BEFORE any candidate is evaluated.",
+  "disease_correct_max_drop_pp": 2.0,
+  "disease_missed_max_rise_pp": 2.0,
+  "healthy_false_disease_min_relative_drop": 0.30,
+  "healthy_flagged_max_rise_pp": 0.0,
+  "map50_max_drop": 0.01,
+  "non_rice_accepted_max_rise": 0,
+  "rice_rejected_max_rise_pp": 0.5
+}
