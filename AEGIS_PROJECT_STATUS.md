@@ -1,46 +1,60 @@
 # AEGIS — Báo cáo dự án và theo dõi tiến độ
 
 > Nhật ký chi tiết mục 1–123 đã chuyển sang [AEGIS_PROJECT_HISTORY.md](AEGIS_PROJECT_HISTORY.md) (20/11/2026, nội dung giữ nguyên).
-> Cập nhật tổng hợp: **20/11/2026** (mục 125–126; tổng quan forecast giữ mốc 09/11), múi giờ Asia/Bangkok (UTC+7).
-> Phạm vi: toàn bộ lịch sử dự án và trạng thái hiện hành; phần Nhân phụ trách gồm AI, ML, dữ liệu, Backend, pilot/IoT và vận hành. Frontend/mobile UI thuộc thành viên frontend. Mục124 là chỉ mục quyết định forecast, mục125–126 cập nhật Auth/CI/tài liệu/phạm vi; các mục trước là nhật ký theo thời điểm, không bị viết lại.
+> Cập nhật tổng hợp: **25/11/2026** (phần tổng quan và mục 127), múi giờ Asia/Bangkok (UTC+7).
+> Phạm vi: toàn bộ lịch sử dự án và trạng thái hiện hành; phần Nhân phụ trách gồm AI, ML, dữ liệu, Backend, pilot/IoT và vận hành. Frontend/mobile UI thuộc thành viên frontend. Mục124 là chỉ mục quyết định forecast, mục125–126 cập nhật Auth/CI/tài liệu/phạm vi, mục127 ghi mốc 24–25/11; các mục có số là nhật ký theo thời điểm, không bị viết lại.
 
 ## Tổng quan hiện hành — đọc trước các mốc lịch sử
 
-**Trạng thái mới nhất:** các task dự báo T01–T17 đã có hồ sơ trong file này.
-FM03 là model phục vụ đang hoạt động; candidate FM04/T17 đã được đánh giá trên
-cohort giả lập nhưng **không qua gate qualification**, nên chưa tích hợp hoặc
-shadow. Nhân xác nhận toàn bộ dữ liệu trong giai đoạn hiện tại là giả lập.
-Không có bằng chứng thu thập/xác minh bệnh trên cây thật. Ưu tiên kế tiếp là
-T17.1 với cohort và holdout mới; T18 chỉ được xem xét sau gate. Frontend/mobile
-UI do thành viên frontend phụ trách.
+**Mốc 25/11/2026.** Nhánh tích hợp `develop` ở `c0b31cf` (đến PR #26). Kiểm GitHub ngày
+25/11: không còn PR mở; còn issue #3 mở; `main` chậm hơn `develop` 30 commit (chưa có
+PR phát hành đưa `develop` vào `main`). Kết thúc dự án theo D-01: **02/12/2026** (còn 7 ngày).
+Phạm vi và quyết định: [DECISIONS_20261120](docs/DECISIONS_20261120.md) (gồm D-09…D-11).
 
-| Khối | Trạng thái hiện hành đến 09/11 | Phần còn lại / giới hạn |
+Việc cần chú ý: đóng các hạng mục bắt buộc ở D-04/D-10, và cải thiện nhận diện ảnh lúa
+bằng dữ liệu (train trên máy khác).
+
+### Theo khối
+
+| Khối | Hiện hành đến 25/11 | Phần còn lại / giới hạn |
 |---|---|---|
-| AI nhận diện | YOLO11n V4 fine-tune từ pretrained,50 epoch; API local và luồng Backend đã có | V4 vẫn mặc định; không đổi sang candidate. Không có nghiệm thu thực địa |
-| Thí nghiệm AI ảnh | Boundary-r2/source-r1 và FT25 có artifact/báo cáo; FT25 hoàn thành25epoch mới | FT25 chưa deploy, không gọi model đang phục vụ là train75epoch liên tục |
-| Dữ liệu/AI dự báo | T01–T09: raw→hourly, adapter, feature acceptance, persistence/API, forecast/scheduler, FM02/FM03 và đánh giá nhiều seed/missingness | Các cohort hiện tại đều synthetic; kết quả không xác nhận năng lực bệnh ngoài thực địa |
-| Forecast Backend và dữ liệu | T10–T16: readiness, lịch sử/giải thích, alert, outcome links, dossier, endpoint, mapping/group-time split | Nguồn, outcome và nhãn đều synthetic; external review không tự thành nhãn được duyệt |
-| Candidate T17 | Cohort stochastic 3 seed; LR+sigmoid được khóa trước holdout; replay 144 holdout rows khớp | Candidate chưa qua CI gate so với prior; không promote, không đổi FM03 |
-| Model đang phục vụ | FM03 weather logistic, contract 120 giờ/41 feature/horizon72 giờ, pins được giữ nguyên qua T17 | Không gọi score là xác suất bệnh thực; chưa đánh giá thực địa |
-| Mobile forecast FM-04 | Chọn ruộng/mùa → nguồn riêng → dự báo → dữ liệu đầu vào/kết quả/lịch sử; lỗi/empty/loading | Chưa nghiệm thu giao diện/native trên thiết bị |
-| Trang chủ mobile | Tổng quan từ API theo tài khoản; bỏ số môi trường/cảnh báo mẫu ở trang chủ | Refresh thủ công |
-| Quản lý ruộng/mùa | Tạo/xem ruộng và tạo/xem/phân trang mùa vụ trên mobile | Mùa mới cần được cấp nguồn hourly trước dự báo |
-| Auth/kết nối | Core auth/history/private data đã có; thêm giữ HTTP status lỗi non-JSON, reset theo token và xếp thứ tự lưu/xóa token | SecureStore/account switching cần nghiệm thu native |
-| Pilot/IoT | Raw ingest, QC, retry/buffer, audit, follow-up, timeline, backup/restore và simulator có sẵn | Raw point chưa tự cấp hourly forecast; toàn bộ môi trường demo là giả lập |
-| Vận hành demo | Một launcher Backend+worker+kho chung, seed hai nguồn, replay/restart; tool tiến đồng hồ dry/wet/missing | Localhost; cần nối thiết bị với API và nhập mật khẩu demo khi chạy |
-| Frontend/mobile | Có lịch sử triển khai và handoff ở các mục trước; phạm vi UI do thành viên frontend phụ trách | Các việc UI/native/release phải được frontend xác nhận riêng; không tính vào T01–T17 Backend/ML |
-| Thực địa | Chưa thực hiện thu thập hoặc xác minh dữ liệu vật lý trong phạm vi T14–T17 | Gate nghiên cứu thực địa vẫn mở; chỉ lập kế hoạch khi nhóm đổi phạm vi và có nguồn thực |
+| AI nhận diện lúa (gatekeeper) | `gate_v1b` (YOLO11n-cls, rice/non_rice), phát hành qua Release riêng; backend mặc định gọi `/v2/diagnose`; AI service thiếu trọng số thì trả 503. Test qua kiểm chất lượng + gatekeeper: 1.158/1.160 ảnh lúa được nhận, 0/804 ảnh không phải lúa bị nhận (đo 25/11) | Ảnh lúa train lấy từ một bộ công khai; các mẫu đã xem là lá cận cảnh. Ảnh ghép nền mô phỏng (lá nhỏ trong khung) bị từ chối 21–77%. Chưa đo trên ảnh thực địa |
+| AI nhận diện bệnh (detector) | YOLO11n V4, 3 bệnh. Test 520 ảnh: mAP50 72,7%, mAP50-95 33,7%. Đúng bệnh chính end-to-end: đạo ôn 114/131, đốm nâu 199/217, khô vằn 160/172 | Không train bằng ảnh nền/lúa khỏe. Không có lớp Leaf smut/Tungro nên phần lớn ảnh mẫu hai loại này bị gán một trong ba bệnh. Mục tiêu NFR02 >85% chưa đạt |
+| Dữ liệu ảnh | Gói train để mang sang máy khác ở `D:/AEGIS-AI/train_pack_20261125` (ngoài repo), xem mục 127 | Thư mục Healthy gốc **không sạch**, phải rà trước khi train. `field_evaluation_v1` chưa có ảnh (kiểm 25/11) |
+| Forecast | FM03 weather logistic là model phục vụ; candidate T17 không qua gate (mốc 09/11, mục 124; không kiểm lại) | Toàn bộ dữ liệu synthetic; không kết luận năng lực dự báo bệnh thật. T18 bị chặn bởi gate |
+| Backend core | JWT HS256 + session digest, RBAC farmer/admin, scrypt; Farm → Plot → Season; ảnh/lịch sử; forecast; follow-up pilot | Benchmark NFR01 chưa có ghi nhận. Lịch sử phân tích không lưu `diagnosis.status` (healthy/uncertain) |
+| Database | MySQL + MongoDB mặc định; outbox Mongo gửi bằng dispatcher nền; công cụ chạy MySQL/MongoDB native không cần Docker, có supervisor, không hiện cửa sổ console (PR #25) | Máy chưa bật MySQL thì test phụ thuộc MySQL không chạy được ở local |
+| IoT / MQTT | Backend có bộ nhận MQTT ESP32, lưu telemetry, gán thiết bị vào thửa; đã giới hạn dữ liệu theo chủ sở hữu (PR #23) | Chưa thấy firmware ESP32 trong repo, chưa thấy hồ sơ nghiệm thu với thiết bị thật. Broker mặc định là broker công khai `broker.hivemq.com`, bật sẵn; chưa thấy cấu hình đăng nhập/TLS. Theo đọc code, người dùng bất kỳ có thể nhận thiết bị chưa gán rồi xem lịch sử của nó |
+| Web admin | `web_admin/` (React/Vite) và API `/api/admin/*` đã có trong `develop`; chi tiết [web_admin/PROGRESS](web_admin/PROGRESS.md) | PROGRESS của web admin ghi mốc 22/11 (câu "chưa commit", "chưa có bộ nhận MQTT" đã cũ). File đó ghi một số luồng chưa kiểm trên trình duyệt thật; không kiểm lại ở mốc này |
+| Mobile | Expo/React Native: auth, ruộng/mùa, quét ảnh, lịch sử, forecast, báo cáo PDF; hiện thông báo ảnh bị từ chối (PR #20) và kết quả nghi ngờ (PR #26) | PR #26 chưa xem trên thiết bị. Máy local thiếu một số module nên lint/typecheck còn lỗi có từ trước. Chưa thấy hồ sơ E2E trên thiết bị cho mốc này |
+| CI / Git | Gitflow, `develop` là nhánh tích hợp; `Team policy` và `Backend tests` đạt trên nhánh PR #25, #26 | Theo ghi nhận 24/11, kho private gói free không bật được Ruleset (không kiểm lại) |
+| Hồ sơ môn học | Đã cập nhật theo quyết định 20/11, nằm ngoài repo (mốc 20/11, không kiểm lại) | Chưa có ghi nhận mentor xác nhận thay đổi phạm vi. Cần kiểm D-09…D-11 đã đồng bộ vào hồ sơ chưa |
 
-**Kết luận:** luồng forecast MVP và Backend/dữ liệu đã được xây dựng qua T01–T17.
-Candidate T17 chưa đủ bằng chứng để shadow; FM03 vẫn là model phục vụ. Không suy
-số kiểm thử hoặc kết quả synthetic thành tỷ lệ hoàn thành toàn dự án hay xác nhận
-khả năng dự báo bệnh thật.
+### Hạng mục bắt buộc (D-04, điều chỉnh bởi D-10)
 
-Chi tiết mới nhất ở **mục124** cuối file; lịch sử forecast ở mục102–123 và
-[rà soát core 05/11](docs/MVP_CORE_REVIEW_20261105.md).
-Lệnh chạy/seed/tiến thời gian ở
+| Hạng mục | Trạng thái 25/11 (theo mã nguồn trên `develop`) |
+|---|---|
+| MQTT + ESP32 **thật** | **Một phần:** có phần Backend; chưa thấy bằng chứng chạy với thiết bị thật |
+| Deploy cloud | **Chưa thấy:** không tìm thấy file cấu hình deploy trong repo |
+| Push notification | **Chưa thấy** trong mã backend/mobile |
+| Xuất báo cáo PDF | **Một phần:** mobile tạo PDF bằng `expo-print`; chưa thấy nghiệm thu trên thiết bị; web admin chưa có (theo PROGRESS 22/11) |
+
+Bảng này chỉ dựa trên repo; công việc thành viên làm ngoài repo không được phản ánh.
+
+### Việc tiếp theo đề xuất (chưa được nhóm chốt)
+
+| Ưu tiên | Công việc |
+|---|---|
+| 1 | Chốt phân công và phương án dự phòng cho cloud, push, ESP32 thật và nghiệm thu PDF trước 02/12 |
+| 2 | E2E trên thiết bị (gồm PR #26), benchmark NFR01, Test Report |
+| 3 | Rà ảnh Healthy, train trên máy khác bằng gói train, so với model hiện tại trên cùng danh sách ảnh; chỉ thay model khi đạt mức chốt trước |
+| 4 | Thu ảnh lúa thực địa làm bộ đánh giá riêng |
+| 5 | Bảo mật IoT: broker riêng có xác thực/TLS, xác nhận quyền khi gán thiết bị |
+
+Forecast: lịch sử ở mục102–124, [rà soát core 05/11](docs/MVP_CORE_REVIEW_20261105.md),
 [runbook forecast](docs/FORECAST_MVP_MIDTERM_20261105.md).
-[Chỉ mục bàn giao](docs/CURRENT_HANDOFF.md) tập hợp các mốc khác.
+[Chỉ mục bàn giao](docs/CURRENT_HANDOFF.md) và [TEAM_PROGRESS](docs/TEAM_PROGRESS.md)
+đang ở mốc 20/11: câu nào khác phần tổng quan này thì phần này mới hơn.
 
 ---
 
@@ -133,3 +147,55 @@ delivery trên đường response và `runtime_lock` toàn cục chưa benchmark
 
 Rủi ro chính: deadline 02/12 với bốn hạng mục bắt buộc chưa làm (MQTT/ESP32, cloud, push, report), cùng E2E, benchmark và nghiệm thu thiết bị.
 
+## 127. Tích hợp vào develop, nhận diện lúa và gói train — 24–25/11/2026
+
+### Tích hợp (theo GitHub, kiểm 25/11)
+
+| PR | Nội dung | Trạng thái |
+|---|---|---|
+| #8–#11 | Demo hybrid, JWT/RBAC, tài liệu 20/11, outbox Mongo | Đã merge 24/11 |
+| #12, #15 | Quy tắc Gitflow, CODEOWNERS/ruleset | Đã merge 24/11 (#15 vào `main`) |
+| #13, #14 | MySQL/MongoDB native, leaf wetness trong telemetry | Đã merge 24/11 |
+| #16–#18 | Tích hợp ESP32 MQTT telemetry | Đã merge 24/11 |
+| #19 | Nhận diện lúa (tên nhánh sai quy tắc) | Đóng, thay bằng #20 |
+| #20–#24 | Nhận diện lúa/không phải lúa, sửa POST /plots, tài liệu AI pipeline v2, phân quyền IoT, báo thiếu trọng số gatekeeper | Đã merge 24/11 |
+| #25 | Chạy DB native không hiện cửa sổ console | Đã merge 25/11 |
+| #26 | Mobile hiện đúng kết quả `uncertain_lesion` | Đã merge 25/11 |
+
+### Kiểm chứng ngày 25/11
+
+| Kiểm tra | Kết quả | Giới hạn |
+|---|---|---|
+| Test AI service tại `a0cd22d` | 19/19 đạt | Chưa chạy lại ở `c0b31cf` |
+| Test Backend local tại `a0cd22d` | 238 test, 75 bỏ qua, 38 lỗi: 36 do MySQL chưa bật, 2 do thiếu biến `FM02_PYTHON` | Phần cần MySQL coi như chưa kiểm ở local |
+| CI trên nhánh PR #25, #26 | `Backend tests` và `Team policy` đạt | Là lượt chạy của PR, không phải lượt riêng sau merge |
+| Mobile PR #26 | 5 dạng dữ liệu giả cho đúng nội dung; số lỗi lint/typecheck ngoài phần sửa không đổi | Chưa xem trên thiết bị |
+
+### Ba lỗi nhận diện được báo và kết quả điều tra
+
+Đo trên ảnh có sẵn; chưa có ảnh lỗi thật để tái hiện.
+
+| Lỗi | Phát hiện |
+|---|---|
+| Ảnh lúa bị báo không phải lúa | Trên 180 ảnh bệnh lấy từ tập test rồi ghép mô phỏng, tỷ lệ bị từ chối: ảnh gốc 1%, khóm ghép 35%, nền trắng 21%, nền đất 36%, nền xanh 77%. Nguyên nhân khả dĩ: dữ liệu lúa thiếu đa dạng |
+| Lúa bệnh bị báo khỏe | Trên 520 ảnh test không ảnh nào ra `healthy`, 10 ảnh ra `uncertain_lesion`; mobile hiển thị nhóm này như không có bệnh (sửa ở PR #26). Chưa xác nhận được trường hợp model bỏ sót trên ảnh thật |
+| Sai tên bệnh | Đúng bệnh chính 87–93% theo lớp trên test; trong mẫu 250 ảnh mỗi loại, Leaf smut và Tungro phần lớn bị gán một trong ba bệnh |
+
+**Đính chính:** tỷ lệ ảnh "Healthy" bị báo bệnh (khoảng 36–40% ở các lượt đo trên thư mục
+gốc, val và `test_healthy`) **chưa đáng tin**: thư mục Healthy có ảnh mang tổn thương rõ
+(ví dụ `healthy__Healthy_746.jpg`). Mới xem một phần rất nhỏ nên chưa biết có bao nhiêu
+ảnh như vậy.
+
+### Gói train
+
+Quyết định của Nhân: train trên thiết bị khác. Gói gồm bộ detector v4 kèm ảnh Healthy chia
+theo `gate_v1`, ba biến thể số ảnh nền (0 / 402 / 1.093 ảnh train, trước khi rà), `gate_v1`
+và script tạo biến thể augmentation, script train/đánh giá/rà ảnh, checksum và hướng dẫn.
+Đã kiểm: Ultralytics đọc đủ ảnh; đánh giá model hiện tại trên test v4 cho mAP50 0,7269
+(khớp số đã ghi); script lọc ảnh loại trừ chạy đúng trên mẫu thử. **Chưa train model mới
+nào.** Hai báo cáo mốc trong gói đo trước khi rà ảnh Healthy.
+
+
+Bản nén `D:/AEGIS-AI/train_pack_20261125.zip` (6.306.388.585 byte, khoảng 5,87 GiB; tạo 25/11): 28.232 mục,
+28.230 file có checksum được đối chiếu trong file nén, 0 sai lệch; không có ảnh trùng byte giữa các tập.
+SHA-256 của file nén: `4a71b1e642c56470f3d2b262859c52e3a666aee7eda783d55de15ab0b1b30c15`.

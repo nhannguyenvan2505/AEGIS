@@ -11,12 +11,15 @@ cũ mâu thuẫn với file này thì theo file này.
 | D-01 | **Ngày kết thúc: 02/12/2026** | Sửa lịch Sprint 4, chi phí (số tuần) trong Project Plan và ngày kết thúc trong Architecture V1 (đang ghi 20/12). Demo, Test Report, User Guide và Capstone Report phải xong trước 02/12 |
 | D-02 | **Bệnh: Rice Blast, Brown Spot, Sheath Blight** (theo model V4); bỏ Rice Hispa | Sửa Proposal (2.1, 9.1), bảng `diseases` trong DB Design, User Story |
 | D-03 | **Biến môi trường: nhiệt độ không khí, độ ẩm tương đối, leaf wetness** (forecast dùng cửa sổ 120 giờ) | Soil moisture/pH ghi là hướng mở rộng; bỏ NPK, EC, UV, ánh sáng, mưa khỏi phạm vi. Sửa FR01, Proposal 7.2/9, Architecture 2.2.3/3.2/5.x, `telemetry_readings` trong DB Design, User Story farmer #8 |
-| D-04 | **Vẫn bắt buộc: MQTT + ESP32 thật, deploy cloud, push notification, xuất báo cáo PDF/Excel** | Giữ nguyên các mục này trong hồ sơ; phải triển khai trước 02/12 (xem rủi ro bên dưới) |
+| D-04 | **Vẫn bắt buộc: MQTT + ESP32 thật, deploy cloud, push notification, xuất báo cáo PDF/Excel** (Excel bỏ theo D-10) | Giữ nguyên các mục này trong hồ sơ; phải triển khai trước 02/12 (xem rủi ro bên dưới) |
 | D-04b | **Loại multimodal fusion và OAuth2** | Ảnh và forecast là hai luồng độc lập cùng hiển thị trên dashboard; auth là JWT + RBAC. Sửa Architecture 5.1/5.4 (bỏ Fusion), tech stack Proposal/DB Design (bỏ OAuth2) |
 | D-05 | **Giữ scrypt** (Werkzeug), không đổi sang bcrypt | Sửa NFR04, Architecture 4.2, DB Design (`users.password_hash`, 5.3, mục 6) thành scrypt, kèm lý do |
 | D-06 | **Báo cáo chỉ số trung thực** | NFR02: báo mAP50 = 72,7% và mAP50-95 = 33,7% trên tập test V4 (520 ảnh); mục tiêu >85% ghi "chưa đạt" kèm nguyên nhân. Forecast: báo Brier/log-loss/recall trên dữ liệu synthetic thay cho "accuracy > 80%". NFR01 <500 ms áp cho API CRUD/đọc, không áp cho upload/inference ảnh |
 | D-07 | **Ngưỡng FR09 = 0,50** | Box có confidence < 0,50 gắn "Low Confidence – Field Verification Required"; từ 0,50 ghi "khả năng cao", vẫn khuyến nghị kiểm tra ruộng. API giữ hiển thị mọi box ≥ 0,25 |
 | D-08 | **Vai trò theo Proposal**: Nhân – Team Leader/AI/ML Lead; Tâm – Frontend/Mobile; Mạnh – Database; Toàn – IoT/System Analyst; Thiện – Backend/API | Sửa Architecture V1 mục 2.1 (đang đảo Toàn/Thiện) và Project Plan 2.1 cho khớp |
+| D-09 | **Khuyến nghị điều trị ngoài phạm vi bản này** (User Story Farmer #11, Product Backlog PB13) | Ghi là mở rộng tương lai trong Proposal, User Story, Product Backlog (PB13), Project Plan, Architecture, DB Design (bảng `treatment_recommendations` để dành), SRS. Màn Recommendations trên mobile chỉ là demo |
+| D-10 | **Xuất báo cáo chỉ cần PDF**; Excel là mở rộng tương lai (điều chỉnh D-04) | Sửa FR07 (Proposal, SRS), User Story Farmer #14, PB05, Project Plan 4.4, Test Plan TC-RPT-01, Test Report, User Guide. Khớp với mobile hiện chỉ xuất PDF |
+| D-11 | **PB11 Field Camera Stream ngoài phạm vi bản này** (mở rộng tương lai) | Product Backlog PB11 đổi ưu tiên; khớp Architecture và SRS (video trực tiếp là mở rộng tương lai) |
 
 ## Căn cứ số liệu
 
