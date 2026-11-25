@@ -38,6 +38,7 @@ def ingest_esp32():
             payload,
             topic=get_mqtt_status(current_app)['topic'],
             source='esp32_admin',
+            trust_plot_id=True,  # administrators may assign any plot
         )
     except ValueError as exc:
         raise ApiError('invalid_telemetry', str(exc), 422)

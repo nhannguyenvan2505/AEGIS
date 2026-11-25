@@ -13,6 +13,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from .auth import require_auth
 from .farm import FarmError, body, owned
+from .repositories import repository
 from .storage import connect
 
 DEFAULT_MQTT_BROKER = 'broker.hivemq.com'
@@ -74,6 +75,20 @@ _SQLITE_DDL = (
         updated_at TEXT NOT NULL
     )''',
 )
+
+
+class DeviceBoundError(Exception):
+    """The device is assigned to a plot the caller does not own."""
+
+
+def _is_reserved_uid(device_uid):
+    # 'Unknown' stands for every packet without an id, so nobody may own it.
+    return device_uid.lower() == 'unknown'
+
+
+def _is_plain_uid(device_uid):
+    # MySQL compares bindings accent-insensitively, so non-ASCII look-alikes would alias real ids.
+    return device_uid.isascii() and device_uid.isprintable()
 
 
 def _utc_now():
@@ -200,10 +215,10 @@ def validate_esp32_payload(payload):
     raw_uid = payload.get('device_uid')
     if raw_uid is None or raw_uid == '':
         device_uid = 'Unknown'
-    elif isinstance(raw_uid, str) and 1 <= len(raw_uid.strip()) <= 100:
+    elif isinstance(raw_uid, str) and 1 <= len(raw_uid.strip()) <= 100 and _is_plain_uid(raw_uid.strip()):
         device_uid = raw_uid.strip()
     else:
-        raise ValueError('device_uid must be a non-empty string (<= 100 chars)')
+        raise ValueError('device_uid must be a non-empty ASCII string (<= 100 chars)')
 
     temperature = _finite_number(payload.get('temperature'), 'temperature', -50.0, 60.0)
     humidity = _finite_number(payload.get('humidity'), 'humidity', 0.0, 100.0)
@@ -235,6 +250,8 @@ def validate_esp32_payload(payload):
 
 
 def _resolve_plot_for_device(cur, is_mysql, device_uid):
+    if _is_reserved_uid(device_uid):
+        return None
     cur.execute(_param('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s', is_mysql), (device_uid,))
     bound = cur.fetchone()
     if bound and bound['plot_id']:
@@ -253,14 +270,20 @@ def _resolve_plot_for_device(cur, is_mysql, device_uid):
     return None
 
 
-def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp32_mqtt'):
-    """Validate, evaluate and persist a single ESP32 temperature/humidity reading."""
+def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp32_mqtt',
+                       trust_plot_id=False):
+    """Validate, evaluate and persist a single ESP32 temperature/humidity reading.
+
+    A payload's `plot_id` is honoured only with `trust_plot_id=True`, i.e. after the
+    caller authorized it. Otherwise (MQTT) the plot comes from the device assignment.
+    """
     normalized = validate_esp32_payload(payload)
     alert = evaluate_microclimate(normalized['temperature'], normalized['humidity'])
     created_at = _utc_now()
 
     with _db_cursor(config) as (cur, is_mysql):
-        plot_id = normalized['plot_id'] or _resolve_plot_for_device(cur, is_mysql, normalized['device_uid'])
+        plot_id = ((normalized['plot_id'] if trust_plot_id else None)
+                   or _resolve_plot_for_device(cur, is_mysql, normalized['device_uid']))
         cur.execute(
             _param(
                 '''INSERT INTO esp32_telemetry_readings
@@ -326,22 +349,59 @@ def _row_to_item(row):
     }
 
 
-def bind_device_to_plot(config, device_uid, plot_id, device_name=None):
-    """Bind an ESP32 device_uid to a plot UUID."""
+def _assigned_plots(cur, is_mysql, device_uid):
+    """Every plot the device is assigned to: its binding and, on MySQL, the iot_devices registry.
+
+    A registry row without a plot yields None, which no user owns.
+    """
+    cur.execute(_param('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s', is_mysql), (device_uid,))
+    row = cur.fetchone()
+    plots = [row['plot_id']] if row and row['plot_id'] else []
+    if is_mysql:
+        # iot_devices.device_uid is case-sensitive but bindings are not; match like bindings do.
+        cur.execute(
+            '''SELECT f.external_id plot_id
+               FROM iot_devices d
+               LEFT JOIN farm_fields f ON f.field_id=d.field_id
+               WHERE UPPER(d.device_uid)=UPPER(%s)''',
+            (device_uid,),
+        )
+        plots.extend(device['plot_id'] for device in cur.fetchall())
+    return plots
+
+
+def bind_device_to_plot(config, device_uid, plot_id, device_name=None, *, allowed_plot_ids=None):
+    """Bind an ESP32 device_uid to a plot UUID.
+
+    With `allowed_plot_ids` (the caller's plots) a device assigned anywhere else is
+    refused; check and write share one transaction. `None` is for administrators only.
+    """
     uid = (device_uid or '').strip()
-    if not uid or len(uid) > 100:
-        raise ValueError('device_uid must be 1..100 characters')
+    if not uid or len(uid) > 100 or not _is_plain_uid(uid) or _is_reserved_uid(uid):
+        raise ValueError('device_uid must be 1..100 ASCII characters and not "Unknown"')
     plot_uuid = str(uuid.UUID(plot_id)) if plot_id else None
     updated_at = _utc_now()
     with _db_cursor(config) as (cur, is_mysql):
+        # Serialize concurrent claims before reading who holds the device.
         if is_mysql:
             cur.execute(
-                '''INSERT INTO esp32_device_bindings(device_uid, plot_id, device_name, updated_at)
-                   VALUES (%s,%s,%s,%s)
-                   ON DUPLICATE KEY UPDATE plot_id=VALUES(plot_id),
-                   device_name=COALESCE(VALUES(device_name), device_name),
-                   updated_at=VALUES(updated_at)''',
-                (uid, plot_uuid, device_name, updated_at),
+                '''INSERT INTO esp32_device_bindings(device_uid, plot_id, updated_at)
+                   VALUES (%s,NULL,%s) ON DUPLICATE KEY UPDATE device_uid=device_uid''',
+                (uid, updated_at),
+            )
+            cur.execute('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s FOR UPDATE', (uid,))
+            cur.fetchone()
+        else:
+            cur.execute('BEGIN IMMEDIATE')
+        if allowed_plot_ids is not None:
+            allowed = set(allowed_plot_ids)
+            if any(plot not in allowed for plot in _assigned_plots(cur, is_mysql, uid)):
+                raise DeviceBoundError(uid)
+        if is_mysql:
+            cur.execute(
+                '''UPDATE esp32_device_bindings SET plot_id=%s,
+                   device_name=COALESCE(%s, device_name), updated_at=%s WHERE device_uid=%s''',
+                (plot_uuid, device_name, updated_at, uid),
             )
         else:
             cur.execute(
@@ -360,38 +420,33 @@ def _in_clause(values):
     return ','.join(['%s'] * len(values))
 
 
-def get_device_binding(config, device_uid):
-    """Return the plot_id a device is bound to, or None when it is unbound."""
-    with _db_cursor(config) as (cur, is_mysql):
-        cur.execute(_param('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s', is_mysql), (device_uid,))
-        row = cur.fetchone()
-    return row['plot_id'] if row and row['plot_id'] else None
-
-
 def query_esp32_telemetry(config, *, plot_ids, plot_id=None, device_uid=None, limit=24):
     """Return the latest ESP32 readings visible to the caller.
 
-    `plot_ids` are the plots the caller owns. A reading is visible only when its own
-    plot or the plot its device is bound to is in that set; nothing else is ever
-    returned, so unbound or foreign devices stay private. Pass `plot_ids=None`
-    explicitly only for administrators, who may see every reading.
+    `plot_ids` are the plots the caller owns. A reading is visible only when the plot
+    stamped on it at ingest time is in that set. The device's current binding grants
+    nothing, so claiming or receiving a device never exposes earlier readings. Pass
+    `plot_ids=None` explicitly only for administrators, who may see every reading.
     """
     safe_limit = max(1, min(int(limit), 200))
     if plot_ids is None:
         visible, scope_params = '1=1', ()
+        name_scope, name_params = '', ()
     else:
         plot_ids = list(plot_ids)
         if not plot_ids:
             return {'item': None, 'items': [], 'devices': [], 'binding_scope': None}
         marks = _in_clause(plot_ids)
-        visible, scope_params = f'(r.plot_id IN ({marks}) OR b.plot_id IN ({marks}))', (*plot_ids, *plot_ids)
+        visible, scope_params = f'r.plot_id IN ({marks})', tuple(plot_ids)
+        # A device name belongs to whoever holds the binding now.
+        name_scope, name_params = f' AND b.plot_id IN ({marks})', tuple(plot_ids)
     scope, filters, params = 'user', '', []
     if device_uid:
         scope, filters = 'device', ' AND r.device_uid=%s'
         params.append(device_uid)
     elif plot_id:
-        scope, filters = 'plot', ' AND (r.plot_id=%s OR b.plot_id=%s)'
-        params.extend([plot_id, plot_id])
+        scope, filters = 'plot', ' AND r.plot_id=%s'
+        params.append(plot_id)
     with _db_cursor(config) as (cur, is_mysql):
         cur.execute(
             _param(
@@ -399,7 +454,6 @@ def query_esp32_telemetry(config, *, plot_ids, plot_id=None, device_uid=None, li
                           r.alert_level, r.alert_disease, r.alert_message, r.topic, r.source,
                           r.observed_at, r.created_at
                    FROM esp32_telemetry_readings r
-                   LEFT JOIN esp32_device_bindings b ON b.device_uid=r.device_uid
                    WHERE {visible}{filters}
                    ORDER BY r.observed_at DESC, r.reading_id DESC
                    LIMIT %s''',
@@ -411,23 +465,21 @@ def query_esp32_telemetry(config, *, plot_ids, plot_id=None, device_uid=None, li
 
         cur.execute(
             _param(
-                f'''SELECT r.device_uid,
-                          COALESCE(b.plot_id, r.plot_id) AS plot_id,
-                          b.device_name,
+                f'''SELECT r.device_uid, r.plot_id, b.device_name,
                           r.temperature, r.humidity, r.alert_level, r.alert_disease,
                           r.alert_message, r.observed_at
                    FROM esp32_telemetry_readings r
                    INNER JOIN (
-                       SELECT device_uid, MAX(reading_id) AS max_id
-                       FROM esp32_telemetry_readings
-                       GROUP BY device_uid
+                       SELECT r.device_uid, MAX(r.reading_id) AS max_id
+                       FROM esp32_telemetry_readings r
+                       WHERE {visible}
+                       GROUP BY r.device_uid
                    ) latest ON latest.max_id = r.reading_id
-                   LEFT JOIN esp32_device_bindings b ON b.device_uid = r.device_uid
-                   WHERE {visible}
+                   LEFT JOIN esp32_device_bindings b ON b.device_uid = r.device_uid{name_scope}
                    ORDER BY r.observed_at DESC, r.reading_id DESC''',
                 is_mysql,
             ),
-            scope_params,
+            (*scope_params, *name_params),
         )
         device_rows = cur.fetchall()
 
@@ -576,18 +628,18 @@ def _parse_limit():
 
 def _user_plot_ids(config):
     """Plot ids owned by the authenticated user (storage-backend agnostic)."""
-    with connect(config) as db:
-        if isinstance(db, sqlite3.Connection):
-            from .repositories.sqlite import SQLiteRepository
-            db = SQLiteRepository(db)
+    with repository(config) as db:
         db.begin()
         return list(db.user_plot_ids(g.user['id']))
 
 
 def _require_device_access(config, device_uid, plot_ids):
-    """A device may be used only when it is bound to one of the caller's plots."""
-    bound = get_device_binding(config, device_uid)
-    if bound is None or bound not in plot_ids:
+    """A device may be used only when bound, and every plot it is assigned to is the caller's."""
+    with _db_cursor(config) as (cur, is_mysql):
+        cur.execute(_param('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s', is_mysql), (device_uid,))
+        bound = cur.fetchone()
+        assigned = _assigned_plots(cur, is_mysql, device_uid)
+    if not (bound and bound['plot_id']) or any(plot not in plot_ids for plot in assigned):
         raise FarmError('device_not_found', 'Không tìm thấy thiết bị.', 404)
 
 
@@ -668,6 +720,7 @@ def enable_iot_mqtt(app):
                 data,
                 topic=get_mqtt_status(current_app)['topic'],
                 source='esp32_http',
+                trust_plot_id=True,  # ownership of plot_id was checked above
             )
         except ValueError as exc:
             raise FarmError('invalid_telemetry', str(exc))
@@ -683,17 +736,17 @@ def enable_iot_mqtt(app):
             raise FarmError('invalid_plot_id', 'plot_id phải là UUID hợp lệ.')
         with connect(current_app.config) as db:
             owned(db, 'plots', plot_id)
-        current = get_device_binding(current_app.config, str(data['device_uid']).strip())
-        if current is not None and current not in _user_plot_ids(current_app.config):
-            # Do not let one user take over a device that belongs to another user's plot.
-            raise FarmError('device_already_bound', 'Thiết bị đã được gán cho người dùng khác.', 409)
         try:
             binding = bind_device_to_plot(
                 current_app.config,
                 str(data['device_uid']),
                 plot_id,
                 data.get('device_name'),
+                allowed_plot_ids=_user_plot_ids(current_app.config),
             )
+        except DeviceBoundError:
+            # Do not let one user take over a device that belongs to another user's plot.
+            raise FarmError('device_already_bound', 'Thiết bị đã được gán cho người dùng khác.', 409)
         except ValueError as exc:
             raise FarmError('invalid_binding', str(exc))
         return jsonify(success=True, item=binding)

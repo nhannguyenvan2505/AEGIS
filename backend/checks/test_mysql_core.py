@@ -26,6 +26,7 @@ from app import create_app
 from app.repositories import repository
 from app.storage import connect, save_analysis
 from app.idempotency import reserve
+from app.iot_mqtt import save_esp32_reading
 from app.limits import consume
 
 DATABASE = Path(__file__).resolve().parents[1] / 'database'
@@ -141,6 +142,34 @@ class MySQLCoreTests(unittest.TestCase):
         duplicate=self.post('/seasons/'+season['id']+'/devices',dict(name='Other',source='mock',device_code='D1'))
         self.assertEqual(duplicate.status_code,409)
         self.assertEqual(self.post('/plots/'+plot['id']+'/seasons',dict(name='Spoof',start_date='2026-10-01'),1).status_code,404)
+
+    def test_iot_claim_respects_device_registry_and_history(self):
+        _, _, device = self.chain()
+        response = self.post('/plots',dict(name='Ruộng khác',location_text='Khu khác'),1)
+        self.assertEqual(response.status_code,201,response.json)
+        other_plot = response.json['item']['id']
+        def bind(owner,uid,plot):
+            return self.client.put('/api/iot/bindings',headers=self.headers[owner],json=dict(device_uid=uid,plot_id=plot))
+        # Registered to user 0 in iot_devices: nobody else may claim it, in any letter case.
+        registered = 'mock:'+device['id']
+        for uid in (registered,registered.upper()):
+            response = bind(1,uid,other_plot)
+            self.assertEqual(response.status_code,409,response.json)
+        # A first claim of an unregistered device works, without exposing what it sent before.
+        loose = 'ESP32-'+uuid.uuid4().hex
+        save_esp32_reading(self.config,dict(device_uid=loose,temperature=26.0,humidity=70.0))
+        self.assertEqual(bind(1,loose,other_plot).status_code,200)
+        def latest():
+            return self.client.get('/api/iot/latest?device_uid='+loose,headers=self.headers[1]).json
+        self.assertEqual((latest()['items'],latest()['devices']),([],[]))
+        save_esp32_reading(self.config,dict(device_uid=loose,temperature=27.0,humidity=71.0))
+        self.assertEqual([item['temperature'] for item in latest()['items']],[27.0])
+        self.assertEqual([item['plot_id'] for item in latest()['devices']],[other_plot])
+        # Re-binding by the same owner and a failed foreign claim leave the binding intact.
+        self.assertEqual(bind(1,loose,other_plot).status_code,200)
+        own_plot = self.post('/plots',dict(name='Ruộng của 0',location_text='Khu 0')).json['item']['id']
+        self.assertEqual(bind(0,loose,own_plot).status_code,409)
+        self.assertEqual(len(latest()['items']),1)
 
     def test_cultivation_revision_replay_and_conflict(self):
         _,season,_=self.chain()
