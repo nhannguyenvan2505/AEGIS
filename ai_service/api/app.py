@@ -1,5 +1,4 @@
 import io
-import hashlib
 import json
 import logging
 import os
@@ -18,7 +17,7 @@ from PIL.Image import open as pillow_open
 from werkzeug.exceptions import HTTPException
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from diagnosis import DiagnosisPipeline, build_gatekeeper  # noqa: E402
+from diagnosis import DiagnosisPipeline, build_gatekeeper, check_pin, file_sha256, pinned_sha256  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,12 +34,16 @@ class Detector:
 
         weights = Path(weights) if weights is not None else WEIGHTS
         self.checkpoint_label = weights.name if not weights.is_relative_to(ROOT) else weights.relative_to(ROOT).as_posix()
-        self.model_version = model_version or ("aegis-yolo11n-v4-50epochs" if weights == WEIGHTS else "aegis-yolo11n-candidate")
         if not weights.is_file():
             raise FileNotFoundError(f"Checkpoint missing: {weights}")
-        self.model_sha256 = hashlib.sha256(weights.read_bytes()).hexdigest()
+        self.model_sha256 = file_sha256(weights)
+        # The default path must hold the released file; an explicit path is a candidate by intent.
+        self.pinned = (check_pin(self.model_sha256, "checkpoint.json", "Detector weights") if weights == WEIGHTS
+                       else self.model_sha256 == pinned_sha256("checkpoint.json"))
+        released = weights == WEIGHTS and self.pinned
+        self.model_version = model_version or ("aegis-yolo11n-v4-50epochs" if released else "aegis-yolo11n-candidate")
         self.model = YOLO(str(weights))
-        if hashlib.sha256(weights.read_bytes()).hexdigest() != self.model_sha256:
+        if file_sha256(weights) != self.model_sha256:
             raise RuntimeError('Checkpoint changed during loading')
         if self.model.names != CLASS_NAMES:
             raise ValueError("Checkpoint class mapping differs from API contract")
@@ -133,7 +136,9 @@ def create_app(detector=None, max_inflight=None, gatekeeper=None):
 
     @app.get("/health")
     def health():
-        return jsonify({"status": "ready", "model": "yolo11n", "model_version": getattr(service, "model_version", "aegis-yolo11n-v4-50epochs"), "model_sha256": service.model_sha256, "checkpoint": getattr(service, "checkpoint_label", "baseline_v4_50epochs/best.pt"), "device": service.device, "imgsz": 640, "confidence_threshold": 0.25, "nms_iou": 0.7, "max_det": 300, "classes": [{"id": class_id, "name": name} for class_id, name in CLASS_NAMES.items()]})
+        # Readiness of the default path (/v2/diagnose): 503 while it can only answer gatekeeper_unavailable.
+        ready = gate_ready()
+        return jsonify({"status": "ready" if ready else "degraded", "gatekeeper": pipeline.describe()["gatekeeper"], "model_pinned": getattr(service, "pinned", False), "model": "yolo11n", "model_version": getattr(service, "model_version", "aegis-yolo11n-v4-50epochs"), "model_sha256": service.model_sha256, "checkpoint": getattr(service, "checkpoint_label", "baseline_v4_50epochs/best.pt"), "device": service.device, "imgsz": 640, "confidence_threshold": 0.25, "nms_iou": 0.7, "max_det": 300, "classes": [{"id": class_id, "name": name} for class_id, name in CLASS_NAMES.items()]}), 200 if ready else 503
 
     @app.post("/predict")
     @admit_prediction

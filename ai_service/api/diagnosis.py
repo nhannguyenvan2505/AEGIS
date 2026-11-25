@@ -9,13 +9,17 @@ with an empty detection list. The service never guesses a disease name for an im
 it could not validate.
 """
 import hashlib
+import json
+import logging
 import math
 import os
+import threading
 from pathlib import Path
 
 import numpy as np
 
 SCHEMA_VERSION = "2.0"
+MANIFEST_DIR = Path(__file__).resolve().parent
 
 DEFAULTS = {
     "blur_laplacian_var_min": 60.0,
@@ -95,16 +99,42 @@ class HeuristicGatekeeper:
         return {"rice_probability": rice_prob, "probabilities": [1 - rice_prob, rice_prob]}
 
 
+def file_sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read_manifest(manifest):
+    return json.loads((MANIFEST_DIR / manifest).read_text(encoding="utf-8"))
+
+
+def pinned_sha256(manifest):
+    """SHA-256 of the released artifact named by a manifest next to this file."""
+    return read_manifest(manifest)["sha256"]
+
+
+def check_pin(digest, manifest, label):
+    """True for the released artifact. Anything else stops startup unless explicitly allowed."""
+    if digest == pinned_sha256(manifest):
+        return True
+    if os.environ.get("AEGIS_ALLOW_UNPINNED_MODELS") == "1":
+        logging.getLogger(__name__).warning("%s SHA-256 %s is not the one in %s; running unpinned",
+                                            label, digest[:12], manifest)
+        return False
+    raise RuntimeError(f"{label} SHA-256 {digest[:12]} differs from {manifest}. Restore the released file, "
+                       "or set AEGIS_ALLOW_UNPINNED_MODELS=1 to try a candidate.")
+
+
 class YoloClsGatekeeper:
     """Ultralytics classification checkpoint with classes {non_rice, rice}."""
     method = "yolo_cls"
+    pinned = False  # only build_gatekeeper() checks the release pin; evaluation scripts load candidates
 
     def __init__(self, weights, imgsz=224):
         from ultralytics import YOLO
         weights = Path(weights)
         if not weights.is_file():
             raise FileNotFoundError(f"Gatekeeper checkpoint missing: {weights}")
-        self.sha256 = hashlib.sha256(weights.read_bytes()).hexdigest()
+        self.sha256 = file_sha256(weights)
         self.model = YOLO(str(weights))
         names = {int(k): v for k, v in self.model.names.items()}
         if set(names.values()) != {"non_rice", "rice"}:
@@ -112,9 +142,13 @@ class YoloClsGatekeeper:
         self.rice_index = next(i for i, n in names.items() if n == "rice")
         self.imgsz = imgsz
         self.version = weights.name
+        # Ultralytics builds the predictor on first use outside its own lock; concurrent first
+        # calls would each build one around the same model.
+        self.lock = threading.Lock()
 
     def classify(self, pixels):
-        res = self.model.predict(source=np.ascontiguousarray(pixels[:, :, ::-1]), imgsz=self.imgsz, verbose=False)[0]
+        with self.lock:
+            res = self.model.predict(source=np.ascontiguousarray(pixels[:, :, ::-1]), imgsz=self.imgsz, verbose=False)[0]
         probs = res.probs.data.cpu().numpy().astype(np.float64)
         return {"rice_probability": float(probs[self.rice_index]), "probabilities": probs.tolist()}
 
@@ -125,7 +159,19 @@ DEFAULT_GATE_WEIGHTS = Path(__file__).resolve().parents[1] / "experiments/gateke
 def build_gatekeeper():
     """AEGIS_GATE_WEIGHTS, else the provisioned default file, else the always-rejecting heuristic."""
     weights = os.environ.get("AEGIS_GATE_WEIGHTS") or (str(DEFAULT_GATE_WEIGHTS) if DEFAULT_GATE_WEIGHTS.is_file() else None)
-    return YoloClsGatekeeper(weights) if weights else HeuristicGatekeeper()
+    if not weights:
+        return HeuristicGatekeeper()
+    if not Path(weights).is_file():
+        raise FileNotFoundError(f"Gatekeeper checkpoint missing: {weights}")
+    digest = file_sha256(weights)  # checked before the file is unpickled
+    pinned = check_pin(digest, "gatekeeper.json", "Gatekeeper weights")
+    gate = YoloClsGatekeeper(weights)
+    if gate.sha256 != digest or file_sha256(weights) != digest:
+        raise RuntimeError("Gatekeeper checkpoint changed during loading")
+    gate.pinned = pinned
+    if pinned:
+        gate.version = read_manifest("gatekeeper.json")["release"]
+    return gate
 
 
 # ---------------------------------------------------------------- pipeline
@@ -136,6 +182,8 @@ class DiagnosisPipeline:
 
     def describe(self):
         return {"gatekeeper": {"method": self.gatekeeper.method, "version": getattr(self.gatekeeper, "version", "none"),
+                               "sha256": getattr(self.gatekeeper, "sha256", None),
+                               "pinned": getattr(self.gatekeeper, "pinned", False),
                                "production_ready": self.gatekeeper.method != "heuristic_fallback"},
                 "thresholds": self.t}
 
