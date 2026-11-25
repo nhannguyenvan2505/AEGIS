@@ -44,7 +44,8 @@ MySQL tự commit), dừng backend rồi chạy:
 ```
 
 Dùng được cho cả MySQL native và Docker (cấu hình lấy từ environment hoặc `.env`).
-`setup_native_mysql.py` cũng gọi cùng bộ chạy này. Volume Docker mới tự chạy toàn bộ SQL cấp một trong `mysql/`.
+`setup_native_mysql.py` chỉ gọi bộ chạy này khi database còn trống; với database đã có, nó chỉ báo migration còn
+thiếu. Volume Docker mới tự chạy toàn bộ SQL cấp một trong `mysql/`.
 
 | Migration | Nội dung |
 |---|---|
@@ -125,7 +126,13 @@ Docker. Tài khoản chạy cần quyền đọc view (dùng tài khoản migrat
   được. Đạt rồi mới trỏ backend sang đích mới.
 - Backup chứa dữ liệu cá nhân và password hash: lưu mã hoá, ngoài repo.
 - **Không gồm secret.** Giữ riêng `AEGIS_JWT_SECRET` (hoặc file `jwt-signing.key`); mất khoá thì mọi người dùng
-  phải đăng nhập lại. Không gồm kho pilot dạng file; kho pilot hybrid trong MySQL nằm trong dump.
+  phải đăng nhập lại.
+- Quyền cấp theo tên database. Khôi phục sang **tên database khác** thì đặt `AEGIS_MYSQL_DATABASE` mới và cấp lại
+  quyền cho tài khoản runtime (`create_runtime_user.py`) trước khi trỏ backend sang.
+- **Kho pilot (forecast) chưa được công cụ này khôi phục trọn vẹn.** Bảng `p_<mã>_*` có trong dump, nhưng mã đó
+  sinh từ đường dẫn thư mục kho, và file đánh dấu `.aegis-hybrid.json` trong thư mục kho (không nằm trong backup)
+  ghi tên database. Code từ chối mở kho nếu một trong hai khác đi. Muốn dùng lại phải giữ cùng đường dẫn thư mục,
+  cùng tên database và tự sao lưu thư mục kho; cách này **chưa được diễn tập**.
 
 ### Công cụ backup hybrid cũ
 

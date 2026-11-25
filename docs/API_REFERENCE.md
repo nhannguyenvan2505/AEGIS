@@ -28,6 +28,7 @@ Base URL in development: `http://127.0.0.1:5000`. All `/api` endpoints exchange 
 | POST | `/api/admin/devices` | admin | `app.admin.features.devices.routes` | backend/docs/admin/API_SPEC.md |
 | GET | `/api/admin/devices/{identifier}` | admin | `app.admin.features.devices.routes` | backend/docs/admin/API_SPEC.md |
 | PUT | `/api/admin/devices/{identifier}` | admin | `app.admin.features.devices.routes` | backend/docs/admin/API_SPEC.md |
+| POST | `/api/admin/devices/{identifier}/release` | admin | `app.admin.features.devices.routes` | docs/IOT_DEVICES_ALERTS_PUSH.md |
 | GET | `/api/admin/devices/{identifier}/telemetry` | admin | `app.admin.features.devices.routes` | backend/docs/admin/API_SPEC.md |
 | GET | `/api/admin/diseases` | admin | `app.admin.features.knowledge.routes` | backend/docs/admin/API_SPEC.md |
 | POST | `/api/admin/diseases` | admin | `app.admin.features.knowledge.routes` | backend/docs/admin/API_SPEC.md |

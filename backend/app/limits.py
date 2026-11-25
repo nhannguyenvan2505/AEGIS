@@ -72,4 +72,9 @@ def init_limits(app):
                 'DETECT_USER_LIMIT','BACKEND_MAX_INFLIGHT','RATE_MAX_BUCKETS','FARM_WRITE_LIMIT']:
         if type(app.config[key]) is not int or app.config[key] < 1:
             raise ValueError(f'{key} must be a positive integer')
+    # A shorter lifetime would expire a reservation while its AI call is still running.
+    ttl, longest_call = app.config['IDEMPOTENCY_RUNNING_TTL_SECONDS'], (
+        app.config['AI_CONNECT_TIMEOUT'] + app.config['AI_READ_TIMEOUT'])
+    if type(ttl) is not int or ttl <= longest_call:
+        raise ValueError(f'IDEMPOTENCY_RUNNING_TTL_SECONDS must be an integer above the AI timeouts ({longest_call} s)')
     app.extensions['inference_gate'] = BoundedSemaphore(app.config['BACKEND_MAX_INFLIGHT'])

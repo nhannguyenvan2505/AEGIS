@@ -9,7 +9,23 @@ Quyết định ngày 25/11/2026: admin đăng ký thiết bị trước; cảnh
 - Admin đăng ký: `POST /api/admin/devices` với trường mới `device_uid` (ID mà ESP32 gửi), cùng `season_id`,
   `device_code`, `sensor_type`. Đăng ký xong, số đo tự vào thửa đó. Quy tắc cũ vẫn áp dụng: mỗi thửa một thiết bị
   cho mỗi `sensor_type`. `PUT /api/admin/iot/bindings` cũng là thao tác gán của admin.
-- Lỗi: `invalid_device_uid` (422), `device_uid_exists` (409), `device_bound_elsewhere` (409).
+- Lỗi: `invalid_device_uid` (422), `device_uid_exists` (409), `device_bound_elsewhere` (409). Tiền tố `released:`
+  được hệ thống giữ riêng.
+- Khi có `device_uid` mà không gửi `source`, bản ghi là `field`; không có `device_uid` thì mặc định `mock` như cũ.
+
+### Gỡ đăng ký để chuyển thiết bị
+
+`POST /api/admin/devices/<id>/release` (vai trò admin, không cần body). Trả `{"released_device_uid": "..."}`.
+
+- Giữ bản ghi và mọi dữ liệu đã lưu. Bản ghi mất ID phần cứng (đổi thành `released:<id>`), mất `sensor_type` (thửa
+  cũ đăng ký được thiết bị mới cùng loại), chuyển `inactive`, và binding của ID đó bị xoá.
+- Sau đó đăng ký lại `device_uid` cho mùa vụ khác bằng `POST /api/admin/devices`.
+- Số đo cũ vẫn thuộc thửa cũ; chủ mới chỉ thấy số đo nhận sau khi đăng ký. Số đo đến trong lúc chưa đăng ký không
+  gắn vào thửa nào.
+- Lỗi: `404 not_found`; `409 nothing_to_release` (bản ghi mock, raw, không có ID phần cứng, hoặc đã gỡ).
+- Chỉ gán đè bằng `PUT /api/admin/iot/bindings` **không** chuyển được quyền sở hữu: bản đăng ký vẫn ở thửa cũ.
+- Thiết bị chỉ có binding, không có bản đăng ký, thì gỡ bằng `PUT /api/admin/iot/bindings` với `plot_id: null`.
+- Chủ thửa gửi số đo qua `POST /api/iot/ingest` được ngay sau khi admin đăng ký, không cần tự gán thêm.
 - Người dùng `PUT /api/iot/bindings`: chỉ được dùng thiết bị đã đăng ký cho thửa của mình, để chuyển giữa các thửa
   của mình. **Mới:** `404 device_not_registered`. Giữ nguyên: `409 device_already_bound`.
 - Thiết bị đã claim trước đây vẫn dùng được, vì binding cũ được tính là đã gán.
