@@ -60,6 +60,9 @@ class ExpoTransport:
 
     def send(self, messages):
         tickets = self._post(SEND_URL, messages)
+        # Expo's docs allow a bare ticket object for a single message to a single recipient.
+        if len(messages) == 1 and isinstance(tickets, dict) and 'status' in tickets:
+            tickets = [tickets]
         if not isinstance(tickets, list) or len(tickets) != len(messages) \
                 or not all(isinstance(ticket, dict) for ticket in tickets):
             raise PushTransportError('invalid_response', False)

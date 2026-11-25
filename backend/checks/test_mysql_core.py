@@ -213,6 +213,183 @@ class MySQLCoreTests(unittest.TestCase):
         self.assertEqual(row['status'],'online')
         self.assertIsNotNone(alert)
 
+    def register_device(self, admin, season, uid, code, **extra):
+        body = dict(season_id=season['id'],device_code=code,sensor_type='temperature',device_uid=uid)
+        body.update(extra)
+        return self.client.post('/api/admin/devices',headers=admin,json=body)
+
+    def farmer_with_season(self, owner):
+        plot = self.post('/plots',dict(name='Ruộng '+uuid.uuid4().hex[:6],location_text='x'),owner).json['item']
+        season = self.post('/plots/'+plot['id']+'/seasons',
+            dict(name='Vụ',start_date='2026-10-01',end_date='2026-12-31'),owner).json['item']
+        return plot['id'],season
+
+    def ingest(self, owner, uid, temperature):
+        return self.client.post('/api/iot/ingest',headers=self.headers[owner],
+            json=dict(device_uid=uid,temperature=temperature,humidity=60.0))
+
+    def temperatures(self, owner, uid):
+        response = self.client.get('/api/iot/latest?device_uid='+uid,headers=self.headers[owner])
+        return sorted(item['temperature'] for item in response.json['items'])
+
+    def test_owner_can_send_over_http_from_a_registered_device_without_binding(self):
+        _,season = self.farmer_with_season(0)
+        uid = 'ESP32-'+uuid.uuid4().hex[:20]
+        self.assertEqual(self.register_device(self.admin_session(),season,uid,'HW-HTTP').status_code,201)
+        response = self.ingest(0,uid,26.0)
+        self.assertEqual(response.status_code,201,response.json)
+        self.assertEqual(self.temperatures(0,uid),[26.0])
+        for variant in (uid,'ESP32-NOT-REGISTERED','Unknown'):
+            self.assertEqual(self.ingest(1,variant,30.0).status_code,404,variant)
+
+    def test_admin_releases_a_device_so_another_farmer_can_have_it(self):
+        plot_a,season_a = self.farmer_with_season(0)
+        plot_b,season_b = self.farmer_with_season(1)
+        admin = self.admin_session()
+        uid = 'ESP32-'+uuid.uuid4().hex[:20]
+        first = self.register_device(admin,season_a,uid,'HW-MOVE-A')
+        self.assertEqual(first.status_code,201,first.json)
+        record = first.json['id']
+        self.assertEqual(self.bind(0,uid,plot_a).status_code,200)
+        self.assertEqual(self.ingest(0,uid,21.0).status_code,201)
+        release = '/api/admin/devices/'+record+'/release'
+        self.assertEqual(self.client.post(release,headers=self.headers[0]).status_code,401)
+        response = self.client.post(release,headers=admin)
+        self.assertEqual(response.status_code,200,response.json)
+        self.assertEqual(response.json['released_device_uid'],uid)
+        # Nobody holds it now, and the placeholder cannot be used as an id.
+        detail = self.client.get('/api/admin/devices/'+record,headers=admin).json['device']
+        placeholder = 'released:'+record
+        self.assertEqual((detail['device_uid'],detail['sensor_type'],detail['status']),
+                         (placeholder,None,'inactive'))
+        self.assertIsNone(self.reading(uid,22.0,60.0)['plot_id'])
+        self.assertEqual(self.ingest(0,uid,23.0).status_code,404)
+        self.assertIsNone(self.reading(placeholder,22.5,60.0)['plot_id'])
+        self.assertEqual(self.ingest(0,placeholder,23.5).status_code,404)
+        self.assertEqual(self.bind(0,placeholder,plot_a).status_code,400)
+        rejected = self.register_device(admin,season_b,placeholder,'HW-BAD')
+        self.assertEqual(rejected.json['error']['code'],'invalid_device_uid')
+        self.assertEqual(self.client.post(release,headers=admin).json['error']['code'],'nothing_to_release')
+        # The old field gets its sensor slot back, and farmer B receives the hardware.
+        again = self.register_device(admin,season_a,'ESP32-'+uuid.uuid4().hex[:20],'HW-NEW-A')
+        self.assertEqual(again.status_code,201,again.json)
+        moved = self.register_device(admin,season_b,uid,'HW-MOVE-B')
+        self.assertEqual(moved.status_code,201,moved.json)
+        self.assertEqual(self.ingest(1,uid,31.0).status_code,201)
+        second_plot,_ = self.farmer_with_season(1)
+        self.assertEqual(self.bind(1,uid,second_plot).status_code,200)
+        self.assertEqual(self.ingest(1,uid,32.0).status_code,201)
+        self.assertEqual(self.bind(0,uid,plot_a).status_code,409)
+        self.assertEqual(self.ingest(0,uid,40.0).status_code,404)
+        # Each farmer keeps exactly their own history.
+        self.assertEqual(self.temperatures(0,uid),[21.0])
+        self.assertEqual(self.temperatures(1,uid),[31.0,32.0])
+        with repository(self.config) as repo:
+            logged = repo.one('''SELECT details_json FROM audit_logs WHERE action='device.release'
+                AND entity_id=%s''',(record,))
+        self.assertEqual(json.loads(logged['details_json'])['device_uid'],uid)
+
+    def test_release_refuses_devices_without_a_hardware_id(self):
+        _,_,mock = self.chain()
+        admin = self.admin_session()
+        response = self.client.post('/api/admin/devices/'+mock['id']+'/release',headers=admin)
+        self.assertEqual((response.status_code,response.json['error']['code']),(409,'nothing_to_release'))
+        self.assertEqual(self.client.post('/api/admin/devices/'+str(uuid.uuid4())+'/release',
+                                          headers=admin).status_code,404)
+
+    def test_release_wins_over_a_concurrent_owner_bind(self):
+        plot,season = self.farmer_with_season(0)
+        admin = self.admin_session()
+        for attempt in range(8):
+            uid = 'ESP32-'+uuid.uuid4().hex[:20]
+            created = self.register_device(admin,season,uid,f'HW-RACE-{attempt}',sensor_type='humidity')
+            self.assertEqual(created.status_code,201,created.json)
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                owner = pool.submit(lambda: self.app.test_client().put('/api/iot/bindings',
+                    headers=self.headers[0],json=dict(device_uid=uid,plot_id=plot)))
+                release = pool.submit(lambda: self.app.test_client().post(
+                    '/api/admin/devices/'+created.json['id']+'/release',headers=admin))
+                owner,release = owner.result(),release.result()
+            self.assertEqual(release.status_code,200,release.json)
+            self.assertIn(owner.status_code,(200,404),owner.json)
+            # Whatever the order, nothing keeps the released device on the plot.
+            self.assertIsNone(self.reading(uid,20.0+attempt,60.0)['plot_id'],f'attempt {attempt}')
+
+    def test_hardware_registration_defaults_to_a_field_source(self):
+        _,season = self.farmer_with_season(0)
+        admin = self.admin_session()
+        created = self.register_device(admin,season,'ESP32-'+uuid.uuid4().hex[:20],'HW-SRC')
+        self.assertEqual(created.status_code,201,created.json)
+        detail = self.client.get('/api/admin/devices/'+created.json['id'],headers=admin).json['device']
+        self.assertEqual((detail['source'],detail['is_simulated']),('field',False))
+
+    def root_connection(self, database=None):
+        import pymysql
+        from pymysql.constants import CLIENT
+        if getattr(self,'admin',None):
+            options = dict(self.admin,database=database)
+        else:
+            values = dict(line.split('=',1) for line in (DATABASE/'.env').read_text().splitlines()
+                          if line and not line.startswith('#'))
+            options = dict(host='127.0.0.1',port=int(values.get('AEGIS_MYSQL_PORT',3307)),user='root',
+                           password=values['AEGIS_MYSQL_ROOT_PASSWORD'],database=database)
+        return pymysql.connect(**options,charset='utf8mb4',autocommit=True,client_flag=CLIENT.MULTI_STATEMENTS)
+
+    def query_root(self, sql, database=None):
+        with self.root_connection(database) as connection, connection.cursor() as cursor:
+            cursor.execute(sql)
+            return list(cursor.fetchall())
+
+    def test_setup_script_never_migrates_or_regrants_an_existing_database(self):
+        sys.path.insert(0,str(DATABASE))
+        from migrate import apply_schema
+        from setup_native_mysql import prepare_database
+        database = 'aegis_test_'+uuid.uuid4().hex
+        user = 'aegis_setup_'+uuid.uuid4().hex[:10]
+        config = dict(database=database,user=user,password=uuid.uuid4().hex)
+        self.addCleanup(self.query_root,f"DROP DATABASE IF EXISTS `{database}`")
+        self.addCleanup(self.query_root,f"DROP USER IF EXISTS '{user}'@'localhost'")
+        def grants():
+            return ' / '.join(row[0] for row in self.query_root(f"SHOW GRANTS FOR '{user}'@'localhost'"))
+        def versions():
+            return [row[0] for row in self.query_root('SELECT version FROM schema_versions ORDER BY version',database)]
+        # A new database: provisioned completely, with schema rights for the configured account.
+        with self.root_connection() as connection:
+            result = prepare_database(connection,config,dict(config))
+        self.assertEqual((result['provisioned'],result['pending']),(True,[]))
+        self.assertEqual(versions(),list(range(2,versions()[-1]+1)))
+        self.assertIn('ALL PRIVILEGES',grants())
+        # The same account reduced to row access, and a database that is behind.
+        self.query_root(f"DROP DATABASE `{database}`")
+        self.query_root(f"CREATE DATABASE `{database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci")
+        with self.root_connection(database) as connection:
+            apply_schema(connection,through=6)
+        self.query_root(f"REVOKE ALL PRIVILEGES, GRANT OPTION FROM '{user}'@'localhost'")
+        self.query_root(f"GRANT SELECT, INSERT, UPDATE, DELETE ON `{database}`.* TO '{user}'@'localhost'")
+        before = grants()
+        with self.root_connection() as connection:
+            result = prepare_database(connection,config,dict(config))
+        self.assertEqual((result['provisioned'],result['pending'][0]),(False,7))
+        self.assertEqual(versions(),[2,3,4,5,6])
+        self.assertEqual(grants(),before)
+
+    def test_setup_script_gives_schema_rights_to_the_migration_account_when_separated(self):
+        sys.path.insert(0,str(DATABASE))
+        from setup_native_mysql import prepare_database
+        database = 'aegis_test_'+uuid.uuid4().hex
+        suffix = uuid.uuid4().hex[:10]
+        runtime = dict(database=database,user='aegis_run_'+suffix,password=uuid.uuid4().hex)
+        migration = dict(database=database,user='aegis_mig_'+suffix,password=uuid.uuid4().hex)
+        self.addCleanup(self.query_root,f"DROP DATABASE IF EXISTS `{database}`")
+        for account in (runtime,migration):
+            self.addCleanup(self.query_root,f"DROP USER IF EXISTS '{account['user']}'@'localhost'")
+        with self.root_connection() as connection:
+            prepare_database(connection,runtime,migration)
+        rows = self.query_root(f"SHOW GRANTS FOR '{migration['user']}'@'localhost'")
+        self.assertIn('ALL PRIVILEGES',' / '.join(row[0] for row in rows))
+        accounts = [row[0] for row in self.query_root('SELECT user FROM mysql.user')]
+        self.assertNotIn(runtime['user'],accounts)  # create_runtime_user.py owns that account
+
     def alert_rows(self, plot):
         with repository(self.config) as repo:
             return list(repo.all("""SELECT a.alert_id,a.severity,a.source_key,a.alert_type FROM alerts a
