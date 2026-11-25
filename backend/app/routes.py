@@ -74,7 +74,9 @@ def detect():
         return jsonify(stored)
     except AIServiceError as error:
         if key_hash is not None:
-            mark_uncertain(current_app.config, g.user['id'], key_hash)
+            # Give the key back only when inference certainly did not run; anything unclear stays locked.
+            settle = release if error.not_run else mark_uncertain
+            settle(current_app.config, g.user['id'], key_hash)
         g.ai_error_code = error.code
         current_app.logger.warning('AI request failed request_id=%s code=%s', g.request_id, error.code)
         response = jsonify(success=False, error={'code': error.code, 'message': error.message})
