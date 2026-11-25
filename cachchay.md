@@ -44,7 +44,7 @@ Mở PowerShell tại thư mục muốn chứa dự án và chạy:
 ```powershell
 git clone https://github.com/nhannguyenvan2505/AEGIS.git
 cd AEGIS
-git checkout nvn/test-tich-hop-iot
+git checkout develop
 git pull --ff-only
 ```
 
