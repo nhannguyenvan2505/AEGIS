@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WEIGHTS = ROOT / "experiments/yolo/baseline_v4_50epochs/weights/best.pt"
 CLASS_NAMES = {0: "rice_blast", 1: "brown_spot", 2: "sheath_blight"}
 MAX_PIXELS = 16_000_000
+IMAGE_FORMATS = ("JPEG", "PNG", "WEBP")
 MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 
 
@@ -62,8 +63,10 @@ def decode_image(payload):
     with warnings.catch_warnings():
         warnings.simplefilter("error", Image.DecompressionBombWarning)
         # Keep Pillow's decoder: Ultralytics patches Image.open with a HEIF fallback.
-        with pillow_open(io.BytesIO(payload)) as probe:
-            if probe.format not in {"JPEG", "PNG", "WEBP"}:
+        # `formats` stops every other format's parser from running on the upload.
+        with pillow_open(io.BytesIO(payload), formats=IMAGE_FORMATS) as probe:
+            # JPEG's parser can still report MPO, so check what it identified.
+            if probe.format not in IMAGE_FORMATS:
                 raise ValueError("Chỉ hỗ trợ ảnh JPEG, PNG hoặc WebP.")
             if probe.width * probe.height > MAX_PIXELS:
                 raise ValueError("Ảnh vượt quá giới hạn 16 triệu pixel.")
@@ -72,7 +75,7 @@ def decode_image(payload):
             if getattr(probe, "n_frames", 1) != 1:
                 raise ValueError("Không hỗ trợ ảnh động.")
             probe.verify()
-        with pillow_open(io.BytesIO(payload)) as source:
+        with pillow_open(io.BytesIO(payload), formats=IMAGE_FORMATS) as source:
             oriented = ImageOps.exif_transpose(source).convert("RGB")
             return np.asarray(oriented).copy()
 
