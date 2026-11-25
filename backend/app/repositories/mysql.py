@@ -50,7 +50,7 @@ def mysql_repository(config):
             connection.close()
 
 
-REQUIRED_SCHEMA_VERSIONS = range(2, 10)
+REQUIRED_SCHEMA_VERSIONS = range(2, 13)
 
 
 def check_schema(config):
@@ -198,13 +198,19 @@ class MySQLRepository:
             self.execute('INSERT INTO rate_limit_buckets VALUES (%s,%s,%s,%s)', (key,start,1,expires))
         return True,0
 
-    def reserve(self, user_id, key_hash, payload_hash):
+    def reserve(self, user_id, key_hash, payload_hash, now, running_ttl):
         numeric = self.uid(user_id)
         row = self.one('''SELECT r.*,a.external_id external_analysis FROM inference_requests r
             LEFT JOIN analysis_runs a ON a.analysis_id=r.analysis_id WHERE r.user_id=%s AND r.key_hash=%s''', (numeric,key_hash))
         if row:
-            return ('conflict' if row['payload_hash'] != payload_hash else row['state']),row['external_analysis']
-        self.execute("INSERT INTO inference_requests VALUES (%s,%s,%s,'running',NULL)", (numeric,key_hash,payload_hash))
+            if row['payload_hash'] != payload_hash:
+                return 'conflict',row['external_analysis']
+            if row['state'] == 'running' and row['created_at'] + running_ttl <= now:
+                self.mark_uncertain(user_id, key_hash)  # abandoned work; never re-run it
+                return 'uncertain',None
+            return row['state'],row['external_analysis']
+        self.execute("""INSERT INTO inference_requests(user_id,key_hash,payload_hash,state,analysis_id,created_at)
+            VALUES (%s,%s,%s,'running',NULL,%s)""", (numeric,key_hash,payload_hash,now))
         return 'new',None
 
     def release(self, user_id, key_hash):

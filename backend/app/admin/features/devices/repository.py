@@ -37,6 +37,17 @@ def code_exists(user_id, code):
     return db.one('SELECT 1 x FROM iot_devices WHERE user_id=%s AND device_code=%s', (user_id, code)) is not None
 
 
+def uid_exists(device_uid):
+    # The column is case-sensitive but bindings are not.
+    return db.one('SELECT 1 x FROM iot_devices WHERE UPPER(device_uid)=UPPER(%s)', (device_uid,)) is not None
+
+
+def uid_bound_elsewhere(device_uid, field_id):
+    return db.one('''SELECT 1 x FROM esp32_device_bindings b WHERE b.device_uid=%s AND b.plot_id IS NOT NULL
+                     AND b.plot_id<>(SELECT external_id FROM farm_fields WHERE field_id=%s)''',
+                  (device_uid, field_id)) is not None
+
+
 def sensor_taken(field_id, sensor_type, exclude_device_id=None):
     return db.one('SELECT 1 x FROM iot_devices WHERE field_id=%s AND sensor_type=%s AND device_id<>%s',
                   (field_id, sensor_type, exclude_device_id or 0)) is not None
@@ -45,7 +56,7 @@ def sensor_taken(field_id, sensor_type, exclude_device_id=None):
 def create(values):
     db.execute('''INSERT INTO iot_devices(external_id,user_id,field_id,crop_cycle_id,device_uid,device_code,device_name,sensor_type,
                   protocol,firmware_version,status,source,api_created_at)
-                  VALUES (%(external_id)s,%(user_id)s,%(field_id)s,%(crop_cycle_id)s,%(external_id)s,%(device_code)s,
+                  VALUES (%(external_id)s,%(user_id)s,%(field_id)s,%(crop_cycle_id)s,%(device_uid)s,%(device_code)s,
                   %(device_name)s,%(sensor_type)s,%(protocol)s,%(firmware_version)s,'offline',%(source)s,%(created_at)s)''', values)
 
 

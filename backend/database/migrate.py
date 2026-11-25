@@ -14,7 +14,7 @@ import pymysql
 from pymysql.constants import CLIENT
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.database_config import settings  # noqa: E402
+from app.database_config import migration_settings  # noqa: E402
 
 SQL_DIR = Path(__file__).resolve().parent / 'mysql'
 
@@ -75,7 +75,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--status', action='store_true', help='show versions without changing anything')
     args = parser.parse_args()
-    options = settings()['MYSQL']
+    options = migration_settings()
     connection = pymysql.connect(**options, charset='utf8mb4', autocommit=True, connect_timeout=5,
                                  client_flag=CLIENT.MULTI_STATEMENTS)
     try:

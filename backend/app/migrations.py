@@ -54,6 +54,11 @@ def apply_migrations(db):
             db.execute('ALTER TABLE analyses ADD COLUMN ' + column)
         db.execute('INSERT INTO schema_migrations VALUES (7,?,?)',
                    ('diagnosis_record', datetime.now(timezone.utc).isoformat()))
+    if not db.execute('SELECT 1 FROM schema_migrations WHERE version=8').fetchone():
+        # Mirrors database/mysql/010_idempotency_expiry.sql for SQLite fixtures.
+        db.execute('ALTER TABLE inference_requests ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0')
+        db.execute('INSERT INTO schema_migrations VALUES (8,?,?)',
+                   ('idempotency_expiry', datetime.now(timezone.utc).isoformat()))
     if not db.execute('SELECT 1 FROM schema_migrations WHERE version=6').fetchone():
         # Idempotent: a store upgraded from the old farm-hierarchy marker may
         # already have these columns/table.

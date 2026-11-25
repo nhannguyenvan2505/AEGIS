@@ -14,6 +14,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from .auth import require_auth
 from .farm import FarmError, body, owned
+from .iot_alerts import raise_microclimate_alert
 from .repositories import repository
 from .storage import connect
 
@@ -54,6 +55,10 @@ _SQLITE_DDL = (
 
 class DeviceBoundError(Exception):
     """The device is assigned to a plot the caller does not own."""
+
+
+class DeviceNotRegisteredError(Exception):
+    """No administrator has registered the device to any plot."""
 
 
 def _is_reserved_uid(device_uid):
@@ -312,6 +317,8 @@ def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp
             stored = cur.fetchone()
             reading_id, created_at = stored['reading_id'], _iso(stored['created_at'])
         if is_mysql:
+            raise_microclimate_alert(cur, plot_id=plot_id, device_uid=normalized['device_uid'], alert=alert,
+                                     observed_at=normalized['observed_at'])
             cur.execute(
                 "UPDATE iot_devices SET status='online', last_seen_at=UTC_TIMESTAMP() WHERE device_uid=%s",
                 (normalized['device_uid'],),
@@ -377,8 +384,9 @@ def _assigned_plots(cur, is_mysql, device_uid):
 def bind_device_to_plot(config, device_uid, plot_id, device_name=None, *, allowed_plot_ids=None):
     """Bind an ESP32 device_uid to a plot UUID.
 
-    With `allowed_plot_ids` (the caller's plots) a device assigned anywhere else is
-    refused; check and write share one transaction. `None` is for administrators only.
+    With `allowed_plot_ids` (the caller's plots) the device must already be assigned by
+    an administrator, and only to those plots; an unknown id cannot be claimed. Check
+    and write share one transaction. `None` is for administrators, who register devices.
     """
     uid = (device_uid or '').strip()
     if not uid or len(uid) > 100 or not _is_plain_uid(uid) or _is_reserved_uid(uid):
@@ -399,7 +407,10 @@ def bind_device_to_plot(config, device_uid, plot_id, device_name=None, *, allowe
             cur.execute('BEGIN IMMEDIATE')
         if allowed_plot_ids is not None:
             allowed = set(allowed_plot_ids)
-            if any(plot not in allowed for plot in _assigned_plots(cur, is_mysql, uid)):
+            assigned = _assigned_plots(cur, is_mysql, uid)
+            if not assigned:
+                raise DeviceNotRegisteredError(uid)
+            if any(plot not in allowed for plot in assigned):
                 raise DeviceBoundError(uid)
         if is_mysql:
             cur.execute(
@@ -748,6 +759,9 @@ def enable_iot_mqtt(app):
                 data.get('device_name'),
                 allowed_plot_ids=_user_plot_ids(current_app.config),
             )
+        except DeviceNotRegisteredError:
+            raise FarmError('device_not_registered',
+                            'Thiết bị chưa được quản trị viên đăng ký cho ruộng của bạn.', 404)
         except DeviceBoundError:
             # Do not let one user take over a device that belongs to another user's plot.
             raise FarmError('device_already_bound', 'Thiết bị đã được gán cho người dùng khác.', 409)

@@ -30,6 +30,7 @@ from migrate_sqlite import migrate_core, read
 
 class NativeDatabaseFixture:
     schema_through = None
+    grant_host = 'localhost'
     @classmethod
     def setUpClass(cls):
         options = settings()['MYSQL']
