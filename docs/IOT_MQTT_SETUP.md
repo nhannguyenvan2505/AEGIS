@@ -65,6 +65,14 @@ Kiểm tra ACL trước khi nối thiết bị:
    không báo lỗi cho bên gửi, nên phải kiểm ở phía nhận.
 3. Tài khoản thiết bị subscribe topic: không nhận được dữ liệu của thiết bị khác.
 
+Bản triển khai Docker Compose đã có sẵn broker, ACL và script tạo chứng chỉ, tài khoản (topic
+`aegis/devices/<device_uid>/telemetry`): xem [deploy/README.md](../deploy/README.md).
+
+Khi không muốn Backend tự subscribe (nhiều worker, hoặc chạy tách tiến trình), đặt
+`AEGIS_MQTT_ENABLED=0` cho Backend và chạy `python backend/database/run_mqtt.py` với
+`AEGIS_MQTT_ENABLED=1`. Đặt cùng một `AEGIS_MQTT_STATUS_FILE` cho cả hai để API admin vẫn hiện
+trạng thái; quá 30 giây không có báo cáo thì hiện là mất kết nối.
+
 ## 4. Quy ước firmware ESP32
 
 - Kết nối TLS cổng 8883, **kiểm tra chứng chỉ broker** (không dùng chế độ bỏ qua chứng chỉ);
@@ -78,13 +86,16 @@ Kiểm tra ACL trước khi nối thiết bị:
 ```
 
   `temperature` từ -50 đến 60, `humidity` từ 0 đến 100. `observed_at` là tuỳ chọn; thiếu thì
-  Backend dùng giờ nhận. `plot_id` trong payload MQTT bị bỏ qua: thửa được xác định theo việc
-  gán thiết bị.
+  Backend dùng giờ nhận. **Nên gửi** `observed_at` (giờ lúc đo): gói gửi lại giống hệt mới được
+  nhận ra là trùng, và số đo gửi bù giữ đúng thời điểm (cũ hơn 6 giờ thì không tạo cảnh báo).
+  `plot_id` trong payload MQTT bị bỏ qua: thửa được xác định theo việc gán thiết bị.
 - Wi-Fi và mật khẩu MQTT để trong file cấu hình không commit; đưa firmware vào repo kèm file mẫu.
 
 ## 5. Gán thiết bị và nghiệm thu với ESP32 thật
 
-Gán thiết bị vào thửa **trước** khi thu số đo: số đo gửi trước khi gán chỉ admin xem được.
+Admin đăng ký `device_uid` cho mùa vụ **trước** khi thu số đo (`POST /api/admin/devices`, xem
+[IOT_DEVICES_ALERTS_PUSH.md](IOT_DEVICES_ALERTS_PUSH.md)): số đo gửi trước khi đăng ký chỉ admin
+xem được, và người dùng không tự nhận được thiết bị chưa đăng ký.
 
 Ghi lại cho mỗi mục: ngày giờ, commit đang chạy, kết quả và bằng chứng (ảnh chụp, log đã xoá mật khẩu
 và tên broker riêng).
@@ -99,7 +110,8 @@ và tên broker riêng).
 | 6 | Khởi động lại broker, rồi Backend | Cả hai phía tự kết nối lại |
 | 7 | Chạy liên tục theo thời lượng nhóm chốt | Ghi số gói gửi, số gói lưu và các khoảng trống |
 
-Chạy **một** process Backend có bật MQTT. Nhiều process cùng subscribe sẽ lưu trùng số đo.
+Chỉ chạy **một** process bật MQTT. Chống trùng chỉ bỏ được gói có cùng thiết bị, thửa,
+`observed_at` và giá trị; gói không có `observed_at` mà hai process nhận lệch giây vẫn lưu hai lần.
 
 ## 6. Rà dữ liệu đã thu trước đó
 
@@ -116,6 +128,10 @@ python tools/audit_iot_data.py --storage mysql
 | `mqtt_plot_not_found`, `binding_plot_not_found` | Thửa không tồn tại |
 | `binding_conflicts_with_registry` | Gán khác với đăng ký trong `iot_devices` |
 | `binding_reserved_or_non_ascii_id` | ID không còn được phép gán |
+
+Thiết bị đã được gỡ đăng ký để chuyển chủ không còn giữ ID cũ trong bản ghi cũ, nên số đo trước khi
+chuyển sẽ hiện là `mqtt_plot_without_assignment` hoặc `mqtt_plot_differs_from_assignment`. Đối chiếu
+với lịch sử chuyển thiết bị trước khi kết luận.
 
 Danh sách `bindings` cần được **xác nhận thủ công** từng dòng: một lần gán sai người trông giống hệt
 một lần gán đúng. Số đo từng nhận qua broker không xác thực không nên coi là dữ liệu tin cậy.

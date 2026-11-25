@@ -1,0 +1,6 @@
+# The backend only reads telemetry.
+user aegis-backend
+topic read aegis/devices/+/telemetry
+
+# A device's username is its device_uid; it may publish only to its own topic.
+pattern write aegis/devices/%u/telemetry

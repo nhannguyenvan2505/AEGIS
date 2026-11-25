@@ -323,22 +323,100 @@ class MySQLCoreTests(unittest.TestCase):
         detail = self.client.get('/api/admin/devices/'+created.json['id'],headers=admin).json['device']
         self.assertEqual((detail['source'],detail['is_simulated']),('field',False))
 
+    def test_iot_audit_reads_mysql_without_changing_it(self):
+        sys.path.insert(0,str(DATABASE.parents[1]/'tools'))
+        from audit_iot_data import audit
+        plot,uid = self.new_device()
+        self.reading(uid,26.0,60.0)
+        forged = 'ESP32-'+uuid.uuid4().hex[:20]
+        save_esp32_reading(self.config,dict(device_uid=forged,temperature=26.0,humidity=60.0,plot_id=plot),
+                           trust_plot_id=True)  # no assignment explains this plot
+        def rows():
+            with repository(self.config) as repo:
+                return repo.all('SELECT * FROM esp32_telemetry_readings ORDER BY reading_id')
+        before = rows()
+        report = audit(self.config)
+        self.assertEqual(rows(),before)
+        self.assertEqual(report['missing_tables'],[])
+        self.assertEqual([item['owner_id'] for item in report['bindings'] if item['device_uid']==uid],
+                         [self.identifiers[0]])
+        self.assertEqual([(item['kind'],item['device_uid'],item['count']) for item in report['findings']
+                          if item['device_uid'] in (uid,forged)],
+                         [('mqtt_plot_without_assignment',forged,1)])
+        json.dumps(report,default=str)
+
+    def root_options(self):
+        if getattr(self,'admin',None):
+            return {key:value for key,value in self.admin.items() if key!='database'}
+        values = dict(line.split('=',1) for line in (DATABASE/'.env').read_text().splitlines()
+                      if line and not line.startswith('#'))
+        return dict(host='127.0.0.1',port=int(values.get('AEGIS_MYSQL_PORT',3307)),user='root',
+                    password=values['AEGIS_MYSQL_ROOT_PASSWORD'])
+
     def root_connection(self, database=None):
         import pymysql
         from pymysql.constants import CLIENT
-        if getattr(self,'admin',None):
-            options = dict(self.admin,database=database)
-        else:
-            values = dict(line.split('=',1) for line in (DATABASE/'.env').read_text().splitlines()
-                          if line and not line.startswith('#'))
-            options = dict(host='127.0.0.1',port=int(values.get('AEGIS_MYSQL_PORT',3307)),user='root',
-                           password=values['AEGIS_MYSQL_ROOT_PASSWORD'],database=database)
-        return pymysql.connect(**options,charset='utf8mb4',autocommit=True,client_flag=CLIENT.MULTI_STATEMENTS)
+        return pymysql.connect(**self.root_options(),database=database,charset='utf8mb4',autocommit=True,
+                               client_flag=CLIENT.MULTI_STATEMENTS)
 
     def query_root(self, sql, database=None):
         with self.root_connection(database) as connection, connection.cursor() as cursor:
             cursor.execute(sql)
             return list(cursor.fetchall())
+
+    def deployment(self):
+        """An empty database and a schema-owning account, as the MySQL container image creates them."""
+        suffix = uuid.uuid4().hex[:12]
+        database = 'aegis_test_'+suffix
+        migration = dict(self.root_options(),database=database,user='aegis_mig_'+suffix,password=uuid.uuid4().hex)
+        runtime = ('aegis_run_'+suffix,uuid.uuid4().hex)
+        self.addCleanup(self.query_root,f"DROP DATABASE IF EXISTS `{database}`")
+        for user in (migration['user'],runtime[0]):
+            self.addCleanup(self.query_root,f"DROP USER IF EXISTS '{user}'@'%'")
+        self.query_root(f"CREATE DATABASE `{database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci")
+        self.query_root(f"CREATE USER '{migration['user']}'@'%' IDENTIFIED BY '{migration['password']}'")
+        self.query_root(f"GRANT ALL ON `{database}`.* TO '{migration['user']}'@'%'")
+        return database,migration,runtime
+
+    def test_deploy_init_provisions_once_and_the_runtime_account_can_serve(self):
+        sys.path.insert(0,str(DATABASE))
+        from deploy_init import initialize
+        database,migration,(user,password) = self.deployment()
+        def grants():
+            return ' / '.join(row[0] for row in self.query_root(f"SHOW GRANTS FOR '{user}'@'%'"))
+        result = initialize(self.root_options(),migration,user,password,'%')
+        self.assertEqual((result['state'],result['account'],result['pending']),('provisioned','created',[]))
+        self.assertIn('SELECT, INSERT, UPDATE, DELETE',grants())
+        self.assertNotIn('ALL PRIVILEGES',grants())
+        # The backend runs with the row-only account, including the views the schema defines.
+        config = dict(self.config,MYSQL=dict(migration,user=user,password=password))
+        client = create_app(config).test_client()
+        credentials = dict(email=f'deploy-{uuid.uuid4().hex}@example.test',password='test-password-123')
+        self.assertEqual(client.post('/api/auth/register',json=credentials).status_code,201)
+        token = client.post('/api/auth/login',json=credentials).json['access_token']
+        headers = {'Authorization':'Bearer '+token}
+        farm = client.post('/api/farm/farms',headers=headers,json=dict(name='F',address='A'))
+        self.assertEqual(farm.status_code,201,farm.json)
+        self.assertEqual(client.get('/api/farm/plots',headers=headers).status_code,200)
+        # Running again changes nothing, not even the password of the existing account.
+        again = initialize(self.root_options(),migration,user,uuid.uuid4().hex,'%')
+        self.assertEqual((again['state'],again['account']),('ready','kept'))
+        self.assertEqual(client.get('/api/auth/me',headers=headers).status_code,200)
+
+    def test_deploy_init_never_migrates_an_existing_database(self):
+        sys.path.insert(0,str(DATABASE))
+        from deploy_init import initialize
+        from migrate import apply_schema
+        database,migration,(user,password) = self.deployment()
+        with self.root_connection(database) as connection:
+            apply_schema(connection,through=6)
+        result = initialize(self.root_options(),migration,user,password,'%')
+        self.assertEqual((result['state'],result['pending'][0],result['account']),('pending',7,None))
+        versions = [row[0] for row in self.query_root('SELECT version FROM schema_versions ORDER BY version',database)]
+        self.assertEqual(versions,[2,3,4,5,6])
+        self.assertEqual(self.query_root(f"SELECT COUNT(*) FROM mysql.user WHERE user='{user}'")[0][0],0)
+        with self.assertRaises(ValueError):
+            initialize(self.root_options(),migration,migration['user'],password,'%')
 
     def test_setup_script_never_migrates_or_regrants_an_existing_database(self):
         sys.path.insert(0,str(DATABASE))

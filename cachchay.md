@@ -2,7 +2,7 @@
 
 Tài liệu này hướng dẫn từng bước từ đầu để chạy toàn bộ hệ thống **AEGIS** trên máy **Windows**, gồm:
 1. **MySQL nội bộ** (cổng `3308`) — lưu dữ liệu tài khoản, nông trại, chẩn đoán và số đo IoT.
-2. **Backend API + lắng nghe ESP32 MQTT** (cổng `5000`) — phục vụ cả app Mobile và Web Admin, đồng thời tự động nhận dữ liệu nhiệt độ & độ ẩm từ ESP32 qua MQTT.
+2. **Backend API + lắng nghe ESP32 MQTT** (cổng `5000`) — phục vụ cả app Mobile và Web Admin, và nhận dữ liệu nhiệt độ & độ ẩm từ ESP32 qua MQTT khi đã bật và cấu hình MQTT (mặc định tắt).
 3. **App Mobile** (Expo, cổng `8081`) — chạy trên điện thoại Android thật hoặc máy ảo (Android Studio Emulator / LDPlayer).
 4. **Web Admin** (cổng `5173`) — trang web quản trị cho tài khoản `admin`.
 

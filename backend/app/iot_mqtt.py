@@ -16,6 +16,7 @@ from .auth import require_auth
 from .farm import FarmError, body, owned
 from .iot_alerts import raise_reading_alerts
 from .mqtt_settings import identify_device, load_mqtt_settings, secure_client
+from .mqtt_status import read_status
 from .repositories import repository
 from .storage import connect
 
@@ -598,6 +599,17 @@ class MqttTelemetryService:
                 self._last_error = str(exc)
                 _LOGGER.warning('MQTT listener failed to start: %s', exc)
 
+    @property
+    def started(self):
+        return self._client is not None
+
+    def stop(self):
+        with self._lock:
+            client, self._client, self._connected = self._client, None, False
+        if client is not None:
+            client.disconnect()
+            client.loop_stop()
+
     def _on_connect(self, client, userdata, flags, reason_code, properties=None):
         code = getattr(reason_code, 'value', reason_code)
         ok = code == 0 or str(reason_code) == 'Success'
@@ -643,8 +655,12 @@ class MqttTelemetryService:
 
 def get_mqtt_status(app):
     """Full status including broker details; for administrators and operators only."""
-    service = app.extensions.get('iot_mqtt')
-    return (service or MqttTelemetryService(app.config)).status()
+    service = app.extensions.get('iot_mqtt') or MqttTelemetryService(app.config)
+    # When another process subscribes (database/run_mqtt.py), report what it wrote.
+    status_file = os.environ.get('AEGIS_MQTT_STATUS_FILE')
+    if status_file and not service.settings.enabled:
+        return read_status(status_file)
+    return service.status()
 
 
 def _public_status(app):
