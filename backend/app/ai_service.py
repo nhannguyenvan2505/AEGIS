@@ -100,6 +100,13 @@ def diagnosis_record(data):
 
 
 REJECTED = {'rejected_poor_quality', 'rejected_non_rice', 'rejected_uncertain_scope'}
+QUALITY_ISSUES = ('blur', 'too_dark', 'too_bright', 'no_clear_subject')
+
+
+def known_quality_issues(quality):
+    """The AI's quality issue codes that may be logged; the report itself is passed through unvalidated."""
+    issues = quality.get('issues') if isinstance(quality, dict) else None
+    return [issue for issue in issues if issue in QUALITY_ISSUES] if isinstance(issues, list) else []
 
 
 def validate_rejection(data, expected_request_id):

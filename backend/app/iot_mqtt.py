@@ -53,6 +53,10 @@ _SQLITE_DDL = (
 )
 
 
+# An administrator's release renames the registry entry to this prefix plus its own id.
+RELEASED_PREFIX = 'released:'
+
+
 class DeviceBoundError(Exception):
     """The device is assigned to a plot the caller does not own."""
 
@@ -62,8 +66,10 @@ class DeviceNotRegisteredError(Exception):
 
 
 def _is_reserved_uid(device_uid):
-    # 'Unknown' stands for every packet without an id, so nobody may own it.
-    return device_uid.lower() == 'unknown'
+    # 'Unknown' stands for every packet without an id, and released placeholders are
+    # not hardware, so nobody may own or feed either.
+    lowered = device_uid.lower()
+    return lowered == 'unknown' or lowered.startswith(RELEASED_PREFIX)
 
 
 def _is_plain_uid(device_uid):
@@ -258,6 +264,8 @@ def validate_esp32_payload(payload):
 def _registry_device(cur, device_uid):
     """The iot_devices row for a hardware id (MySQL). Letter case does not matter, as for
     bindings; an exact match wins, and only then is the column scanned."""
+    if _is_reserved_uid(device_uid):
+        return None
     query = '''SELECT d.device_id, f.external_id plot_id FROM iot_devices d
                LEFT JOIN farm_fields f ON f.field_id=d.field_id WHERE {} ORDER BY d.device_id LIMIT 1'''
     cur.execute(query.format('d.device_uid=%s'), (device_uid,))
@@ -406,7 +414,7 @@ def bind_device_to_plot(config, device_uid, plot_id, device_name=None, *, allowe
     """
     uid = (device_uid or '').strip()
     if not uid or len(uid) > 100 or not _is_plain_uid(uid) or _is_reserved_uid(uid):
-        raise ValueError('device_uid must be 1..100 ASCII characters and not "Unknown"')
+        raise ValueError('device_uid must be 1..100 ASCII characters, not "Unknown" or a released placeholder')
     plot_uuid = str(uuid.UUID(plot_id)) if plot_id else None
     updated_at = _utc_now()
     with _db_cursor(config) as (cur, is_mysql):
@@ -665,12 +673,12 @@ def _user_plot_ids(config):
 
 
 def _require_device_access(config, device_uid, plot_ids):
-    """A device may be used only when bound, and every plot it is assigned to is the caller's."""
-    with _db_cursor(config) as (cur, is_mysql):
-        cur.execute(_param('SELECT plot_id FROM esp32_device_bindings WHERE device_uid=%s', is_mysql), (device_uid,))
-        bound = cur.fetchone()
-        assigned = _assigned_plots(cur, is_mysql, device_uid)
-    if not (bound and bound['plot_id']) or any(plot not in plot_ids for plot in assigned):
+    """The device must be assigned, by registration or binding, to the caller's plots only."""
+    assigned = []
+    if not _is_reserved_uid(device_uid):
+        with _db_cursor(config) as (cur, is_mysql):
+            assigned = _assigned_plots(cur, is_mysql, device_uid)
+    if not assigned or any(plot not in plot_ids for plot in assigned):
         raise FarmError('device_not_found', 'Không tìm thấy thiết bị.', 404)
 
 
@@ -741,7 +749,7 @@ def enable_iot_mqtt(app):
             data = dict(data, plot_id=plot_id)
         device_uid = data.get('device_uid')
         if device_uid not in (None, ''):
-            # Only a device already bound to one of the caller's plots may be fed over HTTP.
+            # Only a device assigned to the caller's own plots may be fed over HTTP.
             _require_device_access(current_app.config, str(device_uid).strip(), _user_plot_ids(current_app.config))
         elif plot_id is None:
             raise FarmError('invalid_telemetry', 'Cần device_uid đã gán hoặc plot_id của bạn.')

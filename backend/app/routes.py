@@ -7,7 +7,7 @@ from .auth import require_auth
 from .limits import limit_detection
 from .idempotency import reserve, mark_uncertain, release
 
-from .ai_service import AIServiceError, predict_image
+from .ai_service import AIServiceError, known_quality_issues, predict_image
 from .storage import save_analysis, get_analysis, list_analyses, get_image_record
 
 api = Blueprint('api', __name__)
@@ -56,6 +56,10 @@ def detect():
             if key_hash is not None:
                 release(current_app.config, g.user['id'], key_hash)
             g.model_sha256 = result['model_sha256']
+            # The completion log is the only trace of a rejection; it is how they are counted.
+            g.diagnosis_status = result['status']
+            if result['status'] == 'rejected_poor_quality':
+                g.quality_issues = known_quality_issues(result.get('quality'))
             return jsonify(result)
         if key_hash is None:
             stored = save_analysis(payload, result, current_app.config, g.user['id'], diagnosis=diagnosis)
@@ -63,6 +67,8 @@ def detect():
             stored = save_analysis(payload, result, current_app.config, g.user['id'], key_hash=key_hash,
                                    diagnosis=diagnosis)
         g.analysis_id, g.model_sha256 = stored['analysis_id'], stored['model_sha256']
+        if diagnosis is not None:  # a validated /v2 status; replays do not log it again
+            g.diagnosis_status = diagnosis['diagnosis_status']
         if result.get('ai_status'):
             stored = {**stored, 'diagnosis': {'status': result['ai_status'], 'is_rice': result.get('is_rice'), 'message': result.get('ai_message')}}
         return jsonify(stored)

@@ -29,6 +29,25 @@ def find(identifier):
     return db.one('SELECT device_id, field_id, sensor_type, status FROM iot_devices WHERE external_id=%s', (identifier,))
 
 
+def registration(identifier, lock=False):
+    return db.one('''SELECT d.device_id, d.device_uid, p.external_id plot_id FROM iot_devices d
+                     LEFT JOIN farm_fields p ON p.field_id=d.field_id WHERE d.external_id=%s'''
+                  + (' FOR UPDATE' if lock else ''), (identifier,))
+
+
+def lock_binding(device_uid):
+    # The row a claim locks first: a claim running now either finishes before the
+    # release or sees that the device is no longer registered.
+    db.execute('''INSERT INTO esp32_device_bindings(device_uid, plot_id, updated_at)
+                  VALUES (%s,NULL,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE device_uid=device_uid''', (device_uid,))
+
+
+def release(device_id, device_uid, placeholder):
+    db.execute("UPDATE iot_devices SET device_uid=%s, sensor_type=NULL, status='inactive' WHERE device_id=%s",
+               (placeholder, device_id))
+    db.execute('DELETE FROM esp32_device_bindings WHERE device_uid=%s', (device_uid,))
+
+
 def season_context(season_external_id):
     return db.one('SELECT crop_cycle_id, field_id, user_id FROM crop_cycles WHERE external_id=%s', (season_external_id,))
 

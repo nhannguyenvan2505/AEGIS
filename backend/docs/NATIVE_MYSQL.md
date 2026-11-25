@@ -16,11 +16,14 @@ Mặc định tìm `C:/Program Files/MySQL/MySQL Server 9.3/bin/mysqld.exe`; có
 lần sau đọc cổng từ `backend/database/.env`. `--port` chỉ dùng khi cấu hình khớp.
 Nếu cổng có dịch vụ khác, script dừng; không sửa dịch vụ đó hoặc xóa datadir.
 
-Password root/application được sinh ngẫu nhiên trong `.env` đã được Git bỏ qua;
-không in ra terminal. Schema mới tự áp dụng migrations 001–005. Instance đã có
-dữ liệu chỉ áp dụng migration còn thiếu; marker `running` chặn replay DDL dở dang.
-Trước khi nâng một kho đang có dữ liệu, lưu backup riêng; không xóa marker lỗi để
-thử lại khi chưa kiểm tra trạng thái schema.
+Password root/application được sinh ngẫu nhiên trong `.env` đã được Git bỏ qua; không in ra terminal.
+
+**Từ 25/11/2026:** script này chỉ khởi tạo khi database **còn trống** (tạo tài khoản, cấp quyền, áp mọi migration;
+nếu đã tách tài khoản migration thì chỉ tài khoản đó được cấp quyền đổi schema). Với database **đã có bảng**, script
+chỉ bật server, **không migrate, không đụng tài khoản**, và liệt kê migration còn thiếu. Nâng cấp là thao tác riêng:
+backup bằng `backup_deploy.py`, rồi chạy `migrate.py` (xem [database README](../database/README.md)). Marker
+`running` chặn replay DDL dở dang; không xoá marker lỗi để thử lại khi chưa kiểm schema. Để bật server hằng ngày,
+dùng `native_db.py start`.
 
 ## Chuyển dữ liệu SQLite cũ
 
