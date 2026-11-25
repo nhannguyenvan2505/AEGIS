@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS esp32_telemetry_readings (
   alert_level VARCHAR(20) NOT NULL DEFAULT 'safe',
   alert_disease VARCHAR(50) NULL,
   alert_message TEXT NULL,
-  topic VARCHAR(200) NOT NULL DEFAULT 'nckh_aegis_c1se21/farm/sensors',
+  topic VARCHAR(200) NOT NULL DEFAULT '',
   source VARCHAR(30) NOT NULL DEFAULT 'esp32_mqtt',
   observed_at VARCHAR(40) NOT NULL,
   created_at VARCHAR(40) NOT NULL,

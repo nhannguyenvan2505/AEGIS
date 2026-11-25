@@ -139,7 +139,7 @@ khôi phục: [backend/database/README.md](backend/database/README.md).
 
 Khi thấy dòng `* Running on http://127.0.0.1:5000` là Backend đã chạy:
 - Phục vụ API cho Mobile (`/api/...`) và Web Admin (`/api/admin/...`).
-- Tự động kết nối MQTT tới `broker.hivemq.com:1883` (topic `nckh_aegis_c1se21/farm/sensors`) để nhận nhiệt độ & độ ẩm thực tế từ ESP32, lưu vào MySQL và đánh giá cảnh báo bệnh lúa.
+- MQTT **tắt mặc định**. Muốn nhận nhiệt độ và độ ẩm từ ESP32, đặt các biến `AEGIS_MQTT_*` trước khi chạy Backend theo [hướng dẫn MQTT](docs/IOT_MQTT_SETUP.md).
 
 *(Nếu cần chạy thêm AI nhận diện ảnh ở cổng `8000`, mở thêm terminal riêng chạy `.\ai_service\.venv\Scripts\python.exe -u -X utf8 -B ai_service\api\app.py` — yêu cầu đã được cấp checkpoint YOLO V4 và cài `ai_service\.venv` riêng.)*
 
@@ -203,11 +203,10 @@ Mở trình duyệt vào **http://127.0.0.1:5173** và đăng nhập bằng tài
 
 ## Phần 3: Kiểm tra dữ liệu thực tế từ ESP32 (MQTT)
 
-- Khi Backend ở **Terminal 1** đang chạy, hệ thống tự lắng nghe ESP32 qua:
-  - Broker: `broker.hivemq.com:1883`
-  - Topic: `nckh_aegis_c1se21/farm/sensors`
-  - Dữ liệu JSON mẫu từ ESP32: `{"device_uid": "ESP32-SHT30-01", "temperature": 25.4, "humidity": 87.5}`
-- Ngay khi có gói tin gửi lên, Backend tự lưu vào MySQL và đánh giá nguy cơ bệnh lúa (Đạo ôn, Khô vằn, Đốm nâu).
+- Trước đó cấu hình broker riêng, topic và tài khoản qua biến môi trường, đặt `AEGIS_MQTT_ENABLED=1` ở Terminal 1: xem [hướng dẫn MQTT](docs/IOT_MQTT_SETUP.md). Giá trị thật không commit vào repo.
+- Gán thiết bị vào thửa trước khi thu số đo; số đo gửi trước khi gán chỉ admin xem được.
+- Dữ liệu JSON mẫu từ ESP32 (`device_uid` lấy từ topic): `{"temperature": 25.4, "humidity": 87.5}`
+- Khi có gói tin hợp lệ, Backend lưu vào MySQL và đánh giá nguy cơ bệnh lúa (Đạo ôn, Khô vằn, Đốm nâu).
 - **App Mobile** (Trang chủ & Dự báo) và **Web Admin** (`/devices`) tự động cập nhật số đo mới sau mỗi **5 giây**.
 - Nếu muốn xem log chi tiết từng gói tin ESP32 ra màn hình terminal riêng để debug, có thể chạy thêm:
   ```powershell

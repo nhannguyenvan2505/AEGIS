@@ -15,12 +15,10 @@ from flask import Blueprint, current_app, g, jsonify, request
 from .auth import require_auth
 from .farm import FarmError, body, owned
 from .iot_alerts import raise_reading_alerts
+from .mqtt_settings import identify_device, load_mqtt_settings, secure_client
 from .repositories import repository
 from .storage import connect
 
-DEFAULT_MQTT_BROKER = 'broker.hivemq.com'
-DEFAULT_MQTT_PORT = 1883
-DEFAULT_MQTT_TOPIC = 'nckh_aegis_c1se21/farm/sensors'
 
 _SCHEMA_LOCK = threading.Lock()
 _INITIALIZED_TARGETS = set()
@@ -36,7 +34,7 @@ _SQLITE_DDL = (
         alert_level TEXT NOT NULL DEFAULT 'safe',
         alert_disease TEXT,
         alert_message TEXT,
-        topic TEXT NOT NULL DEFAULT 'nckh_aegis_c1se21/farm/sensors',
+        topic TEXT NOT NULL DEFAULT '',
         source TEXT NOT NULL DEFAULT 'esp32_mqtt',
         observed_at TEXT NOT NULL,
         created_at TEXT NOT NULL
@@ -290,7 +288,7 @@ def _resolve_plot_for_device(cur, is_mysql, device_uid):
     return None
 
 
-def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp32_mqtt',
+def save_esp32_reading(config, payload, *, topic='', source='esp32_mqtt',
                        trust_plot_id=False):
     """Validate, evaluate and persist a single ESP32 temperature/humidity reading.
 
@@ -550,14 +548,11 @@ def query_esp32_telemetry(config, *, plot_ids, plot_id=None, device_uid=None, li
 
 
 class MqttTelemetryService:
-    """Background paho-mqtt subscriber bridging HiveMQ ESP32 payloads into AEGIS storage."""
+    """Background paho-mqtt subscriber bridging ESP32 payloads into AEGIS storage."""
 
-    def __init__(self, config, *, broker=None, port=None, topic=None):
+    def __init__(self, config):
         self.config = dict(config)
-        self.broker = broker or os.environ.get('AEGIS_MQTT_BROKER', DEFAULT_MQTT_BROKER)
-        self.port = int(port or os.environ.get('AEGIS_MQTT_PORT', DEFAULT_MQTT_PORT))
-        self.topic = topic or os.environ.get('AEGIS_MQTT_TOPIC', DEFAULT_MQTT_TOPIC)
-        self.enabled = os.environ.get('AEGIS_MQTT_ENABLED', '1') == '1'
+        self.settings = load_mqtt_settings(os.environ)
         self._lock = threading.Lock()
         self._client = None
         self._connected = False
@@ -566,10 +561,15 @@ class MqttTelemetryService:
         self._last_error = None
 
     def start(self):
-        if not self.enabled:
+        settings = self.settings
+        if not settings.enabled:
             return
         with self._lock:
             if self._client is not None:
+                return
+            if settings.error:
+                self._last_error = f'MQTT configuration refused: {settings.error}'
+                _LOGGER.warning('MQTT listener disabled: %s', self._last_error)
                 return
             try:
                 import paho.mqtt.client as mqtt
@@ -587,11 +587,13 @@ class MqttTelemetryService:
             client.on_connect = self._on_connect
             client.on_disconnect = self._on_disconnect
             client.on_message = self._on_message
-            self._client = client
             try:
-                client.connect_async(self.broker, self.port, 60)
+                secure_client(client, settings)
+                self._client = client
+                client.connect_async(settings.broker, settings.port, 60)
                 client.loop_start()
-                _LOGGER.info('MQTT listener starting for %s:%s topic=%s', self.broker, self.port, self.topic)
+                _LOGGER.info('MQTT listener starting for %s:%s topic=%s', settings.broker, settings.port,
+                             settings.topic)
             except Exception as exc:
                 self._last_error = str(exc)
                 _LOGGER.warning('MQTT listener failed to start: %s', exc)
@@ -606,7 +608,7 @@ class MqttTelemetryService:
             else:
                 self._last_error = f'MQTT connect failed ({reason_code})'
         if ok:
-            client.subscribe(self.topic)
+            client.subscribe(self.settings.topic)
 
     def _on_disconnect(self, client, userdata, *args):
         with self._lock:
@@ -614,7 +616,7 @@ class MqttTelemetryService:
 
     def _on_message(self, client, userdata, msg):
         try:
-            payload = json.loads(msg.payload.decode('utf-8'))
+            payload = identify_device(self.settings.topic, msg.topic, json.loads(msg.payload.decode('utf-8')))
             saved = save_esp32_reading(self.config, payload, topic=msg.topic, source='esp32_mqtt')
             with self._lock:
                 self._received_count += 1
@@ -628,11 +630,11 @@ class MqttTelemetryService:
     def status(self):
         with self._lock:
             return {
-                'enabled': self.enabled,
+                'enabled': self.settings.enabled,
                 'connected': self._connected,
-                'broker': self.broker,
-                'port': self.port,
-                'topic': self.topic,
+                'broker': self.settings.broker,
+                'port': self.settings.port,
+                'topic': self.settings.topic,
                 'received_count': self._received_count,
                 'last_message_at': self._last_message_at,
                 'last_error': self._last_error,
@@ -640,19 +642,22 @@ class MqttTelemetryService:
 
 
 def get_mqtt_status(app):
+    """Full status including broker details; for administrators and operators only."""
     service = app.extensions.get('iot_mqtt')
-    if service is not None:
-        return service.status()
-    return {
-        'enabled': False,
-        'connected': False,
-        'broker': os.environ.get('AEGIS_MQTT_BROKER', DEFAULT_MQTT_BROKER),
-        'port': int(os.environ.get('AEGIS_MQTT_PORT', DEFAULT_MQTT_PORT)),
-        'topic': os.environ.get('AEGIS_MQTT_TOPIC', DEFAULT_MQTT_TOPIC),
-        'received_count': 0,
-        'last_message_at': None,
-        'last_error': None,
-    }
+    return (service or MqttTelemetryService(app.config)).status()
+
+
+def _public_status(app):
+    status = get_mqtt_status(app)
+    return {key: status[key] for key in ('enabled', 'connected', 'received_count', 'last_message_at')}
+
+
+def _public_reading(item):
+    return None if item is None else {key: value for key, value in item.items() if key != 'topic'}
+
+
+def _public_telemetry(data):
+    return dict(data, item=_public_reading(data['item']), items=[_public_reading(i) for i in data['items']])
 
 
 def _parse_limit():
@@ -716,7 +721,7 @@ def enable_iot_mqtt(app):
                 owned(db, 'plots', plot_id)
         data = query_esp32_telemetry(current_app.config, plot_ids=_user_plot_ids(current_app.config),
                                      plot_id=plot_id, device_uid=device_uid, limit=_parse_limit())
-        return jsonify(success=True, mqtt=get_mqtt_status(current_app), **data)
+        return jsonify(success=True, mqtt=_public_status(current_app), **_public_telemetry(data))
 
     @bp.get('/readings')
     @require_auth
@@ -732,7 +737,7 @@ def enable_iot_mqtt(app):
                 owned(db, 'plots', plot_id)
         data = query_esp32_telemetry(current_app.config, plot_ids=_user_plot_ids(current_app.config),
                                      plot_id=plot_id, device_uid=device_uid, limit=_parse_limit())
-        return jsonify(success=True, mqtt=get_mqtt_status(current_app), **data)
+        return jsonify(success=True, mqtt=_public_status(current_app), **_public_telemetry(data))
 
     @bp.post('/ingest')
     @require_auth
@@ -757,13 +762,12 @@ def enable_iot_mqtt(app):
             saved = save_esp32_reading(
                 current_app.config,
                 data,
-                topic=get_mqtt_status(current_app)['topic'],
                 source='esp32_http',
                 trust_plot_id=True,  # ownership of plot_id was checked above
             )
         except ValueError as exc:
             raise FarmError('invalid_telemetry', str(exc))
-        return jsonify(success=True, item=saved), 201
+        return jsonify(success=True, item=_public_reading(saved)), 201
 
     @bp.put('/bindings')
     @require_auth
