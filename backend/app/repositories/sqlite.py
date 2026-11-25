@@ -60,12 +60,18 @@ class SQLiteRepository:
             self.db.execute('INSERT INTO rate_limit_buckets VALUES (?,?,?,?)', (key,start,1,expires))
         return True, 0
 
-    def reserve(self, user_id, key_hash, payload_hash):
+    def reserve(self, user_id, key_hash, payload_hash, now, running_ttl):
         self.begin(True)
         row = self.db.execute('SELECT * FROM inference_requests WHERE user_id=? AND key_hash=?', (user_id,key_hash)).fetchone()
         if row:
-            return ('conflict' if row['payload_hash'] != payload_hash else row['state']),row['analysis_id']
-        self.db.execute("INSERT INTO inference_requests VALUES (?,?,?,'running',NULL)", (user_id,key_hash,payload_hash))
+            if row['payload_hash'] != payload_hash:
+                return 'conflict',row['analysis_id']
+            if row['state'] == 'running' and row['created_at'] + running_ttl <= now:
+                self.mark_uncertain(user_id, key_hash)  # abandoned work; never re-run it
+                return 'uncertain',None
+            return row['state'],row['analysis_id']
+        self.db.execute("""INSERT INTO inference_requests(user_id,key_hash,payload_hash,state,analysis_id,created_at)
+            VALUES (?,?,?,'running',NULL,?)""", (user_id,key_hash,payload_hash,now))
         return 'new',None
 
     def release(self, user_id, key_hash):

@@ -4,6 +4,7 @@ from datetime import timedelta
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -235,6 +236,51 @@ db.grantRolesToUser('aegis_app',[{{role:'readWrite',db:'{cls.mongo_database}'}}]
                     UPLOAD_DIR=self.config['UPLOAD_DIR']))
                 self.assertEqual(pilot.config['STORAGE_BACKEND'],'mysql')
                 self.assertEqual(pilot.test_client().get('/api/farm/plots',headers=self.headers[0]).status_code,200)
+
+    @unittest.skipUnless(shutil.which('mongodump') or sys.platform=='win32','needs the MongoDB database tools')
+    def test_deployment_backup_includes_mongo(self):
+        sys.path.insert(0,str(DATABASE))
+        from backup_deploy import BackupError,backup,restore
+        from pymongo import MongoClient
+        _,season,_=self.chain()
+        body=dict(client_stream_id=str(uuid.uuid4()),name='Backup instrument',source='synthetic',method='manual_reading',
+                  instrument='Synthetic only',reference='FIXTURE',nominal_interval_seconds=None)
+        stream=self.post('/seasons/'+season['id']+'/environment-streams',body).json['item']['id']
+        sample=dict(client_sample_id=str(uuid.uuid4()),observed_at=self.end.isoformat(),air_temperature_c=26,
+                    relative_humidity_pct=90,leaf_wet=True,reported_quality='nominal',reference='TEST')
+        self.assertEqual(self.post('/environment-streams/'+stream+'/samples',dict(records=[sample])).status_code,201)
+        self.assertEqual(deliver(self.app.config,limit=1000)['failed'],0)
+        Path(self.config['UPLOAD_DIR']).mkdir(parents=True,exist_ok=True)
+        with repository(self.config) as repo:
+            for row in repo.all('SELECT i.image_url FROM crop_images i JOIN analysis_runs a ON a.image_id=i.image_id'):
+                (Path(self.config['UPLOAD_DIR'])/row['image_url']).write_bytes(b'earlier-test')
+        work=Path(self.temp.name)/'drill'
+        record=backup(work/'backup',self.config['UPLOAD_DIR'],mysql=dict(self.mysql),mongo=dict(self.mongo))
+        self.assertEqual(record['mongo_database'],self.mongo_database)
+        self.assertIn('mongo.archive.gz',record['files'])
+        mysql_target='aegis_test_'+uuid.uuid4().hex
+        mongo_target='aegis_test_'+uuid.uuid4().hex
+        self.root_sql(f"CREATE DATABASE `{mysql_target}` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; "
+                      f"GRANT ALL ON `{mysql_target}`.* TO '{self.mysql['user']}'@'{self.grant_host}';")
+        self.addCleanup(self.root_sql,f"DROP DATABASE `{mysql_target}`; REVOKE ALL ON `{mysql_target}`.* FROM '{self.mysql['user']}'@'{self.grant_host}';")
+        def mongo_shell(script):
+            result=subprocess.run(self.mongo_root,input=script,text=True,capture_output=True,timeout=60)
+            self.assertEqual(result.returncode,0,result.stdout)
+        mongo_shell(f"db.grantRolesToUser('aegis_app',[{{role:'readWrite',db:'{mongo_target}'}}]);")
+        self.addCleanup(mongo_shell,f"db.getSiblingDB('{mongo_target}').dropDatabase();"
+                        f"db.revokeRolesFromUser('aegis_app',[{{role:'readWrite',db:'{mongo_target}'}}]);")
+        result=restore(work/'backup',mysql=dict(self.mysql,database=mysql_target),uploads=work/'uploads',
+                       mongo=dict(self.mongo,database=mongo_target))
+        self.assertEqual(result['mongo_database'],mongo_target)
+        options=dict(self.mongo);options.pop('database')
+        with MongoClient(**options,serverSelectionTimeoutMS=5000) as client:
+            for name in client[self.mongo_database].list_collection_names():
+                source=sorted(str(d) for d in client[self.mongo_database][name].find())
+                self.assertEqual(sorted(str(d) for d in client[mongo_target][name].find()),source,name)
+            self.assertGreaterEqual(client[mongo_target].telemetry_readings.count_documents({}),1)
+        with self.assertRaisesRegex(BackupError,'must be empty'):
+            restore(work/'backup',mysql=dict(self.mysql,database=mysql_target),uploads=work/'again',
+                    mongo=dict(self.mongo,database=mongo_target))
 
     def test_sqlite_migration_repeat_reconciles_without_overwriting(self):
         from app import create_app

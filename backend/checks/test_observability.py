@@ -131,7 +131,7 @@ class MigrationTests(unittest.TestCase):
                 self.assertEqual(tuple(db.execute("SELECT * FROM analyses WHERE id='owned-id'").fetchone())[:9],owned)
                 self.assertEqual(tuple(db.execute('SELECT * FROM detections').fetchone()),detection)
                 self.assertEqual(db.execute("SELECT password_hash FROM users WHERE id='owner-id'").fetchone()[0],'legacy-hash')
-                self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')},{1,2,3,4,5,6,7})
+                self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')},{1,2,3,4,5,6,7,8})
                 user=db.execute("SELECT role,status FROM users WHERE id='owner-id'").fetchone()
                 self.assertEqual(tuple(user),('farmer','active'))
 

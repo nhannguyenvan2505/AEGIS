@@ -14,6 +14,8 @@ STATUSES = ('online', 'offline', 'maintenance', 'inactive')
 SOURCES = ('mock', 'synthetic', 'field', 'bench', 'legacy')
 FILTERS = ('sensor_type', 'status', 'source', 'owner_id', 'plot_id')
 CODE = re.compile(r'[A-Za-z0-9._-]{1,64}')
+HARDWARE_UID = re.compile(r'[\x21-\x7e](?:[\x20-\x7e]{0,98}[\x21-\x7e])?')
+RESERVED_PREFIXES = ('mock:', 'raw:')
 
 
 def _simulated(row):
@@ -62,15 +64,33 @@ def create_device():
         raise ApiError('invalid_field', 'protocol hoặc source không hợp lệ.', 422)
     if repo.code_exists(season['user_id'], code):
         raise ApiError('code_exists', 'device_code đã tồn tại cho người dùng này.', 409)
+    hardware_uid = _hardware_uid(data.get('device_uid'), season)
     if repo.sensor_taken(season['field_id'], sensor_type):
         raise ApiError('sensor_exists', 'Ruộng này đã có thiết bị loại ' + sensor_type + '.', 409)
     external = str(uuid.uuid4())
-    repo.create(dict(external_id=external, user_id=season['user_id'], field_id=season['field_id'],
+    repo.create(dict(external_id=external, device_uid=hardware_uid or external, user_id=season['user_id'], field_id=season['field_id'],
                      crop_cycle_id=season['crop_cycle_id'], device_code=code, device_name=data.get('device_name'), sensor_type=sensor_type,
                      protocol=protocol, firmware_version=data.get('firmware_version'), source=source,
                      created_at=datetime.now(timezone.utc).isoformat(timespec='seconds')))
-    audit('device.create', 'device', external, {'device_code': code, 'sensor_type': sensor_type, 'source': source})
+    audit('device.create', 'device', external, {'device_code': code, 'sensor_type': sensor_type, 'source': source,
+                                               'device_uid': hardware_uid})
     return ok(id=external), 201
+
+
+def _hardware_uid(value, season):
+    """The id the physical device sends. Registering it lets the field's owner use it."""
+    if value is None or value == '':
+        return None
+    uid = value.strip() if isinstance(value, str) else ''
+    if not HARDWARE_UID.fullmatch(uid) or uid.lower() == 'unknown' or uid.lower().startswith(RESERVED_PREFIXES):
+        raise ApiError('invalid_device_uid',
+                       'device_uid: 1–100 ký tự ASCII, không dùng "Unknown", tiền tố "mock:" hoặc "raw:".', 422)
+    if repo.uid_exists(uid):
+        raise ApiError('device_uid_exists', 'device_uid đã được đăng ký.', 409)
+    if repo.uid_bound_elsewhere(uid, season['field_id']):
+        raise ApiError('device_bound_elsewhere',
+                       'device_uid đang được gán cho ruộng khác; gỡ hoặc đổi binding trước.', 409)
+    return uid
 
 
 @bp.put('/<identifier>')

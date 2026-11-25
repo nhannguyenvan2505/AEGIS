@@ -289,6 +289,8 @@ Base URL in development: `http://127.0.0.1:5000`. All `/api` endpoints exchange 
 | POST | `/api/iot/ingest` | Bearer JWT | `app.iot_mqtt` |  |
 | GET | `/api/iot/latest` | Bearer JWT | `app.iot_mqtt` |  |
 | GET | `/api/iot/readings` | Bearer JWT | `app.iot_mqtt` |  |
+| DELETE | `/api/notifications/push-tokens` | Bearer JWT | `app.push` | Xem IOT_DEVICES_ALERTS_PUSH.md |
+| POST | `/api/notifications/push-tokens` | Bearer JWT | `app.push` | Xem IOT_DEVICES_ALERTS_PUSH.md |
 
 ## Mobile (1)
 
