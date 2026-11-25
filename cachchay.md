@@ -113,10 +113,23 @@ Mỗi dịch vụ chạy trong **1 cửa sổ PowerShell riêng** (đều mở t
 ### Bước 1. Bật MySQL nội bộ (chỉ cần chạy 1 lần mỗi khi bật lại máy)
 
 ```powershell
-& .\backend\.venv\Scripts\python.exe backend\database\setup_native_mysql.py --mysqld "C:\Program Files\MySQL\MySQL Server 9.6\bin\mysqld.exe"
+& .\backend\.venv\Scripts\python.exe backend\database\native_db.py start --only mysql
 ```
 
-*(Nếu máy cài MySQL Server 9.3 thì không cần `--mysqld ...`.)*
+Lệnh này chỉ bật server, **không đổi schema hay tài khoản**. Nó tự tìm `mysqld.exe` bản mới nhất trong
+`C:\Program Files\MySQL\`. Nếu đã khởi tạo MongoDB, bỏ `--only mysql` để bật cả hai.
+
+**Sau khi cập nhật code**, nếu backend báo `MySQL migrations [...] are not applied`: tắt backend, **backup trước**
+(thêm `--no-mongo` nếu không chạy MongoDB; đặt thư mục backup ngoài repo), rồi mới chạy migration. Chi tiết và cách
+khôi phục: [backend/database/README.md](backend/database/README.md).
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend\database\backup_deploy.py backup --out D:\aegis-backups\truoc-nang-cap --uploads backend\mysql-instance\uploads --no-mongo
+```
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend\database\migrate.py
+```
 
 ### Bước 2. Terminal 1 — Chạy Backend (cổng `5000`)
 
@@ -210,6 +223,7 @@ Mở trình duyệt vào **http://127.0.0.1:5173** và đăng nhập bằng tài
 |---|---|
 | `fatal: not a git repository` | Bạn đang đứng ở thư mục cha (`D:\Demo Caps`). Chạy `cd "D:\Demo Caps\AEGIS"` trước. |
 | `setup_native_mysql.py` báo lỗi không thấy `mysqld.exe` | Máy cài MySQL phiên bản khác `9.3` (ví dụ `9.6`). Dùng cờ `--mysqld "C:\Program Files\MySQL\MySQL Server 9.6\bin\mysqld.exe"`. |
+| Backend báo `MySQL migrations [...] are not applied` | Database đang cũ hơn code. Làm theo mục "Sau khi cập nhật code" ở Bước 1 của Phần 2: backup rồi chạy `migrate.py`. |
 | `Can't connect to MySQL server on '127.0.0.1'` | Chưa bật MySQL nội bộ. Chạy lại Bước 1 của Phần 2 trước khi chạy Backend. |
 | Bấm `a` trong Expo báo lỗi `cannot connect to 127.0.0.1:5554` | Do đang dùng **LDPlayer** (không phải Android Studio AVD). Không bấm `a`; hãy dùng `adb reverse` + lệnh `adb shell am start -a android.intent.action.VIEW -d "exp://127.0.0.1:8081" host.exp.exponent`. |
 | Mở Expo Go báo lỗi không tương thích SDK | Cài sai phiên bản Expo Go. Cần đúng **Expo Go SDK 57**. |
