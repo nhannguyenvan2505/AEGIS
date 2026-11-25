@@ -120,7 +120,7 @@ class FarmHierarchyTests(unittest.TestCase):
         with connect(self.config) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM farm_holdings').fetchone()[0], 1)
             self.assertEqual(db.execute('SELECT COUNT(*) FROM farm_plot_memberships').fetchone()[0], 1)
-            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5,6,7})
+            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5,6,7,8})
             self.assertEqual(db.execute('SELECT version FROM farm_hierarchy_meta WHERE id=1').fetchone()[0], 1)
             self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
 
@@ -135,7 +135,7 @@ class FarmHierarchyTests(unittest.TestCase):
         result = restarted.get('/api/farm/farms/'+farm['id']+'/plots', headers=self.headers[0])
         self.assertEqual(result.json['items'][0], plot)
         with connect(self.config) as db:
-            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5,6,7})
+            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5,6,7,8})
             self.assertEqual(db.execute('SELECT version FROM farm_hierarchy_meta WHERE id=1').fetchone()[0], 1)
             self.assertEqual(db.execute('SELECT name FROM schema_migrations WHERE version=6').fetchone()[0], 'user_roles_and_status')
 

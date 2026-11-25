@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 
-def settings():
+def _reader():
     path = Path(__file__).resolve().parents[1]/'database'/'.env'
     values = {}
     if path.exists():
@@ -13,6 +13,25 @@ def settings():
                 if separator: values[key.strip()] = value.strip()
     def get(key, default=None):
         return os.environ.get(key, values.get(key, default))
+    return get
+
+
+def migration_settings():
+    """MySQL options for schema changes and backups.
+
+    AEGIS_MYSQL_MIGRATION_USER / _PASSWORD let the running backend use an account
+    without schema privileges; unset, migrations use the application account.
+    """
+    options = dict(settings()['MYSQL'])
+    get = _reader()
+    user = get('AEGIS_MYSQL_MIGRATION_USER')
+    if user:
+        options.update(user=user, password=get('AEGIS_MYSQL_MIGRATION_PASSWORD', ''))
+    return options
+
+
+def settings():
+    get = _reader()
     return dict(
         MONGO_DELIVERY_ENABLED=get('AEGIS_MONGO_DELIVERY_ENABLED','1')=='1',
         MYSQL=dict(host=get('AEGIS_MYSQL_HOST','127.0.0.1'),port=int(get('AEGIS_MYSQL_PORT','3307')),

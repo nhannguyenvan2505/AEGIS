@@ -45,6 +45,8 @@ def create_app(config=None):
         BACKEND_MAX_INFLIGHT=2,
         RATE_MAX_BUCKETS=10000,
         FARM_WRITE_LIMIT=60,
+        # A reservation still 'running' after this is reported 'uncertain'; AI is never re-run for it.
+        IDEMPOTENCY_RUNNING_TTL_SECONDS=int(os.environ.get('AEGIS_IDEMPOTENCY_RUNNING_TTL', '300')),
     )
     for key in ['RATE_WINDOW_SECONDS','LOGIN_IP_LIMIT','LOGIN_ACCOUNT_LIMIT','REGISTER_IP_LIMIT',
                 'DETECT_USER_LIMIT','BACKEND_MAX_INFLIGHT','RATE_MAX_BUCKETS','FARM_WRITE_LIMIT']:
@@ -65,6 +67,8 @@ def create_app(config=None):
     app.register_blueprint(admin)
     register_admin_cli(app)
     app.register_blueprint(farm)
+    from .push import notifications
+    app.register_blueprint(notifications)
     from .admin import register_admin
     register_admin(app)
     from .mobile_contract import enable_mobile_contract

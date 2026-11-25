@@ -213,7 +213,8 @@ def migrate_core(repo,path,data,uploads,report):
         expected=dict(row,user_id=user,analysis_id=identifier)
         old=repo.one('SELECT * FROM inference_requests WHERE user_id=%s AND key_hash=%s',(user,row['key_hash']))
         if old: assert_equal(old,expected,'inference reservations')
-        else: repo.execute('INSERT INTO inference_requests VALUES (%s,%s,%s,%s,%s)',tuple(expected[k] for k in ['user_id','key_hash','payload_hash','state','analysis_id']))
+        else: repo.execute('INSERT INTO inference_requests(user_id,key_hash,payload_hash,state,analysis_id,created_at) VALUES (%s,%s,%s,%s,%s,%s)',
+                           (*(expected[k] for k in ['user_id','key_hash','payload_hash','state','analysis_id']),expected.get('created_at',0)))
     # Quota is process/runtime state; preserve its source snapshot for audit rather
     # than reviving stale windows from multiple stores in the shared limiter.
     known={'users','sessions','analyses','detections','inference_requests','farm_plots','farm_seasons','farm_devices',

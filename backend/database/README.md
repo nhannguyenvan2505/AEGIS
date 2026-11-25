@@ -32,7 +32,7 @@ Bootstrap chỉ chạy khi volume rỗng. `docker compose stop` dừng service; 
 
 ## Nâng cấp database đã có (migration đánh số)
 
-Backend chỉ khởi động khi mọi migration 2–9 đã `complete`. Sau khi kéo code mới, **backup trước** (DDL
+Backend chỉ khởi động khi mọi migration 2–12 đã `complete`. Sau khi kéo code mới, **backup trước** (DDL
 MySQL tự commit), dừng backend rồi chạy:
 
 ```powershell
@@ -52,6 +52,10 @@ Dùng được cho cả MySQL native và Docker (cấu hình lấy từ environm
 | 008 | Lưu `diagnosis_status`, `rice_probability`, gatekeeper (method/version/SHA-256), `uncertain_regions` trong `analysis_runs`. NULL = không rõ (bản ghi cũ, API v1) |
 | 009 | Chống ghi trùng gói ESP32 (`dedup_token`), đổi cột thời gian sang `DATETIME(6)` UTC, index cho retention. Không xoá bản ghi cũ, kể cả bản trùng |
 
+| 010 | Thời điểm tạo cho `inference_requests`: reservation `running` quá 5 phút chuyển `uncertain`, không chạy lại AI |
+| 011 | Cảnh báo ESP32 ghi vào `alerts` (`source_key` cho thời gian chờ) |
+| 012 | `push_tokens`, `push_deliveries`, hàng đợi push trong `notifications` |
+
 Nếu một migration dừng ở trạng thái `running`, bộ chạy từ chối chạy tiếp: khôi phục từ backup hoặc kiểm schema
 bằng tay. Quay về code cũ sau 009 cần khôi phục backup (code cũ đọc cột thời gian dạng chuỗi).
 
@@ -64,12 +68,44 @@ theo `created_at` (giờ server), binding thiết bị được giữ nguyên.
 & backend\.venv\Scripts\python.exe backend/database/purge_iot_telemetry.py --older-than-days 180
 ```
 
-### Giới hạn của backup/restore hiện có
+### Tài khoản runtime khi deploy
+
+Backend core chỉ cần đọc/ghi dữ liệu. Chạy migration bằng tài khoản có quyền đổi schema, rồi tạo tài khoản
+runtime (mật khẩu lấy từ environment, không truyền trên dòng lệnh):
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/create_runtime_user.py --user aegis_runtime --host localhost
+```
+
+Sau đó đặt `AEGIS_MYSQL_USER`/`AEGIS_MYSQL_PASSWORD` là tài khoản runtime, và
+`AEGIS_MYSQL_MIGRATION_USER`/`_PASSWORD` cho `migrate.py` và backup. Pilot tạo bảng ở lần khởi tạo kho đầu tiên,
+nên khởi tạo bằng tài khoản migration trước khi chuyển.
+
+### Backup và khôi phục bản deploy
+
+`backup_deploy.py` dùng client tool (`mysqldump`, `mysql`, và `mongodump`/`mongorestore` nếu có Mongo), không cần
+Docker. Tài khoản chạy cần quyền đọc view (dùng tài khoản migration).
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/backup_deploy.py backup --out D:\aegis-backups\2026-11-26 --uploads backend\mysql-instance\uploads --no-mongo
+```
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/backup_deploy.py restore --from D:\aegis-backups\2026-11-26 --database aegis_restore --uploads D:\aegis-restore\uploads
+```
+
+- Bỏ `--no-mongo` để gồm MongoDB; khi khôi phục thêm `--mongo-database <database rỗng>`.
+- `restore` chỉ ghi vào database và thư mục **rỗng**, kiểm version schema, đủ ảnh được tham chiếu và view dùng
+  được. Đạt rồi mới trỏ backend sang đích mới.
+- Backup chứa dữ liệu cá nhân và password hash: lưu mã hoá, ngoài repo.
+- **Không gồm secret.** Giữ riêng `AEGIS_JWT_SECRET` (hoặc file `jwt-signing.key`); mất khoá thì mọi người dùng
+  phải đăng nhập lại. Không gồm kho pilot dạng file; kho pilot hybrid trong MySQL nằm trong dump.
+
+### Công cụ backup hybrid cũ
 
 `app/hybrid_backup.py` và `verify_restore.py` chỉ chạy với **Docker Compose**, database tên `aegis`, và cần một
-kho pilot hybrid. Chưa có công cụ cho MySQL/MongoDB native hay cho deploy chỉ có core. `verify_restore.py` khôi phục
-vào database dùng một lần để đối chiếu; nó kiểm hash file ảnh trong bản backup chứ không phải quy trình khôi phục
-production.
+kho pilot hybrid. `verify_restore.py` khôi phục vào database dùng một lần để đối chiếu; nó kiểm hash file ảnh trong
+bản backup chứ không phải quy trình khôi phục production.
 
 ## Quy tắc schema
 
@@ -97,7 +133,7 @@ Set-Location D:\AEGIS
 
 Volume mới chạy tự động cả bốn SQL script trong bootstrap. Các script nâng cấp kiểm tra marker và bỏ qua migration đã hoàn tất. Launcher serve_mysql chạy ở `http://127.0.0.1:5001`; run.py/serve_mobile.py dùng cổng 5000. Endpoint và UUID contract giữ nguyên. Cấu hình từ `.env` và environment; ảnh riêng dưới `backend/mysql-instance/uploads`. Dịch vụ nhận diện ảnh vẫn cần AI API đang chạy.
 
-Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; mặc định chọn MySQL. Environment hỗ trợ `AEGIS_MYSQL_HOST`, `AEGIS_MYSQL_PORT`, `AEGIS_MYSQL_USER`, `AEGIS_MYSQL_PASSWORD`, `AEGIS_MYSQL_DATABASE` và các khóa MONGO tương ứng. Startup yêu cầu mọi migration 2–9 hoàn tất, không tự nâng schema hoặc fallback. Core dùng repository; SQL nội bộ của pilot dùng dialect adapter và API views thay vì mở SQLite.
+Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; mặc định chọn MySQL. Environment hỗ trợ `AEGIS_MYSQL_HOST`, `AEGIS_MYSQL_PORT`, `AEGIS_MYSQL_USER`, `AEGIS_MYSQL_PASSWORD`, `AEGIS_MYSQL_DATABASE` và các khóa MONGO tương ứng. Startup yêu cầu mọi migration 2–12 hoàn tất, không tự nâng schema hoặc fallback. Core dùng repository; SQL nội bộ của pilot dùng dialect adapter và API views thay vì mở SQLite.
 
 `create_pilot_app` mặc định chọn MySQL và provision namespace theo đường dẫn pilot. Marker `.aegis-hybrid.json` ngăn dùng nhầm backend SQLite cho kho đã chuyển. Journal, follow-up, episodes, revisions, research, timeline, automation, hourly, forecast và alerts đã chạy trên MySQL; telemetry và AI logs được chuyển tiếp Mongo qua outbox.
 

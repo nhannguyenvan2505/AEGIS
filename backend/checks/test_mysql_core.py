@@ -9,6 +9,7 @@ import json
 import logging
 import os
 from pathlib import Path
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -26,7 +27,7 @@ from app import create_app
 from app.repositories import repository
 from app.storage import connect, save_analysis
 from app.idempotency import reserve
-from app.iot_mqtt import save_esp32_reading
+from app.iot_mqtt import bind_device_to_plot, save_esp32_reading
 from app.limits import consume
 
 DATABASE = Path(__file__).resolve().parents[1] / 'database'
@@ -148,33 +149,282 @@ class MySQLCoreTests(unittest.TestCase):
         self.assertEqual(duplicate.status_code,409)
         self.assertEqual(self.post('/plots/'+plot['id']+'/seasons',dict(name='Spoof',start_date='2026-10-01'),1).status_code,404)
 
-    def test_iot_claim_respects_device_registry_and_history(self):
-        _, _, device = self.chain()
+    def admin_session(self, index=0):
+        result = self.app.test_cli_runner().invoke(args=[
+            'bootstrap-admin',self.identifiers[index],'--reason','MySQL integration acceptance'])
+        self.assertEqual(result.exit_code,0,result.output)
+        def demote():
+            with repository(self.config) as repo:
+                repo.execute("""UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name='farmer')
+                    WHERE external_id=%s""",(self.identifiers[index],))
+        self.addCleanup(demote)
+        response = self.client.post('/api/admin/auth/login',
+            json=dict(email=self.emails[index],password='test-password-123'))
+        self.assertEqual(response.status_code,200,response.json)
+        return {'Authorization':'Bearer '+response.json['access_token']}
+
+    def bind(self, owner, uid, plot):
+        return self.client.put('/api/iot/bindings',headers=self.headers[owner],json=dict(device_uid=uid,plot_id=plot))
+
+    def test_only_admin_registered_devices_can_be_claimed(self):
+        plot,season,mock = self.chain()
         response = self.post('/plots',dict(name='Ruộng khác',location_text='Khu khác'),1)
         self.assertEqual(response.status_code,201,response.json)
         other_plot = response.json['item']['id']
-        def bind(owner,uid,plot):
-            return self.client.put('/api/iot/bindings',headers=self.headers[owner],json=dict(device_uid=uid,plot_id=plot))
-        # Registered to user 0 in iot_devices: nobody else may claim it, in any letter case.
-        registered = 'mock:'+device['id']
-        for uid in (registered,registered.upper()):
-            response = bind(1,uid,other_plot)
-            self.assertEqual(response.status_code,409,response.json)
-        # A first claim of an unregistered device works, without exposing what it sent before.
-        loose = 'ESP32-'+uuid.uuid4().hex
-        save_esp32_reading(self.config,dict(device_uid=loose,temperature=26.0,humidity=70.0))
-        self.assertEqual(bind(1,loose,other_plot).status_code,200)
-        def latest():
-            return self.client.get('/api/iot/latest?device_uid='+loose,headers=self.headers[1]).json
-        self.assertEqual((latest()['items'],latest()['devices']),([],[]))
-        save_esp32_reading(self.config,dict(device_uid=loose,temperature=27.0,humidity=71.0))
-        self.assertEqual([item['temperature'] for item in latest()['items']],[27.0])
-        self.assertEqual([item['plot_id'] for item in latest()['devices']],[other_plot])
-        # Re-binding by the same owner and a failed foreign claim leave the binding intact.
-        self.assertEqual(bind(1,loose,other_plot).status_code,200)
-        own_plot = self.post('/plots',dict(name='Ruộng của 0',location_text='Khu 0')).json['item']['id']
-        self.assertEqual(bind(0,loose,own_plot).status_code,409)
-        self.assertEqual(len(latest()['items']),1)
+        uid = 'ESP32-'+uuid.uuid4().hex[:20]
+        save_esp32_reading(self.config,dict(device_uid=uid,temperature=26.0,humidity=70.0))
+        # Nobody has registered it yet, not even its future owner may claim it.
+        for owner,target in ((0,plot['id']),(1,other_plot)):
+            response = self.bind(owner,uid,target)
+            self.assertEqual((response.status_code,response.json['error']['code']),(404,'device_not_registered'))
+        admin = self.admin_session()
+        def register(device_uid, code):
+            return self.client.post('/api/admin/devices',headers=admin,json=dict(season_id=season['id'],
+                device_code=code,sensor_type='temperature',protocol='MQTT',source='field',device_uid=device_uid))
+        response = register(uid,'HW-1')
+        self.assertEqual(response.status_code,201,response.json)
+        for invalid,code in (('Unknown','invalid_device_uid'),('mock:x','invalid_device_uid'),
+                             ('ÉSP32','invalid_device_uid'),(uid.lower(),'device_uid_exists')):
+            response = register(invalid,'HW-2')
+            self.assertEqual(response.json['error']['code'],code,(invalid,response.json))
+        # Registration alone routes new readings to the owner; older ones stay hidden.
+        save_esp32_reading(self.config,dict(device_uid=uid,temperature=27.0,humidity=71.0))
+        def latest(owner):
+            return self.client.get('/api/iot/latest?device_uid='+uid,headers=self.headers[owner]).json
+        self.assertEqual([item['temperature'] for item in latest(0)['items']],[27.0])
+        for variant in (uid,uid.lower()):
+            self.assertEqual(self.bind(1,variant,other_plot).status_code,409)
+        self.assertEqual(self.bind(0,uid,plot['id']).status_code,200)
+        self.assertEqual(latest(1)['items'],[])
+        # A user's own mock device stays unavailable to others.
+        self.assertEqual(self.bind(1,('mock:'+mock['id']).upper(),other_plot).status_code,409)
+
+    def alert_rows(self, plot):
+        with repository(self.config) as repo:
+            return list(repo.all("""SELECT a.alert_id,a.severity,a.source_key,a.alert_type FROM alerts a
+                JOIN farm_fields f ON f.field_id=a.field_id WHERE f.external_id=%s ORDER BY a.alert_id""",(plot,)))
+
+    def push_rows(self, user=0):
+        with repository(self.config) as repo:
+            return repo.all("""SELECT n.notification_id,n.delivery_status,n.attempts,n.last_error,n.alert_id
+                FROM notifications n JOIN users u ON u.user_id=n.user_id
+                WHERE u.external_id=%s AND n.channel='push' ORDER BY n.notification_id""",(self.identifiers[user],))
+
+    def new_device(self):
+        plot = self.chain()[0]['id']
+        uid = 'ESP32-'+uuid.uuid4().hex[:20]
+        bind_device_to_plot(self.config,uid,plot)
+        return plot,uid
+
+    def drain_push_queue(self):
+        with repository(self.config) as repo:
+            repo.execute("""UPDATE notifications SET delivery_status='failed' WHERE channel='push'
+                AND delivery_status='pending'""")
+            repo.execute("UPDATE push_deliveries SET receipt_checked_at=UTC_TIMESTAMP(6)")
+
+    def reading(self, uid, temperature, humidity, **extra):
+        return save_esp32_reading(self.config,dict(device_uid=uid,temperature=temperature,humidity=humidity,**extra))
+
+    def test_microclimate_alerts_follow_levels_and_cooldown(self):
+        plot,uid = self.new_device()
+        self.reading(uid,27.0,80.0)   # warning (brown spot): decided not to alert
+        self.reading(uid,26.0,60.0)   # safe
+        self.reading(uid,24.0,90.0,observed_at=(datetime.now(timezone.utc)-timedelta(hours=7)).isoformat())
+        self.assertEqual(self.alert_rows(plot),[])
+        self.reading(uid,24.0,90.0)   # high
+        self.reading(uid,24.5,91.0)   # same disease within the cooldown
+        self.reading(uid,30.0,90.0)   # medium, another disease
+        rows = self.alert_rows(plot)
+        self.assertEqual([(r['severity'],r['source_key'],r['alert_type']) for r in rows],
+            [('high','esp32:rice_blast','environment_anomaly'),
+             ('warning','esp32:sheath_blight','environment_anomaly')])
+        self.assertEqual([r['alert_id'] for r in self.push_rows()],[r['alert_id'] for r in rows])
+        with repository(self.config) as repo:
+            repo.execute('UPDATE alerts SET generated_at=generated_at-INTERVAL 361 MINUTE WHERE alert_id=%s',
+                         (rows[0]['alert_id'],))
+        self.reading(uid,23.0,92.0)
+        self.assertEqual(len(self.alert_rows(plot)),3)
+
+    def test_concurrent_readings_raise_one_alert(self):
+        plot,uid = self.new_device()
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            list(pool.map(lambda n: self.reading(uid,24.0,90.0+n/10),range(6)))
+        self.assertEqual(len(self.alert_rows(plot)),1)
+        self.assertEqual(len(self.push_rows()),1)
+
+    def token(self, owner=0, method='post', **body):
+        return getattr(self.client,method)('/api/notifications/push-tokens',headers=self.headers[owner],json=body)
+
+    def test_push_tokens_queue_delivery_and_receipts(self):
+        from app.push import PushTransportError, check_receipts, deliver
+        self.drain_push_queue()
+        first,second = (f'ExponentPushToken[{uuid.uuid4().hex}]' for _ in range(2))
+        for bad in (dict(token='nope',platform='android'),dict(token=first,platform='web'),dict(token=first)):
+            self.assertEqual(self.token(**bad).status_code,400,bad)
+        self.assertEqual(self.token(token=first,platform='android').status_code,200)
+        self.assertEqual(self.token(token=second,platform='ios').status_code,200)
+        # Another account cannot delete a token it does not own.
+        self.assertEqual(self.token(1,'delete',token=first).status_code,200)
+        plot,uid = self.new_device()
+        self.reading(uid,24.0,90.0)
+        sent = []
+        class Transport:
+            fail = PushTransportError('http_503',True)
+            def send(self, messages):
+                if self.fail:
+                    error, self.fail = self.fail, None
+                    raise error
+                sent.extend(messages)
+                return [dict(status='ok',id='ticket-'+m['to'][-9:]) if m['to']==first else
+                        dict(status='error',message='gone',details=dict(error='DeviceNotRegistered'))
+                        for m in messages]
+            def receipts(self, ids):
+                return {i:dict(status='error',details=dict(error='DeviceNotRegistered')) for i in ids}
+        transport = Transport()
+        self.assertEqual(deliver(self.config,transport),dict(sent=0,failed=0,retry=1))
+        row = self.push_rows()[0]
+        self.assertEqual((row['delivery_status'],row['attempts'],row['last_error']),('pending',1,'http_503'))
+        self.assertEqual(deliver(self.config,transport),dict(sent=0,failed=0,retry=0))  # backing off
+        with repository(self.config) as repo:
+            repo.execute('UPDATE notifications SET next_attempt_at=UTC_TIMESTAMP(6) WHERE notification_id=%s',
+                         (row['notification_id'],))
+        self.assertEqual(deliver(self.config,transport),dict(sent=1,failed=0,retry=0))
+        self.assertEqual({m['to'] for m in sent},{first,second})
+        self.assertEqual(sent[0]['data'],dict(alert_id=row['alert_id'],plot_id=plot))
+        self.assertEqual(self.push_rows()[0]['delivery_status'],'sent')
+        def active():
+            with repository(self.config) as repo:
+                return {r['expo_token'] for r in repo.all('''SELECT t.expo_token FROM push_tokens t
+                    JOIN users u ON u.user_id=t.user_id WHERE u.external_id=%s AND t.disabled_at IS NULL''',
+                    (self.identifiers[0],))}
+        self.assertEqual(active(),{first})
+        self.assertEqual(check_receipts(self.config,transport),dict(delivered=0,failed=0,waiting=0))  # too early
+        self.assertEqual(check_receipts(self.config,transport,after_seconds=0),dict(delivered=0,failed=1,waiting=0))
+        self.assertEqual(active(),set())
+        # The same phone signing in as another account moves the token there.
+        self.assertEqual(self.token(token=first,platform='android').status_code,200)
+        self.assertEqual(self.token(1,token=first,platform='android').status_code,200)
+        self.assertEqual(active(),set())
+
+    def test_old_or_unreachable_notifications_are_not_sent(self):
+        from app.push import deliver
+        self.drain_push_queue()
+        plot,uid = self.new_device()
+        self.reading(uid,24.0,90.0)
+        class Never:
+            def send(self, messages):
+                raise AssertionError('must not send')
+        self.assertEqual(deliver(self.config,Never()),dict(sent=0,failed=1,retry=0))
+        self.assertEqual(self.push_rows()[0]['last_error'],'no_active_token')
+        self.reading(uid,30.0,90.0)
+        with repository(self.config) as repo:
+            repo.execute("UPDATE notifications SET created_at=created_at-INTERVAL 25 HOUR WHERE delivery_status='pending'")
+        self.assertEqual(deliver(self.config,Never()),dict(sent=0,failed=1,retry=0))
+        self.assertEqual(self.push_rows()[-1]['last_error'],'expired')
+
+    def test_abandoned_idempotency_reservation_expires(self):
+        user = self.identifiers[0]
+        key_hash,state,_ = reserve(self.config,user,'abandoned',b'payload')
+        self.assertEqual(state,'new')
+        self.assertEqual(reserve(self.config,user,'abandoned',b'payload')[1],'running')
+        def age(seconds):
+            with repository(self.config) as repo:
+                repo.execute('UPDATE inference_requests SET created_at=created_at-%s WHERE key_hash=%s',
+                             (seconds,key_hash))
+        age(240)  # inside the 300 s window, with room for a slow runner
+        self.assertEqual(reserve(self.config,user,'abandoned',b'payload')[1],'running')
+        age(61)
+        self.assertEqual(reserve(self.config,user,'abandoned',b'other')[1],'conflict')
+        self.assertEqual(reserve(self.config,user,'abandoned',b'payload')[1],'uncertain')
+        with patch('app.routes.predict_image') as ai:
+            response = self.detect(key='abandoned',payload=b'payload')
+        self.assertEqual((response.status_code,response.json['error']['code']),(409,'idempotency_uncertain'))
+        ai.assert_not_called()
+
+    grant_host = '%'  # host of the application account that receives test grants
+
+    def root_sql(self, sql):
+        if getattr(self,'admin',None):  # native fixtures hold an administrator connection
+            import pymysql
+            from pymysql.constants import CLIENT
+            with pymysql.connect(**self.admin,autocommit=True,client_flag=CLIENT.MULTI_STATEMENTS) as connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(sql)
+                    while cursor.nextset():
+                        pass
+            return
+        result = subprocess.run(self.root_command,input=sql,text=True,capture_output=True,timeout=60)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_runtime_account_reads_and_writes_but_cannot_change_schema(self):
+        sys.path.insert(0,str(DATABASE))
+        from create_runtime_user import runtime_account_statements
+        user,password = 'aegis_rt_'+uuid.uuid4().hex[:12], uuid.uuid4().hex
+        statements = runtime_account_statements(self.database,user,'%',password)
+        self.addCleanup(self.root_sql,f"DROP USER IF EXISTS '{user}'@'%';")
+        self.root_sql(';'.join(statements)+';')
+        config = dict(self.config,MYSQL=dict(self.mysql,user=user,password=password))
+        client = create_app(config).test_client()
+        email = uuid.uuid4().hex+'@example.invalid'
+        credentials = dict(email=email,password='test-password-123')
+        self.assertEqual(client.post('/api/auth/register',json=credentials).status_code,201)
+        token = client.post('/api/auth/login',json=credentials).json['access_token']
+        headers = {'Authorization':'Bearer '+token}
+        response = client.post('/api/farm/plots',headers=headers,json=dict(name='Runtime',location_text='x'))
+        self.assertEqual(response.status_code,201,response.json)
+        plot = response.json['item']['id']
+        uid = 'ESP32-'+uuid.uuid4().hex[:20]
+        bind_device_to_plot(config,uid,plot)
+        self.assertIsNotNone(save_esp32_reading(config,dict(device_uid=uid,temperature=24.0,humidity=90.0))['id'])
+        self.assertEqual(len(client.get('/api/iot/latest',headers=headers).json['items']),1)
+        for statement in ('CREATE TABLE forbidden(x INT)','ALTER TABLE alerts ADD x INT','DROP TABLE alerts'):
+            with self.assertRaisesRegex(sqlite3.OperationalError,'1142'):
+                with repository(config) as repo:
+                    repo.execute(statement)
+
+    @unittest.skipUnless(shutil.which('mysqldump') or sys.platform == 'win32','needs the MySQL client tools')
+    def test_deployment_backup_restores_into_an_empty_database(self):
+        sys.path.insert(0,str(DATABASE))
+        from backup_deploy import BackupError, backup, restore, verify
+        plot,uid = self.new_device()
+        self.reading(uid,24.0,90.0)
+        with patch('app.routes.predict_image',side_effect=lambda payload,config,request_id:
+                   dict(self.result(),request_id=request_id)):
+            response = self.detect(key='backup')
+        self.assertEqual(response.status_code,200,response.json)
+        work = Path(self.temp.name)/'drill'
+        # Earlier tests of this class stored images in their own temporary folders.
+        with repository(self.config) as repo:
+            stored = repo.all('SELECT i.image_url FROM crop_images i JOIN analysis_runs a ON a.image_id=i.image_id')
+        for row in stored:
+            path = Path(self.config['UPLOAD_DIR'])/row['image_url']
+            if not path.is_file():
+                path.write_bytes(b'earlier-test')
+        admin = dict(self.mysql)
+        record = backup(work/'backup',self.config['UPLOAD_DIR'],mysql=admin)
+        self.assertEqual((record['mongo_database'],record['schema_versions'][-1]),(None,12))
+        target = 'aegis_test_'+uuid.uuid4().hex
+        self.root_sql(f"CREATE DATABASE `{target}` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; "
+                      f"GRANT ALL ON `{target}`.* TO '{admin['user']}'@'{self.grant_host}';")
+        self.addCleanup(self.root_sql,f"DROP DATABASE `{target}`; REVOKE ALL ON `{target}`.* FROM '{admin['user']}'@'{self.grant_host}';")
+        with self.assertRaisesRegex(BackupError,'must be empty'):
+            restore(work/'backup',mysql=admin,uploads=work/'refused')
+        result = restore(work/'backup',mysql=dict(admin,database=target),uploads=work/'uploads')
+        self.assertGreaterEqual(result['images_checked'],1)
+        self.assertGreaterEqual(result['views_checked'],1)
+        # The signing key is a secret, not part of the backup: sessions survive only if it is provided.
+        restored = dict(self.config,MYSQL=dict(admin,database=target),UPLOAD_DIR=work/'uploads',
+                        JWT_SECRET=self.app.config['JWT_SECRET'])
+        client = create_app(restored).test_client()
+        detail = client.get('/api/disease/analyses/'+response.json['analysis_id']+'/image',headers=self.headers[0])
+        self.assertEqual(detail.status_code,200)
+        detail.close()
+        from app.iot_mqtt import query_esp32_telemetry
+        self.assertEqual(len(query_esp32_telemetry(restored,plot_ids=[plot])['items']),1)
+        with (work/'backup'/'mysql.sql').open('ab') as stream:
+            stream.write(b'-- tampered')
+        with self.assertRaisesRegex(BackupError,'hash verification'):
+            verify(work/'backup')
 
     def test_diagnosis_outcome_is_stored(self):
         region = dict(class_id=1,disease='brown_spot',confidence=0.2,bbox=dict(x1=1,y1=2,x2=10,y2=12))
@@ -492,7 +742,7 @@ class MySQLUpgradeTests(unittest.TestCase):
         config = dict(STORAGE_BACKEND='mysql',MYSQL=self.mysql)
         with self.connection() as connection, connection.cursor() as cursor:
             apply_schema(connection,through=6)
-            with self.assertRaisesRegex(RuntimeError,r'\[7, 8, 9\] are not applied'):
+            with self.assertRaisesRegex(RuntimeError,r'\[7, 8, 9, 10, 11, 12\] are not applied'):
                 check_schema(config)
             cursor.execute("ALTER TABLE iot_devices ADD COLUMN sensor_type "
                            "ENUM('temperature','humidity','soil_ph','rainfall') NULL, "
@@ -507,7 +757,7 @@ class MySQLUpgradeTests(unittest.TestCase):
                     '2026-11-20T01:02:03+00:00','2026-11-20T01:02:04+00:00')""",(plot,))
             cursor.execute("INSERT INTO esp32_device_bindings VALUES ('ESP32-LEGACY',%s,'Old',"
                            "'2026-11-20T01:00:00+00:00')",(plot,))
-            self.assertEqual(apply_schema(connection),[7,8,9])
+            self.assertEqual(apply_schema(connection),[7,8,9,10,11,12])
             self.assertEqual(apply_schema(connection),[])
             cursor.execute('SELECT disease_name, COUNT(*) FROM diseases GROUP BY disease_name')
             self.assertEqual(dict(cursor.fetchall()),{'rice_blast':1,'brown_spot':1,'sheath_blight':1})
