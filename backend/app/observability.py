@@ -29,7 +29,7 @@ def init_observability(app):
         event = dict(event='request_completed', service='aegis-backend', request_id=g.request_id,
                      method=request.method, route=request.url_rule.rule if request.url_rule else 'unmatched',
                      status=response.status_code, processing_ms=duration)
-        for key in ['analysis_id', 'model_sha256', 'ai_error_code']:
+        for key in ['analysis_id', 'model_sha256', 'ai_error_code', 'diagnosis_status', 'quality_issues']:
             if hasattr(g, key):
                 event[key] = getattr(g, key)
         # Never log tokens, passwords, multipart filenames, bytes or query strings.
