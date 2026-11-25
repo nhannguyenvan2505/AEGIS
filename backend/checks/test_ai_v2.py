@@ -119,6 +119,28 @@ class V2Tests(unittest.TestCase):
         self.assertEqual((r.status_code, r.json['error']['code']), (503, 'ai_gatekeeper_unavailable'))
         self.assertEqual(self.count(), 0)
 
+    def test_every_box_carries_the_fr09_confidence_level(self):
+        low = ('low', 'Low Confidence – Field Verification Required')
+        likely = ('likely', 'Khả năng cao – vẫn khuyến nghị kiểm tra ruộng')
+        # D-07: below 0.50 is low confidence, from 0.50 it is likely; boxes from 0.25 stay visible.
+        expected = {0.25: low, 0.499999: low, 0.5: likely, 0.97: likely}
+        boxes = [dict(class_id=0, class_name='rice_blast', confidence=value, bbox_xyxy=[1, 2, 10, 12])
+                 for value in expected]
+
+        def levels(response):
+            self.assertEqual(response.status_code, 200, response.json)
+            return {d['confidence']: (d.get('confidence_level'), d.get('confidence_label'))
+                    for d in response.json['detections']}
+
+        created = self.post(self.accepted('disease_detected', detections=boxes), key='fr09')
+        self.assertEqual(levels(created), expected)
+        replayed = self.post(self.accepted('disease_detected', detections=boxes), key='fr09')
+        self.assertEqual(replayed.headers.get('Idempotency-Replayed'), 'true')
+        self.assertEqual(levels(replayed), expected)
+        detail = self.client.get('/api/disease/analyses/' + created.json['analysis_id'],
+                                 headers={'Authorization': 'Bearer ' + self.token})
+        self.assertEqual(levels(detail), expected)
+
     def test_v1_flag_uses_predict(self):
         self.app.config['AI_API_VERSION'] = 'v1'
         self.post(dict(model_sha256='e' * 64, model_version='m', processing_ms=1, image=dict(width=32, height=32), detections=[]))
