@@ -1,0 +1,32 @@
+[
+  {
+    "manifest": "ai_service/api/checkpoint.json",
+    "model_type": "yolo_detection",
+    "version_name": "aegis-yolo11n-v4-50epochs",
+    "algorithm": "YOLO11n detection",
+    "training_dataset": "rice disease detector v4",
+    "metrics": {
+      "split": "V4 test, 520 images",
+      "map50": 0.727,
+      "map50_95": 0.337,
+      "source": "docs/DECISIONS_20261120.md D-06",
+      "limits": "NFR02 target above 0.85 is not met; not measured on field photos"
+    }
+  },
+  {
+    "manifest": "ai_service/api/gatekeeper.json",
+    "model_type": "rice_gatekeeper",
+    "version_name": "gate_v1b",
+    "algorithm": "YOLO11n-cls rice / non_rice",
+    "training_dataset": "gate_v1",
+    "metrics": {
+      "split": "gate_v1 test",
+      "rice_images": 1160,
+      "rice_accepted": 1158,
+      "non_rice_images": 804,
+      "non_rice_accepted": 0,
+      "source": "ai_service/api/gatekeeper.json and AEGIS_PROJECT_STATUS.md (25/11/2026)",
+      "limits": "rice images come from one public set; synthetic composites were rejected 21-77%; not measured on field photos"
+    }
+  }
+]

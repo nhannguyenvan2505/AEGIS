@@ -30,9 +30,10 @@ Checkpoint và ảnh có nguồn/quyền chưa rõ ở máy nhận: dừng bư�
 | AI inference NVIDIA | Env AI riêng; torch/torchvision CUDA phù hợp OS/Python/driver; api/requirements.txt | Local Windows/Python3.11.9,RTX3050Laptop4GiB, driver610.62; torch2.11.0+cu128/torchvision0.26.0+cu128,CUDA build12.8 được smoke mới |
 | Máy/OS khác | Chọn wheel/runtime phù hợp máy thực, giữ app/model pin và ghi inventory | Chưa kiểm máy thứ hai, Linux/macOS/MPS/ROCm; không coi cấu hình local là lock phổ quát |
 
-AI requirements hiện tại: Flask>=3.1,<4, numpy>=1.26,<3, Pillow>=10,<13,
-ultralytics==8.4.178. Inventory local: Flask3.1.3,requests2.34.2,numpy2.4.6,
-Pillow12.3.0,Werkzeug3.1.9. Đây là phiên bản đã quan sát, không full GPU lock.
+AI requirements hiện tại: Flask>=3.1,<4, numpy>=1.26,<3, Pillow>=13,<14,
+ultralytics==8.4.178; Pillow13 cần Python>=3.11. Inventory local: Flask3.1.3,
+requests2.34.2,numpy2.4.6,Pillow12.3.0 (đo trước khi yêu cầu Pillow13),
+Werkzeug3.1.9. Đây là phiên bản đã quan sát, không full GPU lock.
 Không cài CPU regression requirements thay cho runtime AI; không chạy pip upgrade
 hoặc thay torch trong env GPU hiện dùng để cố làm giống máy nhận.
 

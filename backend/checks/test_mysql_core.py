@@ -199,6 +199,20 @@ class MySQLCoreTests(unittest.TestCase):
         # A user's own mock device stays unavailable to others.
         self.assertEqual(self.bind(1,('mock:'+mock['id']).upper(),other_plot).status_code,409)
 
+    def test_registry_routes_readings_whatever_the_letter_case(self):
+        plot,season,_ = self.chain()
+        registered = 'esp32-'+uuid.uuid4().hex[:20]
+        response = self.client.post('/api/admin/devices',headers=self.admin_session(),json=dict(season_id=season['id'],
+            device_code='HW-CASE',sensor_type='temperature',protocol='MQTT',source='field',device_uid=registered))
+        self.assertEqual(response.status_code,201,response.json)
+        saved = self.reading(registered.upper(),24.0,90.0)
+        self.assertEqual(saved['plot_id'],plot['id'])
+        with repository(self.config) as repo:
+            row = repo.one('SELECT status,device_id FROM iot_devices WHERE device_uid=%s',(registered,))
+            alert = repo.one('SELECT device_id FROM alerts WHERE device_id=%s',(row['device_id'],))
+        self.assertEqual(row['status'],'online')
+        self.assertIsNotNone(alert)
+
     def alert_rows(self, plot):
         with repository(self.config) as repo:
             return list(repo.all("""SELECT a.alert_id,a.severity,a.source_key,a.alert_type FROM alerts a
@@ -244,6 +258,37 @@ class MySQLCoreTests(unittest.TestCase):
                          (rows[0]['alert_id'],))
         self.reading(uid,23.0,92.0)
         self.assertEqual(len(self.alert_rows(plot)),3)
+
+    def test_admin_thresholds_raise_their_own_alerts(self):
+        plot,uid = self.new_device()
+        other = self.post('/plots',dict(name='Ruộng khác',location_text='x'),1).json['item']['id']
+        admin = self.admin_session()
+        def threshold(**data):
+            response = self.client.post('/api/admin/thresholds',headers=admin,json=data)
+            self.assertEqual(response.status_code,201,response.json)
+            self.addCleanup(self.client.delete,'/api/admin/thresholds/'+str(response.json['id']),headers=admin)
+            return response.json['id']
+        with repository(self.config) as repo:
+            repo.execute('DELETE FROM alert_thresholds')
+        hot = threshold(metric='temperature',operator='gt',threshold_value=34,severity='critical',plot_id=plot)
+        note = threshold(metric='humidity',operator='between',threshold_value=40,threshold_value_2=50,
+                         severity='info',plot_id=plot)
+        threshold(metric='temperature',operator='gt',threshold_value=10,severity='warning',plot_id=other)
+        threshold(metric='temperature',operator='gt',threshold_value=10,severity='warning',plot_id=plot,is_active=False)
+        threshold(metric='soil_ph',operator='gt',threshold_value=1,severity='warning',plot_id=plot)
+        self.reading(uid,34.0,60.0)
+        self.assertEqual(self.alert_rows(plot),[])
+        self.reading(uid,35.5,45.0)
+        self.reading(uid,36.0,45.5)  # same thresholds inside the cooldown
+        rows = self.alert_rows(plot)
+        self.assertEqual([(r['severity'],r['source_key']) for r in rows],
+            [('critical',f'threshold:{hot}'),('info',f'threshold:{note}')])
+        # 'info' is listed but never pushed.
+        self.assertEqual([r['alert_id'] for r in self.push_rows()],[rows[0]['alert_id']])
+        # A global threshold reaches every field, next to the built-in disease rule.
+        wide = threshold(metric='humidity',operator='gte',threshold_value=90,severity='high')
+        self.reading(uid,24.0,92.0)
+        self.assertEqual([r['source_key'] for r in self.alert_rows(plot)][2:],['esp32:rice_blast',f'threshold:{wide}'])
 
     def test_concurrent_readings_raise_one_alert(self):
         plot,uid = self.new_device()
@@ -402,7 +447,7 @@ class MySQLCoreTests(unittest.TestCase):
                 path.write_bytes(b'earlier-test')
         admin = dict(self.mysql)
         record = backup(work/'backup',self.config['UPLOAD_DIR'],mysql=admin)
-        self.assertEqual((record['mongo_database'],record['schema_versions'][-1]),(None,12))
+        self.assertEqual((record['mongo_database'],record['schema_versions'][-1]),(None,14))
         target = 'aegis_test_'+uuid.uuid4().hex
         self.root_sql(f"CREATE DATABASE `{target}` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci; "
                       f"GRANT ALL ON `{target}`.* TO '{admin['user']}'@'{self.grant_host}';")
@@ -441,6 +486,79 @@ class MySQLCoreTests(unittest.TestCase):
                 (response.json['analysis_id'],))
         self.assertEqual(json.loads(row.pop('uncertain_regions')),[region])
         self.assertEqual(row,{k:v for k,v in record.items() if k!='uncertain_regions'})
+
+    def model_rows(self, kind, sha):
+        with repository(self.config) as repo:
+            return list(repo.all('''SELECT model_version_id,version_name,metrics_json,is_active,artifact_path
+                FROM model_versions WHERE model_type=%s AND artifact_sha256=%s''',(kind,sha)))
+
+    def test_models_are_registered_once_with_documented_metrics(self):
+        sys.path.insert(0,str(DATABASE))
+        from register_models import load_entries, register
+        entries = load_entries()
+        detector,gate = entries
+        record = dict(diagnosis_status='healthy',rice_probability=0.99,gatekeeper_method='yolo_cls',
+                      gatekeeper_version='best.pt',gatekeeper_sha256=gate['sha256'],uncertain_regions=[])
+        with patch('app.routes.predict_image',side_effect=lambda payload,config,request_id:
+                   dict(self.result(),request_id=request_id,model_sha256=detector['sha256'],
+                        diagnosis_record=dict(record))):
+            for key in ('registry-1','registry-2'):
+                self.assertEqual(self.detect(key=key).status_code,200)
+        # Inference alone records both artifacts, once each.
+        for entry in entries:
+            self.assertEqual(len(self.model_rows(entry['model_type'],entry['sha256'])),1,entry['model_type'])
+        self.assertEqual([r['action'] for r in register(self.mysql,entries,activate=True)],['updated','updated'])
+        self.assertEqual([r['action'] for r in register(self.mysql,entries,activate=True)],['updated','updated'])
+        for entry in entries:
+            rows = self.model_rows(entry['model_type'],entry['sha256'])
+            self.assertEqual((len(rows),rows[0]['version_name'],bool(rows[0]['is_active'])),
+                             (1,entry['version_name'],True))
+            self.assertEqual(json.loads(rows[0]['metrics_json']),entry['metrics'])
+        admin = self.admin_session()
+        response = self.client.get('/api/admin/models?type=rice_gatekeeper',headers=admin)
+        self.assertEqual(response.status_code,200,response.json)
+        self.assertIn('gate_v1b',[item['version_name'] for item in response.json['items']])
+
+    def test_retention_removes_only_old_delivered_outbox_events(self):
+        sys.path.insert(0,str(DATABASE))
+        from retention import purge_outbox
+        marker = 'retention-'+uuid.uuid4().hex
+        with repository(self.config) as repo:
+            repo.execute('DELETE FROM mongo_outbox')
+            for name,status,age in (('old','delivered',31),('fresh','delivered',29),
+                                    ('pending','pending',90),('failed','failed',90)):
+                repo.execute('''INSERT INTO mongo_outbox(event_key,collection_name,document_json,document_sha256,
+                    status,delivered_at,created_at) VALUES (%s,'ai_inference_logs','{}',%s,%s,
+                    IF(%s='delivered',UTC_TIMESTAMP(6)-INTERVAL %s DAY,NULL),UTC_TIMESTAMP(6)-INTERVAL %s DAY)''',
+                    (marker+name,'a'*64,status,status,age,age))
+        self.assertEqual(purge_outbox(self.config)['matched'],1)
+        self.assertEqual(purge_outbox(self.config)['deleted'],0)  # counting never deletes
+        self.assertEqual(purge_outbox(self.config,apply=True,batch=1)['deleted'],1)
+        with repository(self.config) as repo:
+            left = {row['event_key'][len(marker):] for row in repo.all('SELECT event_key FROM mongo_outbox')}
+            repo.execute('DELETE FROM mongo_outbox')
+        self.assertEqual(left,{'fresh','pending','failed'})
+        with self.assertRaises(ValueError):
+            purge_outbox(self.config,0)
+
+    def test_image_reconciliation_reports_missing_and_orphan_files(self):
+        sys.path.insert(0,str(DATABASE))
+        from reconcile_images import reconcile
+        with patch('app.routes.predict_image',side_effect=lambda payload,config,request_id:
+                   dict(self.result(),request_id=request_id)):
+            response = self.detect(key='reconcile')
+        self.assertEqual(response.status_code,200,response.json)
+        uploads = Path(self.config['UPLOAD_DIR'])
+        kept = response.json['image_path']
+        (uploads/'orphan.bin').write_bytes(b'12345')
+        os.utime(uploads/'orphan.bin',(time.time()-7200,)*2)
+        (uploads/'uploading.bin').write_bytes(b'1')
+        result = reconcile(self.mysql,uploads)
+        self.assertEqual((result['orphans'],result['orphan_bytes'],result['skipped_recent']),(['orphan.bin'],5,1))
+        self.assertNotIn(kept,result['missing'])
+        (uploads/kept).unlink()
+        self.assertIn(kept,reconcile(self.mysql,uploads)['missing'])
+        self.assertTrue((uploads/'orphan.bin').is_file())  # read-only
 
     def test_every_admin_read_route_works_on_a_fresh_database(self):
         plot,season,device = self.chain()
@@ -742,7 +860,7 @@ class MySQLUpgradeTests(unittest.TestCase):
         config = dict(STORAGE_BACKEND='mysql',MYSQL=self.mysql)
         with self.connection() as connection, connection.cursor() as cursor:
             apply_schema(connection,through=6)
-            with self.assertRaisesRegex(RuntimeError,r'\[7, 8, 9, 10, 11, 12\] are not applied'):
+            with self.assertRaisesRegex(RuntimeError,r'\[7, 8, 9, 10, 11, 12, 13, 14\] are not applied'):
                 check_schema(config)
             cursor.execute("ALTER TABLE iot_devices ADD COLUMN sensor_type "
                            "ENUM('temperature','humidity','soil_ph','rainfall') NULL, "
@@ -757,7 +875,7 @@ class MySQLUpgradeTests(unittest.TestCase):
                     '2026-11-20T01:02:03+00:00','2026-11-20T01:02:04+00:00')""",(plot,))
             cursor.execute("INSERT INTO esp32_device_bindings VALUES ('ESP32-LEGACY',%s,'Old',"
                            "'2026-11-20T01:00:00+00:00')",(plot,))
-            self.assertEqual(apply_schema(connection),[7,8,9,10,11,12])
+            self.assertEqual(apply_schema(connection),[7,8,9,10,11,12,13,14])
             self.assertEqual(apply_schema(connection),[])
             cursor.execute('SELECT disease_name, COUNT(*) FROM diseases GROUP BY disease_name')
             self.assertEqual(dict(cursor.fetchall()),{'rice_blast':1,'brown_spot':1,'sheath_blight':1})
