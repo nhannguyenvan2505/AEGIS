@@ -3,13 +3,22 @@ import re
 import time
 
 import requests
+from urllib3.exceptions import NewConnectionError
 
 
 class AIServiceError(Exception):
-    def __init__(self, code, message, status, retry_after=None):
+    def __init__(self, code, message, status, retry_after=None, not_run=False):
         super().__init__(message)
         self.code, self.message, self.status = code, message, status
         self.retry_after = retry_after
+        # True only when the AI certainly never ran inference, so the same Idempotency-Key may be sent again.
+        self.not_run = not_run
+
+
+def never_connected(error):
+    """A requests error raised before any connection existed (refused, unresolved host)."""
+    cause = error.args[0] if error.args else None
+    return isinstance(getattr(cause, 'reason', None), NewConnectionError)
 
 
 def validate_result(data, expected_request_id):
@@ -130,22 +139,26 @@ def predict_image(payload, config, request_id):
             timeout=(config['AI_CONNECT_TIMEOUT'], config['AI_READ_TIMEOUT']),
             allow_redirects=False,
         )
+    except requests.ConnectTimeout as exc:  # subclass of Timeout; nothing was sent
+        raise AIServiceError('ai_timeout', 'AI xử lý quá thời gian cho phép.', 504, not_run=True) from exc
     except requests.Timeout as exc:
         raise AIServiceError('ai_timeout', 'AI xử lý quá thời gian cho phép.', 504) from exc
     except requests.RequestException as exc:
-        raise AIServiceError('ai_unavailable', 'Không thể kết nối dịch vụ AI.', 503) from exc
-    if response.status_code in (400, 413):
+        raise AIServiceError('ai_unavailable', 'Không thể kết nối dịch vụ AI.', 503,
+                             not_run=never_connected(exc)) from exc
+    if response.status_code in (400, 413):  # the AI refuses the upload before inference
         raise AIServiceError('invalid_image' if response.status_code == 400 else 'upload_too_large',
-                             'Ảnh không hợp lệ hoặc vượt giới hạn dịch vụ AI.', response.status_code)
+                             'Ảnh không hợp lệ hoặc vượt giới hạn dịch vụ AI.', response.status_code, not_run=True)
     if response.status_code == 503:
         try:
             body = response.json()
         except ValueError:
             body = None
         if isinstance(body, dict) and isinstance(body.get('error'), dict) and body['error'].get('code') == 'gatekeeper_unavailable':
-            raise AIServiceError('ai_gatekeeper_unavailable', 'Dịch vụ AI chưa được cài mô hình nhận diện cây lúa. Liên hệ quản trị.', 503)
+            raise AIServiceError('ai_gatekeeper_unavailable', 'Dịch vụ AI chưa được cài mô hình nhận diện cây lúa. Liên hệ quản trị.', 503,
+                                 not_run=True)
         if isinstance(body, dict) and isinstance(body.get('error'), dict) and body['error'].get('code') == 'ai_busy':
-            raise AIServiceError('ai_busy', 'Dịch vụ AI đang bận; vui lòng thử lại.', 503, retry_after=1)
+            raise AIServiceError('ai_busy', 'Dịch vụ AI đang bận; vui lòng thử lại.', 503, retry_after=1, not_run=True)
     if response.status_code != 200:
         raise AIServiceError('ai_inference_failed', 'Dịch vụ AI không thể xử lý ảnh.', 502)
     try:
