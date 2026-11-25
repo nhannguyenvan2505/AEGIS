@@ -2,13 +2,16 @@
 import os
 import sys
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import create_app  # noqa: E402
-from app.iot_mqtt import evaluate_microclimate, save_esp32_reading, validate_esp32_payload  # noqa: E402
+from app.iot_mqtt import (  # noqa: E402
+    DeviceBoundError, bind_device_to_plot, evaluate_microclimate, save_esp32_reading, validate_esp32_payload,
+)
 
 
 class IotMqttTests(unittest.TestCase):
@@ -124,6 +127,88 @@ class IotMqttTests(unittest.TestCase):
         for plot in (first, second):
             self.assertEqual(self.client.put('/api/iot/bindings', headers=headers,
                                              json={'device_uid': 'ESP32-MOVE', 'plot_id': plot['id']}).status_code, 200)
+
+    def _bind(self, headers, device_uid, plot):
+        return self.client.put('/api/iot/bindings', headers=headers,
+                               json={'device_uid': device_uid, 'plot_id': plot['id']})
+
+    def _latest(self, headers, query=''):
+        return self.client.get('/api/iot/latest' + query, headers=headers).get_json()
+
+    def test_mqtt_payload_cannot_choose_the_plot(self):
+        victim = self._auth_header('victim@example.test')
+        plot = self._plot(victim, 'Victim plot')
+        saved = save_esp32_reading(self.app.config, {
+            'device_uid': 'ESP32-FORGED', 'plot_id': plot['id'], 'temperature': 40.0, 'humidity': 99.0})
+        self.assertIsNone(saved['plot_id'])
+        self.assertEqual(self._latest(victim)['items'], [])
+
+    def test_mqtt_payload_cannot_redirect_a_bound_device(self):
+        owner, victim = self._auth_header('owner@example.test'), self._auth_header('victim@example.test')
+        own_plot, victim_plot = self._plot(owner, 'Own'), self._plot(victim, 'Victim')
+        self.assertEqual(self._bind(owner, 'ESP32-MINE', own_plot).status_code, 200)
+        saved = save_esp32_reading(self.app.config, {
+            'device_uid': 'ESP32-MINE', 'plot_id': victim_plot['id'], 'temperature': 40.0, 'humidity': 99.0})
+        self.assertEqual(saved['plot_id'], own_plot['id'])
+        self.assertEqual(self._latest(victim)['items'], [])
+
+    def test_claiming_a_device_does_not_reveal_earlier_readings(self):
+        claimer = self._auth_header('claimer@example.test')
+        plot = self._plot(claimer, 'Claimer plot')
+        save_esp32_reading(self.app.config, {'device_uid': 'ESP32-HIST', 'temperature': 26.0, 'humidity': 70.0})
+        self.assertEqual(self._bind(claimer, 'ESP32-HIST', plot).status_code, 200)
+        for query in ('', '?device_uid=ESP32-HIST', f"?plot_id={plot['id']}"):
+            seen = self._latest(claimer, query)
+            self.assertEqual((seen['items'], seen['devices']), ([], []), query)
+        save_esp32_reading(self.app.config, {'device_uid': 'ESP32-HIST', 'temperature': 27.0, 'humidity': 71.0})
+        self.assertEqual([i['temperature'] for i in self._latest(claimer)['items']], [27.0])
+
+    def test_rebound_device_keeps_each_owners_history_apart(self):
+        first, second = self._auth_header('first@example.test'), self._auth_header('second@example.test')
+        first_plot, second_plot = self._plot(first, 'First'), self._plot(second, 'Second')
+        bind_device_to_plot(self.app.config, 'ESP32-SOLD', first_plot['id'], 'First name')
+        save_esp32_reading(self.app.config, {'device_uid': 'ESP32-SOLD', 'temperature': 21.0, 'humidity': 61.0})
+        # Reassignment is an administrator action (no ownership restriction).
+        bind_device_to_plot(self.app.config, 'ESP32-SOLD', second_plot['id'], 'Second private name')
+        save_esp32_reading(self.app.config, {'device_uid': 'ESP32-SOLD', 'temperature': 22.0, 'humidity': 62.0})
+
+        for headers, plot, temperature in ((first, first_plot, 21.0), (second, second_plot, 22.0)):
+            seen = self._latest(headers)
+            self.assertEqual([i['temperature'] for i in seen['items']], [temperature])
+            self.assertEqual([(d['temperature'], d['plot_id']) for d in seen['devices']], [(temperature, plot['id'])])
+        self.assertNotIn('Second private name', [d['device_name'] for d in self._latest(first)['devices']])
+
+    def test_reserved_and_non_ascii_device_ids_cannot_be_claimed(self):
+        headers = self._auth_header()
+        plot = self._plot(headers, 'P')
+        for uid in ('Unknown', 'unknown', 'ÉSP32-A'):
+            response = self._bind(headers, uid, plot)
+            self.assertEqual((response.status_code, response.get_json()['error']['code']), (400, 'invalid_binding'), uid)
+        with self.assertRaises(ValueError):
+            validate_esp32_payload({'device_uid': 'ÉSP32-A', 'temperature': 25, 'humidity': 50})
+
+    def test_concurrent_claims_have_a_single_winner(self):
+        users = [self._auth_header(f'racer{n}@example.test') for n in range(2)]
+        plots = [self._plot(headers, f'Racer {n}')['id'] for n, headers in enumerate(users)]
+        for attempt in range(20):
+            barrier, winners, errors = threading.Barrier(2), [], []
+
+            def claim(plot_id, uid=f'ESP32-RACE-{attempt}'):
+                try:
+                    barrier.wait()
+                    bind_device_to_plot(self.app.config, uid, plot_id, allowed_plot_ids=[plot_id])
+                    winners.append(plot_id)
+                except DeviceBoundError:
+                    pass
+                except Exception as exc:  # surfaced below; threads swallow exceptions
+                    errors.append(exc)
+
+            threads = [threading.Thread(target=claim, args=(plot_id,)) for plot_id in plots]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+            self.assertEqual((errors, len(winners)), ([], 1), f'attempt {attempt}')
 
     def test_iot_routes_require_auth(self):
         self.assertEqual(self.client.get('/api/iot/latest').status_code, 401)
