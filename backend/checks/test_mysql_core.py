@@ -667,6 +667,24 @@ class MySQLCoreTests(unittest.TestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data,b'\x89PNG\r\n\x1a\ntest'); response.close()
 
+    def test_saved_diagnosis_is_returned_by_replay_detail_and_history(self):
+        message = 'Có dấu hiệu bất thường nhưng độ tin cậy chưa đạt ngưỡng kết luận bệnh. Cần kiểm tra thực địa hoặc chụp lại cận cảnh.'
+        def uncertain(*args):
+            return dict(self.result(), status='no_detection', detections=[], ai_status='uncertain_lesion',
+                        is_rice=True, ai_message=message, diagnosis_record=dict(
+                            diagnosis_status='uncertain_lesion', rice_probability=0.97, gatekeeper_method='yolo_cls',
+                            gatekeeper_version='gate', gatekeeper_sha256='b'*64, uncertain_regions=[]))
+        with patch('app.routes.predict_image',side_effect=uncertain):
+            first=self.detect(key='diagnosis-history'); self.assertEqual(first.status_code,200,first.json)
+            replay=self.detect(key='diagnosis-history')
+        expected=dict(status='uncertain_lesion',is_rice=True,message=message)
+        self.assertEqual(first.json['diagnosis'],expected)
+        self.assertEqual(replay.json.get('diagnosis'),expected,replay.json)
+        detail=self.client.get('/api/disease/analyses/'+first.json['analysis_id'],headers=self.headers[0])
+        self.assertEqual(detail.json.get('diagnosis'),expected,detail.json)
+        history=self.client.get('/api/disease/analyses',headers=self.headers[0])
+        self.assertEqual(history.json['items'][0].get('diagnosis'),expected,history.json)
+
     def test_failed_completion_rolls_back_all_rows_and_image(self):
         result=self.result(); result['request_id']=str(uuid.uuid4())
         with self.assertRaises(sqlite3.IntegrityError):

@@ -1,4 +1,5 @@
 """Backend handling of /v2/diagnose: domain rejections are answered, never stored; healthy/uncertain keep status."""
+import ast
 import io
 import json
 import sys
@@ -140,6 +141,45 @@ class V2Tests(unittest.TestCase):
         detail = self.client.get('/api/disease/analyses/' + created.json['analysis_id'],
                                  headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(levels(detail), expected)
+
+    @staticmethod
+    def ai_messages():
+        """MESSAGES as written in the AI service; parsed, because the backend venv cannot import it."""
+        source = (Path(__file__).resolve().parents[2] / 'ai_service' / 'api' / 'diagnosis.py').read_text(encoding='utf-8')
+        for node in ast.parse(source).body:
+            if isinstance(node, ast.Assign) and node.targets[0].id == 'MESSAGES':
+                return ast.literal_eval(node.value)
+        raise AssertionError('MESSAGES not found in the AI service')
+
+    def test_saved_diagnosis_reads_back_exactly_as_it_was_answered(self):
+        messages = self.ai_messages()
+        auth = {'Authorization': 'Bearer ' + self.token}
+        for status in ('disease_detected', 'uncertain_lesion', 'healthy'):
+            with self.subTest(status=status):
+                body = self.accepted(status, message=messages[status])
+                created = self.post(body, key='history-' + status)
+                self.assertEqual(created.status_code, 200, created.json)
+                expected = dict(status=status, is_rice=True, message=messages[status])
+                self.assertEqual(created.json['diagnosis'], expected)
+                replayed = self.post(body, key='history-' + status)
+                self.assertEqual(replayed.headers.get('Idempotency-Replayed'), 'true')
+                self.assertEqual(replayed.json.get('diagnosis'), expected)
+                url = '/api/disease/analyses/' + created.json['analysis_id']
+                self.assertEqual(self.client.get(url, headers=auth).json.get('diagnosis'), expected)
+                listed = {item['analysis_id']: item for item in
+                          self.client.get('/api/disease/analyses', headers=auth).json['items']}
+                self.assertEqual(listed[created.json['analysis_id']].get('diagnosis'), expected)
+
+    def test_analyses_without_a_saved_diagnosis_have_no_diagnosis_key(self):
+        # /predict (v1) and rows older than migration 008 store NULL: never guess a conclusion.
+        self.app.config['AI_API_VERSION'] = 'v1'
+        created = self.post(dict(model_sha256='e' * 64, model_version='m', processing_ms=1,
+                                 image=dict(width=32, height=32), detections=[]))
+        self.assertEqual(created.status_code, 200)
+        auth = {'Authorization': 'Bearer ' + self.token}
+        detail = self.client.get('/api/disease/analyses/' + created.json['analysis_id'], headers=auth)
+        self.assertNotIn('diagnosis', detail.json)
+        self.assertNotIn('diagnosis', self.client.get('/api/disease/analyses', headers=auth).json['items'][0])
 
     def test_v1_flag_uses_predict(self):
         self.app.config['AI_API_VERSION'] = 'v1'

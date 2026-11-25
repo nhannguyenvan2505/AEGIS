@@ -111,6 +111,23 @@ def with_confidence_level(detection):
     return dict(detection, confidence_level=level, confidence_label=CONFIDENCE_LABELS[level])
 
 
+# The message is not stored: for the three saved statuses the AI service sends a fixed sentence.
+# This copy must match MESSAGES in ai_service/api/diagnosis.py (a test compares them).
+DIAGNOSIS_MESSAGES = {
+    'healthy': 'Không phát hiện vùng bệnh trên cây lúa ở ngưỡng hiện tại. Đây chưa phải xác nhận cây khỏe; hãy tiếp tục theo dõi.',
+    'uncertain_lesion': 'Có dấu hiệu bất thường nhưng độ tin cậy chưa đạt ngưỡng kết luận bệnh. Cần kiểm tra thực địa hoặc chụp lại cận cảnh.',
+    'disease_detected': 'Phát hiện vùng nghi bệnh trên cây lúa; cần xác minh thực địa.',
+}
+
+
+def with_saved_diagnosis(response, row):
+    """Add the same `diagnosis` object the POST answered. Nothing is added when none was saved."""
+    status = row['diagnosis_status']
+    if status is None:  # /predict (v1) or stored before migration 008: unknown, never guessed
+        return response
+    return dict(response, diagnosis=dict(status=status, is_rice=True, message=DIAGNOSIS_MESSAGES[status]))
+
+
 def save_analysis(payload, result, config, user_id, key_hash=None, diagnosis=None):
     analysis_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
@@ -149,7 +166,7 @@ def get_analysis(analysis_id, config, user_id):
         if analysis is None:
             return None
         rows = db.detections(analysis_id)
-    return dict(success=True, analysis_id=analysis['id'], user_id=analysis['user_id'],
+    response = dict(success=True, analysis_id=analysis['id'], user_id=analysis['user_id'],
                 image_url=f'/api/disease/analyses/{analysis["id"]}/image',
                 created_at=analysis['created_at'], image_path=analysis['image_path'],
                 model_version=analysis['model_version'], status=analysis['status'],
@@ -159,6 +176,7 @@ def get_analysis(analysis_id, config, user_id):
                 detections=[with_confidence_level(dict(
                     detection_id=r['id'], class_id=r['class_id'], disease=r['disease'], confidence=r['confidence'],
                     bbox=dict(x1=r['x1'], y1=r['y1'], x2=r['x2'], y2=r['y2']))) for r in rows])
+    return with_saved_diagnosis(response, analysis)
 
 
 def list_analyses(config, user_id, page, page_size):
@@ -166,12 +184,12 @@ def list_analyses(config, user_id, page, page_size):
         db.begin()
         total, rows = db.analysis_page(user_id,page_size,(page-1)*page_size)
     pages = (total + page_size - 1) // page_size
-    return dict(success=True, items=[dict(analysis_id=r['id'], created_at=r['created_at'],
+    return dict(success=True, items=[with_saved_diagnosis(dict(analysis_id=r['id'], created_at=r['created_at'],
                 model_version=r['model_version'], status=r['status'], detection_count=r['detection_count'],
                 request_id=r['request_id'],model_sha256=r['model_sha256'],
                 timings=dict(ai_processing_ms=r['ai_processing_ms'],ai_roundtrip_ms=r['ai_roundtrip_ms']),
                 image=dict(width=r['image_width'], height=r['image_height'], orientation=r['orientation']),
-                image_url=f'/api/disease/analyses/{r["id"]}/image') for r in rows],
+                image_url=f'/api/disease/analyses/{r["id"]}/image'), r) for r in rows],
                 pagination=dict(page=page, page_size=page_size, total=total, total_pages=pages,
                                 has_next=page < pages))
 
