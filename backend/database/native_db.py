@@ -43,8 +43,10 @@ SUPERVISOR_LOG = ROOT / 'backend' / 'native-db-supervisor.log'
 TASK_NAME = 'AEGIS Native Databases'
 MYSQL_STATE = ROOT / 'backend' / 'mysql-instance'
 MONGO_STATE = ROOT / 'backend' / 'mongo-instance'
-DETACHED = (getattr(subprocess, 'CREATE_NO_WINDOW', 0) | getattr(subprocess, 'DETACHED_PROCESS', 0)
-            | getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0))
+# Not DETACHED_PROCESS: it makes Windows ignore CREATE_NO_WINDOW, and the console-less
+# mysqld monitor then opens a visible window for its server child. CREATE_NO_WINDOW gives
+# a hidden console that the child inherits.
+DETACHED = getattr(subprocess, 'CREATE_NO_WINDOW', 0) | getattr(subprocess, 'CREATE_NEW_PROCESS_GROUP', 0)
 BREAKAWAY = getattr(subprocess, 'CREATE_BREAKAWAY_FROM_JOB', 0x01000000)
 
 
