@@ -121,6 +121,20 @@ dùng `image_url` tương đối ghép với base URL để lấy ảnh, vẫn p
 
 ## Chi tiết, lịch sử và ảnh
 
+**Kết luận đã lưu.** Với kết quả từ `/v2/diagnose`, POST, lần trả lại theo
+`Idempotency-Key`, GET chi tiết và **mỗi item của lịch sử** có cùng một object:
+
+```json
+"diagnosis": {"status": "uncertain_lesion", "is_rice": true, "message": "..."}
+```
+
+`status` là `disease_detected`, `uncertain_lesion` hoặc `healthy`; trường `status`
+ở ngoài (`detection_found` / `no_detection`) không đổi. **Không có khóa
+`diagnosis`** nghĩa là không có kết luận được lưu (đường `/predict` v1, hoặc bản
+ghi cũ hơn migration 008): client không được tự hiểu là cây khỏe. `healthy` cũng
+không phải xác nhận cây khỏe. `message` không lưu trong database; backend dùng câu
+cố định hiện hành theo `status`.
+
 | Method / path | Thành công |
 |---|---|
 | GET /api/disease/analyses/{analysis_id} | 200: cùng cấu trúc kết quả đã lưu như POST |

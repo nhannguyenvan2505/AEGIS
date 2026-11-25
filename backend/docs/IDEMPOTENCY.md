@@ -19,13 +19,27 @@ DB chỉ lưu SHA-256 của khóa và ảnh, không lưu khóa gốc.
 Các giới hạn quota và admission vẫn chạy trước idempotency: replay cũng tính
 quota và có thể nhận 429/503 khi quá tải. Client xử lý Retry-After của các lỗi đó.
 
-Sau lỗi AI hoặc lỗi lưu kết quả, khóa chuyển sang uncertain; gửi lại nhận 409
-`idempotency_uncertain`. Tiến trình chết có thể để lại running vô thời hạn.
-Không tự hết hạn hay chiếm lại khóa: timeout không chứng minh AI đã ngừng chạy.
-Kiểm tra lịch sử trước khi người dùng chủ động tạo tác vụ với khóa mới.
-Đây là cơ chế chống gửi trùng, không bảo đảm exactly-once xuyên qua sự cố
-mạng, GPU và filesystem. Chưa có giao diện phục hồi reservation hoặc retention.
-Khóa dùng cho ảnh không hợp lệ cũng bị giữ sau lỗi AI; sửa ảnh cần khóa mới.
+Khi AI **chắc chắn chưa suy luận**, khóa được nhả và có thể gửi lại cùng khóa:
+
+| Lỗi trả cho client | Điều kiện |
+|---|---|
+| 503 `ai_busy` | AI từ chối vì đủ số request (`Retry-After`) |
+| 503 `ai_gatekeeper_unavailable` | AI chưa có trọng số gatekeeper |
+| 400 `invalid_image`, 413 `upload_too_large` | AI từ chối file trước inference; được gửi file khác với cùng khóa |
+| 503 `ai_unavailable` | chưa mở được kết nối (bị từ chối, không phân giải được tên) |
+| 504 `ai_timeout` | hết thời gian **kết nối** |
+
+Mọi trường hợp còn lại giữ khóa ở uncertain, gửi lại nhận 409 `idempotency_uncertain`:
+hết thời gian chờ trả lời, mất kết nối sau khi đã gửi, 503 `ai_unavailable` không rõ
+đã gửi chưa, 502 `ai_inference_failed` hoặc `invalid_ai_response`, và lỗi lưu kết
+quả. Mã lỗi giống nhau (`ai_unavailable`, `ai_timeout`) có thể thuộc hai nhóm, nên
+client không suy ra từ mã: gửi lại cùng khóa, nếu nhận `idempotency_uncertain` thì
+kiểm tra lịch sử trước khi người dùng chủ động tạo tác vụ với khóa mới.
+
+Reservation `running` bị bỏ dở (tiến trình chết) chuyển sang uncertain sau thời hạn
+cấu hình; không tự chạy lại. Đây là cơ chế chống gửi trùng, không bảo đảm
+exactly-once xuyên qua sự cố mạng, GPU và filesystem. Chưa có giao diện phục hồi
+reservation hoặc retention.
 
 Migration 3 chỉ thêm bảng inference_requests. Script
 `checks/migrate_local_database.py` sao lưu trước khi áp dụng và kiểm tra dữ liệu cũ.
