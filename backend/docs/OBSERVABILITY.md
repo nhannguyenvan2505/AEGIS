@@ -79,15 +79,37 @@ Completion log không chứa Authorization, mật khẩu, body, filename upload,
 hoặc query string. Access log của Flask/Werkzeug là luồng riêng và có thể chứa URL;
 không đưa token hay mật khẩu vào URL. Chưa có log rotation/file collector.
 
-Để lưu log local ở PowerShell, mỗi service chạy trong terminal riêng:
+### Kết luận chẩn đoán và số ảnh bị từ chối
+
+Khi AI trả lời `/v2/diagnose`, completion log có thêm `diagnosis_status`:
+`rejected_non_rice`, `rejected_poor_quality`, `rejected_uncertain_scope`,
+`disease_detected`, `uncertain_lesion` hoặc `healthy`. Riêng ảnh kém chất lượng có
+`quality_issues`, chỉ gồm `blur`, `too_dark`, `too_bright`, `no_clear_subject`.
+Ảnh bị từ chối **không được lưu**, nên log là dấu vết duy nhất để đếm. Lần trả lại
+theo `Idempotency-Key` không ghi lại, để không đếm hai lần. Đường `/predict` (v1)
+không có trường này.
+
+```powershell
+python tools/count_diagnosis_outcomes.py backend\instance\logs\backend.log
+```
+
+Công cụ in tổng theo kết luận, tỷ lệ bị từ chối, lý do chất lượng và mã lỗi AI. Nó
+chỉ biết những gì còn trong file được đưa vào: giữ và xoay vòng log là việc của môi
+trường triển khai. Mã thoát 2 nghĩa là có dòng sự kiện bị cắt hoặc hỏng, số liệu
+không đủ.
+
+### Lưu log local trên Windows
+
+Mỗi service chạy trong terminal riêng. Chuyển hướng bằng `cmd`: `*>` của Windows
+PowerShell 5.1 **ngắt dòng dài** làm vỡ JSON, khi đó công cụ đếm báo mã thoát 2.
 
 ```powershell
 Set-Location D:\AEGIS\backend
 New-Item -ItemType Directory -Force instance\logs | Out-Null
 # Terminal AI:
-& D:\AEGIS-AI\.venv\Scripts\python.exe D:\AEGIS-AI\api\app.py *> D:\AEGIS\backend\instance\logs\ai.log
+cmd /c "D:\AEGIS-AI\.venv\Scripts\python.exe D:\AEGIS-AI\api\app.py 2> D:\AEGIS\backend\instance\logs\ai.log"
 # Terminal Backend:
-& D:\AEGIS\backend\.venv\Scripts\python.exe D:\AEGIS\backend\run.py *> D:\AEGIS\backend\instance\logs\backend.log
+cmd /c ".venv\Scripts\python.exe run.py 2> instance\logs\backend.log"
 # Tìm theo ID cụ thể (không ghi token vào file tìm kiếm):
 Select-String -Path D:\AEGIS\backend\instance\logs\*.log -SimpleMatch 'REPLACE_WITH_REQUEST_ID'
 ```
