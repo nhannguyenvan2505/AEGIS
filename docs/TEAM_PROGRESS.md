@@ -1,6 +1,11 @@
 # Tiến độ Git/GitHub AEGIS
 
-**Cập nhật 20/11/2026 (hiện hành):**
+**Cập nhật 25/11/2026 (hiện hành, chỉ phần repository):** repository công khai (chủ ý). GitHub
+cưỡng chế ruleset trên `main`, `develop`, `release/*` với ba check bắt buộc; admin được
+merge PR không cần approval ([thiết lập GitHub](github-setup.md)). Các câu bên dưới về
+repo private, lỗi 403 và chưa có Ruleset đã cũ.
+
+**Cập nhật 20/11/2026 (mốc cũ):**
 
 | PR | Nhánh → đích | Trạng thái |
 |---|---|---|

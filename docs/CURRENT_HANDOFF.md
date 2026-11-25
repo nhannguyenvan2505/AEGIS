@@ -2,6 +2,9 @@
 
 ## Trạng thái hiện hành — 20/11/2026
 
+> Cập nhật 25/11/2026: repository công khai và GitHub đã cưỡng chế ruleset trên nhánh
+> chung ([thiết lập GitHub](github-setup.md)). Cột CI / PR bên dưới vẫn ở mốc cũ.
+
 Đọc bảng này trước. Mọi đoạn có ngày phía dưới là nhật ký theo mốc: câu nào mâu
 thuẫn với bảng này thì bảng này đúng. Phạm vi và quyết định: [DECISIONS_20261120](DECISIONS_20261120.md).
 
@@ -15,7 +18,7 @@ thuẫn với bảng này thì bảng này đúng. Phạm vi và quyết định
 | API | Bảng route sinh tự động từ code (gồm Farm → Plot → Season của mobile) | [API_REFERENCE](API_REFERENCE.md) |
 | CI / PR | `Team policy` trên main; `Backend tests` xanh trên PR #9, #10, #11. Từ 24/11 repo dùng Gitflow (`develop` mặc định, `TEAM_FLOW=gitflow`); PR #8 và #9 đã vào `develop`. Còn lại: #10, #11, #12, #13, #14 | [TEAM_PROGRESS](TEAM_PROGRESS.md) |
 | Hồ sơ môn học | Bộ hồ sơ C1SE.21 đã cập nhật theo quyết định 20/11; thêm SRS, Test Plan, User Guide, Test Report (nháp). Nằm ngoài repo, xem `DANH_MUC.txt` trong thư mục hồ sơ | — |
-| Artifact | Artifact forecast T07–T17 và bằng chứng có ngày không vào Git; chia sẻ qua Release riêng tư | [ARTIFACT_STORAGE](ARTIFACT_STORAGE.md) |
+| Artifact | Artifact forecast T07–T17 và bằng chứng có ngày không vào Git. Cập nhật 25/11: Release là công khai, chỉ tải lên file được phép công khai | [ARTIFACT_STORAGE](ARTIFACT_STORAGE.md) |
 | Việc mở | Benchmark NFR01, E2E trên thiết bị, 4 hạng mục bắt buộc ở D-04, nhãn Low Confidence trên mobile, mentor xác nhận thay đổi phạm vi | [DECISIONS_20261120](DECISIONS_20261120.md) |
 
 **Phạm vi của link trong repo.** Các thư mục bằng chứng có ngày ở gốc repo

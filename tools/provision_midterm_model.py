@@ -1,4 +1,4 @@
-"""Fetch the private Release checkpoints (V4 detector + rice/non_rice gatekeeper) or copy a member-provided file; verify SHA-256."""
+"""Fetch the GitHub Release checkpoints (V4 detector + rice/non_rice gatekeeper) or copy a member-provided file; verify SHA-256."""
 import argparse
 import hashlib
 import json
@@ -42,7 +42,7 @@ def provision(name,source,parser):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--artifact',choices=[*ARTIFACTS,'all'],default='all')
-    parser.add_argument('--source',type=Path,help='Checkpoint downloaded through the private Release page (needs --artifact detector|gatekeeper)')
+    parser.add_argument('--source',type=Path,help='Checkpoint downloaded through the Release page (needs --artifact detector|gatekeeper)')
     args=parser.parse_args()
     if args.source and args.artifact=='all': parser.error('--source needs --artifact detector or gatekeeper')
     for name in (ARTIFACTS if args.artifact=='all' else [args.artifact]):

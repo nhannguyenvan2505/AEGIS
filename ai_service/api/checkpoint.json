@@ -6,5 +6,5 @@
   "sha256": "1b755ca0263daa770dc6928f29d650ce1e441e0c48b0976389d09b26fb70940a",
   "size_bytes": 5509466,
   "classes": {"0": "rice_blast", "1": "brown_spot", "2": "sheath_blight"},
-  "purpose": "YOLO11n V4 image inference for the private team midterm demo"
+  "purpose": "YOLO11n V4 image inference for the team midterm demo. Distributed under AGPL-3.0; see the Release notes."
 }
