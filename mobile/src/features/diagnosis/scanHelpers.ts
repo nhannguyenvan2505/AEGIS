@@ -18,6 +18,18 @@ export function summarizeDetections(result: Analysis) {
   }
   return [...grouped.values()].sort((a, b) => b.confidence - a.confidence);
 }
+export function resultSummary(result: Analysis) {
+  const groups = summarizeDetections(result);
+  if (groups.length) return { groups, needsCheck: false, title: `Có dấu hiệu giống ${groups[0].name.toLocaleLowerCase('vi-VN')}`,
+    body: `AI nhận diện ${result.detections.length} vùng có dấu hiệu bệnh trong ảnh. Cần đối chiếu thêm với tình trạng thực tế của cây.` };
+  if (result.diagnosis?.status === 'uncertain_lesion') return { groups, needsCheck: true, title: 'Có dấu hiệu bất thường, cần kiểm tra thêm',
+    body: result.diagnosis.message || 'AI thấy dấu hiệu bất thường nhưng chưa đủ tin cậy để kết luận bệnh. Hãy chụp lại cận cảnh hoặc kiểm tra thực địa.' };
+  if (result.diagnosis?.status === 'healthy') return { groups, needsCheck: false, title: 'Chưa phát hiện dấu hiệu bệnh',
+    body: 'AI chưa nhận diện được đối tượng bệnh trong ảnh này. Kết quả không xác nhận cây khỏe; hãy chụp lại nếu dấu hiệu vẫn còn.' };
+  // Saved analyses do not keep `diagnosis`, so an uncertain scan cannot be told apart from a clear one.
+  return { groups, needsCheck: false, title: 'Chưa có kết luận bệnh',
+    body: 'Không có vùng bệnh nào đạt ngưỡng tin cậy. Kết quả không xác nhận cây khỏe; hãy chụp lại cận cảnh nếu thấy dấu hiệu bất thường.' };
+}
 export function validateScanImage(image: { width: number; height: number; fileSize?: number; mimeType?: string | null; type?: string | null }) {
   if (image.type && image.type !== 'image') return 'Chỉ chọn ảnh JPEG, PNG hoặc WebP tĩnh.';
   if (image.fileSize && image.fileSize > 8 * 1024 * 1024) return 'Ảnh tối đa 8 MiB. Hãy chọn ảnh có dung lượng nhỏ hơn.';
