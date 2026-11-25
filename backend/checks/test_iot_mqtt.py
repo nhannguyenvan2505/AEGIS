@@ -16,6 +16,7 @@ from app.iot_mqtt import (  # noqa: E402
     validate_esp32_payload,
 )
 from purge_iot_telemetry import purge  # noqa: E402
+from app.iot_alerts import threshold_matches  # noqa: E402
 
 
 class IotMqttTests(unittest.TestCase):
@@ -54,6 +55,23 @@ class IotMqttTests(unittest.TestCase):
         self.assertEqual(evaluate_microclimate(27.0, 80.0)['level'], 'warning')
         self.assertIsNone(evaluate_microclimate(26.0, 65.0)['disease'])
         self.assertEqual(evaluate_microclimate(26.0, 65.0)['level'], 'safe')
+
+    def test_band_without_a_disease_rule_asks_to_watch_instead_of_safe(self):
+        for temperature, humidity in ((27.0, 95.0), (26.6, 88.0), (27.9, 100.0)):
+            result = evaluate_microclimate(temperature, humidity)
+            self.assertEqual((result['level'], result['disease']), ('warning', None), (temperature, humidity))
+        # The neighbouring rules are unchanged.
+        self.assertEqual(evaluate_microclimate(26.5, 95.0)['disease'], 'rice_blast')
+        self.assertEqual(evaluate_microclimate(28.0, 95.0)['disease'], 'sheath_blight')
+        self.assertEqual(evaluate_microclimate(27.0, 86.0)['disease'], 'brown_spot')
+        self.assertEqual(evaluate_microclimate(27.0, 77.0)['level'], 'safe')
+
+    def test_threshold_operators(self):
+        cases = (('gt', 30, 30, False), ('gte', 30, 30, True), ('lt', 29.9, 30, True), ('lte', 30.1, 30, False))
+        for operator, value, limit, expected in cases:
+            self.assertEqual(threshold_matches(operator, value, limit), expected, (operator, value, limit))
+        self.assertEqual([threshold_matches('between', v, 20, 25) for v in (19.9, 20, 25, 25.1)],
+                         [False, True, True, False])
 
     def test_validate_payload_rejects_invalid_values(self):
         with self.assertRaises(ValueError):

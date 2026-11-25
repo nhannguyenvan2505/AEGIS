@@ -5,6 +5,7 @@ Quyết định ngày 25/11/2026: admin đăng ký thiết bị trước; cảnh
 
 ## Cấp phát thiết bị
 
+- ID thiết bị không phân biệt hoa thường, kể cả khi gán số đo vào thửa.
 - Admin đăng ký: `POST /api/admin/devices` với trường mới `device_uid` (ID mà ESP32 gửi), cùng `season_id`,
   `device_code`, `sensor_type`. Đăng ký xong, số đo tự vào thửa đó. Quy tắc cũ vẫn áp dụng: mỗi thửa một thiết bị
   cho mỗi `sensor_type`. `PUT /api/admin/iot/bindings` cũng là thao tác gán của admin.
@@ -21,8 +22,24 @@ Quyết định ngày 25/11/2026: admin đăng ký thiết bị trước; cảnh
 | `medium` (khô vằn) | `warning` | Có |
 | `warning` (đốm nâu), `safe` | | Không |
 
-Số đo có `observed_at` cũ hơn 6 giờ (gửi bù) không tạo cảnh báo. Ngưỡng nhiệt độ, độ ẩm vẫn là ngưỡng viết cứng
-hiện có, **chưa dùng** `alert_thresholds`. Chưa có API cho người dùng đọc danh sách cảnh báo.
+Số đo có `observed_at` cũ hơn 6 giờ (gửi bù) không tạo cảnh báo. Chưa có API cho người dùng đọc danh sách cảnh báo.
+
+**Khoảng không có luật bệnh** (trên 26,5°C và dưới 28°C, độ ẩm từ 85%, ngoài khoảng đốm nâu): API trả
+`alert.level = "warning"` với **`disease = null`**, tiêu đề "Theo dõi · Độ ẩm cao". Client không được giả định
+mức `warning` luôn có tên bệnh. Mức này không tạo cảnh báo. Ngưỡng của ba luật bệnh vẫn viết trong code và chưa
+được người có chuyên môn bệnh lúa xác nhận trong hồ sơ.
+
+### Ngưỡng do admin đặt
+
+Dòng `alert_thresholds` đang bật với `metric` là `temperature` hoặc `humidity` tạo cảnh báo riêng
+(`source_key = threshold:<id>`), bên cạnh luật bệnh:
+
+- Phạm vi: có `plot_id` thì chỉ thửa đó; chỉ có `farm_id` thì mọi thửa của nông trại; không có cả hai thì mọi
+  thửa. Các dòng khớp đều được áp dụng, không dòng nào ghi đè dòng khác.
+- `severity` lấy từ dòng ngưỡng. `info` chỉ ghi cảnh báo, **không gửi push**.
+- Thời gian chờ 6 giờ tính theo từng thửa và từng ngưỡng.
+- `soil_moisture`, `soil_ph`, `risk_probability`, `confidence` chưa được IoT dùng. Tối đa 50 ngưỡng cho một số đo.
+- Ngưỡng toàn hệ thống đặt quá rộng sẽ tạo cảnh báo và push cho mọi thửa có thiết bị.
 
 ## API push cho mobile
 

@@ -24,7 +24,7 @@ def register():
     """Đăng ký metadata của artifact đã có trên máy chủ (chưa nhận tải tệp qua API). Bản mới chưa kích hoạt."""
     data = body()
     sha = data.get('artifact_sha256')
-    if data.get('model_type') not in ('yolo_detection', 'risk_prediction'):
+    if data.get('model_type') not in ('yolo_detection', 'risk_prediction', 'rice_gatekeeper'):
         raise ApiError('invalid_field', 'model_type không hợp lệ.', 422)
     for key in ('version_name', 'algorithm', 'artifact_path'):
         if not isinstance(data.get(key), str) or not data[key].strip():
