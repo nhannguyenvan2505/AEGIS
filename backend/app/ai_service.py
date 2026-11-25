@@ -27,9 +27,18 @@ def validate_result(data, expected_request_id):
     image = data.get('image')
     if not isinstance(image, dict) or any(type(image.get(k)) is not int or image[k] <= 0 for k in ('width', 'height')):
         raise ValueError('Invalid dimensions')
+    detections = validate_boxes(data['detections'], image)
+    return dict(success=True, model_version=data['model_version'],
+                request_id=expected_request_id, model_sha256=data['model_sha256'],
+                timings={'ai_processing_ms': duration},
+                image={'width': image['width'], 'height': image['height'], 'orientation': 'exif_corrected'},
+                detections=detections, status='detection_found' if detections else 'no_detection')
+
+
+def validate_boxes(items, image):
     names = {0: 'rice_blast', 1: 'brown_spot', 2: 'sheath_blight'}
     detections = []
-    for item in data['detections']:
+    for item in items:
         if not isinstance(item, dict):
             raise ValueError('Invalid detection')
         class_id, confidence, bbox = item.get('class_id'), item.get('confidence'), item.get('bbox_xyxy')
@@ -44,11 +53,41 @@ def validate_result(data, expected_request_id):
             raise ValueError('Invalid bbox bounds')
         detections.append(dict(class_id=class_id, disease=names[class_id], confidence=confidence,
                                bbox=dict(x1=x1, y1=y1, x2=x2, y2=y2)))
-    return dict(success=True, model_version=data['model_version'],
-                request_id=expected_request_id, model_sha256=data['model_sha256'],
-                timings={'ai_processing_ms': duration},
-                image={'width': image['width'], 'height': image['height'], 'orientation': 'exif_corrected'},
-                detections=detections, status='detection_found' if detections else 'no_detection')
+    return detections
+
+
+DIAGNOSIS_STATUSES = ('disease_detected', 'uncertain_lesion', 'healthy')
+
+
+def diagnosis_record(data):
+    """The /v2 outcome persisted beside an accepted analysis; None for /predict (v1).
+
+    Call after validate_result(): it relies on an already validated `image`.
+    """
+    status = data.get('status')
+    if status not in DIAGNOSIS_STATUSES:
+        return None
+    gate = data.get('gatekeeper')
+    gate = {} if gate is None else gate
+    if not isinstance(gate, dict):
+        raise ValueError('Invalid gatekeeper report')
+    probability = gate.get('rice_probability')
+    if probability is not None and (type(probability) not in (int, float) or not math.isfinite(probability)
+                                    or not 0 <= probability <= 1):
+        raise ValueError('Invalid rice probability')
+    for key, limit in (('method', 32), ('version', 100)):
+        if gate.get(key) is not None and (not isinstance(gate[key], str) or len(gate[key]) > limit):
+            raise ValueError('Invalid gatekeeper ' + key)
+    digest = gate.get('sha256')
+    if digest is not None and (not isinstance(digest, str) or not re.fullmatch('[0-9a-f]{64}', digest)):
+        raise ValueError('Invalid gatekeeper digest')
+    regions = data.get('uncertain_regions')
+    regions = [] if regions is None else regions
+    if not isinstance(regions, list) or len(regions) > 300:
+        raise ValueError('Invalid uncertain regions')
+    return dict(diagnosis_status=status, rice_probability=probability,
+                gatekeeper_method=gate.get('method'), gatekeeper_version=gate.get('version'),
+                gatekeeper_sha256=digest, uncertain_regions=validate_boxes(regions, data['image']))
 
 
 REJECTED = {'rejected_poor_quality', 'rejected_non_rice', 'rejected_uncertain_scope'}
@@ -113,6 +152,9 @@ def predict_image(payload, config, request_id):
             result['ai_status'] = body['status']  # disease_detected | uncertain_lesion | healthy
             result['is_rice'] = body.get('is_rice')
             result['ai_message'] = body.get('message')
+        record = diagnosis_record(body)
+        if record is not None:
+            result['diagnosis_record'] = record  # stored by the route, not part of its response
         result['timings']['ai_roundtrip_ms'] = round((time.perf_counter() - started) * 1000, 3)
         return result
     except (ValueError, TypeError, KeyError) as exc:

@@ -50,23 +50,17 @@ def mysql_repository(config):
             connection.close()
 
 
+REQUIRED_SCHEMA_VERSIONS = range(2, 10)
+
+
 def check_schema(config):
     with mysql_repository(config) as repo:
-        row = repo.one('SELECT status FROM schema_versions WHERE version=2')
-        if not row or row['status'] != 'complete':
-            raise RuntimeError('Apply MySQL migration 002_core_runtime.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=3')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 003_hybrid.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=4')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 004_api_semantics.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=5')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 005_farm_hierarchy.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=6')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 006_outbox_delivery.sql (database/apply_hybrid.py) before selecting mysql')
+        complete = {row['version'] for row in
+                    repo.all("SELECT version FROM schema_versions WHERE status='complete'")}
+    missing = [version for version in REQUIRED_SCHEMA_VERSIONS if version not in complete]
+    if missing:
+        raise RuntimeError(f'MySQL migrations {missing} are not applied. '
+                           'Back up, then run backend/database/migrate.py before selecting mysql')
 
 
 # Projections expose exactly the UUID/ISO strings expected by the existing API.
@@ -388,8 +382,12 @@ class MySQLRepository:
         model_id = model['model_version_id'] if model else self.execute('''INSERT INTO model_versions
             (model_type,version_name,algorithm,artifact_path,artifact_sha256) VALUES ('yolo_detection',%s,'YOLO11',%s,%s)''', (sha,'sha256:'+sha,sha)).lastrowid
         run = self.execute('''INSERT INTO analysis_runs(external_id,user_id,image_id,model_version_id,model_version,model_sha256,status,
-            request_id,ai_processing_ms,ai_roundtrip_ms,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
-            (analysis['id'],user,image,model_id,analysis['model_version'],sha,analysis['status'],analysis['request_id'],analysis['ai_processing_ms'],analysis['ai_roundtrip_ms'],analysis['created_at'])).lastrowid
+            request_id,ai_processing_ms,ai_roundtrip_ms,created_at,diagnosis_status,rice_probability,gatekeeper_method,
+            gatekeeper_version,gatekeeper_sha256,uncertain_regions)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+            (analysis['id'],user,image,model_id,analysis['model_version'],sha,analysis['status'],analysis['request_id'],analysis['ai_processing_ms'],analysis['ai_roundtrip_ms'],analysis['created_at'],
+             *(analysis.get(name) for name in ('diagnosis_status','rice_probability','gatekeeper_method',
+               'gatekeeper_version','gatekeeper_sha256','uncertain_regions')))).lastrowid
         for detection in detections:
             label = detection['disease']
             disease = self.one('SELECT disease_id FROM diseases WHERE disease_name=%s', (label,))

@@ -50,6 +50,8 @@ def main():
         keys=mysql_check('Pilot namespace registry', 'SELECT store_key FROM pilot_stores;').splitlines()
         for key in keys:
             expected.update('p_'+key+'_'+scopes[filename]+'_'+name for filename,data in layout.items() for name in data['columns'])
+    if 'esp32_telemetry_readings' in tables:
+        expected |= {'esp32_telemetry_readings','esp32_device_bindings'}
     if set(tables) != expected:
         raise RuntimeError(f'Unexpected MySQL tables: {tables}')
     token = uuid.uuid4().hex

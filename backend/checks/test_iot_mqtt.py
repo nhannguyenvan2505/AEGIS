@@ -4,14 +4,18 @@ import sys
 import tempfile
 import threading
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'database'))
 
 from app import create_app  # noqa: E402
 from app.iot_mqtt import (  # noqa: E402
-    DeviceBoundError, bind_device_to_plot, evaluate_microclimate, save_esp32_reading, validate_esp32_payload,
+    DeviceBoundError, bind_device_to_plot, evaluate_microclimate, query_esp32_telemetry, save_esp32_reading,
+    validate_esp32_payload,
 )
+from purge_iot_telemetry import purge  # noqa: E402
 
 
 class IotMqttTests(unittest.TestCase):
@@ -209,6 +213,44 @@ class IotMqttTests(unittest.TestCase):
             for thread in threads:
                 thread.join()
             self.assertEqual((errors, len(winners)), ([], 1), f'attempt {attempt}')
+
+    def test_redelivered_packet_is_stored_once(self):
+        packet = {'device_uid': 'ESP32-DUP', 'temperature': 27.0, 'humidity': 80.0,
+                  'observed_at': '2026-11-25T01:02:03+07:00'}
+        first = save_esp32_reading(self.app.config, packet)
+        again = save_esp32_reading(self.app.config, dict(packet, device_uid='esp32-dup'))
+        self.assertEqual((again['id'], again['created_at']), (first['id'], first['created_at']))
+        # Different values at the same instant are different data and are kept.
+        self.assertNotEqual(save_esp32_reading(self.app.config, dict(packet, temperature=28.0))['id'], first['id'])
+        anonymous = {k: v for k, v in packet.items() if k != 'device_uid'}
+        ids = {save_esp32_reading(self.app.config, anonymous)['id'] for _ in range(2)}
+        self.assertEqual(len(ids), 2)
+        seen = query_esp32_telemetry(self.app.config, plot_ids=None)['items']
+        self.assertEqual(len(seen), 4)
+        self.assertEqual({item['observed_at'] for item in seen}, {'2026-11-24T18:02:03+00:00'})
+
+    def test_implausible_device_clock_is_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_esp32_payload({'temperature': 25, 'humidity': 50, 'observed_at': '0999-01-01T00:00:00Z'})
+
+    def test_retention_counts_first_and_deletes_only_old_readings(self):
+        headers = self._auth_header()
+        plot = self._plot(headers, 'Retention')
+        self.assertEqual(self._bind(headers, 'ESP32-OLD', plot).status_code, 200)
+        for temperature in (20.0, 21.0, 22.0):
+            save_esp32_reading(self.app.config, {'device_uid': 'ESP32-OLD', 'temperature': temperature, 'humidity': 60.0})
+        later = datetime.now(timezone.utc) + timedelta(days=31)
+        self.assertEqual(purge(self.app.config, 365, apply=True, now=later)['deleted'], 0)
+        counted = purge(self.app.config, 30, now=later)
+        self.assertEqual((counted['matched'], counted['deleted']), (3, 0))
+        self.assertEqual(len(self._latest(headers)['items']), 3)
+        self.assertEqual(purge(self.app.config, 30, apply=True, batch=2, now=later)['deleted'], 3)
+        self.assertEqual(self._latest(headers)['items'], [])
+        # The binding survives, so new readings still reach the plot.
+        save_esp32_reading(self.app.config, {'device_uid': 'ESP32-OLD', 'temperature': 23.0, 'humidity': 60.0})
+        self.assertEqual(len(self._latest(headers)['items']), 1)
+        with self.assertRaises(ValueError):
+            purge(self.app.config, 0)
 
     def test_iot_routes_require_auth(self):
         self.assertEqual(self.client.get('/api/iot/latest').status_code, 401)

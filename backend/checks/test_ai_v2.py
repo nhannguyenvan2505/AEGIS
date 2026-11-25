@@ -1,5 +1,6 @@
 """Backend handling of /v2/diagnose: domain rejections are answered, never stored; healthy/uncertain keep status."""
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -64,6 +65,52 @@ class V2Tests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json['status'], 'no_detection'); self.assertEqual(r.json['diagnosis']['status'], 'healthy')
         self.assertEqual(self.count(), 1)
+
+    def accepted(self, status, **extra):
+        return dict(dict(status=status, is_rice=True, message='m', model_sha256='d' * 64, model_version='m',
+                         processing_ms=1, image=dict(width=32, height=32), detections=[],
+                         gatekeeper=dict(method='yolo_cls', version='best.pt', sha256='e' * 64,
+                                         rice_probability=0.97, normalized_entropy=0.1)), **extra)
+
+    def rows(self):
+        with connect(self.app.config) as db:
+            return [dict(row) for row in db.execute(
+                'SELECT status,diagnosis_status,rice_probability,gatekeeper_method,gatekeeper_version,'
+                'gatekeeper_sha256,uncertain_regions FROM analyses ORDER BY rowid')]
+
+    def test_diagnosis_outcome_is_stored_without_changing_the_response(self):
+        region = dict(class_id=1, class_name='brown_spot', confidence=0.2, bbox_xyxy=[1, 2, 10, 12])
+        first = self.post(self.accepted('uncertain_lesion', uncertain_regions=[region]), key='u1')
+        second = self.post(self.accepted('healthy', uncertain_regions=[]))
+        self.assertEqual((first.status_code, second.status_code), (200, 200))
+        for response in (first, second):
+            self.assertEqual(response.json['status'], 'no_detection')
+            self.assertNotIn('diagnosis_record', response.json)
+            self.assertNotIn('uncertain_regions', response.json)
+        uncertain, healthy = self.rows()
+        self.assertEqual((uncertain['diagnosis_status'], healthy['diagnosis_status']), ('uncertain_lesion', 'healthy'))
+        self.assertEqual((uncertain['rice_probability'], uncertain['gatekeeper_method'], uncertain['gatekeeper_version'],
+                          uncertain['gatekeeper_sha256']), (0.97, 'yolo_cls', 'best.pt', 'e' * 64))
+        self.assertEqual(json.loads(uncertain['uncertain_regions']), [dict(
+            class_id=1, disease='brown_spot', confidence=0.2, bbox=dict(x1=1, y1=2, x2=10, y2=12))])
+        self.assertEqual(json.loads(healthy['uncertain_regions']), [])
+
+    def test_older_ai_without_gate_identity_is_still_accepted(self):
+        body = self.accepted('healthy')
+        del body['gatekeeper']
+        self.assertEqual(self.post(body).status_code, 200)
+        row = self.rows()[0]
+        self.assertEqual((row['diagnosis_status'], row['rice_probability'], row['gatekeeper_sha256']),
+                         ('healthy', None, None))
+
+    def test_invalid_diagnosis_record_is_bad_gateway_and_stores_nothing(self):
+        bad_region = dict(class_id=1, class_name='rice_blast', confidence=0.2, bbox_xyxy=[1, 2, 10, 12])
+        for extra in (dict(gatekeeper=dict(rice_probability=1.5)), dict(gatekeeper=dict(sha256='xyz')),
+                      dict(gatekeeper=dict(version='v' * 101)), dict(uncertain_regions=[bad_region])):
+            response = self.post(self.accepted('uncertain_lesion', **extra))
+            self.assertEqual((response.status_code, response.json['error']['code']),
+                             (502, 'invalid_ai_response'), extra)
+        self.assertEqual(self.count(), 0)
 
     def test_missing_gatekeeper_weights_is_service_unavailable(self):
         with patch('app.ai_service.requests.post', return_value=Mock(status_code=503, json=lambda: {'error': {'code': 'gatekeeper_unavailable'}})):

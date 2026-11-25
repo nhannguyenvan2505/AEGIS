@@ -24,7 +24,7 @@ def _target(identifier):
 def _role_id(name):
     value = repo.role_id(name)
     if value is None:
-        raise ApiError('invalid_role', f'Role "{name}" chưa tồn tại (xem database/mysql/admin/001_admin_additions.sql).', 422)
+        raise ApiError('invalid_role', f'Role "{name}" chưa tồn tại (xem bảng roles).', 422)
     return value
 
 

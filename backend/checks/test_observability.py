@@ -127,11 +127,11 @@ class MigrationTests(unittest.TestCase):
             with connect(config) as db:
                 row=db.execute("SELECT * FROM analyses WHERE id='legacy-id'").fetchone()
                 self.assertEqual(tuple(row)[:9],original)
-                self.assertEqual(tuple(row)[9:],(None,None,None,None))
+                self.assertEqual(tuple(row)[9:],(None,)*10)  # trace + diagnosis columns
                 self.assertEqual(tuple(db.execute("SELECT * FROM analyses WHERE id='owned-id'").fetchone())[:9],owned)
                 self.assertEqual(tuple(db.execute('SELECT * FROM detections').fetchone()),detection)
                 self.assertEqual(db.execute("SELECT password_hash FROM users WHERE id='owner-id'").fetchone()[0],'legacy-hash')
-                self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')},{1,2,3,4,5,6})
+                self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')},{1,2,3,4,5,6,7})
                 user=db.execute("SELECT role,status FROM users WHERE id='owner-id'").fetchone()
                 self.assertEqual(tuple(user),('farmer','active'))
 

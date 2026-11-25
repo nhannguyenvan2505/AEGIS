@@ -44,6 +44,16 @@ def apply_migrations(db):
     # Farm hierarchy first: it removes an old development marker stored as
     # schema_migrations version 6, which the role migration below now owns.
     apply_farm_hierarchy_migration(db)
+    if not db.execute('SELECT 1 FROM schema_migrations WHERE version=7').fetchone():
+        # Mirrors database/mysql/008_diagnosis_record.sql for SQLite fixtures.
+        for column in ("diagnosis_status TEXT CHECK(diagnosis_status IN "
+                       "('disease_detected','uncertain_lesion','healthy'))",
+                       'rice_probability REAL CHECK(rice_probability BETWEEN 0 AND 1)',
+                       'gatekeeper_method TEXT', 'gatekeeper_version TEXT', 'gatekeeper_sha256 TEXT',
+                       'uncertain_regions TEXT'):
+            db.execute('ALTER TABLE analyses ADD COLUMN ' + column)
+        db.execute('INSERT INTO schema_migrations VALUES (7,?,?)',
+                   ('diagnosis_record', datetime.now(timezone.utc).isoformat()))
     if not db.execute('SELECT 1 FROM schema_migrations WHERE version=6').fetchone():
         # Idempotent: a store upgraded from the old farm-hierarchy marker may
         # already have these columns/table.

@@ -30,6 +30,47 @@ docker compose exec mongo sh -c 'mongosh --quiet -u aegis_app -p "$AEGIS_MONGO_P
 
 Bootstrap chỉ chạy khi volume rỗng. `docker compose stop` dừng service; `docker compose start` mở lại với dữ liệu cũ. Việc chỉnh file bootstrap không nâng schema của volume đã có; các bước nâng cấp sau phải có migration riêng. Nếu bootstrap lỗi, xem `docker compose logs mysql mongo`, sửa lỗi và xác định trạng thái volume trước khi chạy lại. Không dùng reset volume với dữ liệu cần giữ.
 
+## Nâng cấp database đã có (migration đánh số)
+
+Backend chỉ khởi động khi mọi migration 2–9 đã `complete`. Sau khi kéo code mới, **backup trước** (DDL
+MySQL tự commit), dừng backend rồi chạy:
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/migrate.py --status
+```
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/migrate.py
+```
+
+Dùng được cho cả MySQL native và Docker (cấu hình lấy từ environment hoặc `.env`).
+`setup_native_mysql.py` cũng gọi cùng bộ chạy này. Volume Docker mới tự chạy toàn bộ SQL cấp một trong `mysql/`.
+
+| Migration | Nội dung |
+|---|---|
+| 007 | `iot_devices.sensor_type`, hai bảng ESP32, tên 3 bệnh. Chạy được cả khi cột đã thêm tay hoặc bảng đã do backend tự tạo |
+| 008 | Lưu `diagnosis_status`, `rice_probability`, gatekeeper (method/version/SHA-256), `uncertain_regions` trong `analysis_runs`. NULL = không rõ (bản ghi cũ, API v1) |
+| 009 | Chống ghi trùng gói ESP32 (`dedup_token`), đổi cột thời gian sang `DATETIME(6)` UTC, index cho retention. Không xoá bản ghi cũ, kể cả bản trùng |
+
+Nếu một migration dừng ở trạng thái `running`, bộ chạy từ chối chạy tiếp: khôi phục từ backup hoặc kiểm schema
+bằng tay. Quay về code cũ sau 009 cần khôi phục backup (code cũ đọc cột thời gian dạng chuỗi).
+
+### Retention telemetry ESP32
+
+Chưa chốt thời hạn lưu nên không có mặc định và không chạy tự động. Không có `--apply` thì chỉ đếm; tuổi tính
+theo `created_at` (giờ server), binding thiết bị được giữ nguyên.
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/purge_iot_telemetry.py --older-than-days 180
+```
+
+### Giới hạn của backup/restore hiện có
+
+`app/hybrid_backup.py` và `verify_restore.py` chỉ chạy với **Docker Compose**, database tên `aegis`, và cần một
+kho pilot hybrid. Chưa có công cụ cho MySQL/MongoDB native hay cho deploy chỉ có core. `verify_restore.py` khôi phục
+vào database dùng một lần để đối chiếu; nó kiểm hash file ảnh trong bản backup chứ không phải quy trình khôi phục
+production.
+
 ## Quy tắc schema
 
 `mysql/001_design.sql` tạo đủ 18 bảng và FK/index của tài liệu. Bootstrap chỉ seed roles farmer/admin. Migration 002 bổ sung external_id để giữ UUID của API, cùng bảng runtime được giải thích bên dưới. FK `SET NULL` sử dụng cột nullable; ID số dùng INT/BIGINT đúng nhóm dữ liệu tài liệu.
@@ -56,7 +97,7 @@ Set-Location D:\AEGIS
 
 Volume mới chạy tự động cả bốn SQL script trong bootstrap. Các script nâng cấp kiểm tra marker và bỏ qua migration đã hoàn tất. Launcher serve_mysql chạy ở `http://127.0.0.1:5001`; run.py/serve_mobile.py dùng cổng 5000. Endpoint và UUID contract giữ nguyên. Cấu hình từ `.env` và environment; ảnh riêng dưới `backend/mysql-instance/uploads`. Dịch vụ nhận diện ảnh vẫn cần AI API đang chạy.
 
-Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; mặc định chọn MySQL. Environment hỗ trợ `AEGIS_MYSQL_HOST`, `AEGIS_MYSQL_PORT`, `AEGIS_MYSQL_USER`, `AEGIS_MYSQL_PASSWORD`, `AEGIS_MYSQL_DATABASE` và các khóa MONGO tương ứng. Startup yêu cầu migrations 2/3/4 hoàn tất, không tự nâng schema hoặc fallback. Core dùng repository; SQL nội bộ của pilot dùng dialect adapter và API views thay vì mở SQLite.
+Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; mặc định chọn MySQL. Environment hỗ trợ `AEGIS_MYSQL_HOST`, `AEGIS_MYSQL_PORT`, `AEGIS_MYSQL_USER`, `AEGIS_MYSQL_PASSWORD`, `AEGIS_MYSQL_DATABASE` và các khóa MONGO tương ứng. Startup yêu cầu mọi migration 2–9 hoàn tất, không tự nâng schema hoặc fallback. Core dùng repository; SQL nội bộ của pilot dùng dialect adapter và API views thay vì mở SQLite.
 
 `create_pilot_app` mặc định chọn MySQL và provision namespace theo đường dẫn pilot. Marker `.aegis-hybrid.json` ngăn dùng nhầm backend SQLite cho kho đã chuyển. Journal, follow-up, episodes, revisions, research, timeline, automation, hourly, forecast và alerts đã chạy trên MySQL; telemetry và AI logs được chuyển tiếp Mongo qua outbox.
 
