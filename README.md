@@ -1,6 +1,6 @@
 # AEGIS
 
-**Frontend midterm handoff:** follow [the team quickstart](docs/MIDTERM_TEAM_QUICKSTART.md) for setup, private model download, hybrid databases and demo launch. See [checkout verification](docs/MIDTERM_HANDOFF_VERIFICATION.md) for what was exercised.
+**Frontend midterm handoff:** follow [the team quickstart](docs/MIDTERM_TEAM_QUICKSTART.md) for setup, model download from GitHub Releases, hybrid databases and demo launch. See [checkout verification](docs/MIDTERM_HANDOFF_VERIFICATION.md) for what was exercised.
 
 Database update 09/11/2026: core/mobile/pilot now default to MySQL with MongoDB telemetry and inference logs. Start Docker databases before the API; see [hybrid database runbook](docs/HYBRID_DATABASE_RUNBOOK.md). Existing runtime SQLite data has been migrated and retained as recovery sources.
 

@@ -93,13 +93,12 @@ service-account*.json
 /backend/.native-db-paused
 /backend/.native-db-supervisor.lock
 /backend/native-db-supervisor.log
-=======
 
 # Text extracts of course documents (C1SE.21); contain members' phone numbers and emails.
 /_doc_review/
 
 # Forecast experiment artifacts (T07–T17, ~230 MB) and generated hourly-contract
-# outputs: share as private GitHub Release assets, see docs/ARTIFACT_STORAGE.md.
+# outputs: GitHub Releases are public; see docs/ARTIFACT_STORAGE.md before sharing.
 /forecast_*_t[0-9][0-9]/
 /hourly_contract_v1/t[0-9][0-9]_*.json
 

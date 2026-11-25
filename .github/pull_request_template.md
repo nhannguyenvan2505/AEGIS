@@ -27,4 +27,5 @@ Hành vi trước/sau và phạm vi:
 - [ ] Đã chạy kiểm tra phù hợp và ghi kết quả thực tế.
 - [ ] Đã ghi kết quả AI/bot review nếu nhóm đã cấu hình công cụ đó.
 - [ ] Đã chọn assignee và reviewer độc lập đã nhận việc.
-- [ ] Trước merge: approval độc lập, check đạt, người nhận xét xác nhận resolve.
+- [ ] Trước merge: check đạt, người nhận xét xác nhận resolve, và có approval độc lập
+      (nếu admin merge không có approval: ghi rõ "không có review độc lập").
