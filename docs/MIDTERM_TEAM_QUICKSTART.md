@@ -8,7 +8,7 @@ Cần quyền vào repo GitHub riêng tư, Git, Python 3.11, Docker Desktop ch�
 
 ```powershell
 gh auth login
-git clone --branch nvn/portable-forecast-demo https://github.com/nhannguyenvan2505/AEGIS.git
+git clone --branch develop https://github.com/nhannguyenvan2505/AEGIS.git
 Set-Location AEGIS
 powershell -ExecutionPolicy Bypass -File tools/setup_midterm.ps1 -IncludeImageAI
 ```
@@ -89,4 +89,4 @@ Ctrl+C ở launcher để dừng Backend/worker, Ctrl+C ở AI để dừng imag
 
 Lỗi Docker pipe: mở Docker Desktop và đợi Engine sẵn sàng. Lỗi private asset: kiểm tra `gh auth status` và quyền repo, hoặc tải model bằng trình duyệt rồi dùng `-CheckpointPath`. Lỗi cổng 5000: đóng launcher cũ trước khi mở lượt mới. Database không kết nối: kiểm tra `docker compose ... ps`; không xóa volumes để thử chữa lỗi.
 
-Source được bàn giao qua nhánh task và PR để review; việc clone nhánh này không yêu cầu chờ merge vào main.
+Thay đổi được đưa vào `develop` qua nhánh task và PR để review; việc clone `develop` không yêu cầu chờ phát hành lên main.

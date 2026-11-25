@@ -4,11 +4,11 @@
 
 **Cập nhật database 09/11/2026:** khởi tạo MySQL + MongoDB bằng Docker trước các launcher. Core, mobile API và pilot mặc định đã chuyển sang hybrid storage; xem [runbook database](docs/HYBRID_DATABASE_RUNBOOK.md). Mô tả bảy file SQLite trong evidence cũ là trạng thái trước chuyển đổi.
 
-Nhánh này gom source mobile, Backend/pilot, prototype web, simulator IoT, công
+Nhánh `develop` gom source mobile, Backend/pilot, prototype web, simulator IoT, công
 cụ demo và forecast synthetic. Checkout tại PowerShell:
 
 ```powershell
-git clone --branch nvn/portable-forecast-demo https://github.com/nhannguyenvan2505/AEGIS.git
+git clone --branch develop https://github.com/nhannguyenvan2505/AEGIS.git
 Set-Location AEGIS
 Get-Content forecast_demo/README.md
 ```
