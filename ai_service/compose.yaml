@@ -1,0 +1,22 @@
+---
+# AI service for a single host that also runs the Backend (decision 25/11/2026). See DEPLOY.md.
+name: aegis-ai
+services:
+  ai:
+    build: .
+    image: aegis-ai:local
+    # The service has no authentication: publish it on loopback only, never on a public interface.
+    ports:
+      - "127.0.0.1:${AEGIS_AI_PORT:-8000}:8000"
+    volumes:
+      - ${AEGIS_MODELS_DIR:-./experiments}:/app/experiments:ro
+    environment:
+      AEGIS_AI_MAX_INFLIGHT: ${AEGIS_AI_MAX_INFLIGHT:-2}
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
