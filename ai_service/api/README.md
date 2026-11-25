@@ -32,6 +32,37 @@ The prototype binds to http://127.0.0.1:8000 with Flask debug and reloader disab
 Invoke-RestMethod http://127.0.0.1:8000/health
 ```
 
+`/health` is the readiness check of the default path, `/v2/diagnose`. It returns
+**503** with `status: degraded` while the gatekeeper weights are missing, and 200
+with `status: ready` otherwise. The body names both models (`model_sha256`,
+`model_pinned`, `gatekeeper.version/sha256/pinned`); read it for any status code.
+`/v2/health` stays 200 and adds the pipeline thresholds. The v1 `/predict` route
+does not need the gatekeeper.
+
+## Model pinning
+
+At startup the default detector and the gatekeeper are hashed **before** loading
+and compared with `checkpoint.json` and `gatekeeper.json`. A different file stops
+the service. To try a candidate on purpose, set `AEGIS_ALLOW_UNPINNED_MODELS=1`;
+the service then reports `pinned: false` and, for a detector, the version
+`aegis-yolo11n-candidate`. Do not set it on a deployed service. To promote a new
+model, publish it and update the matching manifest (`release`, `sha256`,
+`size_bytes`). A pinned gatekeeper reports the manifest's `release` as its version.
+
+## Load check
+
+With the service running, on a folder holding a few mixed test images:
+
+```powershell
+python ai_service/api/load_test.py --url http://127.0.0.1:8000 --images <folder>
+```
+
+It records each image's answer alone, then repeats under concurrency 1, 2, 4 and 8.
+Only HTTP 503 `ai_busy` is an accepted failure; a changed answer fails the run.
+Above `AEGIS_AI_MAX_INFLIGHT` (default 2) most requests are rejected by design,
+and the tool does not wait for `Retry-After`, so read latency from the levels
+within the limit.
+
 ## Predict
 
 ```powershell
