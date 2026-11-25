@@ -58,7 +58,7 @@ function HistorySession({ token, ready }: { token?: string; ready: boolean }) {
             style={({ pressed }) => [s.scanHistoryCard, pressed && s.scanPressed]}>
             <ScanThumbnail id={item.analysis_id} token={token} />
             <View style={s.scanHistoryCardBody}>
-              <Text style={s.scanHistoryCardTitle}>{item.detection_count ? `Có ${item.detection_count} vùng dấu hiệu` : 'Chưa phát hiện dấu hiệu bệnh'}</Text>
+              <Text style={s.scanHistoryCardTitle}>{item.detection_count ? `Có ${item.detection_count} vùng dấu hiệu` : 'Chưa có kết luận bệnh'}</Text>
               <Text style={s.scanSmall}>{scanDate(item.created_at)}</Text>
               <Text style={s.scanHistoryLink}>Xem ảnh và kết quả</Text>
             </View>

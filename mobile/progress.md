@@ -124,3 +124,9 @@
 - Stack: `animation: 'fade'` 140 ms + `freezeOnBlur` (màn hình ẩn không render lại) ở `_layout.tsx` và `farms/_layout.tsx`.
 - `useFarmData`: stale-while-revalidate — không bật spinner khi đã có dữ liệu mỗi lần focus lại màn hình.
 - Lưu ý: Expo Go ở chế độ dev chậm hơn bản release nhiều.
+
+## 2026-11-25 11:04 — Hiển thị đúng kết quả nghi ngờ khi quét bệnh
+- Công việc: `uncertain_lesion` trước đây hiện "Chưa phát hiện dấu hiệu bệnh"; nay hiện cảnh báo "Có dấu hiệu bất thường, cần kiểm tra thêm" kèm thông điệp từ server. Kết quả không có `diagnosis` (xem lại từ lịch sử, API v1) và thẻ lịch sử không có vùng bệnh nay ghi "Chưa có kết luận bệnh".
+- File: `src/features/diagnosis/scanHelpers.ts`, `AnalysisResult.tsx`, `HistoryScreen.tsx`.
+- Kiểm tra: chạy `resultSummary` với 5 trạng thái đúng nội dung. Lint còn 6 lỗi + 1 cảnh báo như trước khi sửa. `tsc --noEmit` còn 7 lỗi ngoài phần sửa (`_layout.tsx` và các module chưa cài: expo-file-system, expo-print, expo-sharing, fflate). Chưa xem trên thiết bị.
+- # Vấn đề còn tồn tại: backend không lưu `diagnosis.status` nên Lịch sử chưa phân biệt được lần quét nghi ngờ; cần đổi backend/database (phải xin phép). Cần `npm install` để hết lỗi thiếu module.
