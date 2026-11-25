@@ -19,6 +19,7 @@ from app.database_config import settings
 from app.repositories.mysql import mysql_repository
 from app.hybrid_pilot import provision,store_key,SCOPES,LAYOUT,PilotConnection
 from app.mongo_delivery import deliver
+from app.storage import DIAGNOSIS_COLUMNS
 from native_tools import mysql_dump
 
 
@@ -178,7 +179,8 @@ def migrate_core(repo,path,data,uploads,report):
         if file_hash(target)!=image_hash: raise RuntimeError('Image SHA-256 differs after copy')
         report['images'][row['image_path']]=image_hash
         actual=repo.owned('analyses',row['id'],row['user_id'])
-        if actual: assert_equal(actual,row,'analyses')
+        listed={k:v for k,v in row.items() if k not in DIAGNOSIS_COLUMNS}
+        if actual: assert_equal(actual,listed,'analyses')
         else:
             values=[]
             for detection in related:
@@ -187,7 +189,9 @@ def migrate_core(repo,path,data,uploads,report):
             result=dict(legacy_import=True,payload_completeness='reconstructed_from_persisted_columns',
                         status=row['status'],detections=values,model_sha256=row['model_sha256'])
             repo.save_analysis(row,values,None,result)
-        assert_equal(repo.owned('analyses',row['id'],row['user_id']),row,'analyses')
+        assert_equal(repo.owned('analyses',row['id'],row['user_id']),listed,'analyses')
+        stored=repo.one('SELECT diagnosis_status,rice_probability FROM analysis_runs WHERE external_id=%s',(row['id'],))
+        assert_equal(stored,{k:row[k] for k in ('diagnosis_status','rice_probability') if k in row},'analysis diagnosis')
         current={d['id']:d for d in repo.detections(row['id'])}
         if set(current)!={d['id'] for d in related}: raise RuntimeError('Detection count differs')
         for detection in related:

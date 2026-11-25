@@ -1,6 +1,7 @@
 """Live ESP32 MQTT telemetry listener, persistence and API endpoints."""
 from contextlib import contextmanager
 from datetime import datetime, timezone
+import hashlib
 import json
 import logging
 import math
@@ -23,32 +24,6 @@ DEFAULT_MQTT_TOPIC = 'nckh_aegis_c1se21/farm/sensors'
 _SCHEMA_LOCK = threading.Lock()
 _INITIALIZED_TARGETS = set()
 _LOGGER = logging.getLogger(__name__)
-
-_MYSQL_DDL = (
-    '''CREATE TABLE IF NOT EXISTS esp32_telemetry_readings (
-        reading_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-        device_uid VARCHAR(100) NOT NULL,
-        plot_id CHAR(36) NULL,
-        temperature DOUBLE NOT NULL,
-        humidity DOUBLE NOT NULL,
-        alert_level VARCHAR(20) NOT NULL DEFAULT 'safe',
-        alert_disease VARCHAR(50) NULL,
-        alert_message TEXT NULL,
-        topic VARCHAR(200) NOT NULL DEFAULT 'nckh_aegis_c1se21/farm/sensors',
-        source VARCHAR(30) NOT NULL DEFAULT 'esp32_mqtt',
-        observed_at VARCHAR(40) NOT NULL,
-        created_at VARCHAR(40) NOT NULL,
-        INDEX idx_esp32_device_time (device_uid, observed_at),
-        INDEX idx_esp32_plot_time (plot_id, observed_at),
-        INDEX idx_esp32_observed (observed_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci''',
-    '''CREATE TABLE IF NOT EXISTS esp32_device_bindings (
-        device_uid VARCHAR(100) PRIMARY KEY,
-        plot_id CHAR(36) NULL,
-        device_name VARCHAR(150) NULL,
-        updated_at VARCHAR(40) NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci''',
-)
 
 _SQLITE_DDL = (
     '''CREATE TABLE IF NOT EXISTS esp32_telemetry_readings (
@@ -93,6 +68,22 @@ def _is_plain_uid(device_uid):
 
 def _utc_now():
     return datetime.now(timezone.utc).isoformat(timespec='seconds')
+
+
+def _iso(value):
+    """MySQL DATETIME columns hold naive UTC; SQLite already stores the ISO text."""
+    if isinstance(value, datetime):
+        return value.replace(tzinfo=timezone.utc).isoformat(timespec='seconds')
+    return value
+
+
+def _dedup_token(reading, plot_id):
+    """Identity of a redelivered packet. Anonymous packets are never merged."""
+    if _is_reserved_uid(reading['device_uid']):
+        return None
+    identity = [reading['device_uid'].upper(), plot_id, reading['observed_at'],
+                reading['temperature'], reading['humidity']]
+    return hashlib.sha256(json.dumps(identity).encode()).hexdigest()
 
 
 def _is_mysql(config):
@@ -142,29 +133,29 @@ def _db_cursor(config):
 
 
 def ensure_iot_schema(config):
-    """Create the additive ESP32 telemetry tables once per configured database."""
+    """Create the ESP32 tables of a SQLite fixture once per file.
+
+    MySQL tables come from database/mysql/007 and 009; check_schema() enforces them.
+    """
+    if _is_mysql(config):
+        return
     key = _target_key(config)
     with _SCHEMA_LOCK:
         if key in _INITIALIZED_TARGETS:
             return
-        if _is_mysql(config):
-            from .repositories.mysql import open_connection
-            conn = open_connection(config)
-            try:
-                with conn.cursor() as cur:
-                    for stmt in _MYSQL_DDL:
-                        cur.execute(stmt)
-                conn.commit()
-            finally:
-                conn.close()
-        else:
-            conn = sqlite3.connect(str(config['DATABASE_PATH']), timeout=5)
-            try:
-                for stmt in _SQLITE_DDL:
-                    conn.execute(stmt)
-                conn.commit()
-            finally:
-                conn.close()
+        conn = sqlite3.connect(str(config['DATABASE_PATH']), timeout=5)
+        try:
+            for stmt in _SQLITE_DDL:
+                conn.execute(stmt)
+            columns = {row[1] for row in conn.execute('PRAGMA table_info(esp32_telemetry_readings)')}
+            if 'dedup_token' not in columns:
+                conn.execute('ALTER TABLE esp32_telemetry_readings ADD COLUMN dedup_token TEXT')
+            conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS uq_esp32_dedup '
+                         'ON esp32_telemetry_readings(dedup_token)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_esp32_created ON esp32_telemetry_readings(created_at)')
+            conn.commit()
+        finally:
+            conn.close()
         _INITIALIZED_TARGETS.add(key)
 
 
@@ -238,6 +229,8 @@ def validate_esp32_payload(payload):
         parsed = datetime.fromisoformat(observed_raw.replace('Z', '+00:00'))
         if parsed.tzinfo is None:
             parsed = parsed.replace(tzinfo=timezone.utc)
+        if not 2000 <= parsed.year <= 9998:
+            raise ValueError('observed_at year is out of range')
         observed_at = parsed.astimezone(timezone.utc).isoformat(timespec='seconds')
 
     return {
@@ -284,12 +277,15 @@ def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp
     with _db_cursor(config) as (cur, is_mysql):
         plot_id = ((normalized['plot_id'] if trust_plot_id else None)
                    or _resolve_plot_for_device(cur, is_mysql, normalized['device_uid']))
+        token = _dedup_token(normalized, plot_id)
+        on_duplicate = ('ON DUPLICATE KEY UPDATE reading_id=reading_id' if is_mysql
+                        else 'ON CONFLICT(dedup_token) DO NOTHING')
         cur.execute(
             _param(
-                '''INSERT INTO esp32_telemetry_readings
+                f'''INSERT INTO esp32_telemetry_readings
                    (device_uid, plot_id, temperature, humidity, alert_level, alert_disease,
-                    alert_message, topic, source, observed_at, created_at)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+                    alert_message, topic, source, observed_at, created_at, dedup_token)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) {on_duplicate}''',
                 is_mysql,
             ),
             (
@@ -304,9 +300,17 @@ def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp
                 source,
                 normalized['observed_at'],
                 created_at,
+                token,
             ),
         )
         reading_id = cur.lastrowid
+        if token is not None:
+            # A redelivery answers with the row stored the first time.
+            lock = ' FOR UPDATE' if is_mysql else ''
+            cur.execute(_param('SELECT reading_id, created_at FROM esp32_telemetry_readings '
+                               'WHERE dedup_token=%s' + lock, is_mysql), (token,))
+            stored = cur.fetchone()
+            reading_id, created_at = stored['reading_id'], _iso(stored['created_at'])
         if is_mysql:
             cur.execute(
                 "UPDATE iot_devices SET status='online', last_seen_at=UTC_TIMESTAMP() WHERE device_uid=%s",
@@ -344,8 +348,8 @@ def _row_to_item(row):
         },
         'topic': item['topic'],
         'source': item['source'],
-        'observed_at': item['observed_at'],
-        'created_at': item['created_at'],
+        'observed_at': _iso(item['observed_at']),
+        'created_at': _iso(item['created_at']),
     }
 
 
@@ -500,7 +504,7 @@ def query_esp32_telemetry(config, *, plot_ids, plot_id=None, device_uid=None, li
                 'title': eval_alert['title'],
                 'message': d['alert_message'] or eval_alert['message'],
             },
-            'observed_at': d['observed_at'],
+            'observed_at': _iso(d['observed_at']),
         })
     return {
         'item': items[0] if items else None,

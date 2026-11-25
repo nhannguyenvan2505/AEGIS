@@ -1,5 +1,6 @@
 """Core persistence facade. One analysis owns zero or more detections."""
 from contextlib import contextmanager
+import json
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -85,7 +86,20 @@ def init_storage(config):
         apply_migrations(db)
 
 
-def save_analysis(payload, result, config, user_id, key_hash=None):
+DIAGNOSIS_COLUMNS = ('diagnosis_status', 'rice_probability', 'gatekeeper_method',
+                     'gatekeeper_version', 'gatekeeper_sha256', 'uncertain_regions')
+
+
+def diagnosis_columns(diagnosis):
+    """Column values for an optional diagnosis record; all NULL when the AI gave none."""
+    values = dict.fromkeys(DIAGNOSIS_COLUMNS)
+    if diagnosis is not None:
+        values.update({name: diagnosis.get(name) for name in DIAGNOSIS_COLUMNS})
+        values['uncertain_regions'] = json.dumps(diagnosis.get('uncertain_regions') or [], allow_nan=False)
+    return values
+
+
+def save_analysis(payload, result, config, user_id, key_hash=None, diagnosis=None):
     analysis_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
     # Preserve original bytes privately; bbox coordinates use EXIF-corrected dimensions.
@@ -105,7 +119,8 @@ def save_analysis(payload, result, config, user_id, key_hash=None):
                 model_version=result['model_version'],status=result['status'],created_at=created_at,
                 request_id=result['request_id'],model_sha256=result['model_sha256'],
                 ai_processing_ms=result['timings']['ai_processing_ms'],
-                ai_roundtrip_ms=result['timings']['ai_roundtrip_ms']),result['detections'],key_hash,result)
+                ai_roundtrip_ms=result['timings']['ai_roundtrip_ms'],
+                **diagnosis_columns(diagnosis)),result['detections'],key_hash,result)
     except (OSError, sqlite3.Error):
         # Normal failure compensation; crash consistency requires a later recovery job.
         if written:

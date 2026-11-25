@@ -53,6 +53,11 @@ class DiagnoseTests(unittest.TestCase):
         self.assertFalse(r.json['is_rice']); self.assertEqual(r.json['detections'], [])
         self.assertEqual(det.calls, 0)
 
+    def test_accepted_result_names_the_gatekeeper_that_decided(self):
+        r, _ = self.post(0.97, BOX(0.9), textured_png())
+        gate = r.json['gatekeeper']
+        self.assertEqual((gate['method'], gate['version'], gate['sha256']), ('fake', 'none', None))
+
     def test_ambiguous_gate_fails_closed(self):
         r, det = self.post(0.55, BOX(0.9), textured_png())
         self.assertEqual(r.json['status'], 'rejected_uncertain_scope'); self.assertEqual(det.calls, 0)

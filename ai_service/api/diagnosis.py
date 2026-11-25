@@ -8,6 +8,7 @@ Design rule: every branch that is not positively "rice + usable" returns a rejec
 with an empty detection list. The service never guesses a disease name for an image
 it could not validate.
 """
+import hashlib
 import math
 import os
 from pathlib import Path
@@ -103,6 +104,7 @@ class YoloClsGatekeeper:
         weights = Path(weights)
         if not weights.is_file():
             raise FileNotFoundError(f"Gatekeeper checkpoint missing: {weights}")
+        self.sha256 = hashlib.sha256(weights.read_bytes()).hexdigest()
         self.model = YOLO(str(weights))
         names = {int(k): v for k, v in self.model.names.items()}
         if set(names.values()) != {"non_rice", "rice"}:
@@ -153,7 +155,9 @@ class DiagnosisPipeline:
         p_rice = float(gate["rice_probability"])
         entropy = normalized_entropy(gate["probabilities"])
         base["gatekeeper"] = {"method": self.gatekeeper.method, "rice_probability": round(p_rice, 4),
-                              "normalized_entropy": round(entropy, 4)}
+                              "normalized_entropy": round(entropy, 4),
+                              "version": getattr(self.gatekeeper, "version", "none"),
+                              "sha256": getattr(self.gatekeeper, "sha256", None)}
 
         if p_rice < self.t["rice_accept_min"] or entropy > self.t["entropy_max"]:
             if (1 - p_rice) >= self.t["non_rice_reject_min"] and entropy <= self.t["entropy_max"]:

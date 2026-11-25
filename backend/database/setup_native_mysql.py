@@ -15,43 +15,14 @@ from pymysql.constants import CLIENT
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT/'backend'))
 from app.database_config import settings
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from migrate import apply_schema  # noqa: E402
 
 
 def local_values():
     path = Path(__file__).parent/'.env'
     return dict(line.split('=', 1) for line in path.read_text(encoding='utf-8').splitlines()
                 if line.strip() and not line.lstrip().startswith('#'))
-
-
-def apply_schema(connection, through=5):
-    """Apply trusted numbered SQL once; never replay a partial DDL migration."""
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='users'")
-        fresh = cursor.fetchone()[0] == 0
-        if fresh:
-            cursor.execute((Path(__file__).parent/'mysql'/'001_design.sql').read_text(encoding='utf-8'))
-            while cursor.nextset():
-                pass
-        cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='schema_versions'")
-        has_versions = cursor.fetchone()[0] != 0
-        if not fresh and not has_versions:
-            raise RuntimeError('Existing database has no runtime marker; inspect it before upgrading')
-        for path in sorted((Path(__file__).parent/'mysql').glob('00[2-9]_*.sql')):
-            version = int(path.name.split('_', 1)[0])
-            if version > through:
-                continue
-            if has_versions:
-                cursor.execute('SELECT status FROM schema_versions WHERE version=%s', (version,))
-                row = cursor.fetchone()
-                if row:
-                    if row[0] != 'complete':
-                        raise RuntimeError(f'Partial migration {version}; inspect schema instead of replaying DDL')
-                    continue
-            cursor.execute(path.read_text(encoding='utf-8'))
-            while cursor.nextset():
-                pass
-            has_versions = True
-            print(f'Migration {version} complete', flush=True)
 
 
 def main():

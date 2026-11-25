@@ -34,6 +34,8 @@ DATABASE = Path(__file__).resolve().parents[1] / 'database'
 
 @unittest.skipUnless(os.environ.get('AEGIS_RUN_MYSQL_TESTS') == '1', 'requires explicit MySQL dev integration opt-in')
 class MySQLCoreTests(unittest.TestCase):
+    preload_schema = True  # False: start from an empty database
+
     @classmethod
     def setUpClass(cls):
         values = dict(line.split('=',1) for line in (DATABASE/'.env').read_text().splitlines()
@@ -48,7 +50,10 @@ class MySQLCoreTests(unittest.TestCase):
         if result.returncode:
             raise RuntimeError(result.stderr)
         cls.addClassCleanup(cls.drop_database)
-        sql = f'USE `{cls.database}`;\n' + '\n'.join(path.read_text() for path in sorted((DATABASE/'mysql').glob('*.sql')))
+        if not cls.preload_schema:
+            return
+        sql = f'USE `{cls.database}`;\n' + '\n'.join(
+            path.read_text(encoding='utf-8') for path in sorted((DATABASE/'mysql').glob('*.sql')))
         result = subprocess.run(cls.root_command,input=sql,text=True,capture_output=True,timeout=60)
         if result.returncode:
             raise RuntimeError(result.stderr)
@@ -170,6 +175,70 @@ class MySQLCoreTests(unittest.TestCase):
         own_plot = self.post('/plots',dict(name='Ruộng của 0',location_text='Khu 0')).json['item']['id']
         self.assertEqual(bind(0,loose,own_plot).status_code,409)
         self.assertEqual(len(latest()['items']),1)
+
+    def test_diagnosis_outcome_is_stored(self):
+        region = dict(class_id=1,disease='brown_spot',confidence=0.2,bbox=dict(x1=1,y1=2,x2=10,y2=12))
+        record = dict(diagnosis_status='uncertain_lesion',rice_probability=0.97,gatekeeper_method='yolo_cls',
+                      gatekeeper_version='best.pt',gatekeeper_sha256='e'*64,uncertain_regions=[region])
+        with patch('app.routes.predict_image',side_effect=lambda payload,config,request_id:
+                   dict(self.result(),request_id=request_id,diagnosis_record=dict(record))):
+            response = self.detect(key='diagnosis')
+        self.assertEqual(response.status_code,200,response.json)
+        self.assertNotIn('diagnosis_record',response.json)
+        with repository(self.config) as repo:
+            row = repo.one('''SELECT diagnosis_status,rice_probability,gatekeeper_method,gatekeeper_version,
+                gatekeeper_sha256,uncertain_regions FROM analysis_runs WHERE external_id=%s''',
+                (response.json['analysis_id'],))
+        self.assertEqual(json.loads(row.pop('uncertain_regions')),[region])
+        self.assertEqual(row,{k:v for k,v in record.items() if k!='uncertain_regions'})
+
+    def test_every_admin_read_route_works_on_a_fresh_database(self):
+        plot,season,device = self.chain()
+        response = self.post('/farms',dict(name='Trại thử',address='Cần Thơ'))
+        self.assertEqual(response.status_code,201,response.json)
+        with patch('app.routes.predict_image',side_effect=lambda payload,config,request_id:
+                   dict(self.result(),request_id=request_id)):
+            response = self.detect(key='admin-smoke')
+        self.assertEqual(response.status_code,200,response.json)
+        analysis = response.json
+        result = self.app.test_cli_runner().invoke(args=[
+            'bootstrap-admin',self.identifiers[0],'--reason','Fresh database admin smoke'])
+        self.assertEqual(result.exit_code,0,result.output)
+        try:
+            response = self.client.post('/api/admin/auth/login',
+                json=dict(email=self.emails[0],password='test-password-123'))
+            self.assertEqual(response.status_code,200,response.json)
+            headers = {'Authorization':'Bearer '+response.json['access_token']}
+            farm = self.client.get('/api/admin/farms',headers=headers).json
+            self.assertTrue(farm and farm.get('items'),farm)
+            identifiers = {
+                '/api/admin/detections/':analysis['detections'][0]['detection_id'],
+                '/api/admin/devices/':device['id'],'/api/admin/farms/':farm['items'][0]['id'],
+                '/api/admin/plots/':plot['id'],'/api/admin/seasons/':season['id'],
+                '/api/admin/users/':self.identifiers[1]}
+            failures = []
+            for rule in sorted(self.app.url_map.iter_rules(),key=str):
+                path = str(rule)
+                # RBAC routes use the mobile JWT and are covered by their own test.
+                if not path.startswith('/api/admin') or path.startswith('/api/admin/rbac') or 'GET' not in rule.methods:
+                    continue
+                for prefix,value in identifiers.items():
+                    if path.startswith(prefix+'<identifier>'):
+                        path = path.replace('<identifier>',str(value))
+                self.assertNotIn('<',path,'Add a fixture identifier for this route')
+                if path == '/api/admin/models/compare':
+                    continue
+                response = self.client.get(path,headers=headers)
+                if response.status_code != 200:
+                    failures.append((path,response.status_code,(response.get_json(silent=True) or {}).get('error')))
+            self.assertEqual(failures,[],' | '.join(path+' '+str(status) for path,status,_ in failures))
+            names = {item['disease_name'] for item in
+                     self.client.get('/api/admin/diseases',headers=headers).json['items']}
+            self.assertLessEqual({'rice_blast','brown_spot','sheath_blight'},names)
+        finally:
+            with repository(self.config) as repo:
+                repo.execute("""UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name='farmer')
+                    WHERE external_id=%s""",(self.identifiers[0],))
 
     def test_cultivation_revision_replay_and_conflict(self):
         _,season,_=self.chain()
@@ -388,6 +457,72 @@ class MySQLCoreTests(unittest.TestCase):
             with repository(self.config) as repo:
                 for identifier in self.identifiers:
                     repo.execute("UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name='farmer') WHERE external_id=%s",(identifier,))
+
+
+# Tables as the backend used to create them at runtime, before migration 007.
+LEGACY_IOT = (
+    '''CREATE TABLE esp32_telemetry_readings (reading_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        device_uid VARCHAR(100) NOT NULL, plot_id CHAR(36) NULL, temperature DOUBLE NOT NULL,
+        humidity DOUBLE NOT NULL, alert_level VARCHAR(20) NOT NULL DEFAULT 'safe', alert_disease VARCHAR(50) NULL,
+        alert_message TEXT NULL, topic VARCHAR(200) NOT NULL DEFAULT 'old/topic',
+        source VARCHAR(30) NOT NULL DEFAULT 'esp32_mqtt', observed_at VARCHAR(40) NOT NULL,
+        created_at VARCHAR(40) NOT NULL) ENGINE=InnoDB''',
+    '''CREATE TABLE esp32_device_bindings (device_uid VARCHAR(100) PRIMARY KEY, plot_id CHAR(36) NULL,
+        device_name VARCHAR(150) NULL, updated_at VARCHAR(40) NOT NULL) ENGINE=InnoDB''',
+)
+
+
+@unittest.skipUnless(os.environ.get('AEGIS_RUN_MYSQL_TESTS') == '1', 'requires explicit MySQL dev integration opt-in')
+class MySQLUpgradeTests(unittest.TestCase):
+    """A populated version-6 database, hand-patched the old way, upgrades without losing rows."""
+    preload_schema = False
+    setUpClass = classmethod(MySQLCoreTests.setUpClass.__func__)
+    drop_database = classmethod(MySQLCoreTests.drop_database.__func__)
+
+    def connection(self):
+        import pymysql
+        from pymysql.constants import CLIENT
+        return pymysql.connect(**self.mysql,charset='utf8mb4',autocommit=True,client_flag=CLIENT.MULTI_STATEMENTS)
+
+    def test_upgrade_from_version_6_keeps_data(self):
+        sys.path.insert(0,str(DATABASE))
+        from migrate import apply_schema
+        from app.repositories.mysql import check_schema
+        from app.iot_mqtt import query_esp32_telemetry
+        config = dict(STORAGE_BACKEND='mysql',MYSQL=self.mysql)
+        with self.connection() as connection, connection.cursor() as cursor:
+            apply_schema(connection,through=6)
+            with self.assertRaisesRegex(RuntimeError,r'\[7, 8, 9\] are not applied'):
+                check_schema(config)
+            cursor.execute("ALTER TABLE iot_devices ADD COLUMN sensor_type "
+                           "ENUM('temperature','humidity','soil_ph','rainfall') NULL, "
+                           "ADD UNIQUE KEY uq_field_sensor (field_id, sensor_type)")
+            cursor.execute("INSERT INTO diseases(disease_name,crop_type) VALUES ('rice_blast','rice')")
+            for statement in LEGACY_IOT:
+                cursor.execute(statement)
+            plot = str(uuid.uuid4())
+            for _ in range(2):  # duplicates that already exist must survive
+                cursor.execute("""INSERT INTO esp32_telemetry_readings(device_uid,plot_id,temperature,humidity,
+                    observed_at,created_at) VALUES ('ESP32-LEGACY',%s,25.0,70.0,
+                    '2026-11-20T01:02:03+00:00','2026-11-20T01:02:04+00:00')""",(plot,))
+            cursor.execute("INSERT INTO esp32_device_bindings VALUES ('ESP32-LEGACY',%s,'Old',"
+                           "'2026-11-20T01:00:00+00:00')",(plot,))
+            self.assertEqual(apply_schema(connection),[7,8,9])
+            self.assertEqual(apply_schema(connection),[])
+            cursor.execute('SELECT disease_name, COUNT(*) FROM diseases GROUP BY disease_name')
+            self.assertEqual(dict(cursor.fetchall()),{'rice_blast':1,'brown_spot':1,'sheath_blight':1})
+        check_schema(config)
+        items = query_esp32_telemetry(config,plot_ids=[plot])['items']
+        self.assertEqual([(i['observed_at'],i['created_at']) for i in items],
+                         [('2026-11-20T01:02:03+00:00','2026-11-20T01:02:04+00:00')]*2)
+        packet = dict(device_uid='ESP32-LEGACY',temperature=26.0,humidity=71.0,observed_at='2026-11-25T08:00:00+07:00')
+        first, again = save_esp32_reading(config,packet), save_esp32_reading(config,packet)
+        self.assertEqual((again['id'],again['created_at'],again['plot_id']),(first['id'],first['created_at'],plot))
+        self.assertEqual(len(query_esp32_telemetry(config,plot_ids=[plot])['items']),3)
+        from purge_iot_telemetry import purge
+        later = datetime(2027,6,1,tzinfo=timezone.utc)
+        self.assertEqual(purge(config,30,now=later)['matched'],3)
+        self.assertEqual(purge(config,30,apply=True,batch=2,now=later)['deleted'],3)
 
 
 if __name__ == '__main__':
