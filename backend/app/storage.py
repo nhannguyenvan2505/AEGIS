@@ -99,6 +99,18 @@ def diagnosis_columns(diagnosis):
     return values
 
 
+# FR09, decision D-07: every returned box says how far to trust it. Derived from the stored
+# confidence when answering, so older analyses are labelled too and nothing new is persisted.
+CONFIDENCE_LIKELY_FROM = 0.50
+CONFIDENCE_LABELS = {'low': 'Low Confidence – Field Verification Required',
+                     'likely': 'Khả năng cao – vẫn khuyến nghị kiểm tra ruộng'}
+
+
+def with_confidence_level(detection):
+    level = 'likely' if detection['confidence'] >= CONFIDENCE_LIKELY_FROM else 'low'
+    return dict(detection, confidence_level=level, confidence_label=CONFIDENCE_LABELS[level])
+
+
 def save_analysis(payload, result, config, user_id, key_hash=None, diagnosis=None):
     analysis_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
@@ -127,7 +139,8 @@ def save_analysis(payload, result, config, user_id, key_hash=None, diagnosis=Non
             path.unlink(missing_ok=True)
         raise
     return dict(result, analysis_id=analysis_id, user_id=user_id, created_at=created_at,
-                image_path=filename, image_url=f'/api/disease/analyses/{analysis_id}/image')
+                image_path=filename, image_url=f'/api/disease/analyses/{analysis_id}/image',
+                detections=[with_confidence_level(d) for d in result['detections']])
 
 
 def get_analysis(analysis_id, config, user_id):
@@ -143,8 +156,9 @@ def get_analysis(analysis_id, config, user_id):
                 request_id=analysis['request_id'], model_sha256=analysis['model_sha256'],
                 timings=dict(ai_processing_ms=analysis['ai_processing_ms'],ai_roundtrip_ms=analysis['ai_roundtrip_ms']),
                 image=dict(width=analysis['image_width'], height=analysis['image_height'], orientation=analysis['orientation']),
-                detections=[dict(detection_id=r['id'], class_id=r['class_id'], disease=r['disease'], confidence=r['confidence'],
-                                 bbox=dict(x1=r['x1'], y1=r['y1'], x2=r['x2'], y2=r['y2'])) for r in rows])
+                detections=[with_confidence_level(dict(
+                    detection_id=r['id'], class_id=r['class_id'], disease=r['disease'], confidence=r['confidence'],
+                    bbox=dict(x1=r['x1'], y1=r['y1'], x2=r['x2'], y2=r['y2']))) for r in rows])
 
 
 def list_analyses(config, user_id, page, page_size):
