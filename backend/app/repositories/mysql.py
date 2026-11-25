@@ -87,6 +87,7 @@ PROJECTIONS = {
                                  r.profile_sha256,r.change_reason,r.created_at,r.request_id''', 'cultivation_revisions r JOIN crop_cycles c ON c.crop_cycle_id=r.crop_cycle_id JOIN users u ON u.user_id=r.user_id', None,'r.id','u.external_id'),
  'analyses': ('''a.external_id id,u.external_id user_id,i.image_url image_path,i.image_width,i.image_height,i.orientation,
                 a.model_version,a.status,a.created_at,a.request_id,a.model_sha256,a.ai_processing_ms,a.ai_roundtrip_ms,
+                a.diagnosis_status,
                 (SELECT COUNT(*) FROM disease_detections dd WHERE dd.analysis_id=a.analysis_id) detection_count''', 'analysis_runs a JOIN crop_images i ON i.image_id=a.image_id JOIN users u ON u.user_id=a.user_id','a.analysis_id','a.external_id','u.external_id'),
 }
 
