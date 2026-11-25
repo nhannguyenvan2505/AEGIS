@@ -91,10 +91,25 @@ Thành công trả HTTP **200**, kể cả khi không có detection:
     "class_id":0,
     "disease":"rice_blast",
     "confidence":0.639263,
-    "bbox":{"x1":427.16,"y1":351.61,"x2":499.22,"y2":460.33}
+    "bbox":{"x1":427.16,"y1":351.61,"x2":499.22,"y2":460.33},
+    "confidence_level":"likely",
+    "confidence_label":"Khả năng cao – vẫn khuyến nghị kiểm tra ruộng"
   }]
 }
 ```
+
+**FR09 (quyết định D-07).** Mỗi box trong `detections` có thêm hai trường, ở cả
+POST, GET chi tiết và lần trả lại theo `Idempotency-Key`:
+
+| `confidence` | `confidence_level` | `confidence_label` |
+|---|---|---|
+| dưới 0,50 | `low` | `Low Confidence – Field Verification Required` |
+| từ 0,50 | `likely` | `Khả năng cao – vẫn khuyến nghị kiểm tra ruộng` |
+
+Mọi box từ 0,25 vẫn được trả. Client nên rẽ nhánh theo `confidence_level`, không
+theo chuỗi nhãn. Hai trường được tính từ `confidence` đã lưu khi trả kết quả, nên
+kết quả cũ cũng có và database không đổi. `likely` chỉ nói về điểm số model, không
+phải xác suất bệnh đã hiệu chuẩn. Danh sách lịch sử không trả box nên không có nhãn.
 
 Các UUID trên chỉ minh họa. Mapping: 0 rice_blast, 1 brown_spot, 2 sheath_blight.
 Một analysis có 0..N detection. Không có detection: `status="no_detection"`,
