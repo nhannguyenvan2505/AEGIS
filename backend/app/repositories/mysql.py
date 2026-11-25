@@ -50,7 +50,7 @@ def mysql_repository(config):
             connection.close()
 
 
-REQUIRED_SCHEMA_VERSIONS = range(2, 13)
+REQUIRED_SCHEMA_VERSIONS = range(2, 15)
 
 
 def check_schema(config):
@@ -394,6 +394,11 @@ class MySQLRepository:
             (analysis['id'],user,image,model_id,analysis['model_version'],sha,analysis['status'],analysis['request_id'],analysis['ai_processing_ms'],analysis['ai_roundtrip_ms'],analysis['created_at'],
              *(analysis.get(name) for name in ('diagnosis_status','rice_probability','gatekeeper_method',
                'gatekeeper_version','gatekeeper_sha256','uncertain_regions')))).lastrowid
+        gate = analysis.get('gatekeeper_sha256')
+        if gate and not self.one("""SELECT model_version_id FROM model_versions
+                WHERE model_type='rice_gatekeeper' AND artifact_sha256=%s""", (gate,)):
+            self.execute("""INSERT INTO model_versions(model_type,version_name,algorithm,artifact_path,artifact_sha256)
+                VALUES ('rice_gatekeeper',%s,'YOLO11-cls',%s,%s)""", (gate,'sha256:'+gate,gate))
         for detection in detections:
             label = detection['disease']
             disease = self.one('SELECT disease_id FROM diseases WHERE disease_name=%s', (label,))

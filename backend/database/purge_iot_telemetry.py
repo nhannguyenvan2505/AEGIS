@@ -1,11 +1,11 @@
 """Retention for ESP32 telemetry: delete readings received before a cutoff.
 
-There is deliberately no default period and nothing schedules this. Without
---apply it only counts. Age uses created_at (server clock), not the device's
+The default period is 180 days (decided 25/11/2026). Nothing schedules this;
+without --apply it only counts. Age uses created_at (server clock), not the device's
 observed_at. Device bindings are never touched. Back up before --apply.
 
-    python database/purge_iot_telemetry.py --older-than-days 180
-    python database/purge_iot_telemetry.py --older-than-days 180 --apply
+    python database/purge_iot_telemetry.py
+    python database/purge_iot_telemetry.py --apply
 """
 import argparse
 from datetime import datetime, timedelta, timezone
@@ -16,6 +16,9 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.database_config import settings  # noqa: E402
 from app.iot_mqtt import _db_cursor  # noqa: E402
+
+
+TELEMETRY_DAYS = 180
 
 
 def purge(config, older_than_days, *, apply=False, batch=5000, now=None):
@@ -45,7 +48,7 @@ def purge(config, older_than_days, *, apply=False, batch=5000, now=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--older-than-days', type=int, required=True)
+    parser.add_argument('--older-than-days', type=int, default=TELEMETRY_DAYS)
     parser.add_argument('--apply', action='store_true', help='delete; without it only count')
     args = parser.parse_args()
     if args.older_than_days < 1:

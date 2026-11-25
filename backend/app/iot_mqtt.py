@@ -14,7 +14,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from .auth import require_auth
 from .farm import FarmError, body, owned
-from .iot_alerts import raise_microclimate_alert
+from .iot_alerts import raise_reading_alerts
 from .repositories import repository
 from .storage import connect
 
@@ -187,6 +187,14 @@ def evaluate_microclimate(temperature, humidity):
             'title': 'Cảnh báo sớm · Bệnh đốm nâu',
             'message': 'Điều kiện thuận lợi cho nấm BỆNH ĐỐM NÂU (Brown Spot) phát triển.',
         }
+    if 26.5 < temperature < 28.0 and humidity >= 85.0:
+        # No disease rule covers this band; do not call it safe and do not guess one (decided 25/11/2026).
+        return {
+            'level': 'warning',
+            'disease': None,
+            'title': 'Theo dõi · Độ ẩm cao',
+            'message': 'Độ ẩm không khí cao, cần theo dõi đồng ruộng. Chưa có luật xác định nguy cơ bệnh cụ thể ở mức nhiệt này.',
+        }
     return {
         'level': 'safe',
         'disease': None,
@@ -247,6 +255,19 @@ def validate_esp32_payload(payload):
     }
 
 
+def _registry_device(cur, device_uid):
+    """The iot_devices row for a hardware id (MySQL). Letter case does not matter, as for
+    bindings; an exact match wins, and only then is the column scanned."""
+    query = '''SELECT d.device_id, f.external_id plot_id FROM iot_devices d
+               LEFT JOIN farm_fields f ON f.field_id=d.field_id WHERE {} ORDER BY d.device_id LIMIT 1'''
+    cur.execute(query.format('d.device_uid=%s'), (device_uid,))
+    row = cur.fetchone()
+    if row is None:
+        cur.execute(query.format('UPPER(d.device_uid)=UPPER(%s)'), (device_uid,))
+        row = cur.fetchone()
+    return row
+
+
 def _resolve_plot_for_device(cur, is_mysql, device_uid):
     if _is_reserved_uid(device_uid):
         return None
@@ -255,14 +276,7 @@ def _resolve_plot_for_device(cur, is_mysql, device_uid):
     if bound and bound['plot_id']:
         return bound['plot_id']
     if is_mysql:
-        cur.execute(
-            '''SELECT f.external_id plot_id
-               FROM iot_devices d
-               LEFT JOIN farm_fields f ON f.field_id=d.field_id
-               WHERE d.device_uid=%s''',
-            (device_uid,),
-        )
-        device = cur.fetchone()
+        device = _registry_device(cur, device_uid)
         if device and device['plot_id']:
             return device['plot_id']
     return None
@@ -317,12 +331,14 @@ def save_esp32_reading(config, payload, *, topic=DEFAULT_MQTT_TOPIC, source='esp
             stored = cur.fetchone()
             reading_id, created_at = stored['reading_id'], _iso(stored['created_at'])
         if is_mysql:
-            raise_microclimate_alert(cur, plot_id=plot_id, device_uid=normalized['device_uid'], alert=alert,
-                                     observed_at=normalized['observed_at'])
-            cur.execute(
-                "UPDATE iot_devices SET status='online', last_seen_at=UTC_TIMESTAMP() WHERE device_uid=%s",
-                (normalized['device_uid'],),
-            )
+            device = _registry_device(cur, normalized['device_uid'])
+            device_id = device['device_id'] if device else None
+            raise_reading_alerts(cur, plot_id=plot_id, device_id=device_id, alert=alert, reading=normalized)
+            if device_id is not None:
+                cur.execute(
+                    "UPDATE iot_devices SET status='online', last_seen_at=UTC_TIMESTAMP() WHERE device_id=%s",
+                    (device_id,),
+                )
 
     return {
         'id': reading_id,
