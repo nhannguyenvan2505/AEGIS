@@ -49,6 +49,21 @@ the service then reports `pinned: false` and, for a detector, the version
 model, publish it and update the matching manifest (`release`, `sha256`,
 `size_bytes`). A pinned gatekeeper reports the manifest's `release` as its version.
 
+## Image quality stage
+
+`/v2/diagnose` first rejects images that are blurred, too dark, too bright or flat.
+It measures them on an analysis grid whose long side is **512 points**, picked evenly
+from the upload (images up to 512 px are measured as they are, nothing is averaged).
+Before 26/11/2026 the step was `long side // 512`, so the grid was 512 to 640 points
+wide and a slightly blurred photo was rejected more or less often depending only on
+its pixel size.
+
+- At 1024 and 2048 px the picked pixels, and so the results, are the same as before.
+- Other sizes above 512 px are measured differently from before; for
+  example a 640 px image is now judged less strictly.
+- A fixed grid does not make every size answer identically, and the limits themselves
+  have not been calibrated on real phone photos.
+
 ## Load check
 
 With the service running, on a folder holding a few mixed test images:
