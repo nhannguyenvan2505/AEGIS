@@ -6,8 +6,9 @@ thiết bị). Chi tiết thiết bị, cảnh báo và push: [IOT_DEVICES_ALERT
 | Phần Backend | Nhánh / PR |
 |---|---|
 | Đăng ký, gỡ đăng ký thiết bị; push token; vùng "theo dõi" không có tên bệnh | đã ở `develop` |
-| API cảnh báo cho người dùng | `nvn/p0-user-alerts-api` |
-| MQTT mặc định tắt; ẩn thông tin broker với người dùng | `nvn/p0-mqtt-deploy` |
+| API cảnh báo cho người dùng | đã ở `develop` (#47) |
+| MQTT mặc định tắt; ẩn thông tin broker với người dùng | đã ở `develop` (#46) |
+| Nhãn độ tin cậy FR09 trên từng box | đã ở `develop` (#38) |
 | Trả `diagnosis` khi đọc lại | đã ở `develop` (#43) |
 | Gửi lại cùng `Idempotency-Key` | đã ở `develop` (#42) |
 
@@ -53,6 +54,18 @@ thiết bị). Chi tiết thiết bị, cảnh báo và push: [IOT_DEVICES_ALERT
    Không có khoá này nghĩa là không biết, **không** hiểu là cây khỏe. Màn chi tiết đã xử lý
    `uncertain_lesion` và `healthy`; danh sách lịch sử thì chưa hiển thị. Chú thích trong
    `scanHelpers.ts` ("Saved analyses do not keep `diagnosis`") đã cũ.
+   POST còn có `ai_status`, `ai_message`, `is_rice` ở cấp ngoài; GET không trả ba trường này, nên chỉ
+   đọc `diagnosis`. Vùng nghi ngờ (`uncertain_regions`) được lưu nhưng chưa trả qua API.
+7. **Độ tin cậy (FR09):** mỗi box ở POST, GET chi tiết và replay có `confidence_level` và
+   `confidence_label`; lịch sử không trả box. Chưa thấy app dùng hai trường này.
+
+   | `confidence` | `confidence_level` | `confidence_label` |
+   |---|---|---|
+   | dưới 0,50 | `low` | `Low Confidence – Field Verification Required` |
+   | từ 0,50 | `likely` | `Khả năng cao – vẫn khuyến nghị kiểm tra ruộng` |
+
+   Rẽ nhánh theo `confidence_level`, không theo chuỗi nhãn. `likely` không phải xác suất bệnh đã hiệu
+   chuẩn (xem `backend/docs/API.md`).
 
 ## Cần nhóm quyết định
 
