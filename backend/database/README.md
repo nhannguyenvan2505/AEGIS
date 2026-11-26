@@ -121,7 +121,8 @@ Docker. Tài khoản chạy cần quyền đọc view (dùng tài khoản migrat
 & backend\.venv\Scripts\python.exe backend/database/backup_deploy.py restore --from D:\aegis-backups\2026-11-26 --database aegis_restore --uploads D:\aegis-restore\uploads
 ```
 
-- Bỏ `--no-mongo` để gồm MongoDB; khi khôi phục thêm `--mongo-database <database rỗng>`.
+- Bỏ `--no-mongo` để gồm MongoDB; khi khôi phục thêm `--mongo-database <database rỗng>`. "Rỗng" nghĩa là chưa có document nào: collection do
+  `mongo/001_design.js` tạo sẵn được thay bằng bản trong backup.
 - `restore` chỉ ghi vào database và thư mục **rỗng**, kiểm version schema, đủ ảnh được tham chiếu và view dùng
   được. Đạt rồi mới trỏ backend sang đích mới.
 - Backup chứa dữ liệu cá nhân và password hash: lưu mã hoá, ngoài repo.

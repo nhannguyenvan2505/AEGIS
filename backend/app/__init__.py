@@ -4,6 +4,7 @@ from pathlib import Path
 
 from flask import Flask, g, jsonify
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .routes import api
 from .storage import init_storage
@@ -47,6 +48,9 @@ def create_app(config=None):
         FARM_WRITE_LIMIT=60,
         # A reservation still 'running' after this is reported 'uncertain'; AI is never re-run for it.
         IDEMPOTENCY_RUNNING_TTL_SECONDS=int(os.environ.get('AEGIS_IDEMPOTENCY_RUNNING_TTL', '300')),
+        # Reverse proxies in front of this server whose X-Forwarded-For/-Proto may be believed.
+        # 0 = none. Set it only when the server cannot be reached around them.
+        TRUSTED_PROXY_HOPS=int(os.environ.get('AEGIS_TRUSTED_PROXY_HOPS', '0')),
     )
     for key in ['RATE_WINDOW_SECONDS','LOGIN_IP_LIMIT','LOGIN_ACCOUNT_LIMIT','REGISTER_IP_LIMIT',
                 'DETECT_USER_LIMIT','BACKEND_MAX_INFLIGHT','RATE_MAX_BUCKETS','FARM_WRITE_LIMIT']:
@@ -56,6 +60,11 @@ def create_app(config=None):
         app.config.update(config)
     if app.config['STORAGE_BACKEND']=='mysql' and not (config and 'UPLOAD_DIR' in config):
         app.config['UPLOAD_DIR']=data_dir.parent/'mysql-instance'/'uploads'
+    hops = app.config['TRUSTED_PROXY_HOPS']
+    if type(hops) is not int or not 0 <= hops <= 5:
+        raise ValueError('TRUSTED_PROXY_HOPS must be an integer from 0 to 5')
+    if hops:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=hops, x_proto=hops, x_host=0, x_port=0, x_prefix=0)
     init_storage(app.config)
     from .jwt_tokens import init_jwt
     init_jwt(app)
