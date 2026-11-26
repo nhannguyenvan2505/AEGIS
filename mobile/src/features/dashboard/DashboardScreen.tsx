@@ -118,8 +118,8 @@ function DashboardHome() {
         <View style={s.homeMetrics}>
           <HomeMetric label="Nhiệt độ" value={readings.temperature} unit="°C" icon="thermometer" single={single} accent="#d98b1b" min={15} max={40} />
           <HomeMetric label="Độ ẩm" value={readings.humidity} unit="%" icon="droplet" single={single} accent="#5ab4e8" min={0} max={100} />
-          <HomeMetric label="pH đất" value={readings.soilPh} unit="pH" icon="activity" single={single} accent="#b48cf0" min={4} max={9} />
-          <HomeMetric label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" single={single} accent="#4fd8d0" min={0} max={50} />
+          <HomeMetric label="pH đất" value={readings.soilPh} unit="pH" icon="activity" single={single} accent="#b48cf0" min={4} max={9} noDevice />
+          <HomeMetric label="Lượng mưa" value={readings.rainfall} unit="mm" icon="cloud-rain" single={single} accent="#4fd8d0" min={0} max={50} noDevice />
         </View>
 
         <Pressable testID="home-open-forecast" accessibilityRole="button" onPress={openForecast} style={({ pressed }) => [s.homeForecastLink, pressed && s.homePressed]}>
@@ -143,14 +143,11 @@ function DashboardHome() {
         <Text style={s.homeSensorNoticeText}>Các số đo được ghi nhận riêng cho ruộng đang chọn. Mở dự báo để xem đánh giá điều kiện môi trường và việc nên làm.</Text>
       </View>
       <Text style={s.homePlotChoiceTitle}>{plot?.name ?? 'Ruộng đang xem'}</Text>
-      {sensorLabels.map((label, index) => <View key={label} style={s.homeSensorRow}><Text style={s.homeSensorName}>{label}</Text><Text style={s.homeSensorStatus}>
-        {[
-          readings.temperature === null ? '—' : `${forecastNumber(readings.temperature)} °C`,
-          readings.humidity === null ? '—' : `${forecastNumber(readings.humidity)}%`,
-          readings.soilPh === null ? '—' : `${forecastNumber(readings.soilPh)} pH`,
-          readings.rainfall === null ? '—' : `${forecastNumber(readings.rainfall)} mm`,
-        ][index]}
-      </Text></View>)}
+      {sensorLabels.map((label, index) => {
+        const value = [readings.temperature, readings.humidity, readings.soilPh, readings.rainfall][index];
+        const unit = ['°C', '%', ' pH', ' mm'][index];
+        return <View key={label} style={s.homeSensorRow}><Text style={s.homeSensorName}>{label}</Text><Text style={s.homeSensorStatus}>{value !== null ? `${forecastNumber(value)}${unit}` : '—'}</Text></View>;
+      })}
       <Text style={s.homeUpdated}>Cập nhật {stamp}</Text>
       <Pressable accessibilityRole="button" onPress={() => { setSheet(undefined); openForecast(); }} style={s.homeSheetAction}><Text style={s.homeLinkText}>Xem dự báo của ruộng</Text></Pressable>
       <Pressable accessibilityRole="button" onPress={() => setSheet(undefined)} style={s.homeSheetAction}><Text style={s.homeLinkText}>Đã hiểu</Text></Pressable>

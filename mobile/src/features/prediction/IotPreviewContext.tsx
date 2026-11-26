@@ -1,10 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useAuth } from '../../state/AuthContext';
 import { useDemo } from '../../state/DemoContext';
 import type { ForecastSource } from './client';
 import { fieldReadings, forecastNumber } from './forecastFields';
 import { fetchLatestEsp32, type Esp32Alert, type Esp32Reading, type Esp32TelemetryResponse } from './iotClient';
-import { createIotPreviewStore, IOT_PREVIEW_ENABLED, type IotPreviewStore, type IotReadings, type PreviewForecast } from './iotPreview';
+import { createIotPreviewStore, type IotPreviewStore, type IotReadings, type PreviewForecast } from './iotPreview';
 
 export type LiveIotMeta = {
   isLive: boolean;
@@ -51,11 +51,6 @@ export function usePlotIot(plotId?: string, source: ForecastSource | null = null
   const { session } = useAuth();
   if (!store) throw new Error('Missing IotPreviewProvider');
 
-  const subscribe = useCallback((listener: () => void) => IOT_PREVIEW_ENABLED && plotId
-    ? store.subscribe(plotId, listener) : () => {}, [store, plotId]);
-  const getSnapshot = useCallback(() => IOT_PREVIEW_ENABLED && plotId ? store.get(plotId) : null, [store, plotId]);
-  const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
   const [liveResponse, setLiveResponse] = useState<{ plotId?: string; data: Esp32TelemetryResponse } | null>(null);
   const token = session?.access_token;
 
@@ -83,9 +78,8 @@ export function usePlotIot(plotId?: string, source: ForecastSource | null = null
   }, [token, plotId]);
 
   const refresh = useCallback(() => {
-    if (IOT_PREVIEW_ENABLED && plotId) store.refresh(plotId);
     void pullLive();
-  }, [store, plotId, pullLive]);
+  }, [pullLive]);
 
   const liveData = liveResponse && plotId && liveResponse.plotId === plotId ? liveResponse.data : null;
   const liveItem = liveData?.item ?? null;
@@ -108,5 +102,6 @@ export function usePlotIot(plotId?: string, source: ForecastSource | null = null
     return { readings, forecast: buildEsp32Forecast(liveItem), refresh, liveIot };
   }
 
-  return { readings: snapshot?.readings ?? fieldReadings(source), forecast: snapshot?.forecast, refresh, liveIot: null as LiveIotMeta | null };
+  // No live ESP32 reading for this plot: never show the simulated preview frames as if measured.
+  return { readings: fieldReadings(source), forecast: undefined, refresh, liveIot: null as LiveIotMeta | null };
 }
