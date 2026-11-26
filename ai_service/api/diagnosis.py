@@ -49,11 +49,31 @@ ISSUE_LABELS_VI = {
 
 
 # ---------------------------------------------------------------- stage 0
+ANALYSIS_SIDE = 512
+
+
+def analysis_grid(pixels):
+    """Evenly spaced pixels with the long side at ANALYSIS_SIDE; smaller images are returned as they are.
+
+    The sharpness limit only means something on a fixed grid: an integer step (long side // 512) left
+    the grid 512 to 640 points wide depending on the upload size, so phone-sized photos were judged
+    blurrier than the same picture at 1024 px. At 1024 and 2048 px this picks every 2nd and 4th
+    pixel, exactly as before. No averaging: that would change the values the limit was chosen on.
+    """
+    long_side = max(pixels.shape[:2])
+    if long_side <= ANALYSIS_SIDE:
+        return pixels
+
+    def picks(length):
+        count = -(-length * ANALYSIS_SIDE // long_side)  # round up, so a last partial step is kept
+        return np.arange(count) * long_side // ANALYSIS_SIDE
+
+    return pixels[np.ix_(picks(pixels.shape[0]), picks(pixels.shape[1]))]
+
+
 def assess_quality(pixels, t=DEFAULTS):
     """pixels: HxWx3 uint8 RGB. Returns {ok, issues, metrics}."""
-    img = np.asarray(pixels, dtype=np.float32)
-    step = max(1, max(img.shape[:2]) // 512)  # cheap downscale; metrics are scale-tolerant enough
-    img = img[::step, ::step]
+    img = np.asarray(analysis_grid(np.asarray(pixels)), dtype=np.float32)
     gray = img @ np.array([0.299, 0.587, 0.114], dtype=np.float32)
     lap = (-4 * gray[1:-1, 1:-1] + gray[:-2, 1:-1] + gray[2:, 1:-1] + gray[1:-1, :-2] + gray[1:-1, 2:])
     metrics = {
