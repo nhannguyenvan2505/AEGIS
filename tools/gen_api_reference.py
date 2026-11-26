@@ -24,6 +24,7 @@ DOCS = [
     ('/api/admin', 'backend/docs/admin/API_SPEC.md'),
     ('/api/auth', 'backend/docs/API.md, backend/docs/JWT_RBAC.md'),
     ('/api/disease', 'backend/docs/API.md, backend/docs/IDEMPOTENCY.md'),
+    ('/api/alerts', 'docs/IOT_DEVICES_ALERTS_PUSH.md'),
     ('/api/notifications', 'docs/IOT_DEVICES_ALERTS_PUSH.md'),
     ('/api/iot', 'docs/IOT_DEVICES_ALERTS_PUSH.md'),
     ('/api/farm/environment-streams', 'backend/docs/HOURLY_SOURCE_API.md, frontend/ENVIRONMENT_INGEST.md'),

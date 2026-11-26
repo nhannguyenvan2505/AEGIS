@@ -253,6 +253,10 @@ class IotMqttTests(unittest.TestCase):
             final = save_esp32_reading(self.app.config, {'device_uid': uid, 'temperature': 26.0, 'humidity': 70.0})
             self.assertEqual((errors, final['plot_id']), ([], taken), f'attempt {attempt}')
 
+    def test_alert_api_needs_mysql(self):
+        response = self.client.get('/api/alerts', headers=self._auth_header())
+        self.assertEqual((response.status_code, response.get_json()['error']['code']), (503, 'alerts_unavailable'))
+
     def test_push_token_api_needs_mysql(self):
         headers = self._auth_header()
         response = self.client.post('/api/notifications/push-tokens', headers=headers,
