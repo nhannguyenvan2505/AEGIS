@@ -9,7 +9,7 @@ thiết bị). Chi tiết thiết bị, cảnh báo và push: [IOT_DEVICES_ALERT
 | API cảnh báo cho người dùng | `nvn/p0-user-alerts-api` |
 | MQTT mặc định tắt; ẩn thông tin broker với người dùng | `nvn/p0-mqtt-deploy` |
 | Trả `diagnosis` khi đọc lại | đã ở `develop` (#43) |
-| Gửi lại cùng `Idempotency-Key` | #42 (`nvn/idempotency-retry`), chưa merge lúc viết |
+| Gửi lại cùng `Idempotency-Key` | đã ở `develop` (#42) |
 
 ## Web admin
 
@@ -48,7 +48,7 @@ thiết bị). Chi tiết thiết bị, cảnh báo và push: [IOT_DEVICES_ALERT
 5. **Gửi ảnh:** app chưa gửi `Idempotency-Key`. Nên tạo một khoá cho mỗi lần chụp và dùng lại khi
    gửi lại. Nhận `409 idempotency_uncertain` thì kiểm tra lịch sử trước khi tạo khoá mới. Cùng mã
    `ai_unavailable` hoặc `ai_timeout` có thể nhả khoá hoặc không, nên không suy ra từ mã lỗi
-   (xem `backend/docs/IDEMPOTENCY.md` trong #42).
+   (xem `backend/docs/IDEMPOTENCY.md`).
 6. **Lịch sử:** GET chi tiết, từng item lịch sử và replay trả `diagnosis` khi có kết luận đã lưu.
    Không có khoá này nghĩa là không biết, **không** hiểu là cây khỏe. Màn chi tiết đã xử lý
    `uncertain_lesion` và `healthy`; danh sách lịch sử thì chưa hiển thị. Chú thích trong
