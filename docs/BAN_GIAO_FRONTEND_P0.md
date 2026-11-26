@@ -7,7 +7,7 @@ thiết bị). Chi tiết thiết bị, cảnh báo và push: [IOT_DEVICES_ALERT
 |---|---|
 | Đăng ký, gỡ đăng ký thiết bị; push token; vùng "theo dõi" không có tên bệnh | đã ở `develop` |
 | API cảnh báo cho người dùng | đã ở `develop` (#47) |
-| MQTT mặc định tắt; ẩn thông tin broker với người dùng | `nvn/p0-mqtt-deploy` (#46, chưa merge) |
+| MQTT mặc định tắt; ẩn thông tin broker với người dùng | đã ở `develop` (#46) |
 | Nhãn độ tin cậy FR09 trên từng box | đã ở `develop` (#38) |
 | Trả `diagnosis` khi đọc lại | đã ở `develop` (#43) |
 | Gửi lại cùng `Idempotency-Key` | đã ở `develop` (#42) |
