@@ -1,0 +1,16 @@
+# Allow-list for the backend images: local settings, data and uploads never enter the context.
+*
+!backend/requirements.txt
+!backend/requirements-serve.txt
+!backend/app
+!backend/database
+!ai_service/api/checkpoint.json
+!ai_service/api/gatekeeper.json
+!tools/audit_iot_data.py
+**/__pycache__
+**/*.pyc
+**/.env
+**/.env.*
+backend/database/latest-backup.txt
+backend/database/cutover_report.json
+backend/database/pilot_acceptance_report.json

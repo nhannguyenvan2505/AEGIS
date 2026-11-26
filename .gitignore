@@ -50,6 +50,9 @@ instance/
 /backend/database/pilot_acceptance_report.json
 /fe-source-import/
 /ai_service/experiments/
+# Deployment secrets made on the server (deploy/.env is covered by .env above)
+/deploy/secrets/
+/deploy/backups/
 /ai_service/datasets/
 /ai_service/weights/
 /demo_runs/

@@ -269,11 +269,31 @@ db.grantRolesToUser('aegis_app',[{{role:'readWrite',db:'{cls.mongo_database}'}}]
         mongo_shell(f"db.grantRolesToUser('aegis_app',[{{role:'readWrite',db:'{mongo_target}'}}]);")
         self.addCleanup(mongo_shell,f"db.getSiblingDB('{mongo_target}').dropDatabase();"
                         f"db.revokeRolesFromUser('aegis_app',[{{role:'readWrite',db:'{mongo_target}'}}]);")
-        result=restore(work/'backup',mysql=dict(self.mysql,database=mysql_target),uploads=work/'uploads',
-                       mongo=dict(self.mongo,database=mongo_target))
-        self.assertEqual(result['mongo_database'],mongo_target)
+        def load():
+            return restore(work/'backup',mysql=dict(self.mysql,database=mysql_target),uploads=work/'uploads',
+                           mongo=dict(self.mongo,database=mongo_target))
         options=dict(self.mongo);options.pop('database')
+        def layout(client,database):
+            return {item['name']:(item['options'],sorted(client[database][item['name']].index_information()))
+                    for item in client[database].list_collections()}
         with MongoClient(**options,serverSelectionTimeoutMS=5000) as client:
+            # A new deployment: the bootstrap script has already made the collections, all empty.
+            for name,(settings_,indexes) in layout(client,self.mongo_database).items():
+                client[mongo_target].create_collection(name,**settings_)
+            # Data in any one of them is never overwritten.
+            marker={'_id':'keep-me'}
+            client[mongo_target].create_collection('operator_notes').insert_one(marker)
+        with self.assertRaisesRegex(BackupError,'MongoDB database must be empty'):
+            load()
+        with MongoClient(**options,serverSelectionTimeoutMS=5000) as client:
+            self.assertEqual(list(client[mongo_target].operator_notes.find()),[marker])
+            client[mongo_target].operator_notes.delete_one(marker)
+        result=load()
+        self.assertEqual(result['mongo_database'],mongo_target)
+        with MongoClient(**options,serverSelectionTimeoutMS=5000) as client:
+            expected=layout(client,self.mongo_database)
+            restored=layout(client,mongo_target)
+            self.assertEqual({name:restored[name] for name in expected},expected)  # validators and indexes
             for name in client[self.mongo_database].list_collection_names():
                 source=sorted(str(d) for d in client[self.mongo_database][name].find())
                 self.assertEqual(sorted(str(d) for d in client[mongo_target][name].find()),source,name)

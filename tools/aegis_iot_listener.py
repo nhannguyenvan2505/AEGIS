@@ -1,6 +1,7 @@
 """Standalone ESP32 MQTT listener with console alerts and AEGIS DB persistence."""
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -10,13 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'backend'))
 
 from app.database_config import settings
-from app.iot_mqtt import (
-    DEFAULT_MQTT_BROKER,
-    DEFAULT_MQTT_PORT,
-    DEFAULT_MQTT_TOPIC,
-    evaluate_microclimate,
-    save_esp32_reading,
-)
+from app.iot_mqtt import evaluate_microclimate, save_esp32_reading
+from app.mqtt_settings import identify_device, load_mqtt_settings, secure_client
 
 
 def runtime_config(storage_backend='mysql'):
@@ -43,12 +39,17 @@ def print_reading(saved):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--broker', default=DEFAULT_MQTT_BROKER)
-    parser.add_argument('--port', type=int, default=DEFAULT_MQTT_PORT)
-    parser.add_argument('--topic', default=DEFAULT_MQTT_TOPIC)
+    parser.add_argument('--broker', help='Overrides AEGIS_MQTT_BROKER')
+    parser.add_argument('--port', type=int, help='Overrides AEGIS_MQTT_PORT')
+    parser.add_argument('--topic', help='Overrides AEGIS_MQTT_TOPIC')
     parser.add_argument('--storage', choices=('mysql', 'sqlite'), default='mysql')
     parser.add_argument('--no-save', action='store_true', help='Only print alerts without writing to DB')
     args = parser.parse_args()
+    # Credentials come only from the environment so they never appear in a command line.
+    overrides = {'AEGIS_MQTT_BROKER': args.broker, 'AEGIS_MQTT_PORT': args.port, 'AEGIS_MQTT_TOPIC': args.topic}
+    mqtt_settings = load_mqtt_settings({**os.environ, **{k: str(v) for k, v in overrides.items() if v is not None}})
+    if mqtt_settings.error:
+        parser.error(mqtt_settings.error)
 
     cfg = runtime_config(args.storage)
 
@@ -56,14 +57,14 @@ def main():
         code = getattr(reason_code, 'value', reason_code)
         if code == 0 or str(reason_code) == 'Success':
             print('-> Đã kết nối MQTT Broker thành công!')
-            client.subscribe(args.topic)
-            print(f'-> Đang lắng nghe luồng dữ liệu từ topic: {args.topic}\n' + '=' * 60)
+            client.subscribe(mqtt_settings.topic)
+            print(f'-> Đang lắng nghe luồng dữ liệu từ topic: {mqtt_settings.topic}\n' + '=' * 60)
         else:
             print(f'-> Kết nối thất bại với mã lỗi: {reason_code}')
 
     def on_message(client, userdata, msg):
         try:
-            payload = json.loads(msg.payload.decode('utf-8'))
+            payload = identify_device(mqtt_settings.topic, msg.topic, json.loads(msg.payload.decode('utf-8')))
             if args.no_save:
                 temp = float(payload.get('temperature'))
                 hum = float(payload.get('humidity'))
@@ -85,8 +86,9 @@ def main():
         client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
+    secure_client(client, mqtt_settings)
     print('Đang kết nối đến máy chủ MQTT...')
-    client.connect(args.broker, args.port, 60)
+    client.connect(mqtt_settings.broker, mqtt_settings.port, 60)
     client.loop_forever()
 
 

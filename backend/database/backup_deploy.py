@@ -10,8 +10,10 @@ hashes: store it encrypted, outside the repository.
     python database/backup_deploy.py restore --from <dir> --database <empty db> --uploads <empty dir>
                                              [--mongo-database <empty db>]
 
-Restore only fills empty targets and never overwrites. After it passes, point the
-backend at the restored database and image directory.
+Restore only fills empty targets and never overwrites data. A MongoDB database that
+only holds the empty collections made by mongo/001_design.js counts as empty; they are
+replaced by the ones in the backup. After it passes, point the backend at the restored
+database and image directory.
 """
 import argparse
 from datetime import datetime, timezone
@@ -193,7 +195,8 @@ def restore(source, *, mysql, uploads, mongo=None, mysql_client=None, mongoresto
         from pymongo import MongoClient
         options = {key: value for key, value in mongo.items() if key != 'database'}
         with MongoClient(**options, serverSelectionTimeoutMS=5000) as client:
-            if client[mongo['database']].list_collection_names():
+            target = client[mongo['database']]
+            if any(target[name].find_one({}, {'_id': 1}) is not None for name in target.list_collection_names()):
                 raise BackupError('Target MongoDB database must be empty')
 
     with tempfile.TemporaryFile() as script:
@@ -204,7 +207,7 @@ def restore(source, *, mysql, uploads, mongo=None, mysql_client=None, mongoresto
         _run(command, 'mysql restore', stdin=script, stdout=subprocess.DEVNULL, env=environment)
     if mongo:
         name = record['mongo_database']
-        _mongo_run(restore_tool, mongo, ['--gzip', '--archive=' + str(source / MONGO_FILE),
+        _mongo_run(restore_tool, mongo, ['--drop', '--gzip', '--archive=' + str(source / MONGO_FILE),
                                          f'--nsFrom={name}.*', f"--nsTo={mongo['database']}.*"], 'mongorestore')
     shutil.copytree(source / 'uploads', uploads, dirs_exist_ok=True)
 

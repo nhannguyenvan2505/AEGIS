@@ -1,0 +1,9 @@
+# Used by deploy/acceptance.py only, on top of compose.yaml: a stand-in replaces the AI
+# service, which needs model weights and has its own workflow. Never use it to deploy.
+services:
+  ai:
+    image: aegis-backend:local
+    build: !reset null
+    command: ["python", "/stub/acceptance_ai_stub.py"]
+    volumes: !override
+      - ./acceptance_ai_stub.py:/stub/acceptance_ai_stub.py:ro

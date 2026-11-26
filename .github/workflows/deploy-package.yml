@@ -1,0 +1,32 @@
+---
+name: Deploy package
+
+# Not a required check: it runs only when something in the deployment changes.
+on:
+  pull_request:
+    paths:
+      - 'deploy/**'
+      - 'backend/Dockerfile*'
+      - 'backend/requirements*.txt'
+      - 'backend/app/**'
+      - 'backend/database/**'
+      - '.github/workflows/deploy-package.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      # Real MySQL, MongoDB, Mosquitto and Caddy with throwaway secrets. The AI service has
+      # its own workflow and needs model weights, so a stand-in answers here. Devices are
+      # simulated.
+      - name: Start the stack and run the acceptance checks
+        run: python deploy/acceptance.py
