@@ -1,0 +1,297 @@
+# AEGIS deployment for one Linux host: HTTPS proxy, backend, AI service, MySQL, MongoDB
+# and its outbox delivery, MQTT broker and listener, push worker. The forecast service
+# is not included (decisions 25-26/11/2026). Settings and secrets: deploy/.env, README.md.
+name: aegis
+
+x-backend-image: &backend-image
+  image: aegis-backend:local
+  build:
+    context: ..
+    dockerfile: backend/Dockerfile
+    target: backend
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "5"
+
+x-hardening: &hardening
+  logging: *logging
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+
+x-database: &database
+  AEGIS_STORAGE_BACKEND: mysql
+  AEGIS_MYSQL_HOST: mysql
+  AEGIS_MYSQL_PORT: "3306"
+  AEGIS_MYSQL_DATABASE: aegis
+  # Row access only; schema changes use the migration account in db-init and tools.
+  AEGIS_MYSQL_USER: aegis_runtime
+  AEGIS_MYSQL_PASSWORD: ${AEGIS_MYSQL_RUNTIME_PASSWORD:?Set it in deploy/.env}
+  # The web process does not deliver to MongoDB; the mongo-outbox service does.
+  AEGIS_MONGO_DELIVERY_ENABLED: "0"
+
+# Only the delivery worker and the one-off tools talk to MongoDB.
+x-mongo-client: &mongo-client
+  AEGIS_MONGO_HOST: mongo
+  AEGIS_MONGO_PORT: "27017"
+  AEGIS_MONGO_DATABASE: aegis
+  AEGIS_MONGO_USER: aegis_app
+  AEGIS_MONGO_PASSWORD: ${AEGIS_MONGO_PASSWORD:?Set it in deploy/.env}
+
+x-schema-owner: &schema-owner
+  AEGIS_MYSQL_MIGRATION_USER: aegis_migrate
+  AEGIS_MYSQL_MIGRATION_PASSWORD: ${AEGIS_MYSQL_MIGRATION_PASSWORD:?Set it in deploy/.env}
+  AEGIS_MYSQL_ADMIN_PASSWORD: ${AEGIS_MYSQL_ROOT_PASSWORD:?Set it in deploy/.env}
+  AEGIS_MYSQL_RUNTIME_USER: aegis_runtime
+  AEGIS_MYSQL_RUNTIME_PASSWORD: ${AEGIS_MYSQL_RUNTIME_PASSWORD:?Set it in deploy/.env}
+
+services:
+  mysql:
+    image: mysql:8.4
+    logging: *logging
+    environment:
+      MYSQL_ROOT_PASSWORD: ${AEGIS_MYSQL_ROOT_PASSWORD:?Set it in deploy/.env}
+      MYSQL_DATABASE: aegis
+      MYSQL_USER: aegis_migrate
+      MYSQL_PASSWORD: ${AEGIS_MYSQL_MIGRATION_PASSWORD:?Set it in deploy/.env}
+    command:
+      - --default-time-zone=+00:00
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      # TCP: the temporary server of the first initialisation listens on the socket only.
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql --protocol=TCP -h 127.0.0.1 -u $$MYSQL_USER -D aegis -e 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [data]
+
+  mongo:
+    logging: *logging
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: aegis_root
+      MONGO_INITDB_ROOT_PASSWORD: ${AEGIS_MONGO_ROOT_PASSWORD:?Set it in deploy/.env}
+      MONGO_INITDB_DATABASE: aegis
+      # Read by the bootstrap script, which creates the application account.
+      AEGIS_MONGO_PASSWORD: ${AEGIS_MONGO_PASSWORD:?Set it in deploy/.env}
+    # By default MongoDB would claim about half of the memory it shares with everything else.
+    command: ["--wiredTigerCacheSizeGB", "${AEGIS_MONGO_CACHE_GB:-0.5}"]
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+      # Runs only while the data volume is empty.
+      - ../backend/database/mongo:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet -u aegis_app -p \"$$AEGIS_MONGO_PASSWORD\" --authenticationDatabase aegis aegis --eval 'quit(db.getCollectionNames().length >= 3 ? 0 : 1)'"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [data]
+
+  db-init:
+    <<: [*hardening, *backend-image]
+    command: ["python", "database/deploy_init.py"]
+    environment:
+      <<: [*database, *schema-owner]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: "no"
+    networks: [data]
+
+  backend:
+    <<: [*hardening, *backend-image]
+    environment:
+      <<: *database
+      AEGIS_JWT_SECRET: ${AEGIS_JWT_SECRET:?Set it in deploy/.env}
+      AEGIS_AI_URL: http://ai:8000
+      # Caddy is the only way in: this service publishes no port.
+      AEGIS_TRUSTED_PROXY_HOPS: "1"
+      # The mqtt-listener service subscribes; the web server only reports its status.
+      AEGIS_MQTT_ENABLED: "0"
+      AEGIS_MQTT_STATUS_FILE: /app/run/mqtt-status.json
+      # Empty: no other web origin may call the admin API.
+      AEGIS_ADMIN_ALLOWED_ORIGINS: ${AEGIS_ADMIN_ALLOWED_ORIGINS:-}
+    volumes:
+      - uploads:/app/backend/mysql-instance/uploads
+      - mqtt_status:/app/run:ro
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [web, data, inference]
+
+  ai:
+    <<: *hardening
+    image: aegis-ai:local
+    build: ../ai_service
+    # No authentication: reachable by the backend only. See ai_service/DEPLOY.md.
+    volumes:
+      - ${AEGIS_MODELS_DIR:-../ai_service/experiments}:/app/experiments:ro
+    environment:
+      AEGIS_AI_MAX_INFLIGHT: ${AEGIS_AI_MAX_INFLIGHT:-2}
+    networks: [inference]
+
+  mqtt-listener:
+    <<: [*hardening, *backend-image]
+    # Exactly one: a second subscriber would receive its own copy of every reading.
+    command: ["python", "database/run_mqtt.py"]
+    environment:
+      <<: *database
+      AEGIS_MQTT_ENABLED: "1"
+      AEGIS_MQTT_BROKER: ${AEGIS_MQTT_HOSTNAME:?Set it in deploy/.env}
+      AEGIS_MQTT_PORT: "8883"
+      AEGIS_MQTT_TOPIC: aegis/devices/+/telemetry
+      AEGIS_MQTT_USERNAME: aegis-backend
+      AEGIS_MQTT_PASSWORD: ${AEGIS_MQTT_BACKEND_PASSWORD:?Set it in deploy/.env}
+      AEGIS_MQTT_CA_CERT: /app/mqtt-ca.crt
+      AEGIS_MQTT_STATUS_FILE: /app/run/mqtt-status.json
+    volumes:
+      - ./secrets/mqtt/ca.crt:/app/mqtt-ca.crt:ro
+      - mqtt_status:/app/run
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      mosquitto:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "database/run_mqtt.py", "--check"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [data, mqtt]
+
+  # Copies queued events from MySQL to MongoDB; the API never waits for MongoDB.
+  mongo-outbox:
+    <<: [*hardening, *backend-image]
+    command: ["python", "database/deliver_outbox.py", "--poll", "5"]
+    environment:
+      <<: [*database, *mongo-client]
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      # Unhealthy when events are parked as failed and need someone to look.
+      test: ["CMD", "python", "database/deliver_outbox.py", "--status"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+    networks: [data]
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    logging: *logging
+    ports:
+      - "${AEGIS_MQTT_BIND:-0.0.0.0}:8883:8883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/acl:/mosquitto/config/acl:ro
+      - ./secrets/mqtt:/mosquitto/secrets:ro
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      mqtt:
+        # The listener reaches the broker by the name its certificate carries.
+        aliases:
+          - ${AEGIS_MQTT_HOSTNAME:?Set it in deploy/.env}
+
+  caddy:
+    image: caddy:2.10
+    logging: *logging
+    environment:
+      AEGIS_DOMAIN: ${AEGIS_DOMAIN:?Set it in deploy/.env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [web]
+
+  # Opt-in: sends alert titles, messages and device tokens to Expo.
+  #   docker compose --profile push up -d push
+  push:
+    <<: [*hardening, *backend-image]
+    profiles: [push]
+    command: ["python", "database/deliver_push.py", "--poll", "30"]
+    environment:
+      <<: *database
+      AEGIS_PUSH_ENABLED: ${AEGIS_PUSH_ENABLED:-0}
+      EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    networks: [data, egress]
+
+  # One-off commands: docker compose run --rm tools python3.11 database/<script>.py ...
+  tools:
+    image: aegis-tools:local
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+      target: tools
+    profiles: [tools]
+    environment:
+      <<: [*database, *schema-owner, *mongo-client]
+    volumes:
+      - uploads:/app/backend/mysql-instance/uploads
+      - ./backups:/backups
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks: [data]
+
+networks:
+  web: {}
+  data:
+    internal: true
+  inference:
+    internal: true
+  mqtt: {}
+  egress: {}
+
+volumes:
+  mysql_data:
+  mongo_data:
+  mongo_config:
+  uploads:
+  mqtt_status:
+  caddy_data:
+  caddy_config:

@@ -36,7 +36,6 @@ def ingest_esp32():
         item = save_esp32_reading(
             current_app.config,
             payload,
-            topic=get_mqtt_status(current_app)['topic'],
             source='esp32_admin',
             trust_plot_id=True,  # administrators may assign any plot
         )

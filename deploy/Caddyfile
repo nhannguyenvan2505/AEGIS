@@ -1,0 +1,13 @@
+# HTTPS in front of the backend. A public domain gets a Let's Encrypt certificate
+# automatically (ports 80 and 443 must reach this host); "localhost" gets Caddy's own CA.
+# Caddy discards X-Forwarded-* sent by clients and writes its own, which is why the
+# backend may trust exactly one hop.
+{$AEGIS_DOMAIN} {
+	encode gzip
+	header Strict-Transport-Security "max-age=31536000"
+	# The backend accepts images up to 8 MiB plus form overhead.
+	request_body {
+		max_size 9MB
+	}
+	reverse_proxy backend:5000
+}
