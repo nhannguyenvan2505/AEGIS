@@ -13,8 +13,9 @@ Tên file không tham gia so sánh. `X-Request-ID` thuộc request hiện tại;
 Cùng khóa nhưng byte ảnh khác trả 409 `idempotency_conflict`.
 Request trùng khi đang chạy trả 409 `idempotency_in_progress`.
 
-SQLite giữ reservation trước khi gọi AI, dùng giao dịch ghi để phối hợp nhiều
-process. Lưu analysis và chuyển reservation sang completed trong cùng giao dịch.
+Database giữ reservation trước khi gọi AI (MySQL khi chạy thật, SQLite chỉ cho
+test), dùng giao dịch ghi để phối hợp nhiều process. Lưu analysis và chuyển
+reservation sang completed trong cùng giao dịch.
 DB chỉ lưu SHA-256 của khóa và ảnh, không lưu khóa gốc.
 Các giới hạn quota và admission vẫn chạy trước idempotency: replay cũng tính
 quota và có thể nhận 429/503 khi quá tải. Client xử lý Retry-After của các lỗi đó.
@@ -36,8 +37,10 @@ quả. Mã lỗi giống nhau (`ai_unavailable`, `ai_timeout`) có thể thuộc
 client không suy ra từ mã: gửi lại cùng khóa, nếu nhận `idempotency_uncertain` thì
 kiểm tra lịch sử trước khi người dùng chủ động tạo tác vụ với khóa mới.
 
-Reservation `running` bị bỏ dở (tiến trình chết) chuyển sang uncertain sau thời hạn
-cấu hình; không tự chạy lại. Đây là cơ chế chống gửi trùng, không bảo đảm
+Reservation `running` bị bỏ dở (tiến trình chết) chuyển sang uncertain ở lần gửi lại
+đầu tiên sau thời hạn; không tự chạy lại. Mặc định 300 giây, đổi bằng
+`AEGIS_IDEMPOTENCY_RUNNING_TTL`; backend không khởi động nếu giá trị này không lớn
+hơn tổng timeout gọi AI. Đây là cơ chế chống gửi trùng, không bảo đảm
 exactly-once xuyên qua sự cố mạng, GPU và filesystem. Chưa có giao diện phục hồi
 reservation hoặc retention.
 

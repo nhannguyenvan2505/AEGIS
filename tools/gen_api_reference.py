@@ -23,7 +23,10 @@ DOCS = [
     ('/api/admin/rbac', 'backend/docs/JWT_RBAC.md'),
     ('/api/admin', 'backend/docs/admin/API_SPEC.md'),
     ('/api/auth', 'backend/docs/API.md, backend/docs/JWT_RBAC.md'),
-    ('/api/disease', 'backend/docs/API.md'),
+    ('/api/disease', 'backend/docs/API.md, backend/docs/IDEMPOTENCY.md'),
+    ('/api/alerts', 'docs/IOT_DEVICES_ALERTS_PUSH.md'),
+    ('/api/notifications', 'docs/IOT_DEVICES_ALERTS_PUSH.md'),
+    ('/api/iot', 'docs/IOT_DEVICES_ALERTS_PUSH.md'),
     ('/api/farm/environment-streams', 'backend/docs/HOURLY_SOURCE_API.md, frontend/ENVIRONMENT_INGEST.md'),
     ('/api/farm/forecast', 'backend/docs/STORED_HOURLY_FORECAST_API.md, FORECAST_*_T1x.md'),
     ('/api/farm/automation', 'frontend/MOCK_AUTOMATION.md'),
@@ -35,6 +38,9 @@ DOCS = [
 
 
 def doc_for(path):
+    # The id sits in the middle of this path, so a prefix cannot select it.
+    if path.startswith('/api/admin/devices/') and path.endswith('/release'):
+        return 'docs/IOT_DEVICES_ALERTS_PUSH.md'
     for prefix, doc in DOCS:
         if path.startswith(prefix):
             return doc

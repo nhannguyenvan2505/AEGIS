@@ -107,7 +107,7 @@ Huấn luyện YOLO11n-cls, 224 px, dừng sớm ở epoch 26/40. Tập test `ga
 cd D:\AEGIS\ai_service
 .\run_ai_service.ps1            # bật gatekeeper gate_v1b (trọng số: ai_service\experiments\gatekeeper\gate_v1b\best.pt, git-ignore)
 ```
-Backend gọi `POST /v2/diagnose` (mặc định `AEGIS_AI_API_VERSION=v2`; đặt `v1` để quay về `/predict`). `rejected_non_rice`, `rejected_poor_quality`, `rejected_uncertain_scope` trả HTTP 200 với `rejected: true`, không lưu ảnh hay analysis; mobile hiển thị thông báo tương ứng. `healthy`/`uncertain_lesion` lưu như `no_detection` kèm `diagnosis.status`. Không cần migration DB.
+Backend gọi `POST /v2/diagnose` (mặc định `AEGIS_AI_API_VERSION=v2`; đặt `v1` để quay về `/predict`). `rejected_non_rice`, `rejected_poor_quality`, `rejected_uncertain_scope` trả HTTP 200 với `rejected: true`, không lưu ảnh hay analysis; mobile hiển thị thông báo tương ứng. `healthy`/`uncertain_lesion` lưu `status=no_detection`; kết luận được lưu riêng ở cột `diagnosis_status` (MySQL migration 008) và trả lại ở GET, lịch sử và replay, xem [API.md](../backend/docs/API.md).
 
 ## 6. Việc còn lại (thứ tự)
 1. Thu thập/gán nhãn tập gatekeeper + hard negatives → `train_gatekeeper.py` → `eval_gatekeeper.py` → đặt ngưỡng.
