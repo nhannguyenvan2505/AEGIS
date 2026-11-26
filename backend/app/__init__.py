@@ -69,6 +69,8 @@ def create_app(config=None):
     app.register_blueprint(farm)
     from .push import notifications
     app.register_blueprint(notifications)
+    from .alerts_api import alerts
+    app.register_blueprint(alerts)
     from .admin import register_admin
     register_admin(app)
     from .mobile_contract import enable_mobile_contract
