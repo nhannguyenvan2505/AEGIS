@@ -125,6 +125,18 @@
 - `useFarmData`: stale-while-revalidate — không bật spinner khi đã có dữ liệu mỗi lần focus lại màn hình.
 - Lưu ý: Expo Go ở chế độ dev chậm hơn bản release nhiều.
 
+## 2026-11-22 — Header các trang con hoà màu nền
+- `.appHeader` (app.scss): bỏ bo góc dưới, bỏ đổ bóng/elevation, nền `$card` → `$bg` (trùng nền trang); vẫn cố định phía trên, ngoài ScrollView. Áp dụng cho mọi trang dùng `AppHeader` (trừ Trang chủ, Đăng nhập, Đăng ký). Chạy lại `npm run styles`.
+- Kiểm tra: `npm run styles` OK; `tsc --noEmit` còn 1 lỗi có sẵn ở `_layout.tsx` (`translucent` của StatusBar), không liên quan.
+
+## 2026-11-24 — Trang chủ chỉ hiện số đo ESP32 thật
+- Bỏ fallback sang khung IoT giả lập (`iotPreview`) trong `usePlotIot`: khi ruộng chưa có số đo ESP32 thì không hiện số giả; chỉ dùng số đo thật (ESP32 hoặc dữ liệu giờ nếu có).
+- Trang chủ giữ đủ 4 ô; pH đất và lượng mưa hiện "Chưa có thiết bị" vì ESP32 không đo (`HomeMetric` prop `noDevice`, file `HomeUI.tsx`).
+- File: `DashboardScreen.tsx`, `IotPreviewContext.tsx`.
+- Dữ liệu: gán `ESP32_NODE_01` vào ruộng `tam2` (bảng `esp32_device_bindings`) để API trả số đo cho ruộng này.
+- Kiểm tra: eslint sạch; `tsc --noEmit` còn 1 lỗi có sẵn ở `_layout.tsx`.
+- Tồn tại: màn Dự báo (`ForecastDetailContent`, `ForecastListScreen`) vẫn dùng `IOT_PREVIEW_ENABLED`, chưa chỉnh.
+
 ## 2026-11-25 11:04 — Hiển thị đúng kết quả nghi ngờ khi quét bệnh
 - Công việc: `uncertain_lesion` trước đây hiện "Chưa phát hiện dấu hiệu bệnh"; nay hiện cảnh báo "Có dấu hiệu bất thường, cần kiểm tra thêm" kèm thông điệp từ server. Kết quả không có `diagnosis` (xem lại từ lịch sử, API v1) và thẻ lịch sử không có vùng bệnh nay ghi "Chưa có kết luận bệnh".
 - File: `src/features/diagnosis/scanHelpers.ts`, `AnalysisResult.tsx`, `HistoryScreen.tsx`.

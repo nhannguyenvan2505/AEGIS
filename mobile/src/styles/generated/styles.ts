@@ -5100,21 +5100,11 @@ export const s = StyleSheet.create({
     "fontWeight": "800"
   },
   "appHeader": {
-    "backgroundColor": "#ffffff",
-    "borderBottomLeftRadius": 24,
-    "borderBottomRightRadius": 24,
+    "backgroundColor": "#f7f3e8",
     "paddingTop": 10,
     "paddingRight": 16,
-    "paddingBottom": 14,
+    "paddingBottom": 12,
     "paddingLeft": 16,
-    "shadowOffset": {
-      "width": 0,
-      "height": 6
-    },
-    "shadowRadius": 18,
-    "shadowColor": "rgba(14, 60, 42, 0.1)",
-    "shadowOpacity": 1,
-    "elevation": 4,
     "zIndex": 5
   },
   "appHeaderRow": {
