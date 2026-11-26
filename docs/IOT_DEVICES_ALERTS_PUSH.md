@@ -38,7 +38,7 @@ Quyết định ngày 25/11/2026: admin đăng ký thiết bị trước; cảnh
 | `medium` (khô vằn) | `warning` | Có |
 | `warning` (đốm nâu), `safe` | | Không |
 
-Số đo có `observed_at` cũ hơn 6 giờ (gửi bù) không tạo cảnh báo. Chưa có API cho người dùng đọc danh sách cảnh báo.
+Số đo có `observed_at` cũ hơn 6 giờ (gửi bù) không tạo cảnh báo.
 
 **Khoảng không có luật bệnh** (trên 26,5°C và dưới 28°C, độ ẩm từ 85%, ngoài khoảng đốm nâu): API trả
 `alert.level = "warning"` với **`disease = null`**, tiêu đề "Theo dõi · Độ ẩm cao". Client không được giả định
@@ -56,6 +56,38 @@ Dòng `alert_thresholds` đang bật với `metric` là `temperature` hoặc `hu
 - Thời gian chờ 6 giờ tính theo từng thửa và từng ngưỡng.
 - `soil_moisture`, `soil_ph`, `risk_probability`, `confidence` chưa được IoT dùng. Tối đa 50 ngưỡng cho một số đo.
 - Ngưỡng toàn hệ thống đặt quá rộng sẽ tạo cảnh báo và push cho mọi thửa có thiết bị.
+
+## API cảnh báo cho người dùng
+
+Bearer JWT, chỉ thấy cảnh báo của thửa mình. `id` chính là `data.alert_id` trong thông báo push.
+
+| Method | Path | Ghi chú |
+|---|---|---|
+| GET | `/api/alerts?page=1&page_size=20&status=open&plot_id=<uuid>` | Mới nhất trước; mọi tham số đều tuỳ chọn |
+| GET | `/api/alerts/<id>` | |
+| POST | `/api/alerts/<id>/acknowledge` | `open` sang `acknowledged`; gọi lại vẫn trả 200 |
+
+```json
+{"success": true, "open_count": 2,
+ "pagination": {"page": 1, "page_size": 20, "total": 2, "total_pages": 1, "has_next": false},
+ "items": [{"id": 12, "plot_id": "<uuid>", "plot_name": "Ruộng 1",
+            "alert_type": "environment_anomaly", "severity": "warning",
+            "title": "...", "message": "...", "status": "open",
+            "generated_at": "2026-11-25T15:00:00+00:00", "resolved_at": null}]}
+```
+
+- `severity`: `info`, `warning`, `high`, `critical`. `status`: `open`, `acknowledged`, `resolved`.
+- `open_count` tính theo bộ lọc `plot_id`, không theo `status` (dùng cho huy hiệu số).
+- Đánh dấu `resolved` vẫn là việc của admin.
+
+| Status | `error.code` |
+|---|---|
+| 400 | `invalid_pagination`, `invalid_status`, `invalid_plot_id` |
+| 401 | `unauthorized` |
+| 404 | `alert_not_found`, `resource_not_found` (thửa không phải của mình) |
+| 409 | `alert_resolved` |
+| 429 | `rate_limit_exceeded` |
+| 503 | `alerts_unavailable` (backend không dùng MySQL) |
 
 ## API push cho mobile
 

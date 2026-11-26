@@ -468,6 +468,75 @@ class MySQLCoreTests(unittest.TestCase):
         accounts = [row[0] for row in self.query_root('SELECT user FROM mysql.user')]
         self.assertNotIn(runtime['user'],accounts)  # create_runtime_user.py owns that account
 
+    def alerts(self, owner, query=''):
+        return self.client.get('/api/alerts'+query,headers=self.headers[owner])
+
+    def acknowledge(self, owner, alert_id):
+        return self.client.post(f'/api/alerts/{alert_id}/acknowledge',headers=self.headers[owner])
+
+    def test_owner_reads_filters_and_acknowledges_alerts(self):
+        plot,uid = self.new_device()
+        second,_ = self.farmer_with_season(0)
+        self.reading(uid,24.0,90.0)   # rice blast, high
+        self.reading(uid,30.0,90.0)   # sheath blight, warning
+        response = self.alerts(0,'?plot_id='+plot)
+        self.assertEqual(response.status_code,200,response.json)
+        self.assertEqual(response.headers['Cache-Control'],'private, no-store')
+        body = response.json
+        newest,oldest = body['items']
+        self.assertEqual((newest['severity'],oldest['severity']),('warning','high'))
+        self.assertEqual(set(newest),{'id','plot_id','plot_name','alert_type','severity','title','message',
+                                      'status','generated_at','resolved_at'})
+        self.assertEqual((newest['plot_id'],newest['status'],newest['alert_type'],newest['resolved_at']),
+                         (plot,'open','environment_anomaly',None))
+        self.assertTrue(newest['generated_at'].endswith('+00:00'),newest['generated_at'])
+        age = datetime.now(timezone.utc)-datetime.fromisoformat(newest['generated_at'])
+        self.assertLess(abs(age.total_seconds()),120)
+        self.assertEqual(body['pagination'],dict(page=1,page_size=20,total=2,total_pages=1,has_next=False))
+        self.assertEqual(body['open_count'],2)
+        # The id is the one the push notification carries.
+        self.assertIn(newest['id'],[row['alert_id'] for row in self.push_rows()])
+        one = self.client.get(f"/api/alerts/{newest['id']}",headers=self.headers[0])
+        self.assertEqual((one.status_code,one.json['item']),(200,newest))
+        paged = self.alerts(0,'?plot_id='+plot+'&page=2&page_size=1').json
+        self.assertEqual(([item['id'] for item in paged['items']],paged['pagination']['has_next']),
+                         ([oldest['id']],False))
+        self.assertEqual(self.alerts(0,'?plot_id='+second).json['items'],[])
+        for expected_open in (1,1):  # acknowledging twice is harmless
+            done = self.acknowledge(0,newest['id'])
+            self.assertEqual((done.status_code,done.json['item']['status']),(200,'acknowledged'),done.json)
+            listed = self.alerts(0,'?plot_id='+plot+'&status=open').json
+            self.assertEqual(([item['id'] for item in listed['items']],listed['open_count']),
+                             ([oldest['id']],expected_open))
+        with repository(self.config) as repo:
+            repo.execute("UPDATE alerts SET status='resolved',resolved_at=UTC_TIMESTAMP() WHERE alert_id=%s",
+                         (oldest['id'],))
+        closed = self.acknowledge(0,oldest['id'])
+        self.assertEqual((closed.status_code,closed.json['error']['code']),(409,'alert_resolved'))
+        resolved = self.alerts(0,'?plot_id='+plot+'&status=resolved').json
+        self.assertTrue(resolved['items'][0]['resolved_at'].endswith('+00:00'))
+        self.assertEqual(resolved['open_count'],0)
+
+    def test_alerts_are_private_to_the_plot_owner(self):
+        plot,uid = self.new_device()
+        self.reading(uid,24.0,90.0)
+        alert = self.alerts(0,'?plot_id='+plot).json['items'][0]['id']
+        stranger = self.alerts(1)
+        self.assertEqual(stranger.status_code,200,stranger.json)
+        self.assertNotIn(alert,[item['id'] for item in stranger.json['items']])
+        foreign = self.alerts(1,'?plot_id='+plot)
+        self.assertEqual((foreign.status_code,foreign.json['error']['code']),(404,'resource_not_found'))
+        for response in (self.client.get(f'/api/alerts/{alert}',headers=self.headers[1]),
+                         self.acknowledge(1,alert),self.acknowledge(0,987654321)):
+            self.assertEqual((response.status_code,response.json['error']['code']),(404,'alert_not_found'))
+        self.assertEqual(self.alerts(0,'?plot_id='+plot).json['items'][0]['status'],'open')
+        self.assertEqual(self.client.get('/api/alerts').status_code,401)
+        for query,code in (('?status=bad','invalid_status'),('?plot_id=nope','invalid_plot_id'),
+                           ('?page=0','invalid_pagination'),('?page_size=101','invalid_pagination'),
+                           ('?page=1&page=2','invalid_pagination')):
+            response = self.alerts(0,query)
+            self.assertEqual((response.status_code,response.json['error']['code']),(400,code),query)
+
     def alert_rows(self, plot):
         with repository(self.config) as repo:
             return list(repo.all("""SELECT a.alert_id,a.severity,a.source_key,a.alert_type FROM alerts a
