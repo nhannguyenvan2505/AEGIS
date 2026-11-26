@@ -10,12 +10,12 @@ là nguồn đối chiếu hiện hành. Tab Cảnh báo đã nối follow-up **
 Trang chủ, Dữ liệu và Đề xuất vẫn demo. Camera giám sát chưa có stream, còn chọn/
 chụp ảnh trong Chẩn đoán dùng ImagePicker. Native chưa được nghiệm thu trong BE-03.
 
-Kiểm mới04/11: tsc/lint đạt,23unit và2bài HTTP client TypeScript đạt trên kho
+Kiểm mới 04/11: tsc/lint đạt,23 unit và 2 bài HTTP client TypeScript đạt trên kho
 tạm (ảnh dùng inference stub). Không chạy lại inference/GPU hoặc Android export.
-Client detect chưa gửi Idempotency-Key; history/farms/detect chưa tự xử lý401 và
+Client detect chưa gửi Idempotency-Key; history/farms/detect chưa tự xử lý 401 và
 Retry-After đầy đủ như follow-up. Xem backlog và tiêu chí native trong ma trận.
 
-## H2-T04 client follow-up — cập nhật03/11/2026
+## H2-T04 client follow-up — cập nhật 03/11/2026
 
 Người dùng nhận triển khai phần mobile; tab Cảnh báo khi đăng nhập đã nối luồng
 ruộng/mùa vụ → list/filterstate → required/current/actions → acknowledge/check
@@ -107,9 +107,9 @@ backend/.venv/Scripts/python.exe -m unittest discover -s backend/checks -p 'test
 mobile_http.py chạy chính client TypeScript qua HTTP Flask, kiểm tra register/conflict/login/me, ruộng, multipart, lịch sử/chi tiết, ownership và token bị thu hồi. Inference là fixture; không chứng minh model hoặc thao tác camera thật.
 
 BE-03 dùng tsc --noEmit trực tiếp (không regenerate styles) và chạy lại HTTP
-core/pilot; bằng chứng/lệnh replay ở [review04/11](BE03_MOBILE_API_HANDOFF_20261104.md).
+core/pilot; bằng chứng/lệnh replay ở [review 04/11](BE03_MOBILE_API_HANDOFF_20261104.md).
 Full Backend discovery và Android export trong hướng dẫn là lệnh tùy phạm vi,
-không phải các lượt vừa chạy trong BE-03. Kết quả25/10 giữ tại
+không phải các lượt vừa chạy trong BE-03. Kết quả 25/10 giữ tại
 [verification lịch sử](MOBILE_VERIFICATION_20261025.md).
 
 Nếu sandbox chặn thư mục home/temp Expo, đặt EXPO_NO_TELEMETRY=1, __UNSAFE_EXPO_HOME_DIRECTORY và TEMP/TMP vào mobile/.expo trước lint/export. Bản export Android là bundle Hermes, không phải APK hay kiểm thử trên điện thoại.

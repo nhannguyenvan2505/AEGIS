@@ -177,6 +177,7 @@ class PilotConnection:
     def begin(self,write=False): pass
     def owned(self,kind,identifier,user_id): return self.repo.owned(kind,identifier,user_id)
     def latest_profile(self,season,user): return self.repo.latest_profile(season,user)
+    def user_plot_ids(self,user_id): return self.repo.user_plot_ids(user_id)
     def page(self,table,where,params,size,offset,order):
         if self.scope=='core': return self.repo.page(table,where,params,size,offset,order)
         total=self.execute(f'SELECT COUNT(*) FROM {table} WHERE {where}',params).fetchone()[0]

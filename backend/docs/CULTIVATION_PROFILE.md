@@ -6,8 +6,8 @@ Implementation: `app/cultivation.py`, các route trong `app/farm.py`, migration5
 
 ## API
 
-Mọi endpoint yêu cầu Bearer của owner mùa vụ. Sai owner trả404; thiếu phiên
-trả401. Header trace/no-store giống các route farm khác.
+Mọi endpoint yêu cầu Bearer của owner mùa vụ. Sai owner trả 404; thiếu phiên
+trả 401. Header trace/no-store giống các route farm khác.
 
 | Method | Path |
 |---|---|
@@ -17,7 +17,7 @@ trả401. Header trace/no-store giống các route farm khác.
 
 GET hiện tại trả `{success:true,item,context_check}`. Chưa từng khai báo thì
 item=null, context_check=incomplete; **không tự lấy start_date làm ngày gieo/cấy**.
-GET không tạo bản ghi. History trả items,pagination như farm; sort revision DESC.
+GET không tạo bản ghi. History trả items, pagination như farm; sort revision DESC.
 
 PUT là gửi đầy đủ hồ sơ mới, không PATCH lẻ từng trường. Ví dụ:
 
@@ -88,15 +88,15 @@ created_at và origin request_id. base_revision phải là phiên bản vừa đ
 đầu dùng0. Transaction BEGIN IMMEDIATE bảo đảm hai sửa đồng thời chỉ một thắng.
 409 cultivation_revision_conflict yêu cầu tải bản mới/đối chiếu, không tự ghi đè.
 
-Nội dung không đổi và base hiện tại trả200, không tạo revision; lý do mới đơn
+Nội dung không đổi và base hiện tại trả 200, không tạo revision; lý do mới đơn
 thuần không tạo một sự kiện ghi chú riêng. Retry nội dung/lý do giống lần lưu
-ngay trước với base=current−1 cũng trả200 và header Idempotency-Replayed:true.
-Trường hợp khác không chấp nhận base cũ. Revision mới trả201; không có sửa/xóa
+ngay trước với base=current−1 cũng trả 200 và header Idempotency-Replayed:true.
+Trường hợp khác không chấp nhận base cũ. Revision mới trả 201; không có sửa/xóa
 revision qua API. Đây không là cơ chế chống sửa DB trực tiếp của quản trị viên.
 
 PUT dùng quota ghi farm và giới hạn JSON64KiB hiện có; base_revision là int,
 không nhận bool/âm; change_reason1..500 ký tự sau trim. Trường/enum/ngày sai
-trả400 invalid_cultivation_profile; lỗi body/reason chung giữ code farm hiện có.
+trả 400 invalid_cultivation_profile; lỗi body/reason chung giữ code farm hiện có.
 Quota429 giữ Retry-After. HEAD chỉ đọc, không tạo revision.
 
 ## Hồ sơ trong assessment
@@ -135,4 +135,4 @@ cùng DB tạm; chưa bổ sung chế độ pilot bền vững cho launcher tron
 
 Postman: `backend/postman/AEGIS-Cultivation.postman_collection.json` mở rộng
 collection farm, giữ nguyên bản57 request cũ. Chạy đúng thứ tự trên DB cô lập;
-có69 request, gồm context, stale conflict, snapshot, owner và luồng V4 ảnh.
+có 69 request, gồm context, stale conflict, snapshot, owner và luồng V4 ảnh.

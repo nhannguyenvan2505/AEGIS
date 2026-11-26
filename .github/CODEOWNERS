@@ -1,0 +1,7 @@
+# Governance changes require review from a repository maintainer.
+# Add another trusted maintainer with write access before this owner authors such a PR.
+/.github/ @nhannguyenvan2505
+/CONTRIBUTING.md @nhannguyenvan2505
+/docs/git-flow.md @nhannguyenvan2505
+/docs/github-setup.md @nhannguyenvan2505
+/docs/TEAM_POLICY_ACTIONS.md @nhannguyenvan2505

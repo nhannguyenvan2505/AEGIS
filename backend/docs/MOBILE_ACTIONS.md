@@ -3,7 +3,7 @@
 BE-03,04/11: client follow-up local đã đọc projection này; native chưa được kiểm.
 [Bàn giao theo từng màn](../../docs/BE03_MOBILE_API_HANDOFF_20261104.md) phân biệt
 code/client HTTP với nghiệm thu thiết bị. Các ghi chú “không sửa UI” dưới đây
-giữ phạm vi task Backend H2-T02 ngày02/11, không phủ nhận client đã có sau đó.
+giữ phạm vi task Backend H2-T02 ngày 02/11, không phủ nhận client đã có sau đó.
 
 02/11/2026, UTC+7. Thêm **`item.action_capabilities`** vào response của
 `GET /api/farm/follow-ups/{id}/assessment-view`. Không thêm endpoint hoặc đổi

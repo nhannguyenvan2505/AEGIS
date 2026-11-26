@@ -50,20 +50,17 @@ def mysql_repository(config):
             connection.close()
 
 
+REQUIRED_SCHEMA_VERSIONS = range(2, 15)
+
+
 def check_schema(config):
     with mysql_repository(config) as repo:
-        row = repo.one('SELECT status FROM schema_versions WHERE version=2')
-        if not row or row['status'] != 'complete':
-            raise RuntimeError('Apply MySQL migration 002_core_runtime.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=3')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 003_hybrid.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=4')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 004_api_semantics.sql before selecting mysql')
-        row=repo.one('SELECT status FROM schema_versions WHERE version=5')
-        if not row or row['status']!='complete':
-            raise RuntimeError('Apply MySQL migration 005_farm_hierarchy.sql before selecting mysql')
+        complete = {row['version'] for row in
+                    repo.all("SELECT version FROM schema_versions WHERE status='complete'")}
+    missing = [version for version in REQUIRED_SCHEMA_VERSIONS if version not in complete]
+    if missing:
+        raise RuntimeError(f'MySQL migrations {missing} are not applied. '
+                           'Back up, then run backend/database/migrate.py before selecting mysql')
 
 
 # Projections expose exactly the UUID/ISO strings expected by the existing API.
@@ -90,6 +87,7 @@ PROJECTIONS = {
                                  r.profile_sha256,r.change_reason,r.created_at,r.request_id''', 'cultivation_revisions r JOIN crop_cycles c ON c.crop_cycle_id=r.crop_cycle_id JOIN users u ON u.user_id=r.user_id', None,'r.id','u.external_id'),
  'analyses': ('''a.external_id id,u.external_id user_id,i.image_url image_path,i.image_width,i.image_height,i.orientation,
                 a.model_version,a.status,a.created_at,a.request_id,a.model_sha256,a.ai_processing_ms,a.ai_roundtrip_ms,
+                a.diagnosis_status,
                 (SELECT COUNT(*) FROM disease_detections dd WHERE dd.analysis_id=a.analysis_id) detection_count''', 'analysis_runs a JOIN crop_images i ON i.image_id=a.image_id JOIN users u ON u.user_id=a.user_id','a.analysis_id','a.external_id','u.external_id'),
 }
 
@@ -142,7 +140,8 @@ class MySQLRepository:
         return row['pk']
 
     def user_by_email(self, email):
-        return self.one("SELECT external_id id,email,password_hash FROM users WHERE email=%s AND status='active'", (email,))
+        return self.one("""SELECT u.external_id id,u.email,u.password_hash,r.role_name role
+            FROM users u JOIN roles r ON r.role_id=u.role_id WHERE u.email=%s AND u.status='active'""", (email,))
 
     def add_user(self, identifier, email, password_hash, created_at):
         if not self.one("SELECT role_id FROM roles WHERE role_name='farmer'"):
@@ -152,8 +151,32 @@ class MySQLRepository:
             (identifier,email,identifier,password_hash,datetime.fromtimestamp(created_at,timezone.utc).replace(tzinfo=None)))
 
     def session_user(self, token_hash, now):
-        return self.one('''SELECT u.external_id id,u.email FROM sessions s JOIN users u ON u.user_id=s.user_id
+        return self.one('''SELECT u.external_id id,u.email,r.role_name role FROM sessions s JOIN users u ON u.user_id=s.user_id
+            JOIN roles r ON r.role_id=u.role_id
             WHERE s.token_hash=%s AND s.expires_at>%s AND u.status='active' ''', (token_hash,now))
+
+    def admin_users(self, size, offset):
+        total = self.one('SELECT COUNT(*) n FROM users')['n']
+        rows = self.all('''SELECT u.external_id id,u.email,r.role_name role,u.status FROM users u
+            JOIN roles r ON r.role_id=u.role_id ORDER BY u.external_id LIMIT %s OFFSET %s''', (size, offset))
+        return total, rows
+
+    def role_user(self, identifier):
+        return self.one('''SELECT u.external_id id,u.email,r.role_name role,u.status FROM users u
+            JOIN roles r ON r.role_id=u.role_id WHERE u.external_id=%s''', (identifier,))
+
+    def active_admin_count(self):
+        return self.one("""SELECT COUNT(*) n FROM users u JOIN roles r ON r.role_id=u.role_id
+            WHERE r.role_name='admin' AND u.status='active'""")['n']
+
+    def set_user_role(self, identifier, role, actor_id, reason, created_at):
+        old = self.role_user(identifier)
+        self.execute('UPDATE users SET role_id=(SELECT role_id FROM roles WHERE role_name=%s) WHERE external_id=%s',
+                     (role, identifier))
+        self.execute('''INSERT INTO audit_logs(user_id,action,entity_type,entity_id,details_json)
+            VALUES (%s,'user_role_changed','user',%s,%s)''',
+                     (self.uid(actor_id) if actor_id else None, identifier,
+                      json.dumps(dict(old_role=old['role'],new_role=role,reason=reason,recorded_at=created_at))))
 
     def add_session(self, token_hash, user_id, expires_at, now):
         self.execute('DELETE FROM sessions WHERE expires_at<=%s', (now,))
@@ -176,17 +199,30 @@ class MySQLRepository:
             self.execute('INSERT INTO rate_limit_buckets VALUES (%s,%s,%s,%s)', (key,start,1,expires))
         return True,0
 
-    def reserve(self, user_id, key_hash, payload_hash):
+    def reserve(self, user_id, key_hash, payload_hash, now, running_ttl):
         numeric = self.uid(user_id)
         row = self.one('''SELECT r.*,a.external_id external_analysis FROM inference_requests r
             LEFT JOIN analysis_runs a ON a.analysis_id=r.analysis_id WHERE r.user_id=%s AND r.key_hash=%s''', (numeric,key_hash))
         if row:
-            return ('conflict' if row['payload_hash'] != payload_hash else row['state']),row['external_analysis']
-        self.execute("INSERT INTO inference_requests VALUES (%s,%s,%s,'running',NULL)", (numeric,key_hash,payload_hash))
+            if row['payload_hash'] != payload_hash:
+                return 'conflict',row['external_analysis']
+            if row['state'] == 'running' and row['created_at'] + running_ttl <= now:
+                self.mark_uncertain(user_id, key_hash)  # abandoned work; never re-run it
+                return 'uncertain',None
+            return row['state'],row['external_analysis']
+        self.execute("""INSERT INTO inference_requests(user_id,key_hash,payload_hash,state,analysis_id,created_at)
+            VALUES (%s,%s,%s,'running',NULL,%s)""", (numeric,key_hash,payload_hash,now))
         return 'new',None
+
+    def release(self, user_id, key_hash):
+        self.execute("DELETE FROM inference_requests WHERE user_id=%s AND key_hash=%s AND state='running' AND analysis_id IS NULL", (self.uid(user_id),key_hash))
 
     def mark_uncertain(self, user_id, key_hash):
         self.execute("UPDATE inference_requests SET state='uncertain' WHERE user_id=%s AND key_hash=%s AND state='running'", (self.uid(user_id),key_hash))
+
+    def user_plot_ids(self, user_id):
+        _, source, _, external_column, owner_column = PROJECTIONS['farm_plots']
+        return [row['id'] for row in self.all(f'SELECT {external_column} id FROM {source} WHERE {owner_column}=%s', (user_id,))]
 
     def owned(self, kind, identifier, user_id):
         projection, source, _, external_column, owner_column = PROJECTIONS[kind]
@@ -353,8 +389,17 @@ class MySQLRepository:
         model_id = model['model_version_id'] if model else self.execute('''INSERT INTO model_versions
             (model_type,version_name,algorithm,artifact_path,artifact_sha256) VALUES ('yolo_detection',%s,'YOLO11',%s,%s)''', (sha,'sha256:'+sha,sha)).lastrowid
         run = self.execute('''INSERT INTO analysis_runs(external_id,user_id,image_id,model_version_id,model_version,model_sha256,status,
-            request_id,ai_processing_ms,ai_roundtrip_ms,created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
-            (analysis['id'],user,image,model_id,analysis['model_version'],sha,analysis['status'],analysis['request_id'],analysis['ai_processing_ms'],analysis['ai_roundtrip_ms'],analysis['created_at'])).lastrowid
+            request_id,ai_processing_ms,ai_roundtrip_ms,created_at,diagnosis_status,rice_probability,gatekeeper_method,
+            gatekeeper_version,gatekeeper_sha256,uncertain_regions)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+            (analysis['id'],user,image,model_id,analysis['model_version'],sha,analysis['status'],analysis['request_id'],analysis['ai_processing_ms'],analysis['ai_roundtrip_ms'],analysis['created_at'],
+             *(analysis.get(name) for name in ('diagnosis_status','rice_probability','gatekeeper_method',
+               'gatekeeper_version','gatekeeper_sha256','uncertain_regions')))).lastrowid
+        gate = analysis.get('gatekeeper_sha256')
+        if gate and not self.one("""SELECT model_version_id FROM model_versions
+                WHERE model_type='rice_gatekeeper' AND artifact_sha256=%s""", (gate,)):
+            self.execute("""INSERT INTO model_versions(model_type,version_name,algorithm,artifact_path,artifact_sha256)
+                VALUES ('rice_gatekeeper',%s,'YOLO11-cls',%s,%s)""", (gate,'sha256:'+gate,gate))
         for detection in detections:
             label = detection['disease']
             disease = self.one('SELECT disease_id FROM diseases WHERE disease_name=%s', (label,))

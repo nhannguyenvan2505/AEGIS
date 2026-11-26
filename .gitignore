@@ -50,6 +50,9 @@ instance/
 /backend/database/pilot_acceptance_report.json
 /fe-source-import/
 /ai_service/experiments/
+# Deployment secrets made on the server (deploy/.env is covered by .env above)
+/deploy/secrets/
+/deploy/backups/
 /ai_service/datasets/
 /ai_service/weights/
 /demo_runs/
@@ -89,3 +92,50 @@ service-account*.json
 /*_20??????/
 /frontend/evidence/
 /backend/postman/reports/
+/backend/mongo-instance/
+/backend/.native-db-paused
+/backend/.native-db-supervisor.lock
+/backend/native-db-supervisor.log
+
+# Text extracts of course documents (C1SE.21); contain members' phone numbers and emails.
+/_doc_review/
+
+# Forecast experiment artifacts (T07–T17, ~230 MB) and generated hourly-contract
+# outputs: GitHub Releases are public; see docs/ARTIFACT_STORAGE.md before sharing.
+/forecast_*_t[0-9][0-9]/
+/hourly_contract_v1/t[0-9][0-9]_*.json
+
+# Local AI-agent tool configuration (agent-skills-standard, 19/11/2026); not project source.
+/.agents/
+/.augment/
+/.claude/*
+!/.claude/settings.json
+/.codebuddy/
+/.codewhale/
+/.continue/
+/.cursor/
+/.factory/
+/.gemini/
+/.kilocode/
+/.kiro/
+/.opencode/
+/.qoder/
+/.roo/
+/.trae/
+/.warp/
+/.windsurf/
+/.github/agents/
+/.github/hooks/
+/.github/hooks.json
+/.github/instructions/
+/.github/mcp.json
+/.github/prompts/
+/.github/skills/
+/.skills-lock.json
+/.skillsrc
+/skills-lock.json
+/AGENTS.md
+/backend/mongo-instance/
+/backend/.native-db-paused
+/backend/.native-db-supervisor.lock
+/backend/native-db-supervisor.log

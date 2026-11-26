@@ -1,6 +1,6 @@
 # T12 — Cảnh báo trong ứng dụng từ forecast
 
-Ngày08/11/2026. Backend lưu cảnh báo và acknowledge; giao diện/mobile có thể đọc API dưới đây. Không gửi SMS, email hoặc push. Model/pin/threshold inference giữ nguyên, không train hoặc calibration mới.
+Ngày 08/11/2026. Backend lưu cảnh báo và acknowledge; giao diện/mobile có thể đọc API dưới đây. Không gửi SMS, email hoặc push. Model/pin/threshold inference giữ nguyên, không train hoặc calibration mới.
 
 ## Policy đã version
 
@@ -10,8 +10,8 @@ Ngày08/11/2026. Backend lưu cảnh báo và acknowledge; giao diện/mobile c�
 |---|---|
 | Nguồn đủ điều kiện | Forecast hourly có liên kết nguồn raw đã lưu, synthetic, pin FM-03 hiện tại |
 | Score threshold | 0,5, trùng threshold inference hiện có |
-| Cooldown | 21.600giây/6giờ, tính bằng issued_at, riêng từng loại cảnh báo |
-| Độ mới để tạo cảnh báo | Issue không ở tương lai, tuổi forecast≤3.600giây và cửa sổ target chưa kết thúc |
+| Cooldown | 21.600 giây/6giờ, tính bằng issued_at, riêng từng loại cảnh báo |
+| Độ mới để tạo cảnh báo | Issue không ở tương lai, tuổi forecast≤3.600 giây và cửa sổ target chưa kết thúc |
 | Scope | Owner/season/stream/model pin/feature contract/horizon/hourly policy revision/alert policy version+hash |
 | Ordering | Issue tăng nghiêm ngặt theo scope; lần đánh giá hợp lệ đầu tiên thắng khi cùng issue |
 | Delivery | Lưu in-app; không có external delivery |
@@ -47,26 +47,26 @@ Các outcome đã lưu không được tính lại theo đồng hồ mới khi r
 
 ## API owner-scoped
 
-Tất cả route cần Bearer, Cache-Control private,no-store và Vary Authorization.
+Tất cả route cần Bearer, Cache-Control private, no-store và Vary Authorization.
 
 | Method/path | Hành vi |
 |---|---|
 | GET /api/farm/forecast-alert-policy | Policy hiện hành cùng hash; không nhận query |
 | GET /api/farm/forecasts/{id}/alert-evaluation | Đọc evaluation/outcome; không backfill, không gọi model |
 | POST /api/farm/forecasts/{id}/alert-evaluation | Body `{}`; đánh giá rõ ràng forecast đã lưu theo policy cố định, không nhận threshold/clock override |
-| GET /api/farm/forecast-alerts | List theo owner, pagination1/20 tối đa100; filter season_id, kind, state, window |
+| GET /api/farm/forecast-alerts | List theo owner, pagination 1/20 tối đa100; filter season_id, kind, state, window |
 | GET /api/farm/forecast-alerts/{id} | Alert snapshot cùng state/version và forecast_window_active |
 | POST /api/farm/forecast-alerts/{id}/acknowledgements | Body `{"base_version":1}` để ghi đã xem |
 
-Filter `state=unread|acknowledged`, `kind=score_threshold|data_quality`, `window=active|expired`. Mặc định trả cả lịch sử active/expired. Window chỉ nói target_window_end còn ở tương lai hay không, không chứng minh điều kiện cũ còn tồn tại. Thời điểm đánh giá window được giữ thống nhất cho cả trang. Filter season khác owner trả404.
+Filter `state=unread|acknowledged`, `kind=score_threshold|data_quality`, `window=active|expired`. Mặc định trả cả lịch sử active/expired. Window chỉ nói target_window_end còn ở tương lai hay không, không chứng minh điều kiện cũ còn tồn tại. Thời điểm đánh giá window được giữ thống nhất cho cả trang. Filter season khác owner trả 404.
 
 Đếm badge unread còn trong target window bằng GET `forecast-alerts?state=unread&window=active&page_size=1`, lấy pagination.total. Chỉ render nguyên reasons cho data_quality, không suy diễn risk từ việc không có alert.
 
-Response alert giữ id, forecast/season/plot/source revision, model/feature/input hash, issued_at/target window, kind/score/reasons, policy version/hash, source=synthetic, field_validated=false, disease_confirmed=false. State bắt đầu unread/version1; acknowledge chuyển acknowledged/version2 và có action row duy nhất. First ack201, retry base_version1 hoặc current2 trả200/replayed; version không khớp409. Ack là read receipt, không xác nhận bệnh hoặc đóng follow-up/outcome.
+Response alert giữ id, forecast/season/plot/source revision, model/feature/input hash, issued_at/target window, kind/score/reasons, policy version/hash, source=synthetic, field_validated=false, disease_confirmed=false. State bắt đầu unread/version1; acknowledge chuyển acknowledged/version2 và có action row duy nhất. First ack201, retry base_version1 hoặc current2 trả 200/replayed; version không khớp409. Ack là read receipt, không xác nhận bệnh hoặc đóng follow-up/outcome.
 
-Evaluation POST tạo record mới trả201, replay200; not_eligible trả200 không ghi. Not_evaluated/not_eligible là diagnostic ngắn gồm forecast_id/policy_version/outcome/alert_id; evaluation đã ghi có schema `aegis-forecast-alert-evaluation-v1`, kind/scope/hash/time/watermark metadata.
+Evaluation POST tạo record mới trả 201, replay200; not_eligible trả 200 không ghi. Not_evaluated/not_eligible là diagnostic ngắn gồm forecast_id/policy_version/outcome/alert_id; evaluation đã ghi có schema `aegis-forecast-alert-evaluation-v1`, kind/scope/hash/time/watermark metadata.
 
-401 khi chưa auth,404 không có/khác owner,400 query/body/version sai,429 theo farm write limit. Policy sai hash/version trả500 forecast_alert_policy_error; snapshot/alert/state/evaluation sai integrity trả500 phù hợp. Lỗi trong hook rollback forecast transaction; không tạo trạng thái forecast đã commit nhưng mất alert do failure ở hook.
+401 khi chưa auth,404 không có/khác owner,400 query/body/version sai,429 theo farm write limit. Policy sai hash/version trả 500 forecast_alert_policy_error; snapshot/alert/state/evaluation sai integrity trả 500 phù hợp. Lỗi trong hook rollback forecast transaction; không tạo trạng thái forecast đã commit nhưng mất alert do failure ở hook.
 
 ## Storage và nâng cấp
 
@@ -76,13 +76,13 @@ Backup/verify bảy DB hiện có vẫn giữ nguyên dữ liệu cảnh báo v�
 
 ## Bằng chứng thực chạy
 
-16test T12 mới đạt, gồm positive/negative control, insufficient, độc lập cooldown hai kind, boundary6h/1h đến microsecond, same-issue/out-of-order, stale/expired/future, explicit backfill, owner/query/version, reopen/backup, corruption, concurrency và actual-process crash exit73 rồi recovery offline. Trigger lỗi sau insert alert chứng minh rollback toàn bộ forecast/input/link/alert/state/evaluation.
+16 test T12 mới đạt, gồm positive/negative control, insufficient, độc lập cooldown hai kind, boundary6h/1h đến microsecond, same-issue/out-of-order, stale/expired/future, explicit backfill, owner/query/version, reopen/backup, corruption, concurrency và actual-process crash exit73 rồi recovery offline. Trigger lỗi sau insert alert chứng minh rollback toàn bộ forecast/input/link/alert/state/evaluation.
 
-Hồi quy **242test pilot và120test Backend đạt**. 16test mới nằm trong242test pilot, không cộng trùng. Task này không thay ML math, artifact hoặc pin; không train lại model.
+Hồi quy **242 test pilot và 120 test Backend đạt**. 16 test mới nằm trong242test pilot, không cộng trùng. Task này không thay ML math, artifact hoặc pin; không train lại model.
 
 [Alert JSON](../../forecast_alerts_t12/run01/alerts.synthetic.json), [evaluation/cooldown JSON](../../forecast_alerts_t12/run01/evaluations.synthetic.json), [ack JSON](../../forecast_alerts_t12/run01/acknowledgement.synthetic.json), [verification](../../forecast_alerts_t12/run01/verification.json).
 
-Rehearsal dùng Backend HTTP và worker HTTP thật, issue/evaluation theo UTC hiện tại, lịch sử120giờ synthetic hồi tố. Intake fixture clock được cập nhật theo UTC hiện tại trước từng request. Có đúng2alert gồm quality và threshold, cooldown/replay/ack idempotent đạt; worker/kho tạm được kiểm đã dọn. Waveform positive control là dữ liệu kiểm phần mềm, không có nhãn bệnh thực.
+Rehearsal dùng Backend HTTP và worker HTTP thật, issue/evaluation theo UTC hiện tại, lịch sử 120 giờ synthetic hồi tố. Intake fixture clock được cập nhật theo UTC hiện tại trước từng request. Có đúng2alert gồm quality và threshold, cooldown/replay/ack idempotent đạt; worker/kho tạm được kiểm đã dọn. Waveform positive control là dữ liệu kiểm phần mềm, không có nhãn bệnh thực.
 
 ```powershell
 $env:FM02_PYTHON = 'D:\AEGIS\forecast_demo\.venv\Scripts\python.exe'

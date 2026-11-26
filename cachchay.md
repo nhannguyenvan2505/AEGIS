@@ -1,179 +1,240 @@
-# Cách chạy AEGIS
+# Hướng dẫn cài đặt và chạy AEGIS (dành cho người mới)
 
-Mở PowerShell tại `D:\demoAEGIS\AEGIS`. Có 3 phần: **A. dịch vụ nền** (bắt buộc), **B. chạy app mobile** (giả lập hoặc điện thoại thật), **C. web admin**.
-
----
-
-## A. Dịch vụ nền (làm một lần cho mọi cách chạy)
-
-Khởi động MySQL native **một lần** trước Backend:
-
-```powershell
-.\backend\.venv\Scripts\python.exe backend/database/setup_native_mysql.py
-```
-
-Sau đó mở các terminal riêng cho từng dịch vụ:
-
-```powershell
-# AI nhận diện ảnh — cổng 8000
-.\ai_service\.venv\Scripts\python.exe -u -X utf8 -B ai_service/api/app.py
-```
-
-```powershell
-# Backend — cổng 5000 (có cả API mobile /api và API admin /api/admin)
-.\backend\.venv\Scripts\python.exe -u -X utf8 -B backend/serve_mobile.py --pilot-dir pilot_data/forecast-midterm
-```
-
-```powershell
-# Worker dự báo — cổng 8001 (tùy chọn)
-.\forecast_demo\.venv\Scripts\python.exe -u -B forecast_demo/runtime/serve_synthetic_forecast.py --port 8001
-```
-
-> Sau mỗi lần sửa code backend phải tắt (Ctrl+C) và chạy lại terminal Backend.
+Tài liệu này hướng dẫn từng bước từ đầu để chạy toàn bộ hệ thống **AEGIS** trên máy **Windows**, gồm:
+1. **MySQL nội bộ** (cổng `3308`) — lưu dữ liệu tài khoản, nông trại, chẩn đoán và số đo IoT.
+2. **Backend API + lắng nghe ESP32 MQTT** (cổng `5000`) — phục vụ cả app Mobile và Web Admin, và nhận dữ liệu nhiệt độ & độ ẩm từ ESP32 qua MQTT khi đã bật và cấu hình MQTT (mặc định tắt).
+3. **App Mobile** (Expo, cổng `8081`) — chạy trên điện thoại Android thật hoặc máy ảo (Android Studio Emulator / LDPlayer).
+4. **Web Admin** (cổng `5173`) — trang web quản trị cho tài khoản `admin`.
 
 ---
 
-## B. Chạy app mobile
+## Quy tắc quan trọng trước khi gõ lệnh
 
-Cả hai cách đều dùng Expo (Metro, cổng 8081) và đều cần Backend (5000) đang chạy. App mobile gọi API qua biến `EXPO_PUBLIC_API_URL` (có `/api`, không có `/v1`).
+Mọi lệnh bên dưới đều phải chạy **bên trong thư mục gốc `AEGIS`** (nơi có file `cachchay.md`, thư mục `backend/`, `mobile/`, `web_admin/`).
 
-> **Quan trọng — Expo Go phải đúng SDK.** Dự án dùng **Expo SDK 57**. Expo Go bản mới hơn (SDK 58) sẽ báo lỗi và không mở được dự án. Trên điện thoại hãy cài Expo Go **bản SDK 57** (khoảng 57.0.x). Với giả lập, Expo CLI tự cài đúng bản khi bấm `a`.
->
+Nếu dòng nhắc PowerShell đang là `PS D:\Demo Caps>` (chưa vào `AEGIS`), hãy chạy:
 
+```powershell
+cd "D:\Demo Caps\AEGIS"
+```
 
-### B1. Chạy trên giả lập Android (emulator)
+*(Thay `D:\Demo Caps\AEGIS` bằng đường dẫn nơi bạn lưu thư mục `AEGIS` trên máy của mình.)*
 
-Máy có sẵn 2 giả lập: `Pixel_7` và `Pixel_9a`.
+---
 
-1. Bật giả lập (terminal riêng, để chạy nền):
+## Phần 1: Cài đặt lần đầu (chỉ làm 1 lần trên mỗi máy)
 
+### Bước 1. Cài các phần mềm cần có trên Windows
+
+1. **Git**: [https://git-scm.com/downloads](https://git-scm.com/downloads)
+2. **Python 3.11 hoặc 3.12**: [https://www.python.org/downloads/](https://www.python.org/downloads/) *(khi cài nhớ tick **Add python.exe to PATH**)*.
+3. **Node.js (khuyên dùng bản LTS / 24+) và npm**: [https://nodejs.org/](https://nodejs.org/)
+4. **MySQL Server 9.x** (ví dụ `9.3` hoặc `9.6`): [https://dev.mysql.com/downloads/mysql/](https://dev.mysql.com/downloads/mysql/) *(chỉ cần cài bộ MySQL Server; script của dự án sẽ tự tạo CSDL riêng ở cổng `3308`)*.
+5. **Môi trường chạy Android** (chọn 1 trong 3):
+   - **Điện thoại Android thật**: bật **Tùy chọn nhà phát triển → Gỡ lỗi USB**, cài ứng dụng **Expo Go bản SDK 57**.
+   - **Android Studio Emulator**: cài Android Studio + tạo máy ảo (ví dụ `Pixel_7`).
+   - **LDPlayer**: bật sẵn giả lập + bật **ADB debugging** trong cài đặt LDPlayer.
+
+> **Cảnh báo về Expo Go:** Dự án dùng **Expo SDK 57**. Nếu cài Expo Go bản mới hơn (SDK 58+) từ CH Play, app sẽ báo lỗi không mở được. Hãy cài đúng **Expo Go SDK 57** (khoảng `57.0.x`).
+
+### Bước 2. Tải mã nguồn và chọn đúng nhánh
+
+Mở PowerShell tại thư mục muốn chứa dự án và chạy:
+
+```powershell
+git clone https://github.com/nhannguyenvan2505/AEGIS.git
+cd AEGIS
+git checkout develop
+git pull --ff-only
+```
+
+### Bước 3. Cài thư viện cho Backend, Mobile và Web Admin
+
+Đứng tại thư mục gốc `AEGIS`, chạy lần lượt từng khối lệnh sau:
+
+```powershell
+# 1) Cài môi trường Python cho Backend (gồm Flask, PyMySQL, paho-mqtt...)
+python -m venv backend\.venv
+& .\backend\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+
+# 2) (Tùy chọn) Cài môi trường cho bộ dự báo mẫu
+python -m venv forecast_demo\.venv
+& .\forecast_demo\.venv\Scripts\python.exe -m pip install -r forecast_demo\requirements.txt
+
+# 3) Cài thư viện cho App Mobile
+cd mobile
+npm ci
+cd ..
+
+# 4) Cài thư viện cho Web Admin
+cd web_admin
+npm ci
+cd ..
+```
+
+### Bước 4. Khởi tạo MySQL nội bộ (lần đầu)
+
+Chạy lệnh sau tại thư mục gốc `AEGIS`:
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend\database\setup_native_mysql.py
+```
+
+- **Nếu báo lỗi không tìm thấy `mysqld.exe`** (do máy bạn cài bản MySQL khác `9.3`, ví dụ `MySQL Server 9.6`), hãy kiểm tra tên thư mục trong `C:\Program Files\MySQL\` bằng lệnh:
+  ```powershell
+  Get-ChildItem "C:\Program Files\MySQL"
+  ```
+  Rồi truyền đúng đường dẫn `mysqld.exe` vào cờ `--mysqld`:
+  ```powershell
+  & .\backend\.venv\Scripts\python.exe backend\database\setup_native_mysql.py --mysqld "C:\Program Files\MySQL\MySQL Server 9.6\bin\mysqld.exe"
+  ```
+- Khi thấy dòng `Native MySQL ready on 127.0.0.1:3308` là thành công.
+
+### Bước 5. Tạo tài khoản mẫu và tài khoản Admin (lần đầu)
+
+1. **Tạo dữ liệu & tài khoản nông dân mẫu cho Mobile** (tùy chọn nhưng khuyên dùng để có sẵn 2 ruộng & dữ liệu thử):
    ```powershell
-   E:\Android_SDK\emulator\emulator.exe -avd Pixel_7
+   & .\backend\.venv\Scripts\python.exe -X utf8 -B tools\forecast_demo.py --email aegis.demo@example.test --model-python .\forecast_demo\.venv\Scripts\python.exe
    ```
+   Khi terminal hỏi `Demo password`, gõ: `AEGIS-Demo-2026!` rồi nhấn Enter. Khi thấy `Shared demo ready`, nhấn `Ctrl + C` để tắt (dữ liệu đã được lưu vào MySQL).
 
-   Hoặc mở từ Android Studio → Device Manager. Đợi tới khi thấy màn hình chính của máy ảo, kiểm tra:
+2. **Tạo tài khoản Admin để đăng nhập Web Admin**:
+   ```powershell
+   & .\backend\.venv\Scripts\python.exe backend\checks\create_admin.py admin@aegis.local
+   ```
+   *(Thay `admin@aegis.local` bằng email bạn muốn, nhập mật khẩu dài 12–128 ký tự 2 lần theo yêu cầu).*
 
+---
+
+## Phần 2: Chạy hệ thống hàng ngày (mỗi lần mở máy làm theo 4 bước)
+
+Mỗi dịch vụ chạy trong **1 cửa sổ PowerShell riêng** (đều mở tại thư mục gốc `AEGIS`) và giữ nguyên cửa sổ đó không tắt trong lúc sử dụng.
+
+### Bước 1. Bật MySQL nội bộ (chỉ cần chạy 1 lần mỗi khi bật lại máy)
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend\database\native_db.py start --only mysql
+```
+
+Lệnh này chỉ bật server, **không đổi schema hay tài khoản**. Nó tự tìm `mysqld.exe` bản mới nhất trong
+`C:\Program Files\MySQL\`. Nếu đã khởi tạo MongoDB, bỏ `--only mysql` để bật cả hai.
+
+**Sau khi cập nhật code**, nếu backend báo `MySQL migrations [...] are not applied`: tắt backend, **backup trước**
+(thêm `--no-mongo` nếu không chạy MongoDB; đặt thư mục backup ngoài repo), rồi mới chạy migration. Chi tiết và cách
+khôi phục: [backend/database/README.md](backend/database/README.md).
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend\database\backup_deploy.py backup --out D:\aegis-backups\truoc-nang-cap --uploads backend\mysql-instance\uploads --no-mongo
+```
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend\database\migrate.py
+```
+
+### Bước 2. Terminal 1 — Chạy Backend (cổng `5000`)
+
+```powershell
+& .\backend\.venv\Scripts\python.exe -u -X utf8 -B backend\serve_mobile.py --pilot-dir pilot_data\forecast-midterm
+```
+
+Khi thấy dòng `* Running on http://127.0.0.1:5000` là Backend đã chạy:
+- Phục vụ API cho Mobile (`/api/...`) và Web Admin (`/api/admin/...`).
+- MQTT **tắt mặc định**. Muốn nhận nhiệt độ và độ ẩm từ ESP32, đặt các biến `AEGIS_MQTT_*` trước khi chạy Backend theo [hướng dẫn MQTT](docs/IOT_MQTT_SETUP.md).
+
+*(Nếu cần chạy thêm AI nhận diện ảnh ở cổng `8000`, mở thêm terminal riêng chạy `.\ai_service\.venv\Scripts\python.exe -u -X utf8 -B ai_service\api\app.py` — yêu cầu đã được cấp checkpoint YOLO V4 và cài `ai_service\.venv` riêng.)*
+
+### Bước 3. Terminal 2 — Chạy App Mobile (cổng `8081`)
+
+1. Bật **Android Studio Emulator**, **LDPlayer**, hoặc cắm **điện thoại Android** (đã bật Gỡ lỗi USB) và kiểm tra:
    ```powershell
    adb devices
    ```
+   Phải thấy 1 dòng trạng thái `device` (ví dụ `emulator-5554   device`).
 
-   Phải thấy một dòng dạng `emulator-5554   device`.
-
-2. Chạy Expo và trỏ app tới backend. Giả lập thấy máy tính qua địa chỉ `10.0.2.2`:
-
-   ```powershell
-   $env:EXPO_PUBLIC_API_URL='http://10.0.2.2:5000/api'
-   Set-Location mobile
-   npm ci          # chỉ lần đầu
-   npm start
-   ```
-
-   (Cách khác: chạy `adb reverse tcp:5000 tcp:5000` và `adb reverse tcp:8081 tcp:8081` rồi dùng `http://127.0.0.1:5000/api` như điện thoại thật.)
-
-3. Trong terminal Expo bấm phím **`a`** để mở app trên giả lập. Lần đầu Expo tự cài Expo Go đúng bản rồi nạp app (mất 1–2 phút để tạo gói giao diện).
-
-### B2. Chạy trên điện thoại thật Android
-
-Cách 1 — **cắm cáp USB (khuyên dùng, ổn định nhất):**
-
-1. Trên điện thoại bật **Tùy chọn nhà phát triển → Gỡ lỗi USB**, cắm cáp, chọn "Cho phép gỡ lỗi USB" khi máy hỏi. Kiểm tra:
-
-   ```powershell
-   adb devices
-   ```
-
-   Phải thấy mã máy với trạng thái `device` (nếu là `unauthorized` thì mở khóa máy và bấm cho phép).
-
-2. Chuyển tiếp cổng từ điện thoại về máy tính (làm lại mỗi lần rút/cắm cáp hoặc khởi động lại adb):
-
+2. Chuyển tiếp cổng từ máy ảo / điện thoại về máy tính:
    ```powershell
    adb reverse tcp:5000 tcp:5000
    adb reverse tcp:8081 tcp:8081
-   adb reverse --list
    ```
 
-3. Cài **Expo Go bản SDK 57** trên điện thoại.
-
-4. Chạy Expo:
-
+3. Khởi chạy Expo:
    ```powershell
    $env:EXPO_PUBLIC_API_URL='http://127.0.0.1:5000/api'
-   Set-Location mobile
-   npm ci          # chỉ lần đầu
+   cd mobile
    npm start
    ```
 
-5. Mở app trên điện thoại bằng **một** trong các cách:
-   - Quét mã QR trong terminal bằng Expo Go; hoặc
-   - Chạy lệnh (mở thẳng dự án qua cổng đã chuyển tiếp):
-
+4. Mở app trên thiết bị:
+   - **Với Android Studio Emulator**: bấm phím `a` trong cửa sổ terminal Expo.
+   - **Với LDPlayer hoặc điện thoại cắm cáp**: mở ứng dụng **Expo Go (SDK 57)** rồi quét mã QR, hoặc chạy ở một terminal khác:
      ```powershell
      adb shell am start -a android.intent.action.VIEW -d "exp://127.0.0.1:8081" host.exp.exponent
      ```
+     *(Lưu ý: với LDPlayer không nên bấm `a` trong Expo vì LDPlayer không mở cổng `5554` của Android Studio).*
 
-   Lần đầu mất 1–2 phút (màn hình chờ "Farmer App"), các lần sau nhanh hơn.
+5. Đăng nhập trên app Mobile bằng tài khoản demo `aegis.demo@example.test` / `AEGIS-Demo-2026!` (hoặc đăng ký tài khoản nông dân mới ngay trên app).
 
-Cách 2 — **qua Wi-Fi (không cần cáp):** điện thoại và máy tính phải cùng mạng Wi-Fi.
-
-1. Lấy địa chỉ IP của máy tính (`ipconfig`, mục IPv4, ví dụ `192.168.1.91`).
-2. Chạy Backend cho phép máy khác truy cập (thêm `--host 0.0.0.0`) và cho phép cổng 5000, 8081 qua tường lửa Windows nếu bị chặn:
-
+#### Nếu muốn chạy trên điện thoại qua Wi-Fi (không cắm cáp)
+1. Điện thoại và máy tính dùng **cùng mạng Wi-Fi**.
+2. Xem IP máy tính bằng lệnh `ipconfig` (dòng `IPv4 Address`, ví dụ `192.168.1.91`).
+3. Ở Terminal 1, chạy Backend với `--host 0.0.0.0`:
    ```powershell
-   .\backend\.venv\Scripts\python.exe -u -X utf8 -B backend/serve_mobile.py --host 0.0.0.0 --pilot-dir pilot_data/forecast-midterm
+   & .\backend\.venv\Scripts\python.exe -u -X utf8 -B backend\serve_mobile.py --host 0.0.0.0 --pilot-dir pilot_data\forecast-midterm
    ```
-
-3. Chạy Expo với địa chỉ IP đó rồi quét mã QR bằng Expo Go (SDK 57):
-
+4. Ở Terminal 2, đổi IP tương ứng rồi quét mã QR bằng Expo Go SDK 57:
    ```powershell
    $env:EXPO_PUBLIC_API_URL='http://192.168.1.91:5000/api'
-   Set-Location mobile
+   cd mobile
    npm start
    ```
 
-   Chỉ dùng mạng tin cậy khi mở `--host 0.0.0.0`.
+### Bước 4. Terminal 3 — Chạy Web Admin (cổng `5173`)
 
-Điện thoại iPhone: dùng Expo Go (SDK 57) quét mã QR, đặt `EXPO_PUBLIC_API_URL` theo IP máy tính như cách Wi-Fi ở trên (iPhone không có `adb`).
+```powershell
+cd web_admin
+npm run dev -- --host 127.0.0.1
+```
 
-### Gặp lỗi thường gặp
+Mở trình duyệt vào **http://127.0.0.1:5173** và đăng nhập bằng tài khoản `admin` đã tạo ở Phần 1 (Bước 5.2).
+- Vào mục **Thiết bị IoT** (`/devices`) để xem trực tiếp trạng thái kết nối MQTT và biểu đồ **Nhiệt độ & Độ ẩm thực tế từ ESP32**.
+- *Lưu ý:* tài khoản nông dân tạo trên Mobile không đăng nhập được Web Admin.
 
-| Triệu chứng | Nguyên nhân và cách xử lý |
+---
+
+## Phần 3: Kiểm tra dữ liệu thực tế từ ESP32 (MQTT)
+
+- Trước đó cấu hình broker riêng, topic và tài khoản qua biến môi trường, đặt `AEGIS_MQTT_ENABLED=1` ở Terminal 1: xem [hướng dẫn MQTT](docs/IOT_MQTT_SETUP.md). Giá trị thật không commit vào repo.
+- Gán thiết bị vào thửa trước khi thu số đo; số đo gửi trước khi gán chỉ admin xem được.
+- Dữ liệu JSON mẫu từ ESP32 (`device_uid` lấy từ topic): `{"temperature": 25.4, "humidity": 87.5}`
+- Khi có gói tin hợp lệ, Backend lưu vào MySQL và đánh giá nguy cơ bệnh lúa (Đạo ôn, Khô vằn, Đốm nâu).
+- **App Mobile** (Trang chủ & Dự báo) và **Web Admin** (`/devices`) tự động cập nhật số đo mới sau mỗi **5 giây**.
+- Nếu muốn xem log chi tiết từng gói tin ESP32 ra màn hình terminal riêng để debug, có thể chạy thêm:
+  ```powershell
+  & .\backend\.venv\Scripts\python.exe -u -X utf8 -B tools\aegis_iot_listener.py
+  ```
+  *(Dùng thêm cờ `--no-save` nếu chỉ muốn in ra màn hình mà không ghi trùng vào DB khi Backend đang chạy.)*
+
+---
+
+## Phần 4: Lỗi thường gặp và cách xử lý nhanh
+
+| Triệu chứng | Nguyên nhân & cách xử lý |
 |---|---|
-| Expo Go ra màn hình lỗi ngay khi mở dự án | Expo Go sai SDK. Cài bản SDK 57 |
-| `fetch failed` / không đăng nhập được | Backend chưa chạy, hoặc `adb reverse` đã mất (chạy lại `adb reverse ...`), hoặc `EXPO_PUBLIC_API_URL` sai. Đổi biến này thì phải tắt và chạy lại `npm start` |
-| `CLEARTEXT communication ... not permitted` | Đang dùng app `com.aegis.mobile` bản release. Dùng Expo Go SDK 57 hoặc build bản debug |
-| `No apps connected` trong terminal Expo | Chưa có máy hoặc Expo Go nào kết nối. Chỉ là thông báo, mở app trên máy là hết |
-| `adb devices` không thấy máy | Kiểm tra cáp, bật gỡ lỗi USB, cho phép máy tính trên điện thoại |
+| `fatal: not a git repository` | Bạn đang đứng ở thư mục cha (`D:\Demo Caps`). Chạy `cd "D:\Demo Caps\AEGIS"` trước. |
+| `setup_native_mysql.py` báo lỗi không thấy `mysqld.exe` | Máy cài MySQL phiên bản khác `9.3` (ví dụ `9.6`). Dùng cờ `--mysqld "C:\Program Files\MySQL\MySQL Server 9.6\bin\mysqld.exe"`. |
+| Backend báo `MySQL migrations [...] are not applied` | Database đang cũ hơn code. Làm theo mục "Sau khi cập nhật code" ở Bước 1 của Phần 2: backup rồi chạy `migrate.py`. |
+| `Can't connect to MySQL server on '127.0.0.1'` | Chưa bật MySQL nội bộ. Chạy lại Bước 1 của Phần 2 trước khi chạy Backend. |
+| Bấm `a` trong Expo báo lỗi `cannot connect to 127.0.0.1:5554` | Do đang dùng **LDPlayer** (không phải Android Studio AVD). Không bấm `a`; hãy dùng `adb reverse` + lệnh `adb shell am start -a android.intent.action.VIEW -d "exp://127.0.0.1:8081" host.exp.exponent`. |
+| Mở Expo Go báo lỗi không tương thích SDK | Cài sai phiên bản Expo Go. Cần đúng **Expo Go SDK 57**. |
+| Mobile báo `fetch failed` / không đăng nhập được | Kiểm tra Backend (`5000`) đã chạy chưa, chạy lại `adb reverse tcp:5000 tcp:5000` và `adb reverse tcp:8081 tcp:8081`. Nếu vừa đổi `EXPO_PUBLIC_API_URL` thì phải `Ctrl + C` và chạy lại `npm start`. |
+| `adb devices` không hiện máy | Bật **Gỡ lỗi USB** (điện thoại) hoặc bật **ADB debugging** (LDPlayer) rồi kiểm tra lại cáp. |
+| Đăng nhập Web Admin báo không có quyền | Chỉ tài khoản có vai trò `admin` mới vào được Web Admin; cần tạo bằng `backend/checks/create_admin.py`. |
 
 ---
 
-## C. Chạy web admin
+## Tài liệu tham khảo thêm
 
-Cần Backend (5000) đang chạy (mục A) và đã có tài khoản admin.
-
-1. **Tạo tài khoản admin** (một lần, sẽ hỏi mật khẩu 12–128 ký tự):
-
-   ```powershell
-   .\backend\.venv\Scripts\python.exe backend/checks/create_admin.py admin@aegis.local
-   ```
-
-2. **Chạy web:**
-
-   ```powershell
-   Set-Location web_admin
-   npm install     # chỉ lần đầu
-   npm run dev -- --host 127.0.0.1
-   ```
-
-3. Mở **http://127.0.0.1:5173** và đăng nhập bằng tài khoản vừa tạo. Web tự chuyển tiếp `/api` sang `http://127.0.0.1:5000`. Nếu backend ở cổng khác: `$env:VITE_BACKEND_URL='http://127.0.0.1:<cổng>'` trước khi chạy.
-
-Chỉ tài khoản có vai trò `admin` vào được web; tài khoản nông dân tạo trên điện thoại không đăng nhập được web. Web không cập nhật thời gian thực: sau khi thao tác trên điện thoại, tải lại trang web để thấy dữ liệu mới. Xem thêm `PROGRESS.md` (mô tả chức năng và luồng của admin).
-
----
-
-## Lưu ý khi chạy
-
-Trong `cachchay.txt`, lệnh `setup_native_mysql.py` xuất hiện hai lần. Theo hướng dẫn MySQL, chỉ cần khởi động/setup một lần trước Backend; không cần chạy lại ở terminal dành cho Backend. Backend dùng MySQL native trên cổng 3308 theo cấu hình local, không cần Docker trong cách chạy này.
-
-AI cần checkpoint YOLO V4 được cấp riêng; checkpoint và bộ ảnh không nằm đầy đủ trong repository. Worker dự báo có model Logistic Regression đóng gói, nhưng dùng dữ liệu tổng hợp. Tab Dự báo trên mobile hiện mặc định trình bày preview mô phỏng, không tự gọi worker này. Nếu chỉ cần chạy phần app và API, có thể bỏ worker dự báo; nếu cần quét ảnh bằng AI thì cần mở AI service.
-
-Hướng dẫn chi tiết hơn nằm trong [NATIVE_MYSQL.md](D:/demoAEGIS/AEGIS/backend/docs/NATIVE_MYSQL.md), [README mobile](D:/demoAEGIS/AEGIS/mobile/README.md) và [CLONE_DEMO.md](D:/demoAEGIS/AEGIS/CLONE_DEMO.md).
+- [NATIVE_MYSQL.md](backend/docs/NATIVE_MYSQL.md) — Chi tiết vận hành MySQL nội bộ.
+- [README mobile](mobile/README.md) — Chi tiết ứng dụng Mobile.
+- [README web_admin](web_admin/README.md) — Chi tiết giao diện quản trị Web Admin.
+- [CLONE_DEMO.md](CLONE_DEMO.md) — Ghi chú phạm vi dữ liệu demo và mô phỏng.

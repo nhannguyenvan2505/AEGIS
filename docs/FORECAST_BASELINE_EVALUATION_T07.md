@@ -6,7 +6,7 @@ Ngày 07/11/2026, Asia/Bangkok. T07 hoàn thành đánh giá kỹ thuật artifa
 
 Đánh giá dùng manifest `549f84ac7b154aff63f31a1891f87cec21f60298d5bd8c63eeb6deb1792722fa`, model `eb4376662d50895c01b18c8fa11502b7aa4e5743c163a3c0564698c59eac8098` và bộ FM-01 run02 đúng hash đã ghi trong manifest model. Script kiểm toàn bộ file trong dataset manifest, tái audit feature/label/time-group split và đọc artifact theo hash pin trước khi deserialize.
 
-Logistic Regression dùng threshold0,5 đã chốt. Dummy dùng prior44/102=0,431372549 từ train. T07 chỉ nạp artifact để predict và tính diagnostics. Các bài kiểm chặn gọi fit trên Logistic Regression, StandardScaler và OneHotEncoder. Mean/variance/cỡ mẫu của scaler và category encoder khớp train, reload cho score giống hệt. Toàn bộ68score validation/test khớp bản cũ với max delta0; metric đã lưu cũng khớp trong tolerance1e-12.
+Logistic Regression dùng threshold0,5 đã chốt. Dummy dùng prior44/102=0,431372549 từ train. T07 chỉ nạp artifact để predict và tính diagnostics. Các bài kiểm chặn gọi fit trên Logistic Regression, StandardScaler và OneHotEncoder. Mean/variance/cỡ mẫu của scaler và category encoder khớp train, reload cho score giống hệt. Toàn bộ 68 score validation/test khớp bản cũ với max delta0; metric đã lưu cũng khớp trong tolerance1e-12.
 
 | Partition | Tổng mẫu | Ready | Negative/positive trong ready | Coverage |
 |---|---:|---:|---:|---:|
@@ -14,7 +14,7 @@ Logistic Regression dùng threshold0,5 đã chốt. Dummy dùng prior44/102=0,43
 | Validation |40|34|18/16|85%|
 | Test cũ |40|34|18/16|85%|
 
-Các metric phía dưới tính trên subset ready. Mỗi tập evaluation có34row thuộc18cụm môi trường còn mẫu ready. Hai plot cùng cụm chia sẻ weather realization. Test này đã được xem trong FM-02 và các phiên phát triển trước, nên kết quả T07 là tái đánh giá lịch sử synthetic. Đánh giá trên ruộng hoặc holdout độc lập mới vẫn cần dữ liệu riêng.
+Các metric phía dưới tính trên subset ready. Mỗi tập evaluation có 34 row thuộc18cụm môi trường còn mẫu ready. Hai plot cùng cụm chia sẻ weather realization. Test này đã được xem trong FM-02 và các phiên phát triển trước, nên kết quả T07 là tái đánh giá lịch sử synthetic. Đánh giá trên ruộng hoặc holdout độc lập mới vẫn cần dữ liệu riêng.
 
 ## Kết quả ở threshold0,5
 
@@ -30,17 +30,17 @@ Các metric phía dưới tính trên subset ready. Mỗi tập evaluation có34
 | Log loss |0,72285|0,69453|0,59211|0,69453|
 | Brier |0,25372|0,25067|0,19414|0,25067|
 
-Precision/F1 của Dummy được quy ước0 khi không có predicted positive. Ma trận LR ở validation là TN17, FP1, FN11, TP5. Test cũ có TN13, FP5, FN4, TP12. Validation model chỉ phát6cảnh báo, phát hiện5/16sự kiện synthetic và bỏ sót11sự kiện. Test cũ phát17cảnh báo, phát hiện12/16sự kiện.
+Precision/F1 của Dummy được quy ước0 khi không có predicted positive. Ma trận LR ở validation là TN17, FP1, FN11, TP5. Test cũ có TN13, FP5, FN4, TP12. Validation model chỉ phát6cảnh báo, phát hiện 5/16sự kiện synthetic và bỏ sót11sự kiện. Test cũ phát17cảnh báo, phát hiện 12/16sự kiện.
 
 ## Calibration và độ bất định
 
 ![Calibration theo năm bin score cố định](../forecast_evaluation_t07/run02/calibration.png)
 
-Score trung bình validation là0,2982, trong khi tỷ lệ sự kiện của34mẫu là0,4706. ECE qua5bin cố định là0,2121 cho LR và0,0392 cho Dummy. Test cũ có ECE0,1182 cho LR và0,0392 cho Dummy. ECE phụ thuộc bin và cỡ mẫu; các bin LR chỉ có0–16mẫu, nên các tỷ lệ quan sát có biến động lớn.
+Score trung bình validation là 0,2982, trong khi tỷ lệ sự kiện của34mẫu là 0,4706. ECE qua5bin cố định là 0,2121 cho LR và 0,0392 cho Dummy. Test cũ có ECE0,1182 cho LR và 0,0392 cho Dummy. ECE phụ thuộc bin và cỡ mẫu; các bin LR chỉ có 0–16 mẫu, nên các tỷ lệ quan sát có biến động lớn.
 
-Ở validation, bin[0,2;0,4) có11mẫu với mean score0,2867 nhưng8mẫu mang nhãn positive, tỷ lệ0,7273. Hai bin dưới0,4 chứa toàn bộ11positive bị bỏ sót tại threshold0,5. Bin[0,8;1] có4mẫu, mean score0,9188 và3positive. Những con số này cho thấy sai lệch score trên cohort đang xét, chưa đủ để fit và nghiệm thu một calibrator đáng tin cậy.
+Ở validation, bin[0,2;0,4) có 11 mẫu với mean score0,2867 nhưng8mẫu mang nhãn positive, tỷ lệ 0,7273. Hai bin dưới0,4 chứa toàn bộ 11 positive bị bỏ sót tại threshold0,5. Bin[0,8;1] có 4 mẫu, mean score0,9188 và 3 positive. Những con số này cho thấy sai lệch score trên cohort đang xét, chưa đủ để fit và nghiệm thu một calibrator đáng tin cậy.
 
-Paired bootstrap dùng2000lần lấy mẫu lại toàn bộ18cụm, seed20261107. Mỗi lần giữ LR/Dummy trên cùng các row được lấy lại. Các khoảng dưới là percentile95% của delta LR trừ Dummy, có điều kiện trên model đã train và generator/split hiện hành.
+Paired bootstrap dùng2000lần lấy mẫu lại toàn bộ 18 cụm, seed20261107. Mỗi lần giữ LR/Dummy trên cùng các row được lấy lại. Các khoảng dưới là percentile95% của delta LR trừ Dummy, có điều kiện trên model đã train và generator/split hiện hành.
 
 | Partition / delta | Điểm ước lượng | Khoảng percentile95% |
 |---|---:|---|
@@ -55,7 +55,7 @@ Delta âm tốt hơn cho log loss/Brier; delta dương tốt hơn cho accuracy. 
 
 ## Phân tích lỗi và feature
 
-CSV giữ đủ68dòng, gồm sample_id, cluster, label, score, prediction, outcome và loss từng mẫu. Một số ca có loss lớn được dẫn dưới đây bằng prefix12ký tự; ID đầy đủ nằm trong CSV.
+CSV giữ đủ 68 dòng, gồm sample_id, cluster, label, score, prediction, outcome và loss từng mẫu. Một số ca có loss lớn được dẫn dưới đây bằng prefix12ký tự; ID đầy đủ nằm trong CSV.
 
 | Partition / cluster | Sample prefix | Nhãn | Score | Loại lỗi | Log loss |
 |---|---|---:|---:|---|---:|
@@ -64,13 +64,13 @@ CSV giữ đủ68dòng, gồm sample_id, cluster, label, score, prediction, outc
 | Test007 | 8ab02822831c |1|0,0553|FN|2,8954|
 | Test014 | b441180f9446 |0|0,9399|FP|2,8117|
 
-Train có16feature hằng, gồm12coverage và4categorical region/rice_variety/planting_method/season_status. Cohort này chưa khảo sát biến thiên của các context đó. Các hệ số lớn nhất liên quan wetness và thống kê nhiệt độ cửa sổ6/24giờ. Hệ số ở các cửa sổ chồng nhau có thể tương quan mạnh; chúng mô tả fit của pipeline trên generator và cần được đọc cùng protocol mô phỏng.
+Train có 16 feature hằng, gồm12coverage và 4 categorical region/rice_variety/planting_method/season_status. Cohort này chưa khảo sát biến thiên của các context đó. Các hệ số lớn nhất liên quan wetness và thống kê nhiệt độ cửa sổ 6/24giờ. Hệ số ở các cửa sổ chồng nhau có thể tương quan mạnh; chúng mô tả fit của pipeline trên generator và cần được đọc cùng protocol mô phỏng.
 
 ## Độ nhạy dữ liệu thiếu
 
 Stress chỉ dùng34mẫu validation ready. Với từng biến nhiệt độ, RH và wetness, lần lượt đặt null1/6/24/120giờ cuối trong lịch sử. Tổng408ca đều trả insufficient_data và score=null. Đây là hành vi gate120giờ đủ dữ liệu của contract v1; chưa có preprocessing để suy score khi coverage thấp hơn.
 
-Thêm34ca mô phỏng bucket cuối tới muộn một phút đều abstain trước receipt. Sau khi phát hành ở mốc đủ availability,34/34score khôi phục khớp score gốc. Thêm72bucket tương lai vào từng input validation cũng giữ nguyên34/34score quá khứ. Các probe khôi phục/future là kiểm phần mềm và tính thời gian, giữ label ngoài predictors.
+Thêm34ca mô phỏng bucket cuối tới muộn một phút đều abstain trước receipt. Sau khi phát hành ở mốc đủ availability,34/34score khôi phục khớp score gốc. Thêm72bucket tương lai vào từng input validation cũng giữ nguyên 34/34score quá khứ. Các probe khôi phục/future là kiểm phần mềm và tính thời gian, giữ label ngoài predictors.
 
 Nguồn raw T01–T06 có whole-hour wetness=null nên nằm ngoài gate ready này. Để tăng độ phủ dự báo, T08 cần đối chiếu feature/model phù hợp với dữ liệu quan sát được, bao gồm ablation thiếu wetness và policy missing-data có version, rồi đánh giá trên cohort mới theo protocol đóng trước.
 

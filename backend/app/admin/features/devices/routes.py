@@ -6,6 +6,7 @@ from flask import Blueprint, request
 
 from app.admin.core.sensors import SENSOR_TYPES
 from app.admin.core.security import ApiError, audit, body, ok, pick, require_role
+from app.iot_mqtt import RELEASED_PREFIX
 
 from . import repository as repo
 
@@ -14,6 +15,8 @@ STATUSES = ('online', 'offline', 'maintenance', 'inactive')
 SOURCES = ('mock', 'synthetic', 'field', 'bench', 'legacy')
 FILTERS = ('sensor_type', 'status', 'source', 'owner_id', 'plot_id')
 CODE = re.compile(r'[A-Za-z0-9._-]{1,64}')
+HARDWARE_UID = re.compile(r'[\x21-\x7e](?:[\x20-\x7e]{0,98}[\x21-\x7e])?')
+RESERVED_PREFIXES = ('mock:', 'raw:', RELEASED_PREFIX)
 
 
 def _simulated(row):
@@ -52,7 +55,9 @@ def create_device():
     season = repo.season_context(data.get('season_id'))
     if season is None:
         raise ApiError('not_found', 'Không tìm thấy mùa vụ (season_id).', 404)
-    code, protocol, source = str(data.get('device_code', '')), data.get('protocol', 'HTTP'), data.get('source', 'mock')
+    # A hardware id means a physical device: do not label it simulated unless the caller says so.
+    code, protocol = str(data.get('device_code', '')), data.get('protocol', 'HTTP')
+    source = data.get('source', 'field' if data.get('device_uid') else 'mock')
     if not CODE.fullmatch(code):
         raise ApiError('invalid_code', 'device_code chỉ gồm chữ, số, . _ - (tối đa 64).', 422)
     sensor_type = data.get('sensor_type')
@@ -62,15 +67,54 @@ def create_device():
         raise ApiError('invalid_field', 'protocol hoặc source không hợp lệ.', 422)
     if repo.code_exists(season['user_id'], code):
         raise ApiError('code_exists', 'device_code đã tồn tại cho người dùng này.', 409)
+    hardware_uid = _hardware_uid(data.get('device_uid'), season)
     if repo.sensor_taken(season['field_id'], sensor_type):
         raise ApiError('sensor_exists', 'Ruộng này đã có thiết bị loại ' + sensor_type + '.', 409)
     external = str(uuid.uuid4())
-    repo.create(dict(external_id=external, user_id=season['user_id'], field_id=season['field_id'],
+    repo.create(dict(external_id=external, device_uid=hardware_uid or external, user_id=season['user_id'], field_id=season['field_id'],
                      crop_cycle_id=season['crop_cycle_id'], device_code=code, device_name=data.get('device_name'), sensor_type=sensor_type,
                      protocol=protocol, firmware_version=data.get('firmware_version'), source=source,
                      created_at=datetime.now(timezone.utc).isoformat(timespec='seconds')))
-    audit('device.create', 'device', external, {'device_code': code, 'sensor_type': sensor_type, 'source': source})
+    audit('device.create', 'device', external, {'device_code': code, 'sensor_type': sensor_type, 'source': source,
+                                               'device_uid': hardware_uid})
     return ok(id=external), 201
+
+
+def _hardware_uid(value, season):
+    """The id the physical device sends. Registering it lets the field's owner use it."""
+    if value is None or value == '':
+        return None
+    uid = value.strip() if isinstance(value, str) else ''
+    if not HARDWARE_UID.fullmatch(uid) or uid.lower() == 'unknown' or uid.lower().startswith(RESERVED_PREFIXES):
+        raise ApiError('invalid_device_uid', 'device_uid: 1–100 ký tự ASCII, không dùng "Unknown" hoặc tiền tố '
+                       '"mock:", "raw:", "released:".', 422)
+    if repo.uid_exists(uid):
+        raise ApiError('device_uid_exists', 'device_uid đã được đăng ký.', 409)
+    if repo.uid_bound_elsewhere(uid, season['field_id']):
+        raise ApiError('device_bound_elsewhere',
+                       'device_uid đang được gán cho ruộng khác; gỡ hoặc đổi binding trước.', 409)
+    return uid
+
+
+@bp.post('/<identifier>/release')
+@require_role('admin')
+def release_device(identifier):
+    """Free a hardware id so it can be registered for another field.
+
+    The record and everything stored about it stay; it loses the hardware id, its
+    sensor slot and any binding. Readings already stored stay with their plot.
+    """
+    device = repo.registration(identifier)
+    if device is None:
+        raise ApiError('not_found', 'Không tìm thấy thiết bị.', 404)
+    uid = device['device_uid']
+    repo.lock_binding(uid)
+    device = repo.registration(identifier, lock=True)  # another release may have run while waiting
+    if device['device_uid'] != uid or uid == identifier or uid.lower().startswith(RESERVED_PREFIXES):
+        raise ApiError('nothing_to_release', 'Thiết bị không có ID phần cứng đang đăng ký.', 409)
+    repo.release(device['device_id'], uid, RELEASED_PREFIX + identifier)
+    audit('device.release', 'device', identifier, {'device_uid': uid, 'plot_id': device['plot_id']})
+    return ok(released_device_uid=uid)
 
 
 @bp.put('/<identifier>')

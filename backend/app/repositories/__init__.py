@@ -1,4 +1,4 @@
-"""Core domain repositories; SQLite is the default until explicit cutover."""
+"""Core domain repositories; MySQL runtime and explicit SQLite fixtures."""
 from contextlib import contextmanager
 
 

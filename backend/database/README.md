@@ -30,6 +30,117 @@ docker compose exec mongo sh -c 'mongosh --quiet -u aegis_app -p "$AEGIS_MONGO_P
 
 Bootstrap chỉ chạy khi volume rỗng. `docker compose stop` dừng service; `docker compose start` mở lại với dữ liệu cũ. Việc chỉnh file bootstrap không nâng schema của volume đã có; các bước nâng cấp sau phải có migration riêng. Nếu bootstrap lỗi, xem `docker compose logs mysql mongo`, sửa lỗi và xác định trạng thái volume trước khi chạy lại. Không dùng reset volume với dữ liệu cần giữ.
 
+## Nâng cấp database đã có (migration đánh số)
+
+Backend chỉ khởi động khi mọi migration 2–14 đã `complete`. Sau khi kéo code mới, **backup trước** (DDL
+MySQL tự commit), dừng backend rồi chạy:
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/migrate.py --status
+```
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/migrate.py
+```
+
+Dùng được cho cả MySQL native và Docker (cấu hình lấy từ environment hoặc `.env`).
+`setup_native_mysql.py` chỉ gọi bộ chạy này khi database còn trống; với database đã có, nó chỉ báo migration còn
+thiếu. Volume Docker mới tự chạy toàn bộ SQL cấp một trong `mysql/`.
+
+| Migration | Nội dung |
+|---|---|
+| 007 | `iot_devices.sensor_type`, hai bảng ESP32, tên 3 bệnh. Chạy được cả khi cột đã thêm tay hoặc bảng đã do backend tự tạo |
+| 008 | Lưu `diagnosis_status`, `rice_probability`, gatekeeper (method/version/SHA-256), `uncertain_regions` trong `analysis_runs`. NULL = không rõ (bản ghi cũ, API v1) |
+| 009 | Chống ghi trùng gói ESP32 (`dedup_token`), đổi cột thời gian sang `DATETIME(6)` UTC, index cho retention. Không xoá bản ghi cũ, kể cả bản trùng |
+
+| 010 | Thời điểm tạo cho `inference_requests`: reservation `running` quá 5 phút chuyển `uncertain`, không chạy lại AI |
+| 011 | Cảnh báo ESP32 ghi vào `alerts` (`source_key` cho thời gian chờ) |
+| 012 | `push_tokens`, `push_deliveries`, hàng đợi push trong `notifications` |
+| 013 | Loại model `rice_gatekeeper` trong `model_versions`; suy luận tự ghi gatekeeper đã dùng |
+| 014 | Index "số đo mới nhất mỗi thiết bị" (xem [NFR01](../../docs/NFR01_BENCHMARK.md)) |
+
+Nếu một migration dừng ở trạng thái `running`, bộ chạy từ chối chạy tiếp: khôi phục từ backup hoặc kiểm schema
+bằng tay. Quay về code cũ sau 009 cần khôi phục backup (code cũ đọc cột thời gian dạng chuỗi).
+
+### Retention (chốt 25/11/2026)
+
+Telemetry ESP32 giữ **180 ngày** (theo giờ server `created_at`); event Mongo **đã gửi** giữ **30 ngày**. Event
+đang chờ hoặc lỗi không bị xoá. Không có `--apply` thì chỉ đếm; không có lịch tự chạy. Backup trước khi xoá.
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/retention.py
+```
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/retention.py --apply
+```
+
+### Đối soát ảnh với database
+
+Chỉ đọc. Báo `missing` (database tham chiếu nhưng không có file) và `orphans` (file không bản ghi nào tham chiếu,
+bỏ qua file mới hơn 60 phút). Mã thoát 1 khi có ảnh thiếu. Ảnh của bản ghi đã archive khi nhập từ SQLite cũng
+hiện là orphan, nên rà danh sách trước khi xoá bằng tay.
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/reconcile_images.py --uploads backend/mysql-instance/uploads
+```
+
+### Đăng ký model
+
+Ghi detector và gatekeeper (SHA-256 lấy từ manifest trong `ai_service/api/`) cùng chỉ số **đã ghi trong tài liệu
+dự án** (`model_registry.json`); công cụ không đo gì. `--activate` chỉ bật cờ trong database, không đổi model AI
+service đang nạp. Khi thay model, cập nhật manifest và `model_registry.json` cùng lúc.
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/register_models.py --activate
+```
+
+### Tài khoản runtime khi deploy
+
+Backend core chỉ cần đọc/ghi dữ liệu. Chạy migration bằng tài khoản có quyền đổi schema, rồi tạo tài khoản
+runtime (mật khẩu lấy từ environment, không truyền trên dòng lệnh):
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/create_runtime_user.py --user aegis_runtime --host localhost
+```
+
+Sau đó đặt `AEGIS_MYSQL_USER`/`AEGIS_MYSQL_PASSWORD` là tài khoản runtime, và
+`AEGIS_MYSQL_MIGRATION_USER`/`_PASSWORD` cho `migrate.py` và backup. Pilot tạo bảng ở lần khởi tạo kho đầu tiên,
+nên khởi tạo bằng tài khoản migration trước khi chuyển.
+
+### Backup và khôi phục bản deploy
+
+`backup_deploy.py` dùng client tool (`mysqldump`, `mysql`, và `mongodump`/`mongorestore` nếu có Mongo), không cần
+Docker. Tài khoản chạy cần quyền đọc view (dùng tài khoản migration).
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/backup_deploy.py backup --out D:\aegis-backups\2026-11-26 --uploads backend\mysql-instance\uploads --no-mongo
+```
+
+```powershell
+& backend\.venv\Scripts\python.exe backend/database/backup_deploy.py restore --from D:\aegis-backups\2026-11-26 --database aegis_restore --uploads D:\aegis-restore\uploads
+```
+
+- Bỏ `--no-mongo` để gồm MongoDB; khi khôi phục thêm `--mongo-database <database rỗng>`. "Rỗng" nghĩa là chưa có document nào: collection do
+  `mongo/001_design.js` tạo sẵn được thay bằng bản trong backup.
+- `restore` chỉ ghi vào database và thư mục **rỗng**, kiểm version schema, đủ ảnh được tham chiếu và view dùng
+  được. Đạt rồi mới trỏ backend sang đích mới.
+- Backup chứa dữ liệu cá nhân và password hash: lưu mã hoá, ngoài repo.
+- **Không gồm secret.** Giữ riêng `AEGIS_JWT_SECRET` (hoặc file `jwt-signing.key`); mất khoá thì mọi người dùng
+  phải đăng nhập lại.
+- Quyền cấp theo tên database. Khôi phục sang **tên database khác** thì đặt `AEGIS_MYSQL_DATABASE` mới và cấp lại
+  quyền cho tài khoản runtime (`create_runtime_user.py`) trước khi trỏ backend sang.
+- **Kho pilot (forecast) chưa được công cụ này khôi phục trọn vẹn.** Bảng `p_<mã>_*` có trong dump, nhưng mã đó
+  sinh từ đường dẫn thư mục kho, và file đánh dấu `.aegis-hybrid.json` trong thư mục kho (không nằm trong backup)
+  ghi tên database. Code từ chối mở kho nếu một trong hai khác đi. Muốn dùng lại phải giữ cùng đường dẫn thư mục,
+  cùng tên database và tự sao lưu thư mục kho; cách này **chưa được diễn tập**.
+
+### Công cụ backup hybrid cũ
+
+`app/hybrid_backup.py` và `verify_restore.py` chỉ chạy với **Docker Compose**, database tên `aegis`, và cần một
+kho pilot hybrid. `verify_restore.py` khôi phục vào database dùng một lần để đối chiếu; nó kiểm hash file ảnh trong
+bản backup chứ không phải quy trình khôi phục production.
+
 ## Quy tắc schema
 
 `mysql/001_design.sql` tạo đủ 18 bảng và FK/index của tài liệu. Bootstrap chỉ seed roles farmer/admin. Migration 002 bổ sung external_id để giữ UUID của API, cùng bảng runtime được giải thích bên dưới. FK `SET NULL` sử dụng cột nullable; ID số dùng INT/BIGINT đúng nhóm dữ liệu tài liệu.
@@ -56,7 +167,7 @@ Set-Location D:\AEGIS
 
 Volume mới chạy tự động cả bốn SQL script trong bootstrap. Các script nâng cấp kiểm tra marker và bỏ qua migration đã hoàn tất. Launcher serve_mysql chạy ở `http://127.0.0.1:5001`; run.py/serve_mobile.py dùng cổng 5000. Endpoint và UUID contract giữ nguyên. Cấu hình từ `.env` và environment; ảnh riêng dưới `backend/mysql-instance/uploads`. Dịch vụ nhận diện ảnh vẫn cần AI API đang chạy.
 
-Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; mặc định chọn MySQL. Environment hỗ trợ `AEGIS_MYSQL_HOST`, `AEGIS_MYSQL_PORT`, `AEGIS_MYSQL_USER`, `AEGIS_MYSQL_PASSWORD`, `AEGIS_MYSQL_DATABASE` và các khóa MONGO tương ứng. Startup yêu cầu migrations 2/3/4 hoàn tất, không tự nâng schema hoặc fallback. Core dùng repository; SQL nội bộ của pilot dùng dialect adapter và API views thay vì mở SQLite.
+Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; mặc định chọn MySQL. Environment hỗ trợ `AEGIS_MYSQL_HOST`, `AEGIS_MYSQL_PORT`, `AEGIS_MYSQL_USER`, `AEGIS_MYSQL_PASSWORD`, `AEGIS_MYSQL_DATABASE` và các khóa MONGO tương ứng. Startup yêu cầu mọi migration 2–14 hoàn tất, không tự nâng schema hoặc fallback. Core dùng repository; SQL nội bộ của pilot dùng dialect adapter và API views thay vì mở SQLite.
 
 `create_pilot_app` mặc định chọn MySQL và provision namespace theo đường dẫn pilot. Marker `.aegis-hybrid.json` ngăn dùng nhầm backend SQLite cho kho đã chuyển. Journal, follow-up, episodes, revisions, research, timeline, automation, hourly, forecast và alerts đã chạy trên MySQL; telemetry và AI logs được chuyển tiếp Mongo qua outbox.
 
@@ -68,7 +179,7 @@ Factory nhận dict `MYSQL={host, port, user, password, database}` và `MONGO`; 
 - analysis_runs giữ một lần phân tích, trace/timing/status; crop_images giữ ảnh private; disease_detections lưu cả bbox x/y/width/height và source_bbox/source_confidence để response không mất độ chính xác do DECIMAL. Model được nhận diện bằng artifact SHA-256; version_name registry dùng hash, nhãn model gốc giữ trong analysis_runs, artifact_path là content reference `sha256:<hash>`. Không tự chọn model active từ request inference.
 - Catalog diseases được bổ sung từ label đã qua validator AI hiện tại, không seed nhãn khác với model đang chạy. Confidence/status của response được giữ nguyên.
 - mock_hourly_readings và mock_assessments giữ semantics mock hiện tại. Chúng không ghi vào risk_predictions. Telemetry raw và full validated AI outputs được ghi sang MongoDB qua outbox; MySQL giữ projection cần cho API/hourly cũ.
-- Auth tiếp tục xác minh hash scrypt/Werkzeug và dùng opaque Bearer sessions để giữ contract. Schema role đã có, tài khoản mới nhận farmer; enforcement RBAC, bcrypt/JWT/OAuth2 và reset password thuộc bước 6.
+- Auth (từ 15/11/2026): JWT HS256 kèm session digest để thu hồi; role farmer/admin đọc từ bảng `roles` mỗi request, đổi role ghi `audit_logs` (xem [JWT_RBAC](../docs/JWT_RBAC.md)). Mật khẩu vẫn hash scrypt/Werkzeug; bcrypt, OAuth2 và reset password chưa làm.
 - Runtime dùng một hàng khóa InnoDB `SELECT ... FOR UPDATE` cho mỗi transaction core để tuần tự hóa kiểm tra revision, quota và idempotency qua nhiều process. Khóa được nhả trước khi gọi AI HTTP. Đây là lựa chọn bảo toàn tính đúng trong giai đoạn chuyển đổi, có giới hạn throughput; cần thay bằng khóa theo tài nguyên trước khi scale.
 - Thao tác DB lỗi rollback; file ảnh mới được bù xóa khi lưu thất bại. Crash hoặc mất kết nối đúng lúc commit vẫn cần quy trình đối soát ảnh/DB; chưa có transaction nguyên tử giữa filesystem, MySQL và MongoDB.
 
@@ -95,3 +206,13 @@ Remove-Item Env:\AEGIS_RUN_MYSQL_TESTS
 Các test bao gồm UUID/response compatibility, restart/session, owner scope/FK, cultivation revision/replay, telemetry/snapshot/link, lịch sử/ảnh/detection precision, rollback khi lưu thất bại, reservation/rate-limit đồng thời, HTTP duplicate và launcher MySQL.
 
 Tài liệu kỹ thuật: [MySQL CHECK constraints](https://dev.mysql.com/doc/refman/8.4/en/create-table-check-constraints.html), [MongoDB JSON Schema validation](https://www.mongodb.com/docs/manual/core/schema-validation/specify-json-schema/), [PyMySQL connection API](https://pymysql.readthedocs.io/en/latest/modules/connections.html), [InnoDB locking reads](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html).
+
+## Leaf wetness trong MongoDB (20/11/2026)
+
+`telemetry_readings` nhận trường `leaf_wet` (bool), được chép từ mẫu raw cùng nhiệt độ và độ ẩm (quyết định D-03). DB mới có sẵn qua `mongo/001_design.js`. Với DB đang có (Docker hoặc native), chạy một lần:
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend/database/apply_mongo_leaf_wetness.py
+```
+
+Script dùng tài khoản `aegis_root` trong `.env`, chạy lại nhiều lần vẫn an toàn. Document gửi trước khi sửa không có `leaf_wet`; giá trị gốc vẫn nằm trong MySQL và `sensor_raw_events`.

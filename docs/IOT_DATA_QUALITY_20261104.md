@@ -13,9 +13,9 @@ với Backend process riêng, bounded outbox, retry và mất phản hồi sau c
 Tiếp theo, [IOT-07 đạt49checkpoint](IOT_SENDER_CRASH_RECOVERY.md): process
 sender chết sau ACK201/200 trước xóa queue, process mới replay không nhân đôi.
 [IOT-08 tổng duyệt một lệnh](IOT_MIDTERM_REHEARSAL.md) đã đạt86checkpoint
-thành phần +21đối soát, có report/lời dẫn midterm và QC trên raw mới.
+thành phần +21 đối soát, có report/lời dẫn midterm và QC trên raw mới.
 [IOT-09 simulator định kỳ](IOT_PERIODIC_SIMULATOR.md) đã có hai node dùng giờ
-đo hiện tại, buffer/retry, pause gửi, null sensor và STOP;15unit +38checkpoint đạt.
+đo hiện tại, buffer/retry, pause gửi, null sensor và STOP;15 unit +38checkpoint đạt.
 
 ## Phạm vi khảo sát và mức bằng chứng
 
@@ -74,7 +74,7 @@ hiện hành. Các thư mục có ngày và file ZIP là evidence/prototype riê
   cần registry/assignment có effective_from/to và resolve theo **thời điểm đo**,
   kể cả gói gửi bù sau chuyển vùng. Chưa triển khai registry đó trong task này.
 - `client_sample_id` UUID là message key toàn bảng; retry cùng key/stream/
-  thời điểm/nội dung đọc bản cũ; khác nội dung trả409. Unique(stream,observed_at)
+  thời điểm/nội dung đọc bản cũ; khác nội dung trả 409. Unique(stream, observed_at)
   ngăn hai UUID ở cùng thời điểm. Không có sequence/boot trong raw contract.
 - `observed_at` hiện chính là measured_at; ISO8601 có timezone, chuẩn hóa UTC.
   `received_at` do server ghi; `available_at=received_at`. Retry không đổi giờ
@@ -84,7 +84,7 @@ hiện hành. Các thư mục có ngày và file ZIP là evidence/prototype riê
   điền server time thành observed_at. Gói thiếu timezone/tương lai bị từ chối.
 - Version: DB `aegis-pilot-telemetry-v1`, QC `aegis-raw-qc-v1`, raw export-v1;
   controlled export-v2/context riêng. Ingress legacy không có schema_version
-  trong từng sample; gửi thêm sẽ bị400. Version envelope thiết bị là task sau.
+  trong từng sample; gửi thêm sẽ bị 400. Version envelope thiết bị là task sau.
 
 ### Data dictionary raw đang dùng
 
@@ -103,8 +103,8 @@ hiện hành. Các thư mục có ngày và file ZIP là evidence/prototype riê
 | exclusion | null hoặc reason/recorded_at/request_id | Append-only; không xóa/sửa raw |
 
 Schema batch là `{"records":[sample,...]}`, 1–100 records, JSON tối đa64KiB,
-đúng bảy trường sample trên, không extra key. Stream có client_stream_id,name,
-source,method,instrument,reference,nominal_interval_seconds. Các ví dụ/API đầy
+đúng bảy trường sample trên, không extra key. Stream có client_stream_id, name,
+source, method, instrument, reference, nominal_interval_seconds. Các ví dụ/API đầy
 đủ ở `frontend/ENVIRONMENT_INGEST.md`; task đầu sinh ví dụ chạy được bằng code.
 Soil moisture/light/rainfall/pH **chưa có trong raw API**. Không đổi ADC thành
 % đất; khi có cảm biến cần chốt raw ADC/index/calibrated quantity và version.
@@ -116,7 +116,7 @@ Không cần thêm các đại lượng này chỉ vì màn demo hoặc CSV có 
 |---|---|---|
 | JSON/field/type | Strict key, bool không thay number, finite |400; toàn batch rollback; payload sai chưa có kho quarantine server |
 | Owner/stream | Bearer session và parent season owner |401/404; chưa xác thực device credential |
-| Units | Field có hậu tố + metadata units do server đặt | Extra units key bị400; giá trị 77°F ghi nhầm °C ngoài biên bị400, **32°F ghi là32°C có thể lọt** |
+| Units | Field có hậu tố + metadata units do server đặt | Extra units key bị 400; giá trị 77°F ghi nhầm °C ngoài biên bị 400, **32°F ghi là 32°C có thể lọt** |
 | Value | Temp[-50,60], RH[0,100], leaf bool/null |400 ngoài biên; đây là biên kỹ thuật legacy, chưa là giới hạn model sensor hoặc ngưỡng bệnh |
 | Missing/read fail | null, reported_quality=suspect | Giữ raw; qc=incomplete và giữ reported_suspect; không điền0/dry |
 | Duplicate/conflict | UUID và stream/time unique |200 replay;409 khác giá trị; giữ received_at đầu tiên |
@@ -131,7 +131,7 @@ Mọi raw hiện `calibration_verified=false`, `hourly_eligible=false`,
 Không nội suy trong pipeline hiện tại. Nếu bổ sung phải giữ raw, cờ imputed,
 giới hạn gap và thuật toán chỉ dùng thông tin đã có tại thời điểm dự báo.
 
-Giá trị giới hạn của sandbox cũ (trễ15phút, tương lai60giây, 6điểm đứng số,
+Giá trị giới hạn của sandbox cũ (trễ 15 phút, tương lai60giây, 6 điểm đứng số,
 bước nhiệt5°C) là **chính sách thử nghiệm của sandbox**, không nhập vào raw
 hoặc coi là ngưỡng khoa học. Ngưỡng nguy cơ bệnh thuộc profile khác, không QC.
 
@@ -144,13 +144,13 @@ Không chọn sensor, mua thiết bị hoặc triển khai broker trong lượt 
 
 | Task | Mục tiêu | Hiện trạng | Công việc cần làm | Phụ thuộc | Đầu ra | Tiêu chí nghiệm thu |
 |---|---|---|---|---|---|---|
-| IOT-01 | Chứng minh raw MVP hiện tại | Có API/unit, sandbox khác schema | Simulator tái lập + acceptance 2vùng, fault/retry/backfill/export/as-of | Không cần phần cứng | tools/rehearse_iot.py và review | Các assertion đạt; synthetic riêng; raw không nhân đôi, timestamp giữ đúng, temp cleanup |
+| IOT-01 | Chứng minh raw MVP hiện tại | Có API/unit, sandbox khác schema | Simulator tái lập + acceptance 2 vùng, fault/retry/backfill/export/as-of | Không cần phần cứng | tools/rehearse_iot.py và review | Các assertion đạt; synthetic riêng; raw không nhân đôi, timestamp giữ đúng, temp cleanup |
 | IOT-02 | Intake dataset sắp nhận | Tạm gác theo người dùng sau IOT-01 | Khi mở lại: inventory/hash, dictionary, nguồn/quyền, đơn vị, missing, timestamp/device/label semantics | File và metadata người dùng cung cấp | Báo cáo tiếp nhận, accepted/rejected/unknown theo cột | Không bịa giờ/node/nhãn; xác định dùng để demo, QC hay nghiên cứu |
-| IOT-05 | Theo dõi thiếu/độ mới cho mô phỏng | Đạt phạm vi offline synthetic | Lịch anchor/cadence/tolerance/grace; freshness đo/nhận; replay as-of | Snapshot synthetic và policy demo tường minh | telemetry_monitor.py,10test mới, CLI evidence | Không future leakage, không đếm lặp slot, không sửa raw; không gọi receipt silence là node offline |
-| IOT-06 | Simulator qua HTTP + buffer/retry | Đạt phạm vi loopback synthetic | Hai node, queue đầy, mất ACK sau DB commit, Backend restart, lỗi giữ hàng | Không dataset/hardware; có quyền loopback | iot_http_sender.py, rehearse_iot_http.py,9test +37checkpoint |6raw duy nhất, giữ giờ đo, queue chỉ xóa sau ACK đúng, dọn process/kho tạm |
-| IOT-07 | Sender crash sau ACK trước dequeue | Đạt phạm vi process/HTTP synthetic | Hai os._exit(77) sau ACK201/200; process mới recovery; queue rỗng restart | Tái dùng sender/Backend worker IOT-06, không dataset | rehearse_iot_sender_crash.py +49checkpoint | Queue giữ đủ2raw sau crash; recovery có đúng2raw Backend, timestamp không đổi, dọn process/kho tạm |
-| IOT-08 | Tổng duyệt IoT midterm một lệnh | Đạt tự động; chưa tập trình bày thủ công | HTTP + sender recovery + QC trên raw mới + report/lời dẫn | Công cụ IOT-05/06/07, quyền loopback; không dataset/hardware | rehearse_iot_midterm.py, report,4unit test |86checkpoint thành phần +21đối soát đạt; failure không xuất PASS, temp cleanup/hash/link đạt |
-| IOT-09 | Simulator gửi định kỳ | Đạt phạm vi HTTP synthetic | Hai node, giờ đo live, cadence/duration, gate offline, null sensor, buffer/STOP | Sender/Backend pilot có sẵn; không dataset/hardware | simulate_iot_periodic.py, acceptance driver,15unit +38checkpoint |12raw mới giữ đúng thời gian; overflow báo incomplete, pending archive, STOP/cleanup đạt |
+| IOT-05 | Theo dõi thiếu/độ mới cho mô phỏng | Đạt phạm vi offline synthetic | Lịch anchor/cadence/tolerance/grace; freshness đo/nhận; replay as-of | Snapshot synthetic và policy demo tường minh | telemetry_monitor.py,10 test mới, CLI evidence | Không future leakage, không đếm lặp slot, không sửa raw; không gọi receipt silence là node offline |
+| IOT-06 | Simulator qua HTTP + buffer/retry | Đạt phạm vi loopback synthetic | Hai node, queue đầy, mất ACK sau DB commit, Backend restart, lỗi giữ hàng | Không dataset/hardware; có quyền loopback | iot_http_sender.py, rehearse_iot_http.py,9 test +37checkpoint |6 raw duy nhất, giữ giờ đo, queue chỉ xóa sau ACK đúng, dọn process/kho tạm |
+| IOT-07 | Sender crash sau ACK trước dequeue | Đạt phạm vi process/HTTP synthetic | Hai os._exit(77) sau ACK201/200; process mới recovery; queue rỗng restart | Tái dùng sender/Backend worker IOT-06, không dataset | rehearse_iot_sender_crash.py +49checkpoint | Queue giữ đủ 2 raw sau crash; recovery có đúng2raw Backend, timestamp không đổi, dọn process/kho tạm |
+| IOT-08 | Tổng duyệt IoT midterm một lệnh | Đạt tự động; chưa tập trình bày thủ công | HTTP + sender recovery + QC trên raw mới + report/lời dẫn | Công cụ IOT-05/06/07, quyền loopback; không dataset/hardware | rehearse_iot_midterm.py, report,4 unit test |86 checkpoint thành phần +21 đối soát đạt; failure không xuất PASS, temp cleanup/hash/link đạt |
+| IOT-09 | Simulator gửi định kỳ | Đạt phạm vi HTTP synthetic | Hai node, giờ đo live, cadence/duration, gate offline, null sensor, buffer/STOP | Sender/Backend pilot có sẵn; không dataset/hardware | simulate_iot_periodic.py, acceptance driver,15 unit +38checkpoint |12 raw mới giữ đúng thời gian; overflow báo incomplete, pending archive, STOP/cleanup đạt |
 | H3-T02 | Adapter một format có lineage | Task cũ blocked | Chốt format từ IOT-02, giữ row/raw/hash, key ổn định, import retry | Metadata thật đủ hoặc format synthetic được công bố | Parser + invalid/conflict/replay tests | Không mất cột âm thầm/đổi source; dòng không đủ cách ly có lý do |
 | IOT-03 | Contract node và assignment | Core mock/raw stream chưa là registry | Device identity/credentials, schema version, clock unknown, assignment theo measured_at | Số node/vùng, semantics + review Backend | Contract version và migration tối thiểu nếu cần | Field do server resolve; chuyển vùng + late/reboot không sai lịch sử |
 | H3-T03 | QC vận hành | QC kỹ thuật/audit có sẵn | Schedule/anchor, late/fresh/stale, quarantine, ngưỡng theo sensor | Semantics/cadence/instrument được chốt | QC policy/version + metrics | Lý do giữ/loại tái lập; raw bất biến; ngưỡng tạm ghi rõ |
@@ -187,14 +187,14 @@ bạch, retry backoff có giới hạn/jitter, message key giữ qua reboot và 
 ### Bàn giao AI và metrics
 
 AI feature contract hiện tại `aegis-hourly-feature-input-v1` cần120giờ valid,
-completed, available tại issue cho T/RH/wet và tuổi cây đã biết. Có61predictors;
+completed, available tại issue cho T/RH/wet và tuổi cây đã biết. Có 61 predictors;
 ready chỉ là đủ feature, chưa có forecast/model khả dụng. Không tự đổi bài
 toán AI khi dataset mới thiếu wetness/timestamp; ghi gap và bàn lại contract.
 
 - Tỷ lệ accept = records mới được lưu / records mới thử gửi; đếm replay riêng.
   API atomic batch làm cả batch fail, không tính số lỗi độc lập từ response400.
 - Độ đầy đủ = số slot kỳ vọng có phép đo duy nhất / số slot kỳ vọng trong
-  [start,end), chỉ tính khi có lịch/anchor/tolerance; cadence khai báo một mình
+  [start, end), chỉ tính khi có lịch/anchor/tolerance; cadence khai báo một mình
   chưa đủ. Báo completeness từng đại lượng, không chỉ số hàng.
 - Latency = received_at-observed_at cho bản mới; p50/p95, không đếm retry.
   Clock sai làm chỉ số sai; receipt mới khi backfill không có nghĩa đo mới.
@@ -238,21 +238,21 @@ dự án theo từng dòng vẫn chưa hoàn tất như giới hạn đầu báo
    contract hiện có, AI hoặc thay đổi chưa commit của người khác.
 3. **Lý do:** dùng factory/API raw sẵn có để kiểm đường tích hợp thật với DB,
    tránh lấy sandbox schema rainfall/pH làm hợp đồng Backend đang hoạt động.
-4. **Kết quả thực chạy ngày04/11:** run01 đạt81checkpoint. Sau review, bổ sung
+4. **Kết quả thực chạy ngày 04/11:** run01 đạt81checkpoint. Sau review, bổ sung
    đối chiếu toàn payload và tính freshness trực tiếp từ raw, run02 đạt
    **83/83checkpoint**, exit0, temp store cleaned=true. Bộ có sẵn
    `test_telemetry test_telemetry_audit test_controlled_telemetry` đạt
-   **26test/21,160giây**, exit0. Bộ26test chạy trước chỉnh sửa cuối công cụ,
-   runtime không đổi. Không gọi các checkpoint là83test độc lập.
-5. **Đối soát:** mỗi stream12slot kỳ vọng giả lập,10raw duy nhất,2slot cuối
-   cố ý không gửi; tổng20raw. T có10giá trị, RH/wet mỗi loại9/12slot. Replay
+   **26 test/21,160 giây**, exit0. Bộ 26 test chạy trước chỉnh sửa cuối công cụ,
+   runtime không đổi. Không gọi các checkpoint là 83 test độc lập.
+5. **Đối soát:** mỗi stream12slot kỳ vọng giả lập,10 raw duy nhất,2 slot cuối
+   cố ý không gửi; tổng20raw. T có 10 giá trị, RH/wet mỗi loại 9/12slot. Replay
    không thêm raw hoặc thay received_at. Backfill/đảo thứ tự giữ observed_at;
    max latency2400s. Cuối cửa sổ tuổi lần nhận=0s nhưng tuổi đo mới nhất=900s:
    nhận dữ liệu gần đây không chứng minh dữ liệu đo còn mới.
 6. **Fault đã kiểm:** thiếu trường, string/bool/NaN thay số, ngoài biên, unit
    field sai, extra version/field_id/received_at, clock null/naive/future,
    anonymous/foreign owner/stream lạ, cùng UUID khác payload, cùng giờ khác
-   UUID, chuyển message sang stream khác, batch rollback. Đứng số6điểm và
+   UUID, chuyển message sang stream khác, batch rollback. Đứng số 6 điểm và
    nhảy nhiệt được giữ nguyên; constant run là diagnostic. Không có online
    spike/stuck detector mới. Exclusion đến muộn chỉ tác động audit sau giờ ghi;
    receipt tương lai không xuất hiện trong audit quá khứ.
@@ -260,7 +260,7 @@ dự án theo từng dòng vẫn chưa hoàn tất như giới hạn đầu báo
    socket/broker/Wi-Fi. Restart factory cùng process, không khẳng định crash/
    reboot recovery. Không kiểm flash/outbox/backoff/ACL/hardware. Completeness
    chỉ đúng lịch fixture chốt trước; audit production vẫn trả coverage=null.
-   Timestamps fixture cố định01/11/2026, không phải giờ đo thật. Dữ liệu vẫn
+   Timestamps fixture cố định 01/11/2026, không phải giờ đo thật. Dữ liệu vẫn
    unapproved; không inference/model/training. Công cụ không ghi token/password
    vào summary/export; UUID owner/plot/stream trong snapshot đều của kho tạm.
 8. **Task tiếp theo:** IOT-02 khi người dùng cung cấp dataset. Kiểm file và
@@ -290,7 +290,7 @@ Các file run02:
 - `summary.json`: checkpoint, counts, latency, freshness và giới hạn.
 - `sim-a.generated.synthetic.json`, `sim-b.generated.synthetic.json`: batch
   hợp lệ gồm cả slot cố ý chưa gửi, ví dụ tái lập. Chỉ dùng trong kho synthetic
-  có vụ bao phủ01/11; UUID giữ ổn định nên đổi giá trị rồi retry sẽ conflict.
+  có vụ bao phủ 01/11; UUID giữ ổn định nên đổi giá trị rồi retry sẽ conflict.
 - `sim-a.raw.synthetic.json`, `sim-b.raw.synthetic.json`: raw export-v1/hash,
   source/units/QC, measured và received thật của **đồng hồ fixture**, không
   phải measurements từ phần cứng.

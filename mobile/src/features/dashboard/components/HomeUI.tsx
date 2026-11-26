@@ -25,18 +25,19 @@ export function HomeSheet({ title, onClose, children }: { title: string; onClose
   </Modal>;
 }
 
-export function HomeMetric({ label, value, unit, icon, single, accent, min, max }: {
-  label: string; value: number | null; unit: string; icon: IconName; single: boolean; accent: string; min: number; max: number;
+export function HomeMetric({ label, value, unit, icon, single, accent, min, max, noDevice }: {
+  label: string; value: number | null; unit: string; icon: IconName; single: boolean; accent: string; min: number; max: number; noDevice?: boolean;
 }) {
   const ratio = value === null ? 0 : Math.min(1, Math.max(0, (value - min) / (max - min)));
+  const missing = value === null ? (noDevice ? 'Chưa có thiết bị' : 'Chưa có số đo') : '';
   return <View style={[s.homeMetric, single && s.homeMetricFull, { backgroundColor: accent + '1c', borderColor: accent + '40' }]} accessible
-    accessibilityLabel={`${label}: ${value === null ? 'Chưa có số đo' : `${forecastNumber(value)} ${unit}`}`}>
+    accessibilityLabel={`${label}: ${value === null ? missing : `${forecastNumber(value)} ${unit}`}`}>
     <View style={s.homeMetricHeading}>
       <View style={[s.homeMetricIcon, { backgroundColor: accent + '33' }]}><Icon name={icon} size={18} color={accent} /></View>
       <Text numberOfLines={2} maxFontSizeMultiplier={1.15} style={s.homeMetricLabel}>{label}</Text>
     </View>
-    <Text style={s.homeMetricValue}>{value === null ? '—' : forecastNumber(value)}<Text style={s.homeMetricUnit}>{value === null ? '' : ` ${unit}`}</Text></Text>
+    <Text style={[s.homeMetricValue, value === null && s.forecastDetailReadingMissing]}>{value === null ? '—' : forecastNumber(value)}<Text style={s.homeMetricUnit}>{value === null ? '' : ` ${unit}`}</Text></Text>
     <View style={s.homeGauge}><View style={[s.homeGaugeFill, { width: `${Math.round(ratio * 100)}%`, backgroundColor: accent }]} /></View>
-    <View style={s.homeGaugeScale}><Text style={s.homeGaugeText}>{min}</Text><Text style={s.homeGaugeText}>{value === null ? 'Chờ số đo' : 'Mới'}</Text><Text style={s.homeGaugeText}>{max}</Text></View>
+    {!(noDevice && value === null) && <View style={s.homeGaugeScale}><Text style={s.homeGaugeText}>{min}</Text><Text style={s.homeGaugeText}>{value === null ? 'Chờ số đo' : 'Mới'}</Text><Text style={s.homeGaugeText}>{max}</Text></View>}
   </View>;
 }

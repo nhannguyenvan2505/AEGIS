@@ -19,6 +19,7 @@ from app.database_config import settings
 from app.repositories.mysql import mysql_repository
 from app.hybrid_pilot import provision,store_key,SCOPES,LAYOUT,PilotConnection
 from app.mongo_delivery import deliver
+from app.storage import DIAGNOSIS_COLUMNS
 from native_tools import mysql_dump
 
 
@@ -94,6 +95,13 @@ def migrate_core(repo,path,data,uploads,report):
         if actual is None or any(actual.get(k)!=v for k,v in expected.items()):
             raise RuntimeError('Destination reconciliation failed: '+label)
     for row in data.get('users',[]):
+        # SQLite migration 6 adds role/status. Roles are never migrated: the first
+        # admin is granted only by the audited bootstrap-admin CLI.
+        if row.get('status','active')!='active':
+            raise RuntimeError('Inactive/locked legacy user requires manual migration')
+        if row.get('role','farmer')!='farmer':
+            report['legacy_roles_not_migrated']=report.get('legacy_roles_not_migrated',0)+1
+        row={key:row[key] for key in ('id','email','password_hash','created_at')}
         actual=repo.one('SELECT external_id id,email,password_hash,UNIX_TIMESTAMP(created_at) created_at FROM users WHERE external_id=%s',(row['id'],))
         if actual: assert_equal(actual,row,'users')
         else:
@@ -171,7 +179,8 @@ def migrate_core(repo,path,data,uploads,report):
         if file_hash(target)!=image_hash: raise RuntimeError('Image SHA-256 differs after copy')
         report['images'][row['image_path']]=image_hash
         actual=repo.owned('analyses',row['id'],row['user_id'])
-        if actual: assert_equal(actual,row,'analyses')
+        listed={k:v for k,v in row.items() if k not in DIAGNOSIS_COLUMNS}
+        if actual: assert_equal(actual,listed,'analyses')
         else:
             values=[]
             for detection in related:
@@ -180,7 +189,9 @@ def migrate_core(repo,path,data,uploads,report):
             result=dict(legacy_import=True,payload_completeness='reconstructed_from_persisted_columns',
                         status=row['status'],detections=values,model_sha256=row['model_sha256'])
             repo.save_analysis(row,values,None,result)
-        assert_equal(repo.owned('analyses',row['id'],row['user_id']),row,'analyses')
+        assert_equal(repo.owned('analyses',row['id'],row['user_id']),listed,'analyses')
+        stored=repo.one('SELECT diagnosis_status,rice_probability FROM analysis_runs WHERE external_id=%s',(row['id'],))
+        assert_equal(stored,{k:row[k] for k in ('diagnosis_status','rice_probability') if k in row},'analysis diagnosis')
         current={d['id']:d for d in repo.detections(row['id'])}
         if set(current)!={d['id'] for d in related}: raise RuntimeError('Detection count differs')
         for detection in related:
@@ -202,7 +213,8 @@ def migrate_core(repo,path,data,uploads,report):
         expected=dict(row,user_id=user,analysis_id=identifier)
         old=repo.one('SELECT * FROM inference_requests WHERE user_id=%s AND key_hash=%s',(user,row['key_hash']))
         if old: assert_equal(old,expected,'inference reservations')
-        else: repo.execute('INSERT INTO inference_requests VALUES (%s,%s,%s,%s,%s)',tuple(expected[k] for k in ['user_id','key_hash','payload_hash','state','analysis_id']))
+        else: repo.execute('INSERT INTO inference_requests(user_id,key_hash,payload_hash,state,analysis_id,created_at) VALUES (%s,%s,%s,%s,%s,%s)',
+                           (*(expected[k] for k in ['user_id','key_hash','payload_hash','state','analysis_id']),expected.get('created_at',0)))
     # Quota is process/runtime state; preserve its source snapshot for audit rather
     # than reviving stale windows from multiple stores in the shared limiter.
     known={'users','sessions','analyses','detections','inference_requests','farm_plots','farm_seasons','farm_devices',

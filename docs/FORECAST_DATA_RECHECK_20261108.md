@@ -22,7 +22,7 @@ Winner T08 vẫn là Full Logistic Regression C=0,01 được chọn bằng vali
 ## Những giới hạn cần giữ khi phát triển tiếp
 
 - Toàn bộ dữ liệu kiểm tra là synthetic. Các seed dùng lại alias plot/cluster; sample ID riêng và không pooling, nhưng không đại diện cho những trang trại thực địa độc lập.
-- T08 chấm chất lượng trên1.020/1.200mẫu đủ dữ liệu. 180mẫu thiếu được loại khỏi phép đo score, không gán thành ca âm. Test có255/300mẫu đủ, tương ứng coverage85%.
+- T08 chấm chất lượng trên1.020/1.200mẫu đủ dữ liệu. 180 mẫu thiếu được loại khỏi phép đo score, không gán thành ca âm. Test có 255/300mẫu đủ, tương ứng coverage85%.
 - Raw→hourly đang lưu whole-hour wetness=null. Worker v1 tiếp tục abstain đúng contract; thí nghiệm weather của T08 chưa được tích hợp vào API/scheduler.
 - Nhánh weather chỉ được stress trên lịch sử synthetic đủ nhiệt độ/RH và tuổi lúa. Thiếu nhiệt độ/RH hoặc tuổi lúa vẫn abstain. Các kết quả wet-null không chứng minh khả năng dự báo trên mọi nguồn raw.
 - Audit lần này chạy offline và không fit lại model. Với T04/T06, lượt này xác nhận artifact/hash đã lưu; kiểm thử HTTP, quyền sở hữu, crash recovery và trạng thái dịch vụ trực tiếp thuộc các lượt integration tương ứng.

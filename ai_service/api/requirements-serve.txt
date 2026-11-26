@@ -1,0 +1,2 @@
+# Production WSGI server for the container image (Linux only; development runs api/app.py).
+gunicorn==27.0.1

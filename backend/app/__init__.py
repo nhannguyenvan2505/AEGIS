@@ -4,6 +4,7 @@ from pathlib import Path
 
 from flask import Flask, g, jsonify
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .routes import api
 from .storage import init_storage
@@ -20,6 +21,7 @@ def create_app(config=None):
     default_backend='sqlite' if config and config.get('TESTING') else 'mysql'
     app.config.from_mapping(
         AI_API_URL=os.environ.get('AEGIS_AI_URL', 'http://127.0.0.1:8000'),
+        AI_API_VERSION=os.environ.get('AEGIS_AI_API_VERSION', 'v2'),  # v2 = gatekeeper + detector (/v2/diagnose); v1 = detector only (/predict)
         AI_CONNECT_TIMEOUT=3,
         AI_READ_TIMEOUT=60,
         MAX_IMAGE_BYTES=8 * 1024 * 1024,
@@ -27,6 +29,8 @@ def create_app(config=None):
         DATABASE_PATH=data_dir / 'aegis.sqlite3',
         STORAGE_BACKEND=os.environ.get('AEGIS_STORAGE_BACKEND', default_backend),
         MONGO_DELIVERY_ENABLED=os.environ.get('AEGIS_MONGO_DELIVERY_ENABLED','1')=='1',
+        MONGO_DELIVERY_INTERVAL_SECONDS=float(os.environ.get('AEGIS_MONGO_DELIVERY_INTERVAL','2')),
+        MONGO_DELIVERY_BATCH=100,
         MYSQL=dict(host=os.environ.get('AEGIS_MYSQL_HOST','127.0.0.1'),
                    port=int(os.environ.get('AEGIS_MYSQL_PORT','3307')),
                    user=os.environ.get('AEGIS_MYSQL_USER','aegis_app'),
@@ -42,6 +46,11 @@ def create_app(config=None):
         BACKEND_MAX_INFLIGHT=2,
         RATE_MAX_BUCKETS=10000,
         FARM_WRITE_LIMIT=60,
+        # A reservation still 'running' after this is reported 'uncertain'; AI is never re-run for it.
+        IDEMPOTENCY_RUNNING_TTL_SECONDS=int(os.environ.get('AEGIS_IDEMPOTENCY_RUNNING_TTL', '300')),
+        # Reverse proxies in front of this server whose X-Forwarded-For/-Proto may be believed.
+        # 0 = none. Set it only when the server cannot be reached around them.
+        TRUSTED_PROXY_HOPS=int(os.environ.get('AEGIS_TRUSTED_PROXY_HOPS', '0')),
     )
     for key in ['RATE_WINDOW_SECONDS','LOGIN_IP_LIMIT','LOGIN_ACCOUNT_LIMIT','REGISTER_IP_LIMIT',
                 'DETECT_USER_LIMIT','BACKEND_MAX_INFLIGHT','RATE_MAX_BUCKETS','FARM_WRITE_LIMIT']:
@@ -51,26 +60,38 @@ def create_app(config=None):
         app.config.update(config)
     if app.config['STORAGE_BACKEND']=='mysql' and not (config and 'UPLOAD_DIR' in config):
         app.config['UPLOAD_DIR']=data_dir.parent/'mysql-instance'/'uploads'
+    hops = app.config['TRUSTED_PROXY_HOPS']
+    if type(hops) is not int or not 0 <= hops <= 5:
+        raise ValueError('TRUSTED_PROXY_HOPS must be an integer from 0 to 5')
+    if hops:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=hops, x_proto=hops, x_host=0, x_port=0, x_prefix=0)
     init_storage(app.config)
+    from .jwt_tokens import init_jwt
+    init_jwt(app)
     init_observability(app)
     init_limits(app)
     app.register_blueprint(api)
     app.register_blueprint(auth)
+    from .rbac_admin import admin, register_admin_cli
+    app.register_blueprint(admin)
+    register_admin_cli(app)
     app.register_blueprint(farm)
+    from .push import notifications
+    app.register_blueprint(notifications)
+    from .alerts_api import alerts
+    app.register_blueprint(alerts)
     from .admin import register_admin
     register_admin(app)
     from .mobile_contract import enable_mobile_contract
     enable_mobile_contract(app)
+    from .iot_mqtt import enable_iot_mqtt
+    enable_iot_mqtt(app)
 
-    @app.after_request
-    def deliver_mongo_outbox(response):
-        if app.config['STORAGE_BACKEND']=='mysql' and not app.testing and app.config.get('MONGO_DELIVERY_ENABLED',True):
-            try:
-                from .mongo_delivery import deliver
-                deliver(app.config,limit=50)
-            except Exception as exc:
-                app.logger.error('Mongo delivery deferred: %s',type(exc).__name__)
-        return response
+    # BE-02: Mongo delivery runs in a background dispatcher, never on the
+    # response path. Business writes still enqueue in their own transaction.
+    if app.config['STORAGE_BACKEND']=='mysql' and not app.testing and app.config.get('MONGO_DELIVERY_ENABLED',True):
+        from .outbox_dispatcher import start_dispatcher
+        app.extensions['outbox_dispatcher']=start_dispatcher(app)
 
     @app.errorhandler(sqlite3.Error)
     def database_error(error):

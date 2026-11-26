@@ -4,8 +4,8 @@
 đúng hash và chạy service từ checkout. Các lệnh absolute `D:/AEGIS-AI` bên dưới
 là nhật ký workstation, không phải đường dẫn dùng trong repo này.
 
-Current local handoff, 28/10/2026: [index](D:/AEGIS/docs/CURRENT_HANDOFF.md)
-and [runbook](D:/AEGIS/docs/CURRENT_RUNBOOK.md). Image service, temporal research
+Current local handoff, 28/10/2026: [index](../../docs/CURRENT_HANDOFF.md)
+and [runbook](../../docs/CURRENT_RUNBOOK.md). Image service, temporal research
 and pilot raw contracts are separate. A test-host label or mocked response
 does not establish this checkpoint was loaded. TASK-19 does not rerun GPU inference.
 
@@ -31,6 +31,52 @@ The prototype binds to http://127.0.0.1:8000 with Flask debug and reloader disab
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8000/health
 ```
+
+`/health` is the readiness check of the default path, `/v2/diagnose`. It returns
+**503** with `status: degraded` while the gatekeeper weights are missing, and 200
+with `status: ready` otherwise. The body names both models (`model_sha256`,
+`model_pinned`, `gatekeeper.version/sha256/pinned`); read it for any status code.
+`/v2/health` stays 200 and adds the pipeline thresholds. The v1 `/predict` route
+does not need the gatekeeper.
+
+## Model pinning
+
+At startup the default detector and the gatekeeper are hashed **before** loading
+and compared with `checkpoint.json` and `gatekeeper.json`. A different file stops
+the service. To try a candidate on purpose, set `AEGIS_ALLOW_UNPINNED_MODELS=1`;
+the service then reports `pinned: false` and, for a detector, the version
+`aegis-yolo11n-candidate`. Do not set it on a deployed service. To promote a new
+model, publish it and update the matching manifest (`release`, `sha256`,
+`size_bytes`). A pinned gatekeeper reports the manifest's `release` as its version.
+
+## Image quality stage
+
+`/v2/diagnose` first rejects images that are blurred, too dark, too bright or flat.
+It measures them on an analysis grid whose long side is **512 points**, picked evenly
+from the upload (images up to 512 px are measured as they are, nothing is averaged).
+Before 26/11/2026 the step was `long side // 512`, so the grid was 512 to 640 points
+wide and a slightly blurred photo was rejected more or less often depending only on
+its pixel size.
+
+- At 1024 and 2048 px the picked pixels, and so the results, are the same as before.
+- Other sizes above 512 px are measured differently from before; for
+  example a 640 px image is now judged less strictly.
+- A fixed grid does not make every size answer identically, and the limits themselves
+  have not been calibrated on real phone photos.
+
+## Load check
+
+With the service running, on a folder holding a few mixed test images:
+
+```powershell
+python ai_service/api/load_test.py --url http://127.0.0.1:8000 --images <folder>
+```
+
+It records each image's answer alone, then repeats under concurrency 1, 2, 4 and 8.
+Only HTTP 503 `ai_busy` is an accepted failure; a changed answer fails the run.
+Above `AEGIS_AI_MAX_INFLIGHT` (default 2) most requests are rejected by design,
+and the tool does not wait for `Retry-After`, so read latency from the levels
+within the limit.
 
 ## Predict
 

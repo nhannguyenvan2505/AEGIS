@@ -1,6 +1,6 @@
 # T15 — endpoint và quan sát kết quả synthetic
 
-Ngày08/11/2026. Theo xác nhận của Nhân tại T14, nhóm sử dụng toàn bộ dữ liệu ảo.
+Ngày 08/11/2026. Theo xác nhận của Nhân tại T14, nhóm sử dụng toàn bộ dữ liệu ảo.
 T15 chốt một **contract phần mềm cho mô phỏng**, không đóng protocol thực địa hoặc
 tự xác nhận tư cách chuyên môn của người quan sát trong draft nghiên cứu cũ.
 
@@ -22,7 +22,7 @@ loại bệnh hoặc năng lực xác minh bệnh ngoài thực địa.
 
 Baseline: một quan sát absent có attestation trong24giờ trước/tại issue và đã
 available trước/tại issue. Lịch follow-up giả lập ở +24,+48,+72giờ, max survey gap
-24giờ. Lịch chính xác này là lựa chọn kỹ thuật của simulator, chưa được kiểm định
+24 giờ. Lịch chính xác này là lựa chọn kỹ thuật của simulator, chưa được kiểm định
 về sinh học. Chỉ xuất binary sau khi window72giờ mature và đủ evidence đã available.
 
 ## Input và revision
@@ -34,8 +34,8 @@ Envelope `aegis-synthetic-endpoint-observations-v1` có:
 - `simulation`: generator version, uint32 seed, scenario và explicit simulated
   clock basis. Export/observation/review/record/availability thuộc clock mô phỏng.
 - Full history `visits`, append revision1..n với observed_at và scheduled bất biến.
-  Mỗi revision có recorded_at,available_at,finding absent/present/uncertain,
-  active/voided,evidence reference và hash toàn payload.
+  Mỗi revision có recorded_at, available_at, finding absent/present/uncertain,
+  active/voided, evidence reference và hash toàn payload.
 - Review tùy chọn chỉ nhận origin `simulator_attestation`, alias/reference rõ
   đây là simulator và reviewed_at. Không nhận user_reported_external_review,
   prediction, score, image_prediction hoặc loại nguồn thực vào contract này.
@@ -105,7 +105,7 @@ command observation synthetic với **review=null**. Không tự đẩy các cor
 hoặc attestation offline vào journal.
 
 Rehearsal tạo4visit qua Backend HTTP, retry không trùng, sửa một visit thành
-uncertain revision2 và đọc history2/1. Recorded/available ở phần HTTP là server
+uncertain revision2 và đọc history 2/1. Recorded/available ở phần HTTP là server
 UTC thật; observed_at là mô phỏng hồi tố. Có mapping ID simulator–journal để audit;
 không dùng response HTTP làm y, không làm giả journal receipt theo clock mô phỏng.
 Kho/server tạm được kiểm đã dọn; artifact không chứa token/password.
@@ -119,14 +119,14 @@ PowerShell từ `D:\AEGIS`, mỗi output mới:
 & backend/.venv/Scripts/python.exe -X utf8 -B frontend/synthetic_endpoints.py --observations forecast_endpoints_t15/run01/20261108-late_review/observations.synthetic.json --issued-at 2026-11-01T00:00:00Z --as-of 2026-11-06T00:00:00Z --out forecast_endpoints_t15/late_review.manual.json
 ```
 
-`endpoint_simulation.make` tạo3seed ×15scenario, mỗi case đánh giá tại60/96/120giờ
+`endpoint_simulation.make` tạo3seed ×15 scenario, mỗi case đánh giá tại60/96/120giờ
 sau issue. Có positive/negative/uncertain/missed visit/late review/prevalent,
 ambiguous ở hai biên, intervention/unverified/voided/correction/baseline late/
 missing baseline/late intervention. Đây là test rules, không là cohort sinh học.
 Seed điều khiển độ trễ ghi nhận nhỏ của observation; finding do scenario khai báo,
 không suy từ weather để tạo accuracy giả hoặc tune model hiện hành.
 
-15test mới kiểm cả3seed, maturity/receipt/horizon, revision replay/knowledge hash,
+15 test mới kiểm cả 3 seed, maturity/receipt/horizon, revision replay/knowledge hash,
 void/intervention, source/protocol/review/prediction guards, corruption, timezone,
 input immutability và journal command review. Bằng chứng ở
 [T15](../../forecast_endpoints_t15/README.md).

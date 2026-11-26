@@ -3,13 +3,22 @@ import re
 import time
 
 import requests
+from urllib3.exceptions import NewConnectionError
 
 
 class AIServiceError(Exception):
-    def __init__(self, code, message, status, retry_after=None):
+    def __init__(self, code, message, status, retry_after=None, not_run=False):
         super().__init__(message)
         self.code, self.message, self.status = code, message, status
         self.retry_after = retry_after
+        # True only when the AI certainly never ran inference, so the same Idempotency-Key may be sent again.
+        self.not_run = not_run
+
+
+def never_connected(error):
+    """A requests error raised before any connection existed (refused, unresolved host)."""
+    cause = error.args[0] if error.args else None
+    return isinstance(getattr(cause, 'reason', None), NewConnectionError)
 
 
 def validate_result(data, expected_request_id):
@@ -27,9 +36,18 @@ def validate_result(data, expected_request_id):
     image = data.get('image')
     if not isinstance(image, dict) or any(type(image.get(k)) is not int or image[k] <= 0 for k in ('width', 'height')):
         raise ValueError('Invalid dimensions')
+    detections = validate_boxes(data['detections'], image)
+    return dict(success=True, model_version=data['model_version'],
+                request_id=expected_request_id, model_sha256=data['model_sha256'],
+                timings={'ai_processing_ms': duration},
+                image={'width': image['width'], 'height': image['height'], 'orientation': 'exif_corrected'},
+                detections=detections, status='detection_found' if detections else 'no_detection')
+
+
+def validate_boxes(items, image):
     names = {0: 'rice_blast', 1: 'brown_spot', 2: 'sheath_blight'}
     detections = []
-    for item in data['detections']:
+    for item in items:
         if not isinstance(item, dict):
             raise ValueError('Invalid detection')
         class_id, confidence, bbox = item.get('class_id'), item.get('confidence'), item.get('bbox_xyxy')
@@ -44,41 +62,119 @@ def validate_result(data, expected_request_id):
             raise ValueError('Invalid bbox bounds')
         detections.append(dict(class_id=class_id, disease=names[class_id], confidence=confidence,
                                bbox=dict(x1=x1, y1=y1, x2=x2, y2=y2)))
-    return dict(success=True, model_version=data['model_version'],
-                request_id=expected_request_id, model_sha256=data['model_sha256'],
-                timings={'ai_processing_ms': duration},
-                image={'width': image['width'], 'height': image['height'], 'orientation': 'exif_corrected'},
-                detections=detections, status='detection_found' if detections else 'no_detection')
+    return detections
+
+
+DIAGNOSIS_STATUSES = ('disease_detected', 'uncertain_lesion', 'healthy')
+
+
+def diagnosis_record(data):
+    """The /v2 outcome persisted beside an accepted analysis; None for /predict (v1).
+
+    Call after validate_result(): it relies on an already validated `image`.
+    """
+    status = data.get('status')
+    if status not in DIAGNOSIS_STATUSES:
+        return None
+    gate = data.get('gatekeeper')
+    gate = {} if gate is None else gate
+    if not isinstance(gate, dict):
+        raise ValueError('Invalid gatekeeper report')
+    probability = gate.get('rice_probability')
+    if probability is not None and (type(probability) not in (int, float) or not math.isfinite(probability)
+                                    or not 0 <= probability <= 1):
+        raise ValueError('Invalid rice probability')
+    for key, limit in (('method', 32), ('version', 100)):
+        if gate.get(key) is not None and (not isinstance(gate[key], str) or len(gate[key]) > limit):
+            raise ValueError('Invalid gatekeeper ' + key)
+    digest = gate.get('sha256')
+    if digest is not None and (not isinstance(digest, str) or not re.fullmatch('[0-9a-f]{64}', digest)):
+        raise ValueError('Invalid gatekeeper digest')
+    regions = data.get('uncertain_regions')
+    regions = [] if regions is None else regions
+    if not isinstance(regions, list) or len(regions) > 300:
+        raise ValueError('Invalid uncertain regions')
+    return dict(diagnosis_status=status, rice_probability=probability,
+                gatekeeper_method=gate.get('method'), gatekeeper_version=gate.get('version'),
+                gatekeeper_sha256=digest, uncertain_regions=validate_boxes(regions, data['image']))
+
+
+REJECTED = {'rejected_poor_quality', 'rejected_non_rice', 'rejected_uncertain_scope'}
+QUALITY_ISSUES = ('blur', 'too_dark', 'too_bright', 'no_clear_subject')
+
+
+def known_quality_issues(quality):
+    """The AI's quality issue codes that may be logged; the report itself is passed through unvalidated."""
+    issues = quality.get('issues') if isinstance(quality, dict) else None
+    return [issue for issue in issues if issue in QUALITY_ISSUES] if isinstance(issues, list) else []
+
+
+def validate_rejection(data, expected_request_id):
+    """Domain rejection from /v2/diagnose: not an error, nothing is persisted."""
+    if data.get('request_id') != expected_request_id:
+        raise ValueError('AI request correlation mismatch')
+    if not isinstance(data.get('model_sha256'), str) or not re.fullmatch('[0-9a-f]{64}', data['model_sha256']):
+        raise ValueError('Missing or invalid model artifact digest')
+    if data.get('detections') not in ([], None):
+        raise ValueError('Rejection must not carry detections')
+    message = data.get('message')
+    if not isinstance(message, str) or not message:
+        raise ValueError('Missing rejection message')
+    is_rice = data.get('is_rice')
+    if data['status'] == 'rejected_non_rice' and is_rice is not False:
+        raise ValueError('Inconsistent rejection')
+    return dict(success=True, rejected=True, status=data['status'], is_rice=is_rice, message=message,
+                confidence=data.get('confidence'), quality=data.get('quality'), gatekeeper=data.get('gatekeeper'),
+                request_id=expected_request_id, model_sha256=data['model_sha256'], model_version=data.get('model_version'),
+                decision_support_only=True, detections=[])
 
 
 def predict_image(payload, config, request_id):
     started = time.perf_counter()
     try:
         response = requests.post(
-            config['AI_API_URL'].rstrip('/') + '/predict',
+            config['AI_API_URL'].rstrip('/') + ('/predict' if config.get('AI_API_VERSION') == 'v1' else '/v2/diagnose'),
             files={'image': ('upload', payload, 'application/octet-stream')},
             headers={'X-Request-ID': request_id},
             timeout=(config['AI_CONNECT_TIMEOUT'], config['AI_READ_TIMEOUT']),
             allow_redirects=False,
         )
+    except requests.ConnectTimeout as exc:  # subclass of Timeout; nothing was sent
+        raise AIServiceError('ai_timeout', 'AI xử lý quá thời gian cho phép.', 504, not_run=True) from exc
     except requests.Timeout as exc:
         raise AIServiceError('ai_timeout', 'AI xử lý quá thời gian cho phép.', 504) from exc
     except requests.RequestException as exc:
-        raise AIServiceError('ai_unavailable', 'Không thể kết nối dịch vụ AI.', 503) from exc
-    if response.status_code in (400, 413):
+        raise AIServiceError('ai_unavailable', 'Không thể kết nối dịch vụ AI.', 503,
+                             not_run=never_connected(exc)) from exc
+    if response.status_code in (400, 413):  # the AI refuses the upload before inference
         raise AIServiceError('invalid_image' if response.status_code == 400 else 'upload_too_large',
-                             'Ảnh không hợp lệ hoặc vượt giới hạn dịch vụ AI.', response.status_code)
+                             'Ảnh không hợp lệ hoặc vượt giới hạn dịch vụ AI.', response.status_code, not_run=True)
     if response.status_code == 503:
         try:
             body = response.json()
         except ValueError:
             body = None
+        if isinstance(body, dict) and isinstance(body.get('error'), dict) and body['error'].get('code') == 'gatekeeper_unavailable':
+            raise AIServiceError('ai_gatekeeper_unavailable', 'Dịch vụ AI chưa được cài mô hình nhận diện cây lúa. Liên hệ quản trị.', 503,
+                                 not_run=True)
         if isinstance(body, dict) and isinstance(body.get('error'), dict) and body['error'].get('code') == 'ai_busy':
-            raise AIServiceError('ai_busy', 'Dịch vụ AI đang bận; vui lòng thử lại.', 503, retry_after=1)
+            raise AIServiceError('ai_busy', 'Dịch vụ AI đang bận; vui lòng thử lại.', 503, retry_after=1, not_run=True)
     if response.status_code != 200:
         raise AIServiceError('ai_inference_failed', 'Dịch vụ AI không thể xử lý ảnh.', 502)
     try:
-        result = validate_result(response.json(), request_id)
+        body = response.json()
+        if isinstance(body, dict) and body.get('status') in REJECTED:
+            result = validate_rejection(body, request_id)
+            result['timings'] = {'ai_roundtrip_ms': round((time.perf_counter() - started) * 1000, 3)}
+            return result
+        result = validate_result(body, request_id)
+        if isinstance(body, dict) and isinstance(body.get('status'), str):
+            result['ai_status'] = body['status']  # disease_detected | uncertain_lesion | healthy
+            result['is_rice'] = body.get('is_rice')
+            result['ai_message'] = body.get('message')
+        record = diagnosis_record(body)
+        if record is not None:
+            result['diagnosis_record'] = record  # stored by the route, not part of its response
         result['timings']['ai_roundtrip_ms'] = round((time.perf_counter() - started) * 1000, 3)
         return result
     except (ValueError, TypeError, KeyError) as exc:

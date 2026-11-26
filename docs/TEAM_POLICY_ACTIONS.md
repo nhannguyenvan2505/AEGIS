@@ -2,11 +2,13 @@
 
 Workflow `Team policy`, job `policy`, báo check đỏ khi tên nhánh, đích PR hoặc
 tiêu đề PR sai quy ước. Chạy khi PR được mở, sửa metadata/đích, push commit,
-mở lại hoặc chuyển sang ready for review. Không cần Rulesets hay chuyển Organization.
+mở lại hoặc chuyển sang ready for review. Bản thân workflow không cần Rulesets hay
+Organization; việc bắt buộc check này đạt do [ruleset](github-setup.md) cưỡng chế.
 
-## Quy tắc hiện tại
+## Chế độ `github-flow` (mặc định khi chưa đặt biến)
 
-Repository hiện dùng main, chưa có develop. Mặc định `TEAM_FLOW=github-flow`:
+Từ 24/11/2026 repository dùng `TEAM_FLOW=gitflow` (xem mục Gitflow bên dưới). Khi chưa đặt
+biến, workflow dùng `github-flow`:
 
 - Nhánh task → main: feature/123-add-search, bugfix/145-fix-session,
   docs/12-team-workflow, chore/12-cleanup, test/12-add-checks, ci/12-team-policy.
@@ -18,12 +20,12 @@ Repository hiện dùng main, chưa có develop. Mặc định `TEAM_FLOW=github
 - Tên nhánh viết thường, không dấu, dùng gạch ngang. Task có issue ID dương;
   check chỉ kiểm tra format, không xác minh issue có tồn tại hoặc ai được phân công.
 
-Người merge phải tự xác nhận một reviewer độc lập approve, không còn blocker và
-check đạt. Check đỏ là cảnh báo; khi không có branch protection/Rulesets, GitHub
-vẫn có thể cho merge hoặc push trực tiếp. Workflow không kiểm tra approval,
-comment, nội dung code, build/test, hoặc điểm tách nhánh.
+Từ 25/11/2026 ruleset bắt buộc `policy`, `backend-contracts` và `mysql-core` đạt trước khi
+merge vào `main`, `develop`, `release/*`. Approval do ruleset review yêu cầu; admin có ngoại
+lệ khi merge qua PR (xem [thiết lập GitHub](github-setup.md)). Riêng workflow `Team policy`
+không kiểm tra approval, comment, nội dung code, build/test, hoặc điểm tách nhánh.
 
-## Khi chuyển sang Gitflow
+## Chế độ Gitflow (đang dùng)
 
 Sau khi nhóm review và áp dụng CONTRIBUTING.md, tạo develop và bảo đảm nhánh đó
 có workflow. Trong Settings → Secrets and variables → Actions → Variables,

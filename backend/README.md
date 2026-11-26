@@ -1,5 +1,9 @@
 # AEGIS Backend — local integration milestone
 
+**15/11/2026:** access tokens are now JWTs with persisted revocation and live
+RBAC. Existing opaque tokens require login again. See [JWT/admin setup and
+API contract](docs/JWT_RBAC.md) before provisioning the first administrator.
+
 09/11/2026: runtime mặc định là MySQL + MongoDB cho cả core và pilot. Dữ liệu SQLite cũ đã được nhập/đối chiếu, có backup và kiểm chứng restore. Bắt đầu bằng [hybrid database runbook](../docs/HYBRID_DATABASE_RUNBOOK.md) và bật Compose trước khi chạy backend. Các mốc SQLite bên dưới là evidence lịch sử.
 
 09/11/2026: mobile hỗ trợ **Nông trại → Ruộng → Mùa vụ**, gồm thêm/sửa nông trại,
@@ -40,7 +44,8 @@ Login/detection quotas and bounded inference: [docs/RESOURCE_LIMITS.md](docs/RES
 
 Python 3.11. The backend forwards image bytes to the separate AI service;
 it never imports YOLO or loads model weights. MySQL persistence and MongoDB delivery are included;
-authentication uses server-side bearer sessions.
+authentication uses JWT bearer tokens backed by revocable server-side sessions,
+with farmer/admin RBAC (see [JWT_RBAC](docs/JWT_RBAC.md)).
 
 ## PowerShell
 
@@ -189,7 +194,7 @@ Image bytes retain original EXIF. The client must display EXIF-corrected orienta
 to match returned bbox coordinates and image dimensions. These endpoints do not
 draw bounding boxes or resize images. React Native image requests must include
 the Authorization header; do not put bearer tokens in image URLs. All disease
-responses use private,no-store to avoid retaining a previous user's results.
+responses use private, no-store to avoid retaining a previous user's results.
 
 Persistence tests use temporary databases and exercise multiple/empty detections,
 restart/readback, rollback cleanup and missing records:

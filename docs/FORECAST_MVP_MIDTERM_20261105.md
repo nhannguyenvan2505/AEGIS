@@ -5,8 +5,8 @@
 `fm01_*`, `fm02_*` và evidence ở workspace bên dưới là hồ sơ nghiên cứu theo
 ngày, không nằm trong gói clone và không cần để chạy demo.
 
-**Quyết định người dùng05/11/2026:** mục tiêu chính của MVP là **dự báo**, bắt
-buộc demo mobile ngày09/11. Người dùng chấp nhận **mô hình dự báo trên dữ liệu
+**Quyết định người dùng 05/11/2026:** mục tiêu chính của MVP là **dự báo**, bắt
+buộc demo mobile ngày 09/11. Người dùng chấp nhận **mô hình dự báo trên dữ liệu
 thời gian giả lập**, ghi rõ chưa được xác minh ngoài thực tế. Việc tiếp nhận
 dataset bên ngoài vẫn tạm gác. Đây không phải yêu cầu chuyển dataset CSV tĩnh
 cũ thành chuỗi thời gian hoặc tuyên bố hiệu quả nông học.
@@ -54,8 +54,8 @@ Phạm vi hẹp đề xuất kế thừa temporal hiện có:
 
 | Khối | Hiện trạng | Việc cần làm cho forecast MVP |
 |---|---|---|
-| IoT transport | Simulator/raw/HTTP/buffer/QC đã kiểm | Giữ làm nguồn trình diễn; không coi12giây thu đủ120giờ lịch sử |
-| Hourly features | CORE-01 có61feature, coverage/as-of và insufficient_data | Sinh lịch sử hourly synthetic đúng semantics, tái dùng preparation |
+| IoT transport | Simulator/raw/HTTP/buffer/QC đã kiểm | Giữ làm nguồn trình diễn; không coi12giây thu đủ 120 giờ lịch sử |
+| Hourly features | CORE-01 có 61 feature, coverage/as-of và insufficient_data | Sinh lịch sử hourly synthetic đúng semantics, tái dùng preparation |
 | Model bundle | CORE-03 có hash/runtime/preprocessing/interface checks; chưa gọi predict | Cấp artifact thật đã train trên synthetic, adapter predict/output và loại usage phù hợp |
 | Model thật cho future target | Chưa có temporal forecast đã đánh giá | Generator/label/time-group split, train/evaluate baseline, lưu manifest/model |
 | RF CSV cũ | Phân loại tĩnh;99,5% khớp nhãn CSV cũ | Không đổi tên thành forecast; không dùng metric này cho MVP mới |
@@ -93,7 +93,7 @@ Cần ít nhất các đối soát sau trước tích hợp UI:
    bịa accuracy hoặc chọn threshold sau khi xem test. Metric chỉ chứng minh
    hành vi trên thế giới giả lập, không chứng minh bệnh ngoài ruộng.
 
-Lịch sử120giờ là dữ liệu synthetic được tạo/seed có đánh dấu, không phải chờ
+Lịch sử 120 giờ là dữ liệu synthetic được tạo/seed có đánh dấu, không phải chờ
 thu thật5ngày hoặc tự bịa lịch sử cho CSV không timestamp. Simulation time
 và thời điểm server chạy phải có cách phân biệt; nếu demo replay thời gian
 lịch sử, mobile không trình bày cửa sổ cũ như dự báo từ đồng hồ thực hiện tại.
@@ -102,7 +102,7 @@ lịch sử, mobile không trình bày cửa sổ cũ như dự báo từ đồn
 
 | Task | Đầu ra | Tiêu chí nghiệm thu |
 |---|---|---|
-| FM-01 — Đạt | Contract target/horizon/source và protocol synthetic; generator có future labels, feature/split manifest |200mẫu,170ready,42test đạt; ví dụ input/output,labels ngoài predictors,group/time split và as-of đã kiểm |
+| FM-01 — Đạt | Contract target/horizon/source và protocol synthetic; generator có future labels, feature/split manifest |200 mẫu,170 ready,42 test đạt; ví dụ input/output, labels ngoài predictors, group/time split và as-of đã kiểm |
 | FM-02 — Đạt | Pipeline Logistic Regression, artifact và đánh giá synthetic | Nạp lại cho cùng score trên validation/test. Thêm 72 bucket tương lai vào từng mẫu test vẫn cho cùng dự báo |
 | FM-03 — Đạt qua HTTP | Pilot API gọi worker FM-02, lưu snapshot theo owner/mùa vụ | Kiểm replay, lịch sử sau mở lại kho, dữ liệu thiếu, lỗi worker và quyền của hai tài khoản |
 | FM-04 — Đã nối client | Tab Dự báo chọn ruộng, mùa vụ, kịch bản và lịch sử theo tài khoản | TypeScript và lint đạt. Client TypeScript gọi FM-02 qua Backend HTTP, kiểm cả lỗi 503. Nghiệm thu giao diện trên điện thoại thuộc FM-05 |
@@ -149,33 +149,33 @@ FM-03 cần kiểm hash tin cậy khi nạp model và dùng hàm forecast cho in
 ### Kiểm màn hình FM-04
 
 **Điều chỉnh lịch theo người dùng.** Chạy thử demo và tích hợp mobile vào
-ngày06/11. Ngày05/11 tập trung chức năng lõi Backend/inference.
+ngày 06/11. Ngày 05/11 tập trung chức năng lõi Backend/inference.
 Luồng hourly đã qua bài kiểm HTTP với model thật, gồm đầu vào thay đổi,
 replay, loại dữ liệu tương lai theo as-of, thiếu/late hours và owner isolation.
 
 ### Dự báo từ lịch sử hourly
 
-**P0 nguồn dữ liệu và cửa sổ dự báo đã hoàn tất phần Backend ngày05/11.**
+**P0 nguồn dữ liệu và cửa sổ dự báo đã hoàn tất phần Backend ngày 05/11.**
 Lưu nguồn theo mùa vụ bằng POST
 `/api/farm/seasons/{id}/forecast-source` với
 `{"base_revision":0,"hourly":{...}}`. Object hourly theo contract bên dưới.
-Lần đầu trả201/revision1. GET cùng route trả item gồm revision,hourly,
+Lần đầu trả 201/revision1. GET cùng route trả item gồm revision, hourly,
 input_sha256,created_at, hoặc item=null khi mùa vụ chưa có nguồn.
 
 Để cập nhật, gửi base_revision hiện tại, giữ device_id, tăng issued_at và
 cung cấp lịch sử hourly mới. Mỗi lần cập nhật thêm một revision bất biến.
-Gửi lại nguyên bản với base_revision của lần gửi trước trả200/replayed.
-Ghi dựa trên revision cũ, đổi device hoặc lùi/giữ giờ với dữ liệu khác trả409.
+Gửi lại nguyên bản với base_revision của lần gửi trước trả 200/replayed.
+Ghi dựa trên revision cũ, đổi device hoặc lùi/giữ giờ với dữ liệu khác trả 409.
 Nguồn được kiểm bằng cùng worker FM-02 trước khi lưu, nên việc nhập cần
 worker hoạt động. Quyền sở hữu mùa vụ lấy từ Bearer.
 
 Phát hành từ nguồn đã lưu bằng POST route forecasts với
 `{"scenario":"source"}`. Backend tự đọc revision mới nhất và lấy cửa sổ
-120giờ available tại issued_at. Kết quả chứa source_revision và snapshot
-input. Nếu mùa vụ chưa có nguồn, trả409/forecast_source_missing.
+120 giờ available tại issued_at. Kết quả chứa source_revision và snapshot
+input. Nếu mùa vụ chưa có nguồn, trả 409/forecast_source_missing.
 Dữ liệu mới có issued_at mới tạo dự báo mới, kết quả trước giữ nguyên.
 
-Bài kiểm HTTP Backend với model thật đạt ngày05/11,7,582giây. Đã kiểm import,
+Bài kiểm HTTP Backend với model thật đạt ngày 05/11,7,582 giây. Đã kiểm import,
 replay, optimistic revision, dịch cửa sổ thêm1giờ, thiếu giờ mới, quyền owner,
 đọc lại nguồn sau mở lại kho và giữ dự báo cũ. Bài này còn chạy các ca hồi quy
 hourly, hai fixture cũ, history, thiếu model và dữ liệu tương lai.
@@ -184,7 +184,7 @@ Nguồn được lưu trong synthetic_hourly_sources của telemetry.sqlite3. M�
 revision chứa đầy đủ snapshot hourly để có thể đối chiếu. POST cập nhật là
 thao tác do caller kích hoạt. Phát hành theo lịch tự động và seed tài khoản/
 kho demo dùng chung là các bước cấu hình tiếp theo. Chạy thử và tích hợp trên
-điện thoại giữ lịch06/11 theo người dùng.
+điện thoại giữ lịch 06/11 theo người dùng.
 
 POST vào route forecasts của mùa vụ với body sau. Các array dùng đúng schema
 hourly/context của FM-01. Có thể lấy telemetry và context_revisions từ
@@ -205,8 +205,8 @@ input_ready.synthetic.json để tạo request đầu tiên.
 
 Ví dụ rỗng trên trả insufficient_data khi worker hoạt động. Với dữ liệu đủ,
 model dùng120bucket đã hoàn tất và available tại issued_at để dự báo72giờ.
-Mỗi bucket có start_at,available_at,air_temperature_c,relative_humidity_pct,
-leaf_wet,quality. Context theo aegis-cultivation-v1 của FM-01.
+Mỗi bucket có start_at, available_at, air_temperature_c, relative_humidity_pct,
+leaf_wet, quality. Context theo aegis-cultivation-v1 của FM-01.
 
 Backend lấy plot/season từ tài khoản sở hữu route. Device_id là định danh
 nguồn ảo do client khai báo. Source synthetic và simulation_clock=true được
@@ -214,11 +214,11 @@ lưu trên kết quả. Đây là luồng nhận hourly đã chuẩn bị theo c
 Simulator raw point hiện có cần bước tổng hợp với semantics được chốt trước
 khi gửi vào đây.
 
-Worker kiểm input rồi giữ cửa sổ120giờ và các revision context đã available
+Worker kiểm input rồi giữ cửa sổ 120 giờ và các revision context đã available
 tại issued_at. Snapshot và hash dùng phần input sau bước lọc, nên thêm
 future observations trả cùng dự báo đã lưu. Thay dữ liệu hợp lệ trong cửa
 sổ tạo input hash khác và lưu dự báo mới. Bản ghi thiếu dữ liệu giữ score=null
-cùng reasons. Input sai schema/nguồn, duplicate hour hoặc timestamp sai trả400.
+cùng reasons. Input sai schema/nguồn, duplicate hour hoặc timestamp sai trả 400.
 
 GET /api/farm/forecasts/{id}/input trả snapshot hourly đã dùng, với owner guard.
 Snapshot và kết quả được ghi cùng transaction trong telemetry.sqlite3 qua

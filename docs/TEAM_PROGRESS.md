@@ -1,11 +1,31 @@
 # Tiến độ Git/GitHub AEGIS
 
-**Cập nhật07/11/2026:** đã push nhánh `codex/portable-forecast-demo`
+**Cập nhật 25/11/2026 (hiện hành, chỉ phần repository):** repository công khai (chủ ý). GitHub
+cưỡng chế ruleset trên `main`, `develop`, `release/*` với ba check bắt buộc; admin được
+merge PR không cần approval ([thiết lập GitHub](github-setup.md)). Các câu bên dưới về
+repo private, lỗi 403 và chưa có Ruleset đã cũ.
+
+**Cập nhật 20/11/2026 (mốc cũ):**
+
+| PR | Nhánh → đích | Trạng thái |
+|---|---|---|
+| #9 | `nvn/jwt-rbac` → `nvn/portable-forecast-demo` | Draft; JWT/RBAC + workflow Backend tests; chờ #8 rồi đổi base sang main |
+| #8 | `nvn/portable-forecast-demo` → main | Draft; 20/11 đã merge main vào nhánh, hết xung đột; chờ review |
+| #11 | `nvn/outbox-dispatcher` → `nvn/jwt-rbac` | Draft; BE-02 Mongo outbox chạy nền; Auto-fix bật |
+| #12 | `nvn/team-gitflow-rules` → main | Draft; đề xuất Gitflow, chờ cả nhóm review |
+| #10 | `nvn/docs-current-handoff` → `nvn/jwt-rbac` | Draft; tài liệu, quyết định 20/11, API reference |
+| #4 | `feat/3-mobile-integration` → main | Mở từ 25/10, chưa xử lý |
+| #7, #2, #5 | → main | Đã merge (team policy, quy ước, forecast demo) |
+
+Main có workflow `Team policy`; chưa có develop, Ruleset hay required check.
+Các đoạn bên dưới là nhật ký theo mốc.
+
+**Cập nhật 07/11/2026:** đã push nhánh `codex/portable-forecast-demo`
 (commit đầu `aaffdb4`) cho thành viên clone. Xem [hướng dẫn demo toàn dự án](../CLONE_DEMO.md).
-Các dòng bên dưới là nhật ký TASK-19 ngày28/10, không phải trạng thái mới.
+Các dòng bên dưới là nhật ký TASK-19 ngày 28/10, không phải trạng thái mới.
 
 Ghi chú TASK-19,28/10/2026: đây là nhật ký Git theo mốc cũ, không là dashboard
-remote hiện hành. [Chỉ mục local](D:/AEGIS/docs/CURRENT_HANDOFF.md) ghi phần mềm/
+remote hiện hành. [Chỉ mục local](CURRENT_HANDOFF.md) ghi phần mềm/
 contract mới. Checkout có core/mobile nhưng pilot vẫn untracked; chưa kiểm lại
 PR/merge/invite/branch protection ở task này. Các dòng lịch sử dưới giữ nguyên,
 không xem là vừa xác minh lại.

@@ -22,11 +22,11 @@ Launcher mở URL loopback và khởi chạy Backend + AI service; giữ termina
 Pilot store ở `pilot_data/browser-demo` tồn tại qua restart. Dừng bằng Ctrl+C.
 Đây là prototype desktop/browser; app mobile có hướng dẫn riêng.
 
-Cập nhật28/10/2026: [chỉ mục](D:/AEGIS/docs/CURRENT_HANDOFF.md) và
-[runbook hiện hành](D:/AEGIS/docs/CURRENT_RUNBOOK.md) phân biệt prototype local
+Cập nhật 28/10/2026: [chỉ mục](../docs/CURRENT_HANDOFF.md) và
+[runbook hiện hành](../docs/CURRENT_RUNBOOK.md) phân biệt prototype local
 với mobile của nhóm. Vai trò người dùng là AI/ML và Backend; không cần xây thêm
-frontend để dùng API. Pilot nay có [raw khay opt-in](D:/AEGIS/frontend/CONTROLLED_EXPERIMENT_RAW.md)
-và [backup bảy DB](D:/AEGIS/frontend/PILOT_BACKUP_RESTORE.md). Các kết quả dưới
+frontend để dùng API. Pilot nay có [raw khay opt-in](CONTROLLED_EXPERIMENT_RAW.md)
+và [backup bảy DB](PILOT_BACKUP_RESTORE.md). Các kết quả dưới
 là mốc đã ghi, không phải chạy mới TASK-19.
 
 Đã có [đánh giá bổ sung khi bucket tới muộn](ASSESSMENT_VERSIONS.md): v1 giữ
@@ -58,8 +58,8 @@ research.sqlite3 giữ lịch sử; người nhận chấp thuận quyền rồi
 chứng được giao. Chưa xác minh danh tính/chuyên môn hoặc phê duyệt train.
 
 Đã thêm [vòng đời theo dõi và timeline mùa vụ](FOLLOWUP_TIMELINE.md). Tạo mục
-từ đánh giá mock,xác nhận/kiểm tra/kết thúc/mở lại; timeline nối sự kiện với hai
-mốc thời gian. followup.sqlite3 riêng,không đổi cảnh báo hoặc model mặc định.
+từ đánh giá mock, xác nhận/kiểm tra/kết thúc/mở lại; timeline nối sự kiện với hai
+mốc thời gian. followup.sqlite3 riêng, không đổi cảnh báo hoặc model mặc định.
 
 Đã bổ sung [API/CLI tiếp nhận số đo gốc](ENVIRONMENT_INGEST.md) vào telemetry.sqlite3
 riêng: nguồn theo mùa vụ, kiểm kỹ thuật, thời điểm nhận, đánh dấu loại và raw
@@ -123,7 +123,7 @@ liệu hiển thị hoặc kết quả của lượt chạy mới.
 2. Tạo/chọn ruộng; tạo mùa vụ lúa với ngày **01/10/2026–31/12/2026**; tạo thiết
    bị source=mock, mã riêng như `DEMO-01`.
 3. Chọn **Nạp 24 giờ mẫu lịch sử**, sau đó **Đánh giá mẫu lịch sử**. Kỳ vọng
-   advisory, đủ24 giờ, chuỗi khớp6 giờ và nhãn lịch sử. Mẫu kết thúc
+   advisory, đủ 24 giờ, chuỗi khớp6 giờ và nhãn lịch sử. Mẫu kết thúc
    **24/10/2026 07:00 UTC+7**; không giả là số đo hiện tại.
 4. **Đánh giá giờ hiện tại** dùng giờ server, có thể insufficient_data vì
    chưa nạp đủ số đo cho cửa sổ mới. Không coi thiếu dữ liệu là khỏe/nguy cơ thấp.

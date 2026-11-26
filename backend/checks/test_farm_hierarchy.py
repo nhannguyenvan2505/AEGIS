@@ -120,7 +120,7 @@ class FarmHierarchyTests(unittest.TestCase):
         with connect(self.config) as db:
             self.assertEqual(db.execute('SELECT COUNT(*) FROM farm_holdings').fetchone()[0], 1)
             self.assertEqual(db.execute('SELECT COUNT(*) FROM farm_plot_memberships').fetchone()[0], 1)
-            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5})
+            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5,6,7,8})
             self.assertEqual(db.execute('SELECT version FROM farm_hierarchy_meta WHERE id=1').fetchone()[0], 1)
             self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
 
@@ -129,13 +129,15 @@ class FarmHierarchyTests(unittest.TestCase):
         plot = self.call('/farms/'+farm['id']+'/plots', 'POST', dict(name='Existing plot', area_ha=2.4)).json['item']
         with connect(self.config) as db:
             db.execute('DROP TABLE farm_hierarchy_meta')
-            db.execute("INSERT INTO schema_migrations VALUES (6,'owned_farm_hierarchy','development')")
+            # Version 6 now belongs to the role migration; reuse its row as the old marker.
+            db.execute("UPDATE schema_migrations SET name='owned_farm_hierarchy' WHERE version=6")
         restarted = create_app(self.config).test_client()
         result = restarted.get('/api/farm/farms/'+farm['id']+'/plots', headers=self.headers[0])
         self.assertEqual(result.json['items'][0], plot)
         with connect(self.config) as db:
-            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5})
+            self.assertEqual({row[0] for row in db.execute('SELECT version FROM schema_migrations')}, {1,2,3,4,5,6,7,8})
             self.assertEqual(db.execute('SELECT version FROM farm_hierarchy_meta WHERE id=1').fetchone()[0], 1)
+            self.assertEqual(db.execute('SELECT name FROM schema_migrations WHERE version=6').fetchone()[0], 'user_roles_and_status')
 
 
 if __name__ == '__main__':

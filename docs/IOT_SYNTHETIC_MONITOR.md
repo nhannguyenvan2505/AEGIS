@@ -31,7 +31,7 @@ cần dataset, broker, sensor, AI model hay database mới.
 ```
 
 Đây là ví dụ cấu trúc; stream_id phải khớp raw. File policy chạy được đã tạo
-ở evidence cho từng stream. Các số300/5/60/600 là **giả định kỹ thuật demo**,
+ở evidence cho từng stream. Các số 300/5/60/600 là **giả định kỹ thuật demo**,
 không phải ngưỡng sensor, nông học hoặc điều kiện AI chấp nhận dữ liệu.
 available_at ghi thời điểm policy được khai báo trong kịch bản mô phỏng,
 không phải chứng cứ lịch này đã được vận hành ngoài thực tế. Không lấy thời
@@ -76,14 +76,14 @@ không nội suy, không tổng hợp hourly, không tạo cảnh báo bệnh ho
 
 ## Kiểm tra thực chạy và nghiệm thu
 
-1. **18/18test đạt**, exit0,0,047giây:10test mới và8test audit cũ. Log tại
+1. **18/18test đạt**, exit0,0,047 giây:10test mới và 8 test audit cũ. Log tại
    `iot_monitor_20261104/run01/tests.log`. Không chạy lại toàn bộ Backend vì
    không sửa ingress/runtime; regression chỉ trên đường snapshot/audit.
 2. Chạy CLI thật4lần với hai snapshot synthetic của IOT-01, tại hai as_of.
-   Mỗi vùng:12slot đến hạn,10slot có raw,2slot thiếu; RH/leaf có9slot non-null.
+   Mỗi vùng:12slot đến hạn,10 slot có raw,2 slot thiếu; RH/leaf có 9 slot non-null.
 3. Tại01:00UTC: tuổi đo900s → stale theo policy600s; tuổi nhận0s →
    receiving_recently. Tại01:15UTC: tuổi đo1800s, tuổi nhận900s → receipt_silent.
-   Đây là đồng hồ mô phỏng01/11, không phải chạy chờ15phút thực.
+   Đây là đồng hồ mô phỏng 01/11, không phải chạy chờ 15 phút thực.
 4. Đối chiếu hash hai raw snapshot trước/sau: giữ nguyên. Chạy lại vào output
    cũ trả exit2 và giữ hash output. `verification.json` ghi4scenario và đối soát.
 5. Test bao gồm receipt/exclusion tới muộn, policy availability, stream chưa
@@ -91,7 +91,7 @@ không nội suy, không tổng hợp hourly, không tạo cảnh báo bệnh ho
    đại lượng, timezone/stream/version/source/hash sai và cửa sổ nửa mở.
 
 Nghiệm thu **ĐẠT task IOT-05 offline synthetic**. Không có xác minh hardware,
-MQTT, mạng thật, monitor chạy liên tục, notification hoặc AI. Chỉ8test audit
+MQTT, mạng thật, monitor chạy liên tục, notification hoặc AI. Chỉ 8 test audit
 cũ được chạy lại, không gọi18test này là toàn bộ bộ kiểm IoT của dự án.
 
 ## Chạy lại
@@ -105,8 +105,8 @@ Get-Content iot_monitor_20261104\manual01.json
 ```
 
 Kỳ vọng status=evaluated; schedule.due_slots=12,received_slots=10;
-freshness.measurement_status=stale,receipt_status=receipt_silent;
-training_approved=false,raw_modified=false. Exit0 nghĩa xuất được báo cáo,
+freshness.measurement_status=stale, receipt_status=receipt_silent;
+training_approved=false, raw_modified=false. Exit0 nghĩa xuất được báo cáo,
 **không có nghĩa dữ liệu đầy đủ hoặc fresh**; phải đọc các trạng thái bên trong.
 Lỗi input/hash/policy/nguồn/đường dẫn hoặc output tồn tại trả exit2. Xem
 `--help`, kiểm stream_id/giờ và chọn file output mới; không sửa raw để ép pass.
@@ -126,7 +126,7 @@ demo trên. Không dùng UUID của run cũ với snapshot mới.
 ## Bước tiếp theo
 
 **Cập nhật sau IOT-05:** người dùng đã yêu cầu bắt đầu bước HTTP dưới đây;
-[IOT-06 đạt37checkpoint và9unit test](IOT_HTTP_SIMULATION.md). Nội dung còn
+[IOT-06 đạt37checkpoint và 9 unit test](IOT_HTTP_SIMULATION.md). Nội dung còn
 lại trong đoạn này là đề xuất tại thời điểm kết thúc IOT-05.
 
 Tiếp nhận dataset tiếp tục tạm gác theo người dùng. Đề xuất task kế tiếp:

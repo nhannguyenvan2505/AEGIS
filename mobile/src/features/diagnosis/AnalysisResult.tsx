@@ -2,16 +2,32 @@ import { Text, View } from 'react-native';
 import { Icon } from '../../components/Design';
 import { s } from '../../styles/generated/styles';
 import type { Analysis } from '../../types/domain';
-import { scanColors, scanDate, summarizeDetections } from './scanHelpers';
-export function AnalysisResult({ result }: { result: Analysis }) {
-  const groups = summarizeDetections(result);
+import { resultSummary, scanColors, scanDate } from './scanHelpers';
+const rejectionTitles: Record<string, string> = {
+  rejected_non_rice: 'Đây không phải ảnh cây lúa',
+  rejected_poor_quality: 'Ảnh chưa đủ chất lượng để phân tích',
+  rejected_uncertain_scope: 'Chưa chắc đây là cây lúa',
+};
+function RejectionResult({ result }: { result: Analysis }) {
   return <View style={s.scanResult} accessibilityLiveRegion="polite">
     <View style={s.scanResultTop}>
-      <View style={s.scanAiBadge}><Icon name="check-circle" size={17} color={scanColors.green} /><Text style={s.scanAiBadgeText}>Gợi ý từ AI</Text></View>
+      <View style={s.scanAiBadge}><Icon name="alert-triangle" size={17} color="#8a4b08" /><Text style={s.scanAiBadgeText}>Chưa phân tích bệnh</Text></View>
+    </View>
+    <Text accessibilityRole="header" style={s.scanResultTitle}>{rejectionTitles[result.status] ?? 'Không phân tích được ảnh'}</Text>
+    <Text style={s.scanBody}>{result.message || 'Hãy chụp lại ảnh lá lúa rõ nét, đủ sáng.'}</Text>
+    <Text style={s.scanFootnote}>Ảnh này không được lưu vào lịch sử và không có kết quả chẩn đoán bệnh.</Text>
+  </View>;
+}
+export function AnalysisResult({ result }: { result: Analysis }) {
+  if (result.rejected) return <RejectionResult result={result} />;
+  const { groups, needsCheck, title, body } = resultSummary(result);
+  return <View style={s.scanResult} accessibilityLiveRegion="polite">
+    <View style={s.scanResultTop}>
+      <View style={s.scanAiBadge}><Icon name={needsCheck ? 'alert-triangle' : 'check-circle'} size={17} color={needsCheck ? '#8a4b08' : scanColors.green} /><Text style={s.scanAiBadgeText}>{needsCheck ? 'Nghi ngờ · Chưa kết luận' : 'Gợi ý từ AI'}</Text></View>
       <Text style={s.scanSmall}>{scanDate(result.created_at, true)}</Text>
     </View>
-    <Text accessibilityRole="header" style={s.scanResultTitle}>{groups.length ? `Có dấu hiệu giống ${groups[0].name.toLocaleLowerCase('vi-VN')}` : 'Chưa phát hiện dấu hiệu bệnh'}</Text>
-    <Text style={s.scanBody}>{groups.length ? `AI nhận diện ${result.detections.length} vùng có dấu hiệu bệnh trong ảnh. Cần đối chiếu thêm với tình trạng thực tế của cây.` : 'AI chưa nhận diện được đối tượng bệnh trong ảnh này. Kết quả không xác nhận cây khỏe; hãy chụp lại nếu dấu hiệu vẫn còn.'}</Text>
+    <Text accessibilityRole="header" style={s.scanResultTitle}>{title}</Text>
+    <Text style={s.scanBody}>{body}</Text>
     {groups.map(group => <View style={s.scanDetection} key={group.name}>
       <View style={s.scanDetectionInfo}><Text style={s.scanDetectionName}>{group.name}</Text><Text style={s.scanSmall}>{group.count} vùng · Độ tin cậy nhận diện</Text></View>
       <Text style={s.scanConfidence}>{(group.confidence * 100).toFixed(1)}%</Text>

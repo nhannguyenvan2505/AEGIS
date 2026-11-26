@@ -5,9 +5,9 @@ from pathlib import Path
 from flask import Blueprint, current_app, g, jsonify, request, send_file
 from .auth import require_auth
 from .limits import limit_detection
-from .idempotency import reserve, mark_uncertain
+from .idempotency import reserve, mark_uncertain, release
 
-from .ai_service import AIServiceError, predict_image
+from .ai_service import AIServiceError, known_quality_issues, predict_image
 from .storage import save_analysis, get_analysis, list_analyses, get_image_record
 
 api = Blueprint('api', __name__)
@@ -51,15 +51,32 @@ def detect():
                 return jsonify(success=False, error={'code': codes[state], 'message': 'Khóa đã được dùng. Kiểm tra lịch sử trước khi gửi một tác vụ mới.'}), 409
         result = predict_image(payload, current_app.config, g.request_id)
         result['request_id'] = g.request_id
+        diagnosis = result.pop('diagnosis_record', None)
+        if result.get('rejected'):  # not rice / unusable image: a normal answer, never stored
+            if key_hash is not None:
+                release(current_app.config, g.user['id'], key_hash)
+            g.model_sha256 = result['model_sha256']
+            # The completion log is the only trace of a rejection; it is how they are counted.
+            g.diagnosis_status = result['status']
+            if result['status'] == 'rejected_poor_quality':
+                g.quality_issues = known_quality_issues(result.get('quality'))
+            return jsonify(result)
         if key_hash is None:
-            stored = save_analysis(payload, result, current_app.config, g.user['id'])
+            stored = save_analysis(payload, result, current_app.config, g.user['id'], diagnosis=diagnosis)
         else:
-            stored = save_analysis(payload, result, current_app.config, g.user['id'], key_hash=key_hash)
+            stored = save_analysis(payload, result, current_app.config, g.user['id'], key_hash=key_hash,
+                                   diagnosis=diagnosis)
         g.analysis_id, g.model_sha256 = stored['analysis_id'], stored['model_sha256']
+        if diagnosis is not None:  # a validated /v2 status; replays do not log it again
+            g.diagnosis_status = diagnosis['diagnosis_status']
+        if result.get('ai_status'):
+            stored = {**stored, 'diagnosis': {'status': result['ai_status'], 'is_rice': result.get('is_rice'), 'message': result.get('ai_message')}}
         return jsonify(stored)
     except AIServiceError as error:
         if key_hash is not None:
-            mark_uncertain(current_app.config, g.user['id'], key_hash)
+            # Give the key back only when inference certainly did not run; anything unclear stays locked.
+            settle = release if error.not_run else mark_uncertain
+            settle(current_app.config, g.user['id'], key_hash)
         g.ai_error_code = error.code
         current_app.logger.warning('AI request failed request_id=%s code=%s', g.request_id, error.code)
         response = jsonify(success=False, error={'code': error.code, 'message': error.message})

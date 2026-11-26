@@ -2,6 +2,7 @@
 import importlib.util
 import io
 import unittest
+from unittest import mock
 from pathlib import Path
 from PIL import Image
 
@@ -32,6 +33,19 @@ class ImageContractTests(unittest.TestCase):
         for payload in [b'',b'invalid',encoded((31,64)),encoded((4001,4000)),encoded(fmt='BMP'),animated.getvalue()]:
             with self.subTest(length=len(payload)): self.assertEqual(self.post(payload).status_code,400)
         self.assertEqual(self.post(b'x'*(8*1024*1024+1)).status_code,413)
+    def test_unsupported_formats_never_reach_their_parser(self):
+        Image.init()
+        for fmt in ['BMP','GIF','TIFF','PPM']:
+            with self.subTest(fmt=fmt):
+                payload=encoded(fmt=fmt);factory,accept=Image.OPEN[fmt];parsed=[]
+                def spy(*args,**kwargs):
+                    parsed.append(fmt)
+                    return factory(*args,**kwargs)
+                with mock.patch.dict(Image.OPEN,{fmt:(spy,accept)}):
+                    response=self.post(payload)
+                self.assertEqual(response.status_code,400)
+                self.assertEqual(response.json['error']['code'],'invalid_image')
+                self.assertEqual(parsed,[])
     def test_exif_dimensions_and_box_clipping_use_corrected_frame(self):
         seen=[]
         def predict(pixels):

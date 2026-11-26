@@ -19,8 +19,8 @@ preview. File này có bảng QC, liên kết raw/summary và lời dẫn khoả
 Console in ba giai đoạn và đường dẫn report cuối cùng. Không có UI realtime
 hoặc màn mobile mới trong task này; đây là kịch bản tổng duyệt và artifact.
 
-Kỳ vọng runner cha exit0, success=true,stage=complete,checks_passed=21,
-component_checkpoints=86,backend_stopped=true,temporary_stores_cleaned=true.
+Kỳ vọng runner cha exit0, success=true, stage=complete, checks_passed=21,
+component_checkpoints=86,backend_stopped=true, temporary_stores_cleaned=true.
 Trong mỗi component, forced_stop=false. Số giây chạy thay đổi theo máy; không
 lấy thời gian của một lượt thành SLA hoặc benchmark.
 
@@ -37,18 +37,18 @@ Một lệnh thực hiện tuần tự:
    dừng process → raw export. Có queue đầy, mất ACK sau commit, Backend
    restart, replay, lỗi400/401/409 và đối soát timestamp/payload.
 2. **IOT-07 mới trong kho riêng:** hai process sender os._exit(77) sau ACK201
-   và200 trước DELETE; process mới phục hồi rồi restart trên queue rỗng.
+   và 200 trước DELETE; process mới phục hồi rồi restart trên queue rỗng.
 3. **QC trên raw của chính bước1:** xác minh schema/hash, tạo policy tường
    minh cho từng stream, chạy monitor/audit as_of=exported_at. Đối chiếu
    số hàng/slot, completeness từng đại lượng và freshness đo/nhận; raw không
    bị sửa. Policy được khai báo cho lượt phân tích hiện tại, không giả là
-   đã được biết khi số đo fixture được phát sinh ngày01/11.
+   đã được biết khi số đo fixture được phát sinh ngày 01/11.
 4. Kiểm hash dependency trước/sau; chỉ xuất `DEMO_REPORT.md` đạt khi tất cả
    bước và cleanup assertions đều qua. Giữ manifest để truy vết nguồn.
 
 Các component được gọi lại để có evidence mới của **một lượt tích hợp hiện
 hành**, không copy kết quả PASS cũ vào báo cáo. Hai kho độc lập:6raw HTTP
-và2raw crash không được cộng thành một chuỗi8phép đo của cùng vùng.
+và 2 raw crash không được cộng thành một chuỗi8phép đo của cùng vùng.
 
 ## Review và bằng chứng thực chạy
 
@@ -56,24 +56,24 @@ run01 tại `iot_midterm_20261104/run01` đã đạt, exit0:
 
 | Phần | Kết quả |
 |---|---|
-| HTTP/buffer/retry |37checkpoint, hai stream,6raw duy nhất, process/kho dọn đạt |
-| Sender process crash/recovery |49checkpoint, exit77/77/0/0,2raw duy nhất trong kho khác |
-| Đối soát tổng duyệt/QC |21checkpoint, hash nguồn giữ nguyên, raw giữ nguyên |
-| Failure propagation unit test |4/4test đạt,0,134giây, exit0 |
-| Thời gian runner thật |18,156giây; không đợi hàng giờ hoặc mô phỏng uptime |
+| HTTP/buffer/retry |37 checkpoint, hai stream,6 raw duy nhất, process/kho dọn đạt |
+| Sender process crash/recovery |49 checkpoint, exit77/77/0/0,2 raw duy nhất trong kho khác |
+| Đối soát tổng duyệt/QC |21 checkpoint, hash nguồn giữ nguyên, raw giữ nguyên |
+| Failure propagation unit test |4/4test đạt,0,134 giây, exit0 |
+| Thời gian runner thật |18,156 giây; không đợi hàng giờ hoặc mô phỏng uptime |
 
-Các nhóm checkpoint trên khác với4unit test; không báo là107unit test.
+Các nhóm checkpoint trên khác với4unit test; không báo là 107 unit test.
 Unit test mới dùng stub để kiểm lỗi HTTP stage, cleanup thất bại và crash
 stage thất bại phải chặn báo cáo PASS; output trùng không được chạy component.
 Chúng không phải kiểm mạng/process. Thành công mạng/process được chứng minh
 bằng lượt tích hợp thật qua HTTP nói trên. Log unit test:
 `iot_midterm_20261104/run01/orchestrator_tests.log`.
 
-Mỗi vùng HTTP có3/12slot đến hạn, completeness25%,9slot không được gửi theo
-kịch bản. Ba đại lượng đều có3slot non-null. Đây là lịch demo5phút/slot;
+Mỗi vùng HTTP có 3/12slot đến hạn, completeness25%,9 slot không được gửi theo
+kịch bản. Ba đại lượng đều có 3 slot non-null. Đây là lịch demo5phút/slot;
 không gọi9slot này là mất gói ngoài ruộng hoặc75% dropout của thiết bị.
 
-Lượt này `measurement_age_seconds` khoảng312733giây vì fixture đo ngày01/11;
+Lượt này `measurement_age_seconds` khoảng312733giây vì fixture đo ngày 01/11;
 `receipt_age_seconds` dưới1giây tại snapshot. Monitor trả
 stale/receiving_recently: nhận mới không đổi thời điểm đo cũ. Không đổi giờ
 fixture để làm dữ liệu trông mới, không dùng latency này làm yêu cầu vận hành.

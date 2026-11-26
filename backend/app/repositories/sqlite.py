@@ -11,15 +11,33 @@ class SQLiteRepository:
         self.db.execute('BEGIN IMMEDIATE' if write else 'BEGIN')
 
     def user_by_email(self, email):
-        return self.db.execute('SELECT * FROM users WHERE email=?', (email,)).fetchone()
+        return self.db.execute("SELECT * FROM users WHERE email=? AND status='active'", (email,)).fetchone()
 
     def add_user(self, identifier, email, password_hash, created_at):
         self.db.execute('INSERT INTO users(id,email,password_hash,created_at) VALUES (?,?,?,?)',
                         (identifier,email,password_hash,created_at))
 
     def session_user(self, token_hash, now):
-        return self.db.execute('''SELECT users.id,users.email FROM sessions JOIN users ON users.id=sessions.user_id
-            WHERE token_hash=? AND expires_at>?''', (token_hash,now)).fetchone()
+        return self.db.execute('''SELECT users.id,users.email,users.role FROM sessions JOIN users ON users.id=sessions.user_id
+            WHERE token_hash=? AND expires_at>? AND users.status='active' ''', (token_hash,now)).fetchone()
+
+    def admin_users(self, size, offset):
+        total = self.db.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        rows = self.db.execute('SELECT id,email,role,status FROM users ORDER BY id LIMIT ? OFFSET ?',
+                               (size, offset)).fetchall()
+        return total, rows
+
+    def role_user(self, identifier):
+        return self.db.execute('SELECT id,email,role,status FROM users WHERE id=?', (identifier,)).fetchone()
+
+    def active_admin_count(self):
+        return self.db.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND status='active'").fetchone()[0]
+
+    def set_user_role(self, identifier, role, actor_id, reason, created_at):
+        old = self.role_user(identifier)
+        self.db.execute('UPDATE users SET role=? WHERE id=?', (role, identifier))
+        self.db.execute('INSERT INTO role_audit(actor_id,target_id,old_role,new_role,reason,created_at) VALUES (?,?,?,?,?,?)',
+                        (actor_id, identifier, old['role'], role, reason, created_at))
 
     def add_session(self, token_hash, user_id, expires_at, now):
         self.db.execute('DELETE FROM sessions WHERE expires_at<=?', (now,))
@@ -42,16 +60,28 @@ class SQLiteRepository:
             self.db.execute('INSERT INTO rate_limit_buckets VALUES (?,?,?,?)', (key,start,1,expires))
         return True, 0
 
-    def reserve(self, user_id, key_hash, payload_hash):
+    def reserve(self, user_id, key_hash, payload_hash, now, running_ttl):
         self.begin(True)
         row = self.db.execute('SELECT * FROM inference_requests WHERE user_id=? AND key_hash=?', (user_id,key_hash)).fetchone()
         if row:
-            return ('conflict' if row['payload_hash'] != payload_hash else row['state']),row['analysis_id']
-        self.db.execute("INSERT INTO inference_requests VALUES (?,?,?,'running',NULL)", (user_id,key_hash,payload_hash))
+            if row['payload_hash'] != payload_hash:
+                return 'conflict',row['analysis_id']
+            if row['state'] == 'running' and row['created_at'] + running_ttl <= now:
+                self.mark_uncertain(user_id, key_hash)  # abandoned work; never re-run it
+                return 'uncertain',None
+            return row['state'],row['analysis_id']
+        self.db.execute("""INSERT INTO inference_requests(user_id,key_hash,payload_hash,state,analysis_id,created_at)
+            VALUES (?,?,?,'running',NULL,?)""", (user_id,key_hash,payload_hash,now))
         return 'new',None
+
+    def release(self, user_id, key_hash):
+        self.db.execute("DELETE FROM inference_requests WHERE user_id=? AND key_hash=? AND state='running' AND analysis_id IS NULL", (user_id,key_hash))
 
     def mark_uncertain(self, user_id, key_hash):
         self.db.execute("UPDATE inference_requests SET state='uncertain' WHERE user_id=? AND key_hash=? AND state='running'", (user_id,key_hash))
+
+    def user_plot_ids(self, user_id):
+        return [row['id'] for row in self.db.execute('SELECT id FROM farm_plots WHERE user_id=?', (user_id,)).fetchall()]
 
     def owned(self, kind, identifier, user_id):
         return self.db.execute(f'SELECT * FROM {kind} WHERE id=? AND user_id=?', (identifier,user_id)).fetchone()

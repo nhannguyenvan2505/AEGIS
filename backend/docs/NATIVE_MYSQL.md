@@ -16,11 +16,14 @@ Mặc định tìm `C:/Program Files/MySQL/MySQL Server 9.3/bin/mysqld.exe`; có
 lần sau đọc cổng từ `backend/database/.env`. `--port` chỉ dùng khi cấu hình khớp.
 Nếu cổng có dịch vụ khác, script dừng; không sửa dịch vụ đó hoặc xóa datadir.
 
-Password root/application được sinh ngẫu nhiên trong `.env` đã được Git bỏ qua;
-không in ra terminal. Schema mới tự áp dụng migrations 001–005. Instance đã có
-dữ liệu chỉ áp dụng migration còn thiếu; marker `running` chặn replay DDL dở dang.
-Trước khi nâng một kho đang có dữ liệu, lưu backup riêng; không xóa marker lỗi để
-thử lại khi chưa kiểm tra trạng thái schema.
+Password root/application được sinh ngẫu nhiên trong `.env` đã được Git bỏ qua; không in ra terminal.
+
+**Từ 25/11/2026:** script này chỉ khởi tạo khi database **còn trống** (tạo tài khoản, cấp quyền, áp mọi migration;
+nếu đã tách tài khoản migration thì chỉ tài khoản đó được cấp quyền đổi schema). Với database **đã có bảng**, script
+chỉ bật server, **không migrate, không đụng tài khoản**, và liệt kê migration còn thiếu. Nâng cấp là thao tác riêng:
+backup bằng `backup_deploy.py`, rồi chạy `migrate.py` (xem [database README](../database/README.md)). Marker
+`running` chặn replay DDL dở dang; không xoá marker lỗi để thử lại khi chưa kiểm schema. Để bật server hằng ngày,
+dùng `native_db.py start`.
 
 ## Chuyển dữ liệu SQLite cũ
 
@@ -75,3 +78,47 @@ Remove-Item Env:\AEGIS_RUN_NATIVE_MYSQL_TESTS
 
 Để dừng instance riêng, dùng `mysqladmin shutdown` với cấu hình native của dự án
 và truyền password qua môi trường; không dừng các dịch vụ MySQL khác trên máy.
+
+## Vận hành MySQL + MongoDB native hằng ngày (cập nhật 20/11/2026)
+
+Từ 20/11/2026, máy của Nhân chạy cả hai DB không qua Docker:
+
+| DB | Phiên bản | Địa chỉ | Dữ liệu |
+|---|---|---|---|
+| MySQL | 8.0 (bộ cài có sẵn trên máy, instance riêng) | 127.0.0.1:3307 | `backend/mysql-instance/mysql-data` |
+| MongoDB | 8.0 (cài qua winget, không tạo Windows service) | 127.0.0.1:27018, bật auth | `backend/mongo-instance/data` |
+
+Cổng và mật khẩu giữ nguyên trong `backend/database/.env`, nên backend và các script không cần đổi cấu hình. Service MySQL80 có sẵn trên máy (cổng 3306) không bị đụng tới. Outbox gửi sang MongoDB vẫn bật.
+
+```powershell
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py status   # trạng thái, số bảng, schema version, outbox
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py start    # bật cả hai (sau khi khởi động lại máy)
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py stop     # tắt an toàn cả hai
+& .\backend\.venv\Scripts\python.exe backend/database/native_db.py start --only mysql
+```
+
+Không bật song song Docker Compose của dự án: hai bên dùng chung cổng 3307 và 27018.
+
+Công cụ quản lý: kết nối MySQL Workbench tới `127.0.0.1:3307`, MongoDB Compass hoặc `mongosh` tới `mongodb://127.0.0.1:27018`. Dùng user `aegis_app` (database `aegis`) để làm việc thường ngày; user root/`aegis_root` chỉ dùng cho quản trị. Mật khẩu xem trong `.env`, không chép ra nơi khác.
+
+Sao lưu thủ công:
+
+```powershell
+$env:MYSQL_PWD = (Select-String -Path backend/database/.env -Pattern '^AEGIS_MYSQL_ROOT_PASSWORD=').Line.Split('=',2)[1]
+& 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe' --no-defaults -h127.0.0.1 -P3307 -uroot --single-transaction --routines --triggers --databases aegis > backup.sql
+Remove-Item Env:\MYSQL_PWD
+```
+
+MongoDB: dùng `mongodump --uri "mongodb://aegis_root@127.0.0.1:27018/?authSource=admin" --db aegis --archive=mongo.archive.gz --gzip` (công cụ sẽ hỏi mật khẩu).
+
+**Chuyển từ Docker ngày 20/11/2026:** dump MySQL và MongoDB nằm ở `backend/database/backups/docker_to_native_<thời gian>/`, cùng số đếm trước/sau (`counts_docker.json`, `counts_native.json`). Kết quả: 166 bảng, 33 view, mọi bảng khớp số dòng; `schema_versions` thêm migration 5 và 6; MongoDB khớp 3 collection. Volume Docker cũ vẫn giữ nguyên làm dự phòng.
+
+## Tự khởi động và tự bật lại (supervisor)
+
+Server bật từ một cửa sổ terminal hoặc từ công cụ khác có thể bị kết thúc khi cửa sổ/phiên đó đóng, mà log của chính nó không ghi dòng nào; ngoài ra DB không tự bật sau khi khởi động lại máy. `native_db.py` có chế độ giám sát:
+
+```powershell
+& .ackend\.venv\Scripts\python.exe backend/database/native_db.py install-autostart
+```
+
+Lệnh tạo một tác vụ Task Scheduler tên **AEGIS Native Databases**: chạy khi đăng nhập Windows, chỉ cho user hiện tại, không cần quyền admin. Nó chạy `native_db.py supervise` (không có cửa sổ), cứ 10 giây kiểm tra hai DB và bật lại cái nào đang tắt; nhật ký ở `backend/native-db-supervisor.log`. `native_db.py stop` tạm dừng việc tự bật lại (file cờ `backend/.native-db-paused`), `start` cho chạy lại. Bỏ tính năng này bằng `native_db.py uninstall-autostart`. `status` cho biết supervisor có đang chạy không.

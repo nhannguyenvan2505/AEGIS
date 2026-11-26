@@ -5,14 +5,14 @@ theo yêu cầu mới đọc dự án, lập kế hoạch và triển khai một
 Đây là khảo sát chia module, **chưa hoàn tất đọc toàn bộ dự án**.
 Không thay kết quả lịch sử thành kết quả mới; không sửa phân công Frontend.
 
-Cập nhật04/11/2026: **BE-02/S2 đã đạt**. Đã đọc toàn bộ38Python trực tiếp
-trong frontend/ cùng entrypoints và các contract chọn lọc;140test pilot và
-26bước acceptance đạt trên kho tạm. [Review BE-02](BE02_PILOT_AUDIT_20261104.md)
-là bằng chứng mới; các kết quả BE-01 ngày03/11 bên dưới giữ ngày gốc.
+Cập nhật 04/11/2026: **BE-02/S2 đã đạt**. Đã đọc toàn bộ 38Python trực tiếp
+trong frontend/ cùng entrypoints và các contract chọn lọc;140 test pilot và
+26 bước acceptance đạt trên kho tạm. [Review BE-02](BE02_PILOT_AUDIT_20261104.md)
+là bằng chứng mới; các kết quả BE-01 ngày 03/11 bên dưới giữ ngày gốc.
 
-BE-03/S3 ngày04/11 đã đối chiếu toàn bộ source mobile viết tay (generated styles
+BE-03/S3 ngày 04/11 đã đối chiếu toàn bộ source mobile viết tay (generated styles
 loại khỏi review), API và hành vi từng màn. [Ma trận bàn giao](BE03_MOBILE_API_HANDOFF_20261104.md)
-có23unit và2HTTP client TypeScript đạt cùng typecheck/lint; native chưa kiểm.
+có 23 unit và 2HTTP client TypeScript đạt cùng typecheck/lint; native chưa kiểm.
 
 ## 1. Phạm vi đã khảo sát và phần còn lại
 
@@ -22,8 +22,8 @@ Inventory AST/file tại `D:/AEGIS/backend_audit_20261103/source_inventory.json`
 |---|---:|---|
 | backend/app + entrypoints | 17 / 1.546 | Đọc toàn bộ app core, run.py, serve_mobile.py và pilot_app.py; đã đọc bù các đoạn output công cụ ban đầu bị cắt |
 | backend/checks Python | 28 / 3.201 | Kiểm kê hàm/test; đọc test_farm, test_ai_contract, phần fixture cultivation/mobile pilot; chạy discovery riêng, không đồng nghĩa đã review từng dòng tất cả test |
-| frontend Python (pilot + test/tool) | 38 / 5.566 | Ngày03/11 đọc chọn lọc; BE-02 ngày04/11 đã đọc đầy đủ38file, có inventory/hash và140test mới |
-| mobile/src TypeScript/TSX | 45 / 1.626 | BE-03 ngày04/11 đọc đầy đủ44file viết tay;1generated giữ hash, loại khỏi review; app.scss/scripts/config cũng đã đọc |
+| frontend Python (pilot + test/tool) | 38 / 5.566 | Ngày 03/11 đọc chọn lọc; BE-02 ngày 04/11 đã đọc đầy đủ 38 file, có inventory/hash và 140 test mới |
+| mobile/src TypeScript/TSX | 45 / 1.626 | BE-03 ngày 04/11 đọc đầy đủ 44 file viết tay;1 generated giữ hash, loại khỏi review; app.scss/scripts/config cũng đã đọc |
 | AI api Python | 5 / 362 | Đọc toàn bộ api/app.py và README; checks mới kiểm kê |
 | AI src Python | 88 / 9.751 | Kiểm kê AST; chưa review chi tiết các script train/audit/revision |
 | temporal Python trực tiếp | 12 / 1.911 | Đọc README và kiểm kê AST; chưa review đầy đủ pipeline/bridge/tests |
@@ -137,7 +137,7 @@ Trạng thái:
 | F05 | Device/telemetry | Theo dõi môi trường | farm.devices/readings source mock; pilot raw riêng | Adapter sensor thật chờ timestamp/device/unit/semantics | P1 có điều kiện | F02 + nguồn IoT | Replay/conflict/late/QC đúng; không giả giờ |
 | F06 | Assessment môi trường | Nhắc quan sát đúng bối cảnh | blast_conditions.evaluate, farm.assessments | Giữ nhãn mock; không thay bằng ML khi thiếu dữ liệu | P0 demo đã có | F05 mock | Đủ/thiếu/không khớp, history/replay và owner đạt |
 | F07 | Liên kết analysis-assessment | Theo dõi ảnh theo bối cảnh | farm.followup_analyses | Client chưa nối luồng này trong màn đã đọc | P1 phối hợp FE | F03+F06 | Cùng owner, retry không trùng, snapshot không đổi |
-| F08 | Follow-up pilot | Ghi việc nhận/kiểm và truy vết | pilot_followup + mobile followup client/controller/alerts route | Audit guards S2 đã đạt04/11; native còn tạm gác | P1 tích hợp | Pilot + F06 | Command/version/retry/check ownership; native kiểm riêng |
+| F08 | Follow-up pilot | Ghi việc nhận/kiểm và truy vết | pilot_followup + mobile followup client/controller/alerts route | Audit guards S2 đã đạt 04/11; native còn tạm gác | P1 tích hợp | Pilot + F06 | Command/version/retry/check ownership; native kiểm riêng |
 | F09 | Dashboard/cảnh báo | Tổng hợp cho người dùng | Pilot có warning-dashboard/timeline trong pilot_episodes/pilot_timeline; Dashboard mobile còn mock | BE-03 đối chiếu màn/DTO hiện có trước; chỉ thêm aggregate nếu có use case thực sự thiếu | P1 bàn giao | F02/F06/F08 | Không dùng mock làm số liệu thật, tổng theo owner/phạm vi; native kiểm riêng |
 | F10 | Dự báo ML temporal | Nguy cơ sớm có căn cứ | temporal README: offline pipeline, chưa forecast inference | Nguồn/quyền/SOP/nhãn/QC/readiness trước trainer/API | Chờ điều kiện | G2/G4 roadmap | Metric theo protocol thật; không confidence->risk |
 | F11 | Validation JSON farm | Request lỗi không thành lỗi máy chủ | farm.body: tái hiện RecursionError với JSON ~4 KB | BE-01 xử lý lỗi decoder + regression tests | P0 sửa đầu tiên | Không external | 400 invalid_json, không ghi nghiệp vụ, auth/quota giữ đúng |
@@ -163,7 +163,7 @@ train/promote model, sensor hardware; không thêm thương mại/chatbot/mạng
 2. MOBILE_FOLLOWUP_API.md còn câu slice chưa có UI/native, nhưng client/controller
    followup và alerts route đã có. Status mục92-94 nói đã làm client và tạm gác
    nghiệm thu native. Phân biệt source client với E2E native đã xác minh.
-3. Status đầu file ngày24/10 nói farm chưa có; code và mục status mới đã có.
+3. Status đầu file ngày 24/10 nói farm chưa có; code và mục status mới đã có.
    Giữ lịch sử; dùng tài liệu hiện hành thay vì ghi đè kết quả cũ.
 4. farm.body chỉ bắt ValueError/UnicodeError; JSON lồng 2.000 tầng (~4.010 bytes)
    phát sinh RecursionError không được xử lý (đã tái hiện riêng trên DB tạm).
@@ -182,9 +182,9 @@ train/promote model, sensor hardware; không thêm thương mại/chatbot/mạng
 
 ## 7. Kết quả kiểm tra phiên này
 
-Baseline113test có12test lỗi/fail do socket loopback bị chặn;101test còn lại đạt.
-Sau patch BE-01,30test focused đạt; chạy lại nhóm HTTP/pilot với quyền loopback
-đạt23test, bao gồm cả12test trước đó bị lỗi/fail. Không chạy lại full discovery
+Baseline113test có 12 test lỗi/fail do socket loopback bị chặn;101 test còn lại đạt.
+Sau patch BE-01,30 test focused đạt; chạy lại nhóm HTTP/pilot với quyền loopback
+đạt23test, bao gồm cả 12 test trước đó bị lỗi/fail. Không chạy lại full discovery
 sau patch. Chi tiết trong [review task đầu tiên](../backend/docs/FARM_JSON_VALIDATION.md). Không dùng số test
 phần mềm làm accuracy AI, field forecast hoặc bằng chứng native.
 

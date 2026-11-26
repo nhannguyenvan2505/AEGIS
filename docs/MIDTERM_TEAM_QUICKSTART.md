@@ -4,22 +4,30 @@ Bộ bàn giao gồm source API nhận diện ảnh, forecast model synthetic, I
 
 ## Chuẩn bị và clone
 
-Cần quyền vào repo GitHub riêng tư, Git, Python 3.11, Docker Desktop chạy Linux Engine. Frontend dùng môi trường Node/Expo hiện có của nhóm. Để tải checkpoint từ private Release, cài GitHub CLI và đăng nhập bằng tài khoản có quyền repo:
+Repository GitHub công khai. Cần Git, Python 3.11, Docker Desktop chạy Linux Engine. Frontend dùng môi trường Node/Expo hiện có của nhóm. Để script tự tải checkpoint từ Release, cài GitHub CLI và đăng nhập (`gh` yêu cầu đăng nhập kể cả với repo công khai):
 
 ```powershell
 gh auth login
-git clone --branch nvn/portable-forecast-demo https://github.com/nhannguyenvan2505/AEGIS.git
+git clone --branch develop https://github.com/nhannguyenvan2505/AEGIS.git
 Set-Location AEGIS
 powershell -ExecutionPolicy Bypass -File tools/setup_midterm.ps1 -IncludeImageAI
 ```
 
 Script tạo các môi trường Python riêng cho Backend, forecast và image AI, cài requirements, sinh `.env` ngẫu nhiên, khởi động database và tải checkpoint V4 từ Release `midterm-models-2026-11-09`. File model được xác minh SHA-256 trước khi dùng và nằm ngoài Git source. Cài image AI sẽ tải thêm PyTorch/Ultralytics; CPU có thể chạy demo nhưng chậm hơn GPU.
 
-Nếu đã tải `best.pt` bằng trình duyệt từ trang Release riêng tư:
+Nếu đã tải `best.pt` bằng trình duyệt từ trang Release:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/setup_midterm.ps1 -IncludeImageAI -CheckpointPath 'C:\Downloads\best.pt'
 ```
+
+**Nhận diện cây lúa / không phải cây lúa:** ngoài `best.pt` (detector), cần thêm trọng số gatekeeper `gate_v1b` (Release `gatekeeper-gate-v1b-2026-11-24`). Nếu thiếu, dịch vụ AI trả lỗi `gatekeeper_unavailable` (HTTP 503) và `/v2/health` báo `degraded`; không còn trả "không phải cây lúa" cho mọi ảnh. Đã có repo từ trước, chỉ cần tải riêng gatekeeper rồi khởi động lại AI:
+
+```powershell
+& .ackend\.venv\Scripts\python.exe tools/provision_midterm_model.py --artifact gatekeeper
+```
+
+Đã tải file bằng trình duyệt: thêm `--source 'C:\Downloads\gate_v1b_best.pt'`. Kiểm tra: `GET http://127.0.0.1:8000/v2/health` phải có `"production_ready": true`.
 
 Muốn thử forecast/IoT trước, bỏ `-IncludeImageAI`. Cấu hình và volumes được giữ khi chạy setup lần sau; không thay password sau khi database đã khởi tạo nếu chưa đồng bộ tài khoản trong database.
 
@@ -79,6 +87,6 @@ Dùng tên output mới cho mỗi lượt, nhập cùng mật khẩu demo khi đ
 
 Ctrl+C ở launcher để dừng Backend/worker, Ctrl+C ở AI để dừng image service. `docker compose --env-file backend/database/.env -f backend/database/compose.yaml stop` dừng database nhưng giữ volumes. Lần sau chạy setup với `-SkipInstall`, rồi mở lại hai terminal. Dùng lại mật khẩu của tài khoản demo đã tạo.
 
-Lỗi Docker pipe: mở Docker Desktop và đợi Engine sẵn sàng. Lỗi private asset: kiểm tra `gh auth status` và quyền repo, hoặc tải model bằng trình duyệt rồi dùng `-CheckpointPath`. Lỗi cổng 5000: đóng launcher cũ trước khi mở lượt mới. Database không kết nối: kiểm tra `docker compose ... ps`; không xóa volumes để thử chữa lỗi.
+Lỗi Docker pipe: mở Docker Desktop và đợi Engine sẵn sàng. Lỗi tải asset: kiểm tra `gh auth status`, hoặc tải model bằng trình duyệt rồi dùng `-CheckpointPath`. Lỗi cổng 5000: đóng launcher cũ trước khi mở lượt mới. Database không kết nối: kiểm tra `docker compose ... ps`; không xóa volumes để thử chữa lỗi.
 
-Source được bàn giao qua nhánh task và PR để review; việc clone nhánh này không yêu cầu chờ merge vào main.
+Thay đổi được đưa vào `develop` qua nhánh task và PR để review; việc clone `develop` không yêu cầu chờ phát hành lên main.
