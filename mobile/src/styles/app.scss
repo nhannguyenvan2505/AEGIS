@@ -697,7 +697,7 @@ $dangerStrong: #b42318;
 .profileTitleDark { color: $ink; font-size: 19px; line-height: 26px; font-weight: 800; }
 
 // Fixed page header (outside scroll view) with account shortcut.
-.appHeader { background-color: $card; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; padding: 10px 16px 14px; box-shadow: 0px 6px 18px rgba(14, 60, 42, 0.1); elevation: 4; z-index: 5; }
+.appHeader { background-color: $bg; padding: 10px 16px 12px; z-index: 5; }
 .appHeaderRow { width: 100%; max-width: 600px; align-self: center; min-height: 48px; flex-direction: row; align-items: center; gap: 10px; }
 .appHeaderTitleBox { flex: 1; min-width: 0px; }
 .appHeaderEyebrow { color: $accent; font-size: 9px; line-height: 15px; font-weight: 800; letter-spacing: 1.4px; }
