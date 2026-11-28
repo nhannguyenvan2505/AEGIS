@@ -182,6 +182,37 @@ describe('đăng ký thiết bị', () => {
     await userEvent.selectOptions(sensor, 'rainfall');
     await userEvent.type(within(dialog).getByLabelText(/Mã thiết bị/), 'RAIN-01');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Đăng ký' }));
-    await waitFor(() => expect(sent).toMatchObject({ season_id: 's1', sensor_type: 'rainfall', device_code: 'RAIN-01', protocol: 'MQTT' }));
+    await waitFor(() => expect(sent).toMatchObject({ season_id: 's1', sensor_type: 'rainfall', device_code: 'RAIN-01', protocol: 'MQTT', source: 'mock' }));
+  });
+
+  it('gắn mạch ESP32 thật: gửi device_uid và không gán source mock', async () => {
+    tokenStorage.set('T');
+    let sent: Record<string, unknown> | undefined;
+    const farm = { id: 'f1', name: 'Trang trại A', owner_email: 'khach@x.vn' };
+    mount('/devices', {
+      'GET /auth/me': () => reply({ success: true, user: ADMIN }),
+      'GET /devices': () => reply({ items: [], page: 1, page_size: 20, total: 0 }),
+      'GET /iot/readings': () => reply({ item: null, items: [], devices: [{ device_uid: 'ESP32_SHT30_01', plot_id: null, device_name: null, temperature: 26, humidity: 88, alert: { level: 'high', disease: 'rice_blast', title: 'Đạo ôn', message: '...' }, observed_at: '2026-11-28T10:00:00Z' }], mqtt: { enabled: true, connected: true, broker: 'broker.hivemq.com', port: 1883, topic: 'aegis/test', received_count: 1, last_message_at: null, last_error: null } }),
+      'GET /farms': () => reply({ items: [farm], page: 1, page_size: 100, total: 1 }),
+      'GET /farms/f1': () => reply({ farm, plots: [{ id: 'p1', name: 'Ruộng 1', sensor_count: 0 }] }),
+      'GET /plots/p1': () => reply({ plot: {}, seasons: [{ id: 's1', name: 'Vụ đông xuân', status: 'active' }], devices: [], sensors: { expected: 4, installed: 0, missing: ['temperature', 'humidity'] } }),
+      'POST /devices': (init) => { sent = JSON.parse(String(init?.body)); return reply({ success: true, id: 'd1' }, 201); },
+    });
+    await userEvent.click(await screen.findByRole('button', { name: 'Đăng ký thiết bị' }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.selectOptions(await within(dialog).findByLabelText(/Nông trại/), 'f1');
+    await userEvent.selectOptions(await within(dialog).findByLabelText(/Ruộng/), 'p1');
+    await userEvent.selectOptions(await within(dialog).findByLabelText(/Mùa vụ/), 's1');
+    await userEvent.selectOptions(within(dialog).getByLabelText(/Loại cảm biến/), 'temperature');
+    await userEvent.type(within(dialog).getByLabelText(/Mã thiết bị/), 'ESP32-TEMP-01');
+    await userEvent.type(within(dialog).getByLabelText(/ID phần cứng ESP32/), 'ESP32_SHT30_01');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Đăng ký' }));
+    await waitFor(() => expect(sent).toEqual({
+      season_id: 's1',
+      sensor_type: 'temperature',
+      device_code: 'ESP32-TEMP-01',
+      device_uid: 'ESP32_SHT30_01',
+      protocol: 'MQTT',
+    }));
   });
 });

@@ -11,7 +11,7 @@ import { PageHeader } from '../../../shared/layout/PageHeader';
 import { DeviceStatusBadge, SENSOR_OPTIONS, SensorTag, SourceTag } from '../../../shared/status/Badges';
 import { Card, KeyValue } from '../../../shared/ui/Card';
 import { UserCell } from '../../../shared/ui/UserCell';
-import { FormDialog, type FormValues } from '../../../shared/ui/Dialogs';
+import { ConfirmDialog, FormDialog, type FormValues } from '../../../shared/ui/Dialogs';
 import { useAction } from '../../../shared/hooks/useAction';
 import { usePagedQuery } from '../../../shared/hooks/usePagedQuery';
 import { useUrlFilters } from '../../../shared/hooks/useUrlFilters';
@@ -74,13 +74,14 @@ export function DeviceListPage() {
         <DataTable rows={query.data?.items} loading={query.isLoading} error={query.error} onRetry={() => void query.refetch()}
           rowKey={(d) => d.id} onRowClick={(d) => navigate(`/devices/${d.id}`)}
           columns={[
-            { header: 'Mã thiết bị', cell: (d) => <strong>{d.device_code}</strong> }, { header: 'Cảm biến', cell: (d) => <SensorTag value={d.sensor_type} /> }, { header: 'Ruộng', cell: (d) => d.plot_name ?? '—' }, { header: 'Chủ sở hữu', cell: (d) => <UserCell name={d.owner_name} email={d.owner_email} /> },
+            { header: 'Mã thiết bị', cell: (d) => <><strong>{d.device_code}</strong>{d.device_uid && d.device_uid !== d.id && !/^(mock:|raw:|released:)/i.test(d.device_uid) && <div className="small muted">UID: {d.device_uid}</div>}</> },
+            { header: 'Cảm biến', cell: (d) => <SensorTag value={d.sensor_type} /> }, { header: 'Ruộng', cell: (d) => d.plot_name ?? '—' }, { header: 'Chủ sở hữu', cell: (d) => <UserCell name={d.owner_name} email={d.owner_email} /> },
             { header: 'Giao thức', cell: (d) => d.protocol }, { header: 'Trạng thái', cell: (d) => <DeviceStatusBadge value={d.status} /> },
             { header: 'Nguồn', cell: (d) => <SourceTag source={d.source} /> }, { header: 'Thấy lần cuối', cell: (d) => formatDateTime(d.last_seen_at) },
           ]} />
         {query.data && <Pagination page={query.data.page} pageSize={query.data.page_size} total={query.data.total} onPage={setPage} />}
       </Card>
-      {creating && <RegisterDeviceDialog onClose={() => setCreating(false)} onSubmit={create} />}
+      {creating && <RegisterDeviceDialog onClose={() => setCreating(false)} onSubmit={create} detectedUids={esp32.data?.devices.map((x) => x.device_uid).filter((u) => u && u.toLowerCase() !== 'unknown')} />}
     </>
   );
 }
@@ -89,38 +90,71 @@ export function DeviceDetailPage() {
   const { id = '' } = useParams();
   const { can } = useAuth();
   const dev = useQuery({ queryKey: ['devices', 'detail', id], queryFn: ({ signal }) => api<{ device: Device }>(`/devices/${id}`, { signal }) });
-  const tel = useQuery({ queryKey: ['devices', 'telemetry', id], queryFn: ({ signal }) => api<{ items: TelemetryPoint[] }>(`/devices/${id}/telemetry`, { signal }) });
+  const deviceRow = dev.data?.device;
+  const hasHardwareUid = Boolean(deviceRow?.device_uid && deviceRow.device_uid !== deviceRow.id && !/^(mock:|raw:|released:)/i.test(deviceRow.device_uid));
+  const tel = useQuery({
+    queryKey: ['devices', 'telemetry', id],
+    enabled: Boolean(deviceRow) && !hasHardwareUid,
+    queryFn: ({ signal }) => api<{ items: TelemetryPoint[] }>(`/devices/${id}/telemetry`, { signal }),
+  });
+  const liveTel = useQuery({
+    queryKey: ['devices', 'esp32', deviceRow?.device_uid],
+    enabled: hasHardwareUid,
+    queryFn: ({ signal }) => api<Esp32TelemetryResponse>('/iot/readings', { params: { device_uid: deviceRow!.device_uid, limit: 50 }, signal }),
+    refetchInterval: 5000,
+  });
   const [editing, setEditing] = useState(false);
+  const [releasing, setReleasing] = useState(false);
   const update = useAction((v: FormValues) => api(`/devices/${id}`, { method: 'PUT', body: { device_name: v.device_name, firmware_version: v.firmware_version, status: v.status, sensor_type: v.sensor_type || undefined } }),
     { invalidate: ['devices', 'stats', 'farms'], success: 'Đã cập nhật thiết bị.' });
+  const release = useAction(() => api(`/devices/${id}/release`, { method: 'POST' }),
+    { invalidate: ['devices', 'stats', 'farms'], success: 'Đã gỡ đăng ký phần cứng ESP32.' });
 
   if (dev.isLoading) return <LoadingState />;
   if (dev.isError) return <ErrorState error={dev.error} onRetry={() => void dev.refetch()} />;
   const d = dev.data!.device;
-  const series = [...(tel.data?.items ?? [])].reverse().map((p) => ({
-    time: formatDateTime(p.start_at).slice(0, 17), temp: p.air_temperature_c, humidity: p.relative_humidity_pct,
-  }));
+  const series = hasHardwareUid
+    ? [...(liveTel.data?.items ?? [])].reverse().map((p) => ({
+        time: formatDateTime(p.observed_at).slice(0, 17), temp: p.temperature, humidity: p.humidity,
+      }))
+    : [...(tel.data?.items ?? [])].reverse().map((p) => ({
+        time: formatDateTime(p.start_at).slice(0, 17), temp: p.air_temperature_c, humidity: p.relative_humidity_pct,
+      }));
   return (
     <>
       <PageHeader title={d.device_code} crumbs={[{ label: 'Thiết bị', to: '/devices' }, { label: d.device_code }]}
-        actions={can('admin') && <button className="btn secondary" onClick={() => setEditing(true)}>Sửa / đổi trạng thái</button>} />
+        actions={can('admin') && (
+          <div style={{ display: 'flex', gap: 8 }}>
+            {hasHardwareUid && <button className="btn danger" onClick={() => setReleasing(true)}>Gỡ đăng ký phần cứng</button>}
+            <button className="btn secondary" onClick={() => setEditing(true)}>Sửa / đổi trạng thái</button>
+          </div>
+        )} />
       {d.is_simulated && <SimulatedDataBanner />}
       <Card title="Thông tin">
         <KeyValue rows={[
-          ['Trạng thái', <DeviceStatusBadge value={d.status} />], ['Loại cảm biến', <SensorTag value={d.sensor_type} />], ['Nguồn', <SourceTag source={d.source} />], ['Tên', d.device_name], ['Giao thức', d.protocol], ['Firmware', d.firmware_version],
+          ['Trạng thái', <DeviceStatusBadge value={d.status} />], ['Loại cảm biến', <SensorTag value={d.sensor_type} />], ['Nguồn', <SourceTag source={d.source} />],
+          ['ID phần cứng (device_uid)', hasHardwareUid ? d.device_uid : '—'],
+          ['Tên', d.device_name], ['Giao thức', d.protocol], ['Firmware', d.firmware_version],
           ['Ruộng', d.plot_id ? <Link to={`/plots/${d.plot_id}`}>{d.plot_name}</Link> : null], ['Mùa vụ', d.season_id ? <Link to={`/seasons/${d.season_id}`}>{d.season_name}</Link> : null],
           ['Chủ sở hữu', d.owner_email], ['Thấy lần cuối', formatDateTime(d.last_seen_at)], ['Tạo lúc', formatDateTime(d.created_at)],
         ]} />
       </Card>
-      <Card title="Telemetry theo giờ (mô phỏng)">
-        {tel.isError ? <ErrorState error={tel.error} /> : <MultiLine data={series} x="time" label="Nhiệt độ và độ ẩm theo giờ"
-          lines={[{ key: 'temp', name: 'Nhiệt độ (°C)', color: '#d98b1b' }, { key: 'humidity', name: 'Độ ẩm (%)', color: '#1d5fa8' }]} />}
+      <Card title={hasHardwareUid ? 'Dữ liệu ESP32 thực tế' : 'Telemetry theo giờ (mô phỏng)'}>
+        {(hasHardwareUid ? liveTel.isError : tel.isError)
+          ? <ErrorState error={(hasHardwareUid ? liveTel.error : tel.error)!} />
+          : <MultiLine data={series} x="time" label={hasHardwareUid ? 'Nhiệt độ và độ ẩm ESP32 thực tế' : 'Nhiệt độ và độ ẩm theo giờ'}
+              lines={[{ key: 'temp', name: 'Nhiệt độ (°C)', color: '#d98b1b' }, { key: 'humidity', name: 'Độ ẩm (%)', color: '#1d5fa8' }]} />}
       </Card>
       {editing && (
         <FormDialog open title="Sửa thiết bị" onClose={() => setEditing(false)} onSubmit={update}
           initial={{ device_name: d.device_name ?? '', firmware_version: d.firmware_version ?? '', status: d.status, sensor_type: d.sensor_type ?? '' }}
           fields={[{ name: 'device_name', label: 'Tên' }, { name: 'firmware_version', label: 'Firmware' }, { name: 'status', label: 'Trạng thái', type: 'select', required: true, options: STATUS },
             { name: 'sensor_type', label: 'Loại cảm biến', type: 'select', options: SENSOR_OPTIONS }]} />
+      )}
+      {releasing && (
+        <ConfirmDialog open danger title="Gỡ đăng ký phần cứng ESP32" confirmLabel="Gỡ đăng ký"
+          message={<>Gỡ ID phần cứng <strong>{d.device_uid}</strong> khỏi ruộng <strong>{d.plot_name ?? 'hiện tại'}</strong>? Dữ liệu đo cũ vẫn được giữ lại cho chủ cũ, còn mạch ESP32 có thể đăng ký cho ruộng/mùa vụ khác.</>}
+          onConfirm={() => release(undefined)} onClose={() => setReleasing(false)} />
       )}
     </>
   );

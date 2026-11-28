@@ -6,14 +6,18 @@ import { SENSOR_LABEL } from '../../../shared/status/Badges';
 import { Modal } from '../../../shared/ui/Dialogs';
 import type { Farm, Plot, Season, SensorSlots } from '../../farms/types';
 
-interface Values { device_code: string; device_name: string; firmware_version: string; protocol: string; sensor_type: string }
-const EMPTY: Values = { device_code: '', device_name: '', firmware_version: '', protocol: 'MQTT', sensor_type: '' };
+interface Values { device_code: string; device_uid: string; device_name: string; firmware_version: string; protocol: string; sensor_type: string }
+const EMPTY: Values = { device_code: '', device_uid: '', device_name: '', firmware_version: '', protocol: 'MQTT', sensor_type: '' };
 
 /**
  * Đăng ký thiết bị theo trình tự: nông trại → ruộng → mùa vụ → loại cảm biến còn thiếu.
  * Người dùng không phải tự gõ ID mùa vụ; chỉ các loại cảm biến ruộng đó chưa có mới được chọn.
  */
-export function RegisterDeviceDialog({ onClose, onSubmit }: { onClose(): void; onSubmit(body: Record<string, unknown>): Promise<unknown> }) {
+export function RegisterDeviceDialog({ onClose, onSubmit, detectedUids = [] }: {
+  onClose(): void;
+  onSubmit(body: Record<string, unknown>): Promise<unknown>;
+  detectedUids?: string[];
+}) {
   const [farmId, setFarmId] = useState('');
   const [plotId, setPlotId] = useState('');
   const [seasonId, setSeasonId] = useState('');
@@ -39,9 +43,15 @@ export function RegisterDeviceDialog({ onClose, onSubmit }: { onClose(): void; o
     e.preventDefault();
     setBusy(true); setError(null);
     try {
+      const uid = v.device_uid.trim();
       await onSubmit({
-        season_id: seasonId, sensor_type: v.sensor_type, device_code: v.device_code, protocol: v.protocol, source: 'mock',
-        device_name: v.device_name || undefined, firmware_version: v.firmware_version || undefined,
+        season_id: seasonId,
+        sensor_type: v.sensor_type,
+        device_code: v.device_code,
+        protocol: v.protocol,
+        ...(uid ? { device_uid: uid } : { source: 'mock' }),
+        device_name: v.device_name || undefined,
+        firmware_version: v.firmware_version || undefined,
       });
       onClose();
     } catch (err) { setError(err); } finally { setBusy(false); }
@@ -79,6 +89,17 @@ export function RegisterDeviceDialog({ onClose, onSubmit }: { onClose(): void; o
         <label className="field" htmlFor="rd-code">Mã thiết bị *
           <input id="rd-code" value={v.device_code} required autoComplete="off" onChange={(e) => set({ device_code: e.target.value })} />
           <span className="small muted" style={{ fontWeight: 400 }}>Chữ, số, dấu . _ - (tối đa 64), không trùng với thiết bị khác của khách này.</span>
+        </label>
+        <label className="field" htmlFor="rd-uid">ID phần cứng ESP32 (device_uid)
+          <input id="rd-uid" list="rd-uid-list" value={v.device_uid} placeholder="ví dụ ESP32_SHT30_01 (để trống nếu tạo thiết bị mô phỏng)" autoComplete="off" onChange={(e) => set({ device_uid: e.target.value })} />
+          {detectedUids.length > 0 && (
+            <datalist id="rd-uid-list">
+              {detectedUids.map((uid) => <option key={uid} value={uid} />)}
+            </datalist>
+          )}
+          <span className="small muted" style={{ fontWeight: 400 }}>
+            Điền đúng mã <code>device_uid</code> trong code nạp mạch ESP32 để gắn mạch thật (nguồn <code>field</code>); để trống nếu chỉ tạo thiết bị mô phỏng.
+          </span>
         </label>
         <label className="field" htmlFor="rd-name">Tên thiết bị
           <input id="rd-name" value={v.device_name} autoComplete="off" onChange={(e) => set({ device_name: e.target.value })} />
